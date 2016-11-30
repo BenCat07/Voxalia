@@ -335,7 +335,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                 {
                                     Location skylight = OwningRegion.GetLightAmountForSkyValue(new Location(WorldPosition.X * Chunk.CHUNK_SIZE + x + 0.5, WorldPosition.Y * Chunk.CHUNK_SIZE + y + 0.5,
                                         WorldPosition.Z * Chunk.CHUNK_SIZE + z + 1.0), Location.UnitZ, potentials, zp.BlockLocalData / 255f);
-                                    for (int plx = 1; plx < 4; plx++)
+                                    for (int plx = 0; plx < 3; plx++)
                                     {
                                         for (int ply = 0; ply < 3; ply++)
                                         {
