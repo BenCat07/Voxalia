@@ -34,43 +34,48 @@ namespace Voxalia.ServerGame.WorldSystem
         public void SurroundRunPhysics(Location start)
         {
             start = start.GetBlockLocation();
-            for (int x = -1; x <= 1; x++)
+            Vector3i vec = ChunkLocFor(start);
+            if (!LoadedChunks.ContainsKey(vec))
             {
-                for (int y = -1; y <= 1; y++)
-                {
-                    for (int z = -1; z <= 1; z++)
-                    {
-                        RunBlockPhysics(start + new Location(x, y, z));
-                    }
-                }
+                // Don't physics on an unloaded block. The chunk load sequence will remind us to tick it.
+                return;
             }
-            foreach (Entity e in GetEntitiesInRadius(start + new Location(0.5), 3f))
+            RunBlockPhysics(start);
+            foreach (Entity e in GetEntitiesInRadius(start + new Location(0.5), 2f))
             {
                 e.PotentialActivate();
             }
         }
-
-        public int physThisTick = 0;
-
-        public const double defPhysBoost = 0.5;
-
-        public double physBoost = defPhysBoost;
-
+        
         public void PhysicsSetBlock(Location block, Material mat, byte dat = 0, byte paint = 0, BlockDamage damage = BlockDamage.NONE)
         {
             SetBlockMaterial(block, mat, dat, paint, (byte)(BlockFlags.EDITED | BlockFlags.NEEDS_RECALC), damage);
-            physThisTick++;
-            if (physThisTick > 5)
+            // The below code: So long as the server is unable to update faster than a specified update pace, don't bother updating this.
+            // Once the server is updating at an acceptable pace, immediately perform the final update.
+            // Also, this logic produces a minimum update delay of 0.25 seconds, and no maximum!
+            // Meaning it could update a quarter second from now, or five years from nowhere, or whenever.
+            Action calc = () =>
             {
-                physThisTick = 0;
-                physBoost += 0.05;
-            }
-            TheServer.Schedule.ScheduleSyncTask(() => { SurroundRunPhysics(block); }, physBoost);
+                SurroundRunPhysics(block);
+            };
+            DataHolder<Action> a = new DataHolder<Action>() { Data = calc };
+            a.Data = () =>
+            {
+                double cD = TheWorld.EstimateSpareDelta();
+                if (cD > 0.25) // TODO: 0.25 -> CVar? "MinimumTickTime"?
+                {
+                    TheWorld.Schedule.ScheduleSyncTask(a.Data, 1.0);
+                }
+                else
+                {
+                    calc();
+                }
+            };
+            TheWorld.Schedule.ScheduleSyncTask(a.Data, 0.25);
         }
-        
-        public void RunBlockPhysics(Location block)
+
+        private void RunBlockPhysics(Location block)
         {
-            block = block.GetBlockLocation();
             BlockInternal c = GetBlockInternal(block);
             if (((BlockFlags)c.BlockLocalData).HasFlag(BlockFlags.NEEDS_RECALC))
             {
@@ -80,20 +85,22 @@ namespace Voxalia.ServerGame.WorldSystem
             LiquidPhysics(block, c);
         }
 
-        public void LiquidPhysics(Location block, BlockInternal c)
+        private void LiquidPhysics(Location block, BlockInternal c)
         {
             Material cmat = c.Material;
             if (!cmat.ShouldSpread())
             {
                 return;
             }
-            Material spreadAs = cmat.GetBigSpreadsAs();
+            /*Material spreadAs = cmat.GetBigSpreadsAs();
             if (spreadAs == Material.AIR)
             {
                 spreadAs = cmat;
-            }
+            }*/
+            Material spreadAs = cmat;
             byte cpaint = c.BlockPaint;
-            if (c.BlockData > 5 || c.Damage != BlockDamage.NONE)
+            byte cDat = c.BlockData;
+            if (cDat > 5 || c.Damage != BlockDamage.NONE)
             {
                 PhysicsSetBlock(block, cmat, 0, cpaint, BlockDamage.NONE);
                 return;
@@ -104,6 +111,7 @@ namespace Voxalia.ServerGame.WorldSystem
             if (below_mat == Material.AIR)
             {
                 PhysicsSetBlock(block_below, spreadAs, 0, cpaint, BlockDamage.NONE);
+                PhysicsSetBlock(block, Material.AIR);
                 return;
             }
             byte below_paint = below.BlockPaint;
@@ -112,40 +120,52 @@ namespace Voxalia.ServerGame.WorldSystem
                 if (below.BlockData != 0)
                 {
                     PhysicsSetBlock(block_below, below_mat, 0, cpaint, BlockDamage.NONE);
+                    byte newb = (byte)(cDat + below.BlockData);
+                    if (newb > 5)
+                    {
+                        PhysicsSetBlock(block, Material.AIR);
+                    }
+                    else
+                    {
+                        PhysicsSetBlock(block, cmat, newb, cpaint, BlockDamage.NONE);
+                    }
+                    return;
                 }
-                return;
             }
             // TODO: What happens when one liquid is on top of another of a different type?!
             // For liquid on top of gas, we can swap their places to make the gas rise...
             // But for the rest?
-            if (c.BlockData == 5)
+            if (cDat == 5)
             {
                 return;
             }
-            TryLiquidSpreadSide(block, c, cmat, cpaint, spreadAs, block + new Location(1, 0, 0));
-            TryLiquidSpreadSide(block, c, cmat, cpaint, spreadAs, block + new Location(-1, 0, 0));
-            TryLiquidSpreadSide(block, c, cmat, cpaint, spreadAs, block + new Location(0, 1, 0));
-            TryLiquidSpreadSide(block, c, cmat, cpaint, spreadAs, block + new Location(0, -1, 0));
+            byte b1 = TryLiquidSpreadSide(block, cDat, cmat, cpaint, spreadAs, block + new Location(1, 0, 0));
+            byte b2 = TryLiquidSpreadSide(block, cDat, cmat, cpaint, spreadAs, block + new Location(-1, 0, 0));
+            byte b3 = TryLiquidSpreadSide(block, cDat, cmat, cpaint, spreadAs, block + new Location(0, 1, 0));
+            byte b4 = TryLiquidSpreadSide(block, cDat, cmat, cpaint, spreadAs, block + new Location(0, -1, 0));
+            byte rb = (byte)(cDat + Math.Max(b1, Math.Max(b2, Math.Max(b3, b4))));
+            if (rb != cDat)
+            {
+                PhysicsSetBlock(block, cmat, rb, cpaint, BlockDamage.NONE);
+            }
         }
 
-        public void TryLiquidSpreadSide(Location block, BlockInternal c, Material cmat, byte cpaint, Material spreadAs, Location two)
+        public byte TryLiquidSpreadSide(Location block, byte cDat, Material cmat, byte cpaint, Material spreadAs, Location two)
         {
             BlockInternal tc = GetBlockInternal(two);
             Material tmat = tc.Material;
             if (tmat == Material.AIR)
             {
-                PhysicsSetBlock(two, spreadAs, (byte)(c.BlockData + 1), cpaint, BlockDamage.NONE);
-                return;
+                PhysicsSetBlock(two, spreadAs, (byte)5, cpaint, BlockDamage.NONE);
+                return (byte)1;
             }
             byte tpaint = tc.BlockPaint;
-            if ((tmat == cmat || tmat == spreadAs) && tpaint == cpaint)
+            if ((tmat == cmat || tmat == spreadAs) && tpaint == cpaint && tc.BlockData > cDat + 1)
             {
-                if (tc.BlockData > c.BlockData + 1)
-                {
-                    PhysicsSetBlock(two, tmat, (byte)(c.BlockData + 1), cpaint, BlockDamage.NONE);
-                }
-                return;
+                PhysicsSetBlock(two, tmat, (byte)(tc.BlockData - 1), cpaint, BlockDamage.NONE);
+                return (byte)1;
             }
+            return 0;
         }
     }
 }

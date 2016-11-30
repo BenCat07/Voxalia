@@ -494,7 +494,6 @@ namespace Voxalia.ServerGame.EntitySystem
             SetMass(PreFlyMass);
             IsFlying = false;
             CBody.Body.LocalInertiaTensorInverse = new Matrix3x3();
-            SysConsole.Output(OutputType.INFO, "PFI: " + PreFlyOrient);
             CBody.Body.Orientation = PreFlyOrient;
             CBody.Body.AngularVelocity = Vector3.Zero;
         }

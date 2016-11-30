@@ -112,6 +112,18 @@ namespace Voxalia.ServerGame.WorldSystem
             rg.BuildWorld();
             MainRegion = rg;
         }
+
+        private Stopwatch DeltaCounter;
+
+        private double TotalDelta;
+
+        public double EstimateSpareDelta()
+        {
+            DeltaCounter.Stop();
+            double d = ((double)DeltaCounter.ElapsedTicks) / ((double)Stopwatch.Frequency);
+            DeltaCounter.Start();
+            return d + TotalDelta;
+        }
         
         private void MainThread()
         {
@@ -120,9 +132,9 @@ namespace Voxalia.ServerGame.WorldSystem
             // Tick
             double TARGETFPS = 30d;
             Stopwatch Counter = new Stopwatch();
-            Stopwatch DeltaCounter = new Stopwatch();
+            DeltaCounter = new Stopwatch();
             DeltaCounter.Start();
-            double TotalDelta = 0;
+            TotalDelta = 0;
             double CurrentDelta = 0d;
             double TargetDelta = 0d;
             int targettime = 0;

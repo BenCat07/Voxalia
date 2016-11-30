@@ -632,4 +632,9 @@ namespace Voxalia.Shared
     {
         public volatile int Value = 0;
     }
+
+    public class DataHolder<T>
+    {
+        public T Data;
+    }
 }
