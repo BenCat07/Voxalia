@@ -47,7 +47,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 {
                     // TODO: ???
                 }
-                else if (player.Mode.GetDetails().CanPlace && player.TheRegion.GlobalTickTime - player.LastBlockPlace >= 0.2)
+                else if (player.Mode.GetDetails().CanPlace && player.TheRegion.GlobalTickTime - player.LastBlockPlace >= 0.5)
                 {
                     Location block = new Location(rcr.HitData.Location) + new Location(rcr.HitData.Normal).Normalize() * 0.9f;
                     block = block.GetBlockLocation();
