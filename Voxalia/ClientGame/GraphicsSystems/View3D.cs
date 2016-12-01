@@ -702,6 +702,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Location campos = CameraPos;
                 int n = 0;
                 Frustum tcf = CFrust;
+                int sp = ShadowTexSize();
+                GL.Viewport(0, 0, sp, sp);
                 for (int i = 0; i < Lights.Count; i++)
                 {
                     if (Lights[i] is SkyLight || camFrust == null || camFrust.ContainsSphere(Lights[i].EyePos.ToBVector(), Lights[i].MaxDistance))
@@ -755,6 +757,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                 }
                 complete:
+                oSetViewport();
                 CFrust = tcf;
                 BindFramebuffer(FramebufferTarget.Framebuffer, CurrentFBO);
                 DrawBuffer(CurrentFBO == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0);
