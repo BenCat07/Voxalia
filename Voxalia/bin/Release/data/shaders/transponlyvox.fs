@@ -193,7 +193,7 @@ void main()
 	vec3 L = light_path / light_length;
 	vec4 diffuse = vec4(max(dot(N, -L), 0.0) * diffuse_albedo, 1.0);
 	float powered = pow(max(dot(reflect(L, N), eye_rel), 0.0), 128.0);
-	float spec_res = min(powered * spec, 1.0);
+	float spec_res = max(min(powered * spec, 1.0), 0.0);
 	vec3 specular = spec_res * specular_albedo;
 	opac_min += spec_res;
 	fcolor += vec4((bambient * color + (vec4(depth, depth, depth, 1.0) * atten * (diffuse * vec4(light_color, 1.0)) * color) + (vec4(specular, 1.0) * vec4(light_color, 1.0) * atten * depth)).xyz, color.w);
@@ -201,10 +201,11 @@ void main()
 #endif // lit
 	if (rhBlur > 0.0)
 	{
-		vec3 nflat = normalize(f.tbn * vec3(0.0, 0.0, 1.0));
-		float water_side = min(-dot(eye_rel, nflat), 0.2) * rhBlur;
-		opacity_mod = 1.0 / (0.6 + water_side);
-		//fcolor.xyz += tcolor.xyz * opacity_mod;
+		//vec3 nflat = normalize(f.tbn * vec3(0.0, 0.0, 1.0));
+		//float water_side = min(-dot(eye_rel, nflat), 0.2) * rhBlur;
+		//opacity_mod = 1.0 / (0.6 + water_side);
+		//opacity_mod = dot(f.position.xyz, f.position.xyz) * 0.005;
+		opacity_mod = length(f.position.xyz) * 0.05;
 	}
 #if MCM_GOOD_GRAPHICS
     fcolor = vec4(desaturate(fcolor.xyz), 1.0); // TODO: Make available to all, not just good graphics only! Or a separate CVar!
