@@ -28,9 +28,13 @@ const float HDR_Mod = 5.0; // The HDR modifier: multiply all lights by this cons
 
 out vec4 color; // The color to add to the lighting texture
 
+float fix_sqr(in float inTemp)
+{
+	return 1.0 - (inTemp * inTemp);
+}
+
 void main() // Let's put all code in main, why not...
 {
-	//color = texture(shadowtex, vec3(f.texcoord, 0.0));return;
 	vec3 res_color = vec3(0.0);
 	float aff = 0.0;
 	// Gather all the texture information.
@@ -70,12 +74,13 @@ void main() // Let's put all code in main, why not...
 	{
 		continue; // Forget this light, move on already!
 	}
-	if (should_sqrt >= 0.5) // If square-root trick is enabled (generally this'll be 1.0 or 0.0)
+	if (should_sqrt >= 0.5) // If inverse square trick is enabled (generally this will be 1.0 or 0.0)
 	{
-		f_spos.x = sign(f_spos.x) * sqrt(abs(f_spos.x)); // Square-root the relative position while preserving the sign. Shadow creation buffer also did this.
-		f_spos.y = sign(f_spos.y) * sqrt(abs(f_spos.y)); // This section means that coordinates near the center of the light view will have more pixels per area available than coordinates far from the center.
+		f_spos.x = sign(f_spos.x) * fix_sqr(1.0 - abs(f_spos.x)); // Inverse square the relative position while preserving the sign. Shadow creation buffer also did this.
+		f_spos.y = sign(f_spos.y) * fix_sqr(1.0 - abs(f_spos.y)); // This section means that coordinates near the center of the light view will have more pixels per area available than coordinates far from the center.
 	}
-	vec3 fs = f_spos.xyz * 0.5 + vec3(0.5, 0.5, 0.5); // Create a variable representing the proper screen/texture coordinate of the shadow view (ranging from 0 to 1 instead of -1 to 1).
+	// Create a variable representing the proper screen/texture coordinate of the shadow view (ranging from 0 to 1 instead of -1 to 1).
+	vec3 fs = f_spos.xyz * 0.5 + vec3(0.5, 0.5, 0.5); 
 	if (fs.x < 0.0 || fs.x > 1.0
 		|| fs.y < 0.0 || fs.y > 1.0
 		|| fs.z < 0.0 || fs.z > 1.0) // If any coordinate is outside view range...
@@ -133,4 +138,5 @@ void main() // Let's put all code in main, why not...
 	}
 	res_color += (ambient + vec3(renderhint.z)) * HDR_Mod * diffuset.xyz; // Add ambient light.
 	color = vec4(res_color, diffuset.w + aff + renderhint.z); // I don't know why this alpha value became necessary.
+	//color = color * 0.01 + 0.99 * texture(shadowtex, vec3(f.texcoord, 0.0));
 }

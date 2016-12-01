@@ -90,7 +90,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         }
 
         public View3D MainWorldView = new View3D();
-        
+
         void InitRendering()
         {
             MainWorldView.CameraModifier = () => Player.GetRelativeQuaternion();
@@ -312,7 +312,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public Shader s_forw_grass;
         public Shader s_fbo_grass;
         public Shader s_forw_particles;
-        
+
         public void sortEntities()
         {
             TheRegion.Entities = TheRegion.Entities.OrderBy(o => (o.GetPosition().DistanceSquared(MainWorldView.RenderRelative))).ToList();
@@ -326,11 +326,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public int gTicks = 0;
 
         public int gFPS = 0;
-        
+
         int rTicks = 1000;
 
         public bool shouldRedrawShadows = false;
-        
+
         public void Window_RenderFrame(object sender, FrameEventArgs e)
         {
             lock (TickLock)
@@ -528,7 +528,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             return MaximumStraightBlockDistance() * 1.1f;
         }
-        
+
         public float GetSkyDistance()
         {
             return MaximumStraightBlockDistance();
@@ -599,7 +599,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Rendering.SetColor(Color4.White);
             Rendering.SetMinimumLight(0);
         }
-        
+
         public void Establish2D()
         {
             GL.Disable(EnableCap.DepthTest);
@@ -827,7 +827,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         }
 
         public double RainCylPos = 0;
-        
+
         public void RenderVR()
         {
             if (VR == null)
@@ -1102,7 +1102,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         }
 
         public bool RenderTextures = true;
-        
+
         public double RenderExtraItems = 0;
 
         const string timeformat = "#.000";
@@ -1293,8 +1293,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 FontSets.SlightlyBigger.DrawColoredText("^!^e^7^S" + item.Count, new Location(pos.X + 5, pos.Y + size - FontSets.SlightlyBigger.font_default.Height / 2f - 5, 0));
             }
         }
-        
+
         public Matrix4 Ortho;
     }
-
 }
