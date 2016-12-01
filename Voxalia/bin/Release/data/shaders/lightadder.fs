@@ -30,7 +30,7 @@ out vec4 color; // The color to add to the lighting texture
 
 void main() // Let's put all code in main, why not...
 {
-	//color = texture(shadowtex, vec3(f.texcoord, 2.0));return;
+	//color = texture(shadowtex, vec3(f.texcoord, 0.0));return;
 	vec3 res_color = vec3(0.0);
 	float aff = 0.0;
 	// Gather all the texture information.
@@ -114,17 +114,17 @@ void main() // Let's put all code in main, why not...
 		}
 	}
 	depth = depth / depth_count; // Average up the 0 and 1 light values to produce gray near the edges of shadows. Soft shadows, hooray!
-#else
+#else // Good Graphics
 	float rd = texture(shadowtex, vec3(fs.x, fs.y, float(i))).r; // Calculate the depth of the pixel.
 	float depth = (rd >= (fs.z - 0.001) ? 1.0 : 0.0); // If we have a bad graphics card, just quickly get a 0 or 1 depth value. This will be pixelated (hard) shadows!
-#endif
+#endif // Else - Good Graphics
 	if (depth <= 0.0)
 	{
 		continue; // If we're a fully shadowed pixel, don't add any light!
 	}
-#else
+#else // Shadows
 	const float depth = 1.0; // If shadows are off, depth is a constant 1.0!
-#endif
+#endif // Else - Shadows
 	vec3 L = light_path / light_length; // Get the light's movement direction as a vector
 	vec3 diffuse = max(dot(N, -L), 0.0) * vec3(diffuse_albedo) * HDR_Mod; // Find out how much diffuse light to apply
 	vec3 specular = vec3(pow(max(dot(reflect(L, N), normalize(position - eye_pos)), 0.0), 200.0) * specular_albedo * renderhint.x) * HDR_Mod; // Find out how much specular light to apply.

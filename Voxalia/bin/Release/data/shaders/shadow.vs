@@ -14,7 +14,8 @@ const int MAX_BONES = 200;
 
 layout (location = 1) uniform mat4 projection = mat4(1.0);
 layout (location = 2) uniform mat4 model_matrix = mat4(1.0);
-layout (location = 3) uniform float should_sqrt = 0.0;
+// ...
+layout (location = 5) uniform float should_sqrt = 0.0;
 // ...
 layout (location = 40) uniform mat4 simplebone_matrix = mat4(1.0);
 layout (location = 41) uniform mat4 boneTrans[MAX_BONES];

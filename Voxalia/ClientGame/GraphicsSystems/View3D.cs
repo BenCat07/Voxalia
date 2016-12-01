@@ -729,26 +729,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 TheClient.s_shadowvox = TheClient.s_shadowvox.Bind();
                                 SetMatrix(2, Matrix4d.Identity);
                                 Lights[i].InternalLights[x].SetProj();
-                                if (Lights[i].InternalLights[x] is LightOrtho)
-                                {
-                                    GL.Uniform1(3, 1.0f);
-                                }
-                                else
-                                {
-                                    GL.Uniform1(3, 0.0f);
-                                }
+                                GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
                                 GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
                                 FBOid = FBOID.SHADOWS;
                                 TheClient.s_shadow = TheClient.s_shadow.Bind();
                                 SetMatrix(2, Matrix4d.Identity);
-                                if (Lights[i].InternalLights[x] is LightOrtho)
-                                {
-                                    GL.Uniform1(3, 1.0f);
-                                }
-                                else
-                                {
-                                    GL.Uniform1(3, 0.0f);
-                                }
+                                GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
                                 GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
                                 TranspShadows = Lights[i].InternalLights[x].transp;
                                 Lights[i].InternalLights[x].SetProj();
