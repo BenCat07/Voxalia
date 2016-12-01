@@ -401,7 +401,6 @@ namespace Voxalia.ServerGame.ItemSystem
         {
             string[] data = input.SplitFast('|');
             int temp = 0;
-            SysConsole.Output(OutputType.INFO, "DTL: " + data.Length + ", " + input);
             for (int i = 0; i < data.Length; i++)
             {
                 string cur = data[i].Trim();
@@ -416,14 +415,12 @@ namespace Voxalia.ServerGame.ItemSystem
                 {
                     string blk = cur.Substring("block:".Length);
                     temp += (int)MaterialHelpers.FromNameOrNumber(blk);
-                    SysConsole.Output(OutputType.INFO, "TEMP : " + blk + ":" + temp);
                 }
                 else if (cur.StartsWith("color:"))
                 {
                     string col = cur.Substring("color:".Length);
                     byte b = Colors.ForName(col);
                     temp = BitConverter.ToInt32(BitConverter.GetBytes((uint)(temp + b * 256u * 256u * 256u)), 0);
-                    SysConsole.Output(OutputType.INFO, "TEMP : " + col + ":" + b);
                 }
             }
             return temp;
