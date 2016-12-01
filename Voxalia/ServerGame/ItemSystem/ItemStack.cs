@@ -23,7 +23,7 @@ namespace Voxalia.ServerGame.ItemSystem
     /// <summary>
     /// Represents an item or stack of items on the server.
     /// </summary>
-    public class ItemStack: ItemStackBase
+    public class ItemStack : ItemStackBase
     {
         public Server TheServer;
 
@@ -77,7 +77,7 @@ namespace Voxalia.ServerGame.ItemSystem
             }
             Load(dr, (b) => new ItemStack(b, tserver));
         }
-        
+
         public double GetAttributeF(string attr, double def)
         {
             TemplateObject outp;
@@ -141,7 +141,7 @@ namespace Voxalia.ServerGame.ItemSystem
         public BaseItemInfo Info = null;
 
         public Dictionary<string, TemplateObject> Attributes = new Dictionary<string, TemplateObject>();
-        
+
         public bool IsBound = false;
 
         public override void SetName(string name)
@@ -167,7 +167,7 @@ namespace Voxalia.ServerGame.ItemSystem
         }
 
         public string Model;
-        
+
         public override string GetModelName()
         {
             return Model;
@@ -185,7 +185,7 @@ namespace Voxalia.ServerGame.ItemSystem
             its.SharedAttributes = new Dictionary<string, TemplateObject>(its.SharedAttributes);
             return its;
         }
-        
+
         public string EscapedLocalStr()
         {
             StringBuilder sb = new StringBuilder();
@@ -234,8 +234,8 @@ namespace Voxalia.ServerGame.ItemSystem
         public string ToEscapedString()
         {
             return TagParser.Escape(Name) + "[secondary=" + (SecondaryName == null ? "" : EscapeTagBase.Escape(SecondaryName)) + ";display=" + EscapeTagBase.Escape(DisplayName) + ";count=" + Count
-                + ";weight=" + Weight + ";volume=" + Volume + ";temperature=" + Temperature + ";renderascomponent=" + (RenderAsComponent ? "true": "false") + ";componentrenderoffset=" + ComponentRenderOffset.ToSimpleString()
-                + ";description=" + EscapeTagBase.Escape(Description) + ";texture=" + EscapeTagBase.Escape(GetTextureName()) + ";model=" + EscapeTagBase.Escape(GetModelName()) + ";bound=" + (IsBound ? "true": "false")
+                + ";weight=" + Weight + ";volume=" + Volume + ";temperature=" + Temperature + ";renderascomponent=" + (RenderAsComponent ? "true" : "false") + ";componentrenderoffset=" + ComponentRenderOffset.ToSimpleString()
+                + ";description=" + EscapeTagBase.Escape(Description) + ";texture=" + EscapeTagBase.Escape(GetTextureName()) + ";model=" + EscapeTagBase.Escape(GetModelName()) + ";bound=" + (IsBound ? "true" : "false")
                 + ";drawcolor=" + new ColorTag(DrawColor).ToString() + ";datum=" + Datum + ";shared=" + SharedStr() + ";local=" + EscapedLocalStr() + ";components=" + ComponentEscapedString() + "]";
         }
 
@@ -330,7 +330,7 @@ namespace Voxalia.ServerGame.ItemSystem
                         color = (ColorTag.For(tval) ?? new ColorTag(color)).Internal;
                         break;
                     case "datum":
-                        datum = Utilities.StringToInt(tval);
+                        datum = IntDatumFor(tval);
                         break;
                     case "weight":
                         weight = Utilities.StringToFloat(tval);
@@ -397,8 +397,40 @@ namespace Voxalia.ServerGame.ItemSystem
             return item;
         }
 
+        public static int IntDatumFor(string input)
+        {
+            string[] data = input.SplitFast('|');
+            int temp = 0;
+            SysConsole.Output(OutputType.INFO, "DTL: " + data.Length + ", " + input);
+            for (int i = 0; i < data.Length; i++)
+            {
+                string cur = data[i].Trim();
+                int read;
+                if (int.TryParse(cur, out read))
+                {
+                    temp += read;
+                    continue;
+                }
+                cur = cur.ToLowerFast();
+                if (cur.StartsWith("block:"))
+                {
+                    string blk = cur.Substring("block:".Length);
+                    temp += (int)MaterialHelpers.FromNameOrNumber(blk);
+                    SysConsole.Output(OutputType.INFO, "TEMP : " + blk + ":" + temp);
+                }
+                else if (cur.StartsWith("color:"))
+                {
+                    string col = cur.Substring("color:".Length);
+                    byte b = Colors.ForName(col);
+                    temp = BitConverter.ToInt32(BitConverter.GetBytes((uint)(temp + b * 256u * 256u * 256u)), 0);
+                    SysConsole.Output(OutputType.INFO, "TEMP : " + col + ":" + b);
+                }
+            }
+            return temp;
+        }
+
         public static TemplateObject TOFor(Server tserver, string type, string content)
-    {
+        {
             switch (type)
             {
                 case "text":

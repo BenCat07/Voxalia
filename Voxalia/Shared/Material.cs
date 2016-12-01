@@ -53,7 +53,7 @@ namespace Voxalia.Shared
         COBBLESTONE = 33,
         HELLSTONE = 34,
         LAVA = 35,
-        DIRTY_WATER_FLOWING = 36,
+        // 36!
         BRICKS = 37,
         FIRE = 38,
         /// <summary>
@@ -201,7 +201,13 @@ namespace Voxalia.Shared
                 }
                 while (allmats.Count <= (int)mat)
                 {
-                    allmats.Add(null);
+                    MaterialInfo place = new MaterialInfo(allmats.Count);
+                    place.SetName("errno_" + allmats.Count);
+                    for (int t = 0; t < (int)MaterialSide.COUNT; t++)
+                    {
+                            place.Texture[t] = "white";
+                    }
+                    allmats.Add(place);
                 }
                 allmats[(int)mat] = inf;
             }

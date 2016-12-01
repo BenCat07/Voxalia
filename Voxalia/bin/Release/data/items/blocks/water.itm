@@ -5,6 +5,6 @@ description: Liquid water!
 color: 1,1,1
 model: block
 bound: false
-datum: 4
+datum: block:WATER | color:BLUR
 weight: 1
 volume: 1

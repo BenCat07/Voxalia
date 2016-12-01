@@ -150,7 +150,7 @@ namespace Voxalia.ServerGame.ItemSystem
                     res_description = "^[lang=voxalia|items." + tname.Replace("/", ".") + ".description]";
                 }
                 ItemStack it = new ItemStack(res_type, res_subtype, TheServer, 1, res_icon, res_display, res_description, ColorTag.For(res_color).Internal, res_model,
-                    res_bound.ToLower() == "true", Utilities.StringToInt(res_datum))
+                    res_bound.ToLower() == "true", ItemStack.IntDatumFor(res_datum))
                 {
                     Weight = Utilities.StringToFloat(res_weight),
                     Volume = Utilities.StringToFloat(res_volume)
