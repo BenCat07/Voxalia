@@ -35,7 +35,6 @@ namespace Voxalia.ClientGame.WorldSystem
     {
         /// <summary>
         /// The physics world in which all physics-related activity takes place.
-        /// 
         /// </summary>
         public Space PhysicsWorld;
 
@@ -45,6 +44,7 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public Location GravityNormal = new Location(0, 0, -1);
 
+        // NOTE: Probably fine as a list here, we have a small number of entities that need constant sorting regardless.
         public List<Entity> Entities = new List<Entity>();
 
         public List<Entity> Tickers = new List<Entity>();

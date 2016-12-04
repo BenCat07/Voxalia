@@ -39,14 +39,15 @@ namespace Voxalia.ServerGame.WorldSystem
 
         /// <summary>
         /// All entities that exist on this server.
-        /// TODO: Dictionary? Linked list? Experiment with speeds of different data types for common usages here!
         /// </summary>
-        public List<Entity> Entities = new List<Entity>();
+        public Dictionary<long, Entity> Entities = new Dictionary<long, Entity>();
 
         /// <summary>
         /// All entities that exist on this server and must tick.
         /// </summary>
         public List<Entity> Tickers = new List<Entity>();
+
+        // TODO: Potentially a list of entities separated by what chunk they're in, for faster location lookup?
 
         public List<Entity> DespawnQuick = new List<Entity>();
 
@@ -99,12 +100,12 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
-            Entities.Add(e);
-            e.IsSpawned = true;
             if (e.EID < 1)
             {
                 e.EID = TheServer.AdvanceCID();
             }
+            Entities.Add(e.EID, e);
+            e.IsSpawned = true;
             if (e.Ticks)
             {
                 Tickers.Add(e);
@@ -143,7 +144,6 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
-            Entities.Remove(e);
             e.IsSpawned = false;
             if (e.Ticks)
             {
@@ -182,12 +182,14 @@ namespace Voxalia.ServerGame.WorldSystem
                 DespawnEntityPacketOut desppack = new DespawnEntityPacketOut(e.EID);
                 foreach (PlayerEntity player in Players)
                 {
-                    if (player.ShouldSeePositionPreviously(lpos) || player.ShouldSeePosition(tpos))
+                    if (player.Known.Contains(e.EID))
                     {
                         player.Network.SendPacket(desppack);
+                        player.Known.Remove(e.EID);
                     }
                 }
             }
+            Entities.Remove(e.EID);
         }
 
         public bool IsVisible(Location pos)
@@ -235,7 +237,7 @@ namespace Voxalia.ServerGame.WorldSystem
             // TODO: Efficiency!
             // TODO: Accuracy!
             double rx = rad * rad;
-            foreach (Entity e in Entities)
+            foreach (Entity e in Entities.Values)
             {
                 if ((e.GetPosition().DistanceSquared(pos)) <= rx + e.GetScaleEstimate())
                 {

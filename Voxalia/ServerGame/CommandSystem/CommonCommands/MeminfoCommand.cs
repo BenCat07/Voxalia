@@ -47,7 +47,7 @@ namespace Voxalia.ServerGame.CommandSystem.CommonCommands
                 long chunk = Chunk.RAM_USAGE * world.MainRegion.LoadedChunks.Count;
                 //string reg_cr = Utilities.Pad(Utilities.FormatNumber(chunk), ' ', cr.Length, false);
                 long ent = 0;
-                foreach (Entity e in world.MainRegion.Entities)
+                foreach (Entity e in world.MainRegion.Entities.Values)
                 {
                     ent += e.GetRAMUsage();
                 }

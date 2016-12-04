@@ -191,16 +191,16 @@ namespace Voxalia.ServerGame.WorldSystem
             BsonDocument full = new BsonDocument();
             List<BsonValue> ents = new List<BsonValue>();
             long ts = DateTime.UtcNow.Subtract(new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Ticks / TimeSpan.TicksPerSecond; // Seconds after Midnight, January 1st, 2000 (UTC).
-            for (int i = 0; i < OwningRegion.Entities.Count; i++)
+            foreach (Entity ent in OwningRegion.Entities.Values)
             {
-                if (OwningRegion.Entities[i].CanSave && Contains(OwningRegion.Entities[i].GetPosition()))
+                if (ent.CanSave && Contains(ent.GetPosition()))
                 {
-                    BsonDocument dat = OwningRegion.Entities[i].GetSaveData();
+                    BsonDocument dat = ent.GetSaveData();
                     if (dat != null)
                     {
-                        dat["ENTITY_TYPE"] = OwningRegion.Entities[i].GetEntityType().ToString();
+                        dat["ENTITY_TYPE"] = ent.GetEntityType().ToString();
                         dat["ENTITY_TIMESTAMP"] = ts;
-                        dat["ENTITY_ID"] = OwningRegion.Entities[i].EID;
+                        dat["ENTITY_ID"] = ent.EID;
                         ents.Add(dat);
                     }
                 }
@@ -212,11 +212,11 @@ namespace Voxalia.ServerGame.WorldSystem
         void clearentities()
         {
             // TODO: Efficiency
-            for (int i = 0; i < OwningRegion.Entities.Count; i++)
+            foreach (Entity ent in OwningRegion.Entities.Values)
             {
-                if (Contains(OwningRegion.Entities[i].GetPosition()))
+                if (Contains(ent.GetPosition()))
                 {
-                    OwningRegion.Entities[i].RemoveMe();
+                    ent.RemoveMe();
                 }
             }
         }

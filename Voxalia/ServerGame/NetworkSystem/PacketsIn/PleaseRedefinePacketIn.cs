@@ -24,15 +24,12 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
                 return false;
             }
             long eid = Utilities.BytesToLong(data);
-            foreach (Entity e in Player.TheRegion.Entities)
+            Entity e;
+            if (Player.TheRegion.Entities.TryGetValue(eid, out e))
             {
-                if (e.EID == eid)
+                if (Player.CanSeeChunk(Player.TheRegion.ChunkLocFor(e.GetPosition())))
                 {
-                    if (Player.CanSeeChunk(Player.TheRegion.ChunkLocFor(e.GetPosition())))
-                    {
-                        Player.Network.SendPacket(e.GetSpawnPacket());
-                    }
-                    break;
+                    Player.Network.SendPacket(e.GetSpawnPacket());
                 }
             }
             return true;

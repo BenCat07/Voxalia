@@ -100,12 +100,10 @@ namespace Voxalia.ServerGame.ServerMainSystem
         {
             foreach (World world in LoadedWorlds)
             {
-                foreach (Entity ent in world.MainRegion.Entities)
+                Entity ent;
+                if (world.MainRegion.Entities.TryGetValue(eid, out ent))
                 {
-                    if (ent.EID == eid)
-                    {
-                        return ent;
-                    }
+                    return ent;
                 }
             }
             return null;

@@ -6,6 +6,7 @@
 //
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Drawing;
 using Voxalia.Shared;
@@ -1148,9 +1149,10 @@ namespace Voxalia.ServerGame.EntitySystem
         }
 
         /// <summary>
-        /// This is a temporary lazy way of tracking known entities to prevent double-spawning.
+        /// This is a lazy way of tracking known entities to prevent double-spawning.
+        /// It's not incredibly clever, but it works well enough for the current time.
         /// </summary>
-        public HashSet<long> Known = new HashSet<long>(); // TODO: Scrap this, use CanSeePreviously, etc.
+        public HashSet<long> Known = new HashSet<long>();
 
         public override void EndTick()
         {
@@ -1170,12 +1172,18 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             if (ChunksAwareOf.Remove(cpos))
             {
-                foreach (Entity ent in TheRegion.Entities)
+                List<long> delMe = new List<long>();
+                foreach (long visibleEnt in Known)
                 {
-                    if (ch.Contains(ent.GetPosition()))
+                    if (!TheRegion.Entities.ContainsKey(visibleEnt) || ch.Contains(TheRegion.Entities[visibleEnt].GetPosition()))
                     {
-                        Network.SendPacket(new DespawnEntityPacketOut(ent.EID));
+                        Network.SendPacket(new DespawnEntityPacketOut(visibleEnt));
+                        delMe.Add(visibleEnt);
                     }
+                }
+                foreach (long temp in delMe)
+                {
+                    Known.Remove(temp);
                 }
                 ChunkNetwork.SendPacket(new ChunkForgetPacketOut(cpos));
                 return true;
