@@ -611,6 +611,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
             RenderingShadows = false;
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_SOLID;
+            TheClient.s_forwt.Bind();
+            GL.UniformMatrix4(1, false, ref PrimaryMatrix);
+            GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             TheClient.s_forw_vox.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);

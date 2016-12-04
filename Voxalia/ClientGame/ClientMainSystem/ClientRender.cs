@@ -169,6 +169,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE?grass");
             s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY?grass");
             s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_NO_ALPHA_CAP?particles");
+            s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT");
             // TODO: Better place for models?
             RainCyl = Models.GetModel("raincyl");
             RainCyl.LoadSkin(Textures);
@@ -312,6 +313,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public Shader s_forw_grass;
         public Shader s_fbo_grass;
         public Shader s_forw_particles;
+        public Shader s_forwt;
 
         public void sortEntities()
         {
@@ -886,6 +888,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             else
             {
+                SetEnts();
                 GL.ActiveTexture(TextureUnit.Texture1);
                 Textures.NormalDef.Bind();
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -895,9 +898,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     RenderSkybox();
                     s_fbo.Bind();
                 }
-                if (view.FBOid == FBOID.FORWARD_SOLID || view.FBOid == FBOID.FORWARD_TRANSP)
+                if (view.FBOid == FBOID.FORWARD_SOLID)
                 {
-                    RenderSkybox(); // TODO: s_fbot equivalent for forward renderer?
+                    s_forwt.Bind();
+                    RenderSkybox();
+                    s_forw.Bind();
                 }
                 if (view.FBOid == FBOID.TRANSP_UNLIT || view.FBOid == FBOID.TRANSP_LIT || view.FBOid == FBOID.TRANSP_SHADOWS
                     || view.FBOid == FBOID.FORWARD_SOLID || view.FBOid == FBOID.FORWARD_TRANSP)
@@ -906,6 +911,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     TheRegion.RenderClouds();
                     Rendering.SetMinimumLight(0);
                 }
+                SetEnts();
                 for (int i = 0; i < TheRegion.Entities.Count; i++)
                 {
                     TheRegion.Entities[i].Render();
