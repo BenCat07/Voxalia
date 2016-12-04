@@ -604,7 +604,7 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public void Render()
         {
-            TheClient.Rendering.SetColor(GetSunAdjust());
+            TheClient.Rendering.SetColor(OpenTK.Vector4.One);
             TheClient.Rendering.SetMinimumLight(0f);
             if (TheClient.RenderTextures)
             {

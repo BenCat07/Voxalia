@@ -611,20 +611,26 @@ namespace Voxalia.ClientGame.GraphicsSystems
             RenderingShadows = false;
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_SOLID;
+            Vector3 maxLit = TheClient.TheRegion.GetSunAdjust().Xyz;
             TheClient.s_forwt.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            TheClient.Rendering.SetColor(Color4.White);
             TheClient.s_forw_vox.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             TheClient.Rendering.SetColor(Color4.White);
+            GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
+            GL.Uniform3(11, maxLit);
             TheClient.s_forw.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             TheClient.Rendering.SetColor(Color4.White);
+            GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
+            GL.Uniform3(11, maxLit);
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
             {
                 Viewport(Width / 2, 0, Width / 2, Height);

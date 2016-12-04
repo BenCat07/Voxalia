@@ -36,7 +36,10 @@ in struct vox_fout
 	vec4 color;
 } fi;
 
-layout (location = 5) uniform float minimum_light = 0.5;
+layout (location = 5) uniform float minimum_light = 0.2;
+// ...
+layout (location = 10) uniform vec3 sunlightDir = vec3(0.0, 0.0, -1.0);
+layout (location = 11) uniform vec3 maximum_light = vec3(0.9, 0.9, 0.9);
 
 layout (location = 0) out vec4 color;
 
@@ -65,6 +68,6 @@ void main()
 #if MCM_BRIGHT
 #else
 	// TODO: Maybe read the normal texture too, to increase "prettiness"? (Optionally, probably!)
-	color.xyz *= min(max(dot(-fi.norm, vec3(0.0, 0.0, -1.0)), max(0.5, minimum_light)), 1.0);
+	color.xyz *= min(max(dot(-fi.norm, sunlightDir) * maximum_light, max(0.2, minimum_light)), 1.0);
 #endif
 }
