@@ -168,22 +168,17 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public ASyncScheduleItem chunkAccessDetection = null;
 
-        public Object EditSessionLock = new Object();
-        
         public byte[] GetChunkSaveData()
         {
-            lock (EditSessionLock)
+            byte[] bytes = new byte[BlocksInternal.Length * 5];
+            for (int i = 0; i < BlocksInternal.Length; i++)
             {
-                byte[] bytes = new byte[BlocksInternal.Length * 5];
-                for (int i = 0; i < BlocksInternal.Length; i++)
-                {
-                    Utilities.UshortToBytes(BlocksInternal[i]._BlockMaterialInternal).CopyTo(bytes, i * 2);
-                    bytes[BlocksInternal.Length * 2 + i] = BlocksInternal[i].BlockData;
-                    bytes[BlocksInternal.Length * 3 + i] = BlocksInternal[i].BlockLocalData;
-                    bytes[BlocksInternal.Length * 4 + i] = BlocksInternal[i]._BlockPaintInternal;
-                }
-                return bytes;
+                Utilities.UshortToBytes(BlocksInternal[i]._BlockMaterialInternal).CopyTo(bytes, i * 2);
+                bytes[BlocksInternal.Length * 2 + i] = BlocksInternal[i].BlockData;
+                bytes[BlocksInternal.Length * 3 + i] = BlocksInternal[i].BlockLocalData;
+                bytes[BlocksInternal.Length * 4 + i] = BlocksInternal[i]._BlockPaintInternal;
             }
+            return bytes;
         }
 
         public BsonDocument GetEntitySaveData()

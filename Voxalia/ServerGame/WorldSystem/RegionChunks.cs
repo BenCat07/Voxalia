@@ -100,26 +100,23 @@ namespace Voxalia.ServerGame.WorldSystem
             bool broadcast = true, bool regen = true, bool override_protection = false)
         {
             Chunk ch = LoadChunk(ChunkLocFor(pos));
-            lock (ch.EditSessionLock)
+            int x = (int)Math.Floor(pos.X) - (int)ch.WorldPosition.X * Chunk.CHUNK_SIZE;
+            int y = (int)Math.Floor(pos.Y) - (int)ch.WorldPosition.Y * Chunk.CHUNK_SIZE;
+            int z = (int)Math.Floor(pos.Z) - (int)ch.WorldPosition.Z * Chunk.CHUNK_SIZE;
+            if (!override_protection && ((BlockFlags)ch.GetBlockAt(x, y, z).BlockLocalData).HasFlag(BlockFlags.PROTECTED))
             {
-                int x = (int)Math.Floor(pos.X) - (int)ch.WorldPosition.X * Chunk.CHUNK_SIZE;
-                int y = (int)Math.Floor(pos.Y) - (int)ch.WorldPosition.Y * Chunk.CHUNK_SIZE;
-                int z = (int)Math.Floor(pos.Z) - (int)ch.WorldPosition.Z * Chunk.CHUNK_SIZE;
-                if (!override_protection && ((BlockFlags)ch.GetBlockAt(x, y, z).BlockLocalData).HasFlag(BlockFlags.PROTECTED))
-                {
-                    return;
-                }
-                BlockInternal bi = new BlockInternal((ushort)mat, dat, paint, locdat) { Damage = damage };
-                ch.SetBlockAt(x, y, z, bi);
-                ch.LastEdited = GlobalTickTime;
-                ch.Flags |= ChunkFlags.NEEDS_DETECT;
-                ch.ChunkDetect();
-                // TODO: See if this makes any new chunks visible!
-                if (broadcast)
-                {
-                    // TODO: Send per-person based on chunk awareness details
-                    ChunkSendToAll(new BlockEditPacketOut(new Location[] { pos }, new ushort[] { bi._BlockMaterialInternal }, new byte[] { dat }, new byte[] { paint }), ch.WorldPosition);
-                }
+                return;
+            }
+            BlockInternal bi = new BlockInternal((ushort)mat, dat, paint, locdat) { Damage = damage };
+            ch.SetBlockAt(x, y, z, bi);
+            ch.LastEdited = GlobalTickTime;
+            ch.Flags |= ChunkFlags.NEEDS_DETECT;
+            ch.ChunkDetect();
+            // TODO: See if this makes any new chunks visible!
+            if (broadcast)
+            {
+                // TODO: Send per-person based on chunk awareness details
+                ChunkSendToAll(new BlockEditPacketOut(new Location[] { pos }, new ushort[] { bi._BlockMaterialInternal }, new byte[] { dat }, new byte[] { paint }), ch.WorldPosition);
             }
         }
         
@@ -129,31 +126,28 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             pos = pos.GetBlockLocation();
             Chunk ch = LoadChunk(ChunkLocFor(pos));
-            lock (ch.EditSessionLock)
+            int x = (int)Math.Floor(pos.X) - (int)ch.WorldPosition.X * Chunk.CHUNK_SIZE;
+            int y = (int)Math.Floor(pos.Y) - (int)ch.WorldPosition.Y * Chunk.CHUNK_SIZE;
+            int z = (int)Math.Floor(pos.Z) - (int)ch.WorldPosition.Z * Chunk.CHUNK_SIZE;
+            BlockInternal bi = ch.GetBlockAt(x, y, z);
+            if (((BlockFlags)bi.BlockLocalData).HasFlag(BlockFlags.PROTECTED))
             {
-                int x = (int)Math.Floor(pos.X) - (int)ch.WorldPosition.X * Chunk.CHUNK_SIZE;
-                int y = (int)Math.Floor(pos.Y) - (int)ch.WorldPosition.Y * Chunk.CHUNK_SIZE;
-                int z = (int)Math.Floor(pos.Z) - (int)ch.WorldPosition.Z * Chunk.CHUNK_SIZE;
-                BlockInternal bi = ch.GetBlockAt(x, y, z);
-                if (((BlockFlags)bi.BlockLocalData).HasFlag(BlockFlags.PROTECTED))
+                return;
+            }
+            Material mat = (Material)bi.BlockMaterial;
+            ch.BlocksInternal[ch.BlockIndex(x, y, z)].BlockLocalData |= (byte)BlockFlags.PROTECTED;
+            if (mat != (ushort)Material.AIR)
+            {
+                ch.SetBlockAt(x, y, z, new BlockInternal((ushort)Material.AIR, 0, 0, (byte)BlockFlags.EDITED));
+                ch.LastEdited = GlobalTickTime;
+                SurroundRunPhysics(pos);
+                if (regentrans)
                 {
-                    return;
+                    ChunkSendToAll(new BlockEditPacketOut(new Location[] { pos }, new ushort[] { 0 }, new byte[] { 0 }, new byte[] { 0 }), ch.WorldPosition);
                 }
-                Material mat = (Material)bi.BlockMaterial;
-                ch.BlocksInternal[ch.BlockIndex(x, y, z)].BlockLocalData |= (byte)BlockFlags.PROTECTED;
-                if (mat != (ushort)Material.AIR)
-                {
-                    ch.SetBlockAt(x, y, z, new BlockInternal((ushort)Material.AIR, 0, 0, (byte)BlockFlags.EDITED));
-                    ch.LastEdited = GlobalTickTime;
-                    SurroundRunPhysics(pos);
-                    if (regentrans)
-                    {
-                        ChunkSendToAll(new BlockEditPacketOut(new Location[] { pos }, new ushort[] { 0 }, new byte[] { 0 }, new byte[] { 0 }), ch.WorldPosition);
-                    }
-                    bi.Material = mat.GetBreaksInto();
-                    BlockItemEntity bie = new BlockItemEntity(this, new BlockInternal((ushort)bi._BlockMaterialInternal, bi.BlockData, bi._BlockPaintInternal, 0), pos);
-                    SpawnEntity(bie);
-                }
+                bi.Material = mat.GetBreaksInto();
+                BlockItemEntity bie = new BlockItemEntity(this, new BlockInternal((ushort)bi._BlockMaterialInternal, bi.BlockData, bi._BlockPaintInternal, 0), pos);
+                SpawnEntity(bie);
             }
         }
 

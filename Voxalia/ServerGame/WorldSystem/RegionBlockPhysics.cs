@@ -46,10 +46,59 @@ namespace Voxalia.ServerGame.WorldSystem
                 e.PotentialActivate();
             }
         }
-        
+
         public void PhysicsSetBlock(Location block, Material mat, byte dat = 0, byte paint = 0, BlockDamage damage = BlockDamage.NONE)
         {
             SetBlockMaterial(block, mat, dat, paint, (byte)(BlockFlags.EDITED | BlockFlags.NEEDS_RECALC), damage);
+            PhysBlockAnnounce(block);
+            if (mat.GetSolidity() != MaterialSolidity.FULLSOLID)
+            {
+                PhysBlockAnnounce(block + new Location(1, 0, 0));
+                PhysBlockAnnounce(block + new Location(-1, 0, 0));
+                PhysBlockAnnounce(block + new Location(0, 0, 1));
+                PhysBlockAnnounce(block + new Location(0, 0, -1));
+                PhysBlockAnnounce(block + new Location(0, 1, 0));
+                PhysBlockAnnounce(block + new Location(0, -1, 0));
+            }
+        }
+
+        /// <summary>
+        /// This is for a specific set of cases, and is not recommended for general usage.
+        /// </summary>
+        public BlockInternal SetNeedsRecalc(Location block, bool rec)
+        {
+            Chunk ch = LoadChunk(ChunkLocFor(block));
+            int x = (int)Math.Floor(block.X) - (int)ch.WorldPosition.X * Chunk.CHUNK_SIZE;
+            int y = (int)Math.Floor(block.Y) - (int)ch.WorldPosition.Y * Chunk.CHUNK_SIZE;
+            int z = (int)Math.Floor(block.Z) - (int)ch.WorldPosition.Z * Chunk.CHUNK_SIZE;
+            if (((BlockFlags)ch.GetBlockAt(x, y, z).BlockLocalData).HasFlag(BlockFlags.PROTECTED))
+            {
+                return BlockInternal.AIR;
+            }
+            int ind = ch.BlockIndex(x, y, z);
+            if (rec)
+            {
+                if (((BlockFlags)ch.BlocksInternal[ind].BlockLocalData).HasFlag(BlockFlags.NEEDS_RECALC))
+                {
+                    return BlockInternal.AIR;
+                }
+                ch.BlocksInternal[ind].BlockLocalData |= (int)BlockFlags.NEEDS_RECALC;
+            }
+            else
+            {
+                ch.BlocksInternal[ind].BlockLocalData &= (int)~BlockFlags.NEEDS_RECALC;
+            }
+            return ch.BlocksInternal[ind];
+        }
+
+        private void PhysBlockAnnounce(Location block)
+        {
+            // The below code: Basically, if the block already has the needs_recalc flag,
+            // it probably has a tick like this one waiting already, so let that one complete rather than starting another!
+            if (((BlockFlags)SetNeedsRecalc(block, true).BlockLocalData).HasFlag(BlockFlags.NEEDS_RECALC))
+            {
+                return;
+            }
             // The below code: So long as the server is unable to update faster than a specified update pace, don't bother updating this.
             // Once the server is updating at an acceptable pace, immediately perform the final update.
             // Also, this logic produces a minimum update delay of 0.25 seconds, and no maximum!
@@ -76,12 +125,7 @@ namespace Voxalia.ServerGame.WorldSystem
 
         private void RunBlockPhysics(Location block)
         {
-            BlockInternal c = GetBlockInternal(block);
-            if (((BlockFlags)c.BlockLocalData).HasFlag(BlockFlags.NEEDS_RECALC))
-            {
-                c.BlockLocalData = (byte)(c.BlockLocalData & ~((byte)BlockFlags.NEEDS_RECALC));
-                SetBlockMaterial(block, c, false, false, true);
-            }
+            BlockInternal c = SetNeedsRecalc(block, false);
             LiquidPhysics(block, c);
         }
 
