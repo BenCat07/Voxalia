@@ -22,7 +22,8 @@ namespace Voxalia.ClientGame.AudioSystem
     {
         public static bool TrySpeech = true;
 
-        public static void Speak(string text, bool male)
+
+        public static void Speak(string text, bool male, int rate)
         {
             Task.Factory.StartNew(() =>
             {
@@ -56,11 +57,11 @@ namespace Voxalia.ClientGame.AudioSystem
                         else
                         {
                             speech.SelectVoice(vi.Name);
+                            speech.Rate = rate;
                             speech.Speak(text);
                         }
                     }
 #endif
-                    TrySpeech = false;
                 }
                 catch (Exception ex)
                 {
@@ -69,6 +70,7 @@ namespace Voxalia.ClientGame.AudioSystem
                 }
                 if (!TrySpeech)
                 {
+                    // TODO: Rate!
                     String addme = male ? " -p 40" : " -p 95";
                     Process p = Process.Start("espeak", "\"" + text.Replace("\"", " quote ") + "\"" + addme);
                     Console.WriteLine(p.MainModule.FileName);
