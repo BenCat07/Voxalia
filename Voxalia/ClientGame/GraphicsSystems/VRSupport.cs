@@ -15,9 +15,89 @@ using Valve.VR;
 using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
 using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {
+    public class VRControllerTextureEngine
+    {
+        public int FBO;
+
+        public int Texture;
+
+        public Texture BaseTexture;
+
+        public Color4 TouchSpotColor = Color4.Red;
+
+        public Color4 PressSpotColor = Color4.DarkRed;
+
+        public Vector2 TouchSpotHalfSize = new Vector2(0.05f, 0.05f);
+
+        public Vector2 PressSpotHalfSize = new Vector2(0.1f, 0.1f);
+
+        public void GenerateFirst()
+        {
+            FBO = GL.GenFramebuffer();
+            Texture = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, Texture);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 512, 512, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)TextureCompareMode.CompareRefToTexture);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, FBO);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, Texture, 0);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        }
+
+        Matrix4 id = Matrix4.Identity;
+
+        double CTime;
+
+        public void CalcTexture(VRController cont, double timeNow)
+        {
+            if (timeNow == CTime)
+            {
+                return;
+            }
+            CTime = timeNow;
+            BaseTexture.Engine.TheClient.Shaders.ColorMultShader.Bind();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, FBO);
+            GL.Disable(EnableCap.CullFace);
+            GL.Viewport(0, 0, 512, 512);
+            GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0.5f, 0.5f, 0.5f, 1.0f });
+            GL.ActiveTexture(TextureUnit.Texture0);
+            BaseTexture.Bind();
+            Matrix4 basic = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
+            GL.UniformMatrix4(1, false, ref basic);
+            GL.UniformMatrix4(2, false, ref id);
+            BaseTexture.Engine.TheClient.Rendering.RenderRectangle(-1, -1, 1, 1);
+            bool touched = cont.Touched.HasFlag(VRButtons.TRACKPAD);
+            bool pressed = cont.Pressed.HasFlag(VRButtons.TRACKPAD);
+            if (touched || pressed)
+            {
+                BaseTexture.Engine.White.Bind();
+                BaseTexture.Engine.TheClient.Rendering.SetColor(pressed ? PressSpotColor : TouchSpotColor);
+                Vector2 hsize = pressed ? PressSpotHalfSize : TouchSpotHalfSize;
+                BaseTexture.Engine.TheClient.Rendering.RenderRectangle(cont.TrackPad.X - hsize.X, cont.TrackPad.Y - hsize.X, cont.TrackPad.X + hsize.X, cont.TrackPad.Y + hsize.Y);
+            }
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            BaseTexture.Engine.TheClient.Rendering.SetColor(Color4.White);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, BaseTexture.Engine.TheClient.MainWorldView.cFBO);
+            BaseTexture.Engine.TheClient.MainWorldView.oSetViewport();
+            GL.Enable(EnableCap.CullFace);
+        }
+
+        public void Destroy()
+        {
+            GL.DeleteFramebuffer(FBO);
+            GL.DeleteTexture(Texture);
+        }
+    }
+
     public class VRSupport
     {
         public CVRSystem VR = null;
@@ -65,6 +145,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Compositor = OpenVR.Compositor;
             Compositor.SetTrackingSpace(ETrackingUniverseOrigin.TrackingUniverseStanding);
             Compositor.CompositorBringToFront();
+            LeftTexture = new VRControllerTextureEngine();
+            RightTexture = new VRControllerTextureEngine();
+            LeftTexture.BaseTexture = TheClient.Textures.GetTexture("vr/controller/vive_circle_left");
+            RightTexture.BaseTexture = TheClient.Textures.GetTexture("vr/controller/vive_circle_right");
+            LeftTexture.GenerateFirst();
+            RightTexture.GenerateFirst();
         }
 
         public Matrix4 Eye(bool lefteye)
@@ -87,6 +173,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public void Stop()
         {
             OpenVR.Shutdown();
+            LeftTexture.Destroy();
+            RightTexture.Destroy();
         }
 
         public Matrix4 HeadMatRot = Matrix4.Identity;
@@ -123,6 +211,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public VRController Left;
 
         public VRController Right;
+
+        public VRControllerTextureEngine LeftTexture;
+
+        public VRControllerTextureEngine RightTexture;
 
         public void Submit()
         {

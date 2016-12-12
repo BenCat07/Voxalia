@@ -319,7 +319,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// All the meshes this model has.
         /// </summary>
         public List<ModelMesh> Meshes;
-
+        
         public ModelNode RootNode;
 
         public ModelMesh MeshFor(string name)
