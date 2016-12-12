@@ -462,7 +462,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 // Frustum cf1 = null;
                 if (VR != null)
                 {
-                    MainWorldView.CameraPos = Player.GetBasicEyePos();
+                    MainWorldView.CameraPos = Player.GetPosition();
                 }
                 else if (CVars.g_firstperson.ValueB)
                 {
@@ -509,7 +509,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 sortEntities();
                 Particles.Sort();
-                MainWorldView.Headmat = TheRegion.GetBlockMaterial(MainWorldView.CameraPos);
+                MainWorldView.Headmat = TheRegion.GetBlockMaterial(VR == null ? MainWorldView.CameraPos : Player.GetBasicEyePos());
                 MainWorldView.SunLoc = GetSunLocation();
                 MainWorldView.Render();
                 ReverseEntitiesOrder();
