@@ -852,22 +852,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 mmcircle.Tex = new Texture() { Internal_Texture = VR.LeftTexture.Texture, Engine = Textures };
                 GL.UniformMatrix4(2, false, ref pos);
                 tmod.Draw();
-                // TEMPORARY
-                Quaternion oquat = VR.Left.Position.ExtractRotation(true);
-                BEPUutilities.Quaternion quat = new BEPUutilities.Quaternion(oquat.X, oquat.Y, oquat.Z, oquat.W);
-                BEPUutilities.Vector3 face = -BEPUutilities.Quaternion.Transform(BEPUutilities.Vector3.UnitZ, quat);
-                Vector3 forw = ClientUtilities.Convert(new Location(face));
-                Vector3 ospot = VR.Left.Position.ExtractTranslation();
-                Vector3 goal = ospot + forw * 0.5f;
-                Matrix4 trans = Matrix4.CreateTranslation(goal);
-                GL.UniformMatrix4(2, false, ref trans);
-                tmod.Draw();
-                Textures.White.Bind();
-                Rendering.SetColor(Color4.Red);
-                GL.LineWidth(3);
-                Rendering.RenderLine(MainWorldView.CameraPos + ClientUtilities.Convert(ospot), MainWorldView.CameraPos + ClientUtilities.Convert(goal));
-                GL.LineWidth(1);
-                Rendering.SetColor(Color4.White);
             }
             if (VR.Right != null)
             {
@@ -970,7 +954,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.ActiveTexture(TextureUnit.Texture0);
             }
             Textures.White.Bind();
-            Location mov = (CameraFinalTarget - MainWorldView.CameraPos) / CameraDistance;
+            Location itemSource = Player.ItemSource();
+            Location mov = (CameraFinalTarget - itemSource) / CameraDistance;
             Location cpos = CameraFinalTarget - (CameraImpactNormal * 0.01f);
             Location cpos2 = CameraFinalTarget + (CameraImpactNormal * 0.91f);
             // TODO: 5 -> Variable length (Server controlled?)
@@ -984,6 +969,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     Rendering.SetMinimumLight(1.0f);
                     Rendering.RenderLineBox(cft - mov * 0.01f, cft + Location.One - mov * 0.01f);
                     GL.LineWidth(1);
+                    if (VR != null && VR.Right != null)
+                    {
+                        Rendering.SetColor(Color4.Red);
+                        Rendering.RenderLine(itemSource, CameraFinalTarget);
+                    }
                 }
                 if (CVars.u_highlight_placeblock.ValueB)
                 {

@@ -29,7 +29,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 {
                     if (entry.Player.GrabJoint != null)
                     {
-                        BEPUutilities.Vector3 launchvec = (entry.Player.ForwardVector() * 100).ToBVector(); // TODO: Strength limits
+                        BEPUutilities.Vector3 launchvec = (entry.Player.ItemDir * 100).ToBVector(); // TODO: Strength limits
                         PhysicsEntity pe = entry.Player.GrabJoint.Ent2;
                         entry.Player.TheRegion.DestroyJoint(entry.Player.GrabJoint);
                         entry.Player.GrabJoint = null;
@@ -45,8 +45,8 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             item.Count = 1;
             PhysicsEntity ie = entry.Player.TheRegion.ItemToEntity(item);
             // TODO: Animate player
-            Location fvel = entry.Player.ForwardVector();
-            ie.SetPosition(entry.Player.GetEyePosition() + fvel * 2);
+            Location fvel = entry.Player.ItemDir;
+            ie.SetPosition(entry.Player.ItemSource() + fvel * 2);
             ie.SetOrientation(entry.Player.GetOrientation());
             ie.SetVelocity(fvel * 15);
             entry.Player.TheRegion.SpawnEntity(ie);

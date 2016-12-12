@@ -36,8 +36,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             {
                 return;
             }
-            Location eye = player.GetEyePosition();
-            CollisionResult cr = player.TheRegion.Collision.RayTrace(eye, eye + player.ForwardVector() * 50, player.IgnoreThis);
+            Location eye = player.ItemSource();
+            CollisionResult cr = player.TheRegion.Collision.RayTrace(eye, eye + player.ItemDir * 50, player.IgnoreThis);
             if (!cr.Hit || cr.HitEnt == null || cr.HitEnt.Mass <= 0)
             {
                 return;
@@ -109,7 +109,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             {
                 player.Manipulator_Distance = Math.Max(player.Manipulator_Distance - (double)(player.TheRegion.Delta * 2f), 2f);
             }
-            Location goal = player.GetEyePosition() + player.ForwardVector() * player.Manipulator_Distance;
+            Location goal = player.ItemSource() + player.ItemDir * player.Manipulator_Distance;
             player.Manipulator_Grabbed.SetVelocity((goal - player.Manipulator_Grabbed.GetPosition()) * 5f);
             if (player.Flags.HasFlag(YourStatusFlags.NO_ROTATE))
             {

@@ -649,8 +649,8 @@ namespace Voxalia.ServerGame.EntitySystem
             // TODO: Move use to CharacterEntity
             if (Use)
             {
-                Location forw = ForwardVector();
-                CollisionResult cr = TheRegion.Collision.RayTrace(GetEyePosition(), GetEyePosition() + forw * 5, IgnoreThis);
+                Location forw = ItemDir;
+                CollisionResult cr = TheRegion.Collision.RayTrace(ItemSource(), ItemSource() + forw * 5, IgnoreThis);
                 if (cr.Hit && cr.HitEnt != null && cr.HitEnt.Tag is EntityUseable)
                 {
                     if (UsedNow != (EntityUseable)cr.HitEnt.Tag)

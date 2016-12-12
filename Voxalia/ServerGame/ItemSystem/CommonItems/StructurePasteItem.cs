@@ -125,8 +125,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 {
                     RotateAround(player.Pasting, -90);
                 }
-                Location eye = player.GetEyePosition();
-                Location forw = player.ForwardVector();
+                Location eye = player.ItemSource();
+                Location forw = player.ItemDir;
                 player.Pasting.SetPosition((eye + forw * player.PastingDist).GetBlockLocation() - player.Pasting.Origin - player.Pasting.shapeOffs);
                 RayCastResult rcr;
                 bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, player.PastingDist, MaterialSolidity.ANY, player.IgnoreThis, out rcr);
@@ -162,8 +162,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 return;
             }
            // TODO: Generic 'player.gettargetblock'?
-            Location eye = player.GetEyePosition();
-            Location forw = player.ForwardVector();
+            Location eye = player.ItemSource();
+            Location forw = player.ItemDir;
             RayCastResult rcr;
             bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, player.PastingDist, MaterialSolidity.ANY, player.IgnoreThis, out rcr);
             Location pasteloc = (eye + forw * player.PastingDist + player.Pasting.rotOffs).GetBlockLocation();

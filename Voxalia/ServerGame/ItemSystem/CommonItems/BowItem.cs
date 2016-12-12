@@ -114,9 +114,9 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
         public virtual ArrowEntity SpawnArrow(PlayerEntity player, ItemStack item, double timeStretched)
         {
             ArrowEntity ae = new ArrowEntity(player.TheRegion);
-            ae.SetPosition(player.GetEyePosition());
+            ae.SetPosition(player.ItemSource());
             ae.NoCollide.Add(player.EID);
-            Location forward = player.ForwardVector();
+            Location forward = player.ItemDir;
             ae.SetVelocity(forward * timeStretched * 20 * FireStrength);
             Matrix lookatlh = Utilities.LookAtLH(Location.Zero, forward, Location.UnitZ);
             lookatlh.Transpose();

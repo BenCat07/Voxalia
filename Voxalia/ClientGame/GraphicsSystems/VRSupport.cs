@@ -279,6 +279,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
     public class VRController
     {
+        public Location ForwardVector()
+        {
+            Quaternion loquat = Position.ExtractRotation(true);
+            BEPUutilities.Quaternion lquat = new BEPUutilities.Quaternion(loquat.X, loquat.Y, loquat.Z, loquat.W);
+            BEPUutilities.Vector3 lforw = -BEPUutilities.Quaternion.Transform(BEPUutilities.Vector3.UnitZ, lquat);
+            return new Location(lforw);
+        }
+
         public const int AXIS_TRACKPAD = 0;
 
         public const int AXIS_TRIGGER = 1;
