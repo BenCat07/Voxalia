@@ -462,7 +462,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 // Frustum cf1 = null;
                 if (VR != null)
                 {
-                    MainWorldView.CameraPos = Player.GetPosition();
+                    MainWorldView.CameraPos = Player.GetBasicEyePos();
                 }
                 else if (CVars.g_firstperson.ValueB)
                 {
@@ -846,6 +846,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (VR.Left != null)
             {
                 Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Left.Position;
+                VR.LeftTexture.CalcTexture(VR.Left, GlobalTickTimeLocal);
+                isVox = true;
+                SetEnts();
+                mmcircle.Tex = new Texture() { Internal_Texture = VR.LeftTexture.Texture, Engine = Textures };
                 GL.UniformMatrix4(2, false, ref pos);
                 tmod.Draw();
                 // TEMPORARY
@@ -857,10 +861,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Vector3 goal = ospot + forw * 0.5f;
                 Matrix4 trans = Matrix4.CreateTranslation(goal);
                 GL.UniformMatrix4(2, false, ref trans);
-                VR.LeftTexture.CalcTexture(VR.Left, GlobalTickTimeLocal);
-                isVox = true;
-                SetEnts();
-                mmcircle.Tex = new Texture() { Internal_Texture = VR.LeftTexture.Texture, Engine = Textures };
                 tmod.Draw();
                 Textures.White.Bind();
                 Rendering.SetColor(Color4.Red);
@@ -872,11 +872,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (VR.Right != null)
             {
                 Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Right.Position;
-                GL.UniformMatrix4(2, false, ref pos);
                 VR.RightTexture.CalcTexture(VR.Right, GlobalTickTimeLocal);
                 isVox = true;
                 SetEnts();
                 mmcircle.Tex = new Texture() { Internal_Texture = VR.RightTexture.Texture, Engine = Textures };
+                GL.UniformMatrix4(2, false, ref pos);
                 tmod.Draw();
             }
         }
