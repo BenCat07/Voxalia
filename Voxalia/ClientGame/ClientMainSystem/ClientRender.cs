@@ -844,7 +844,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             // TODO: Special dynamic controller models!
             if (VR.Left != null)
             {
-                Matrix4 pos = Matrix4.CreateScale(0.66666f) * VR.Left.Position;
+                Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Left.Position;
                 GL.UniformMatrix4(2, false, ref pos);
                 tmod.Draw();
                 // TEMPORARY
@@ -866,7 +866,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             if (VR.Right != null)
             {
-                Matrix4 pos = Matrix4.CreateScale(0.66666f) * VR.Right.Position;
+                Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Right.Position;
                 GL.UniformMatrix4(2, false, ref pos);
                 tmod.Draw();
             }
