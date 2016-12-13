@@ -117,6 +117,7 @@ namespace Voxalia.ClientGame.AudioSystem
                 {
                     DeafNoise = PlaySimpleInternal(DeafStart, false);
                 }
+                // TODO: Play 'loop' before 'start' is finished, to avoid a spike of silence.
                 if (!DeafNoise.IsPlaying())
                 {
                     Deafness = DeafenState.LOOP;
@@ -234,6 +235,11 @@ namespace Voxalia.ClientGame.AudioSystem
                 actsfx.Loop = loop;
                 actsfx.Create();
                 actsfx.Play();
+                if (Deafness != DeafenState.NOT)
+                {
+                    actsfx.IsDeafened = true;
+                    AL.Source(actsfx.Src, ALSourcef.Gain, 0.0001f);
+                }
                 if (seek_seconds != 0)
                 {
                     actsfx.Seek(seek_seconds);
