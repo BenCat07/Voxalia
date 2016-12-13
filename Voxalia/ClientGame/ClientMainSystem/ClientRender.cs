@@ -550,7 +550,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         public void RenderSkybox()
         {
-            Rendering.SetMinimumLight(1);
+            float skyAlpha = (float)Math.Max(Math.Min((SunAngle.Pitch - 70.0) / (-90.0), 1.0), 0.06);
+            GL.ActiveTexture(TextureUnit.Texture3);
+            Textures.Black.Bind();
+            GL.ActiveTexture(TextureUnit.Texture2);
+            Textures.Black.Bind();
+            GL.ActiveTexture(TextureUnit.Texture1);
+            Textures.NormalDef.Bind();
+            GL.ActiveTexture(TextureUnit.Texture0);
+            Rendering.SetMinimumLight(Math.Max(1.6f * skyAlpha, 1.0f));
             GL.Disable(EnableCap.CullFace);
             Rendering.SetColor(Color4.White);
             Matrix4 scale = Matrix4.CreateScale(GetSecondSkyDistance());
@@ -568,7 +576,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             skybox[4].Render(false);
             Textures.GetTexture("skies/" + CVars.r_skybox.Value + "_night/yp").Bind();
             skybox[5].Render(false);
-            Rendering.SetColor(new Vector4(1, 1, 1, (float)Math.Max(Math.Min((SunAngle.Pitch - 70.0) / (-90.0), 1.0), 0.06)));
+            Rendering.SetColor(new Vector4(1, 1, 1, skyAlpha));
             scale = Matrix4.CreateScale(GetSkyDistance());
             GL.UniformMatrix4(2, false, ref scale);
             // TODO: Save textures!
