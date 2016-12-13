@@ -541,6 +541,10 @@ namespace Voxalia.ClientGame.WorldSystem
             if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_SOLID)
             {
                 TheClient.s_forw_grass = TheClient.s_forw_grass.Bind();
+                GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+                GL.Uniform4(12, new OpenTK.Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
+                GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+                GL.Uniform1(14, TheClient.ZFar());
             }
             else if (TheClient.MainWorldView.FBOid == FBOID.MAIN)
             {
