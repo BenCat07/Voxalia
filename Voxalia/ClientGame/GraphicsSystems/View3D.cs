@@ -50,8 +50,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public int Height;
 
-        public Material Headmat = Material.AIR;
+        public Location FogCol = new Location(0.7);
 
+        public float FogAlpha = 1.0f;
+        
         public Location SunLoc = Location.NaN;
 
         public Client TheClient;
@@ -1116,7 +1118,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(10, MainEXP * TheClient.CVars.r_exposure.ValueF);
             GL.Uniform1(16, TheClient.CVars.r_znear.ValueF);
             GL.Uniform1(17, TheClient.ZFar());
-            GL.Uniform4(18, new Vector4(ClientUtilities.Convert(Headmat.GetFogColor()), (float)Headmat.GetFogAlpha()));
+            GL.Uniform4(18, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
             // TODO: If thick fog, blur the environment? Or some similar head-in-a-block effect!
             GL.Uniform1(19, DesaturationAmount);
             GL.Uniform3(20, new Vector3(0, 0, 0));

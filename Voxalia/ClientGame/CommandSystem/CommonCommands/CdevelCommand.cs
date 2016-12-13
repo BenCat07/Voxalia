@@ -160,6 +160,14 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         TheClient.VR = VRSupport.TryInit(TheClient);
                         break;
                     }
+                case "fogEnhance":
+                    {
+                        double time = NumberTag.TryFor(entry.GetArgumentObject(queue, 1)).Internal;
+                        double fogVal = NumberTag.TryFor(entry.GetArgumentObject(queue, 2)).Internal;
+                        TheClient.FogEnhanceStrength = (float)fogVal;
+                        TheClient.FogEnhanceTime = time;
+                        break;
+                    }
                 default:
                     ShowUsage(queue, entry);
                     break;

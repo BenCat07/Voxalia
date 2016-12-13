@@ -509,7 +509,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 sortEntities();
                 Particles.Sort();
-                MainWorldView.Headmat = TheRegion.GetBlockMaterial(VR == null ? MainWorldView.CameraPos : Player.GetBasicEyePos());
+                Material headMat = TheRegion.GetBlockMaterial(VR == null ? MainWorldView.CameraPos : Player.GetBasicEyePos());
+                MainWorldView.FogCol = headMat.GetFogColor();
+                float fg = (float)headMat.GetFogAlpha();
+                MainWorldView.FogAlpha = (FogEnhanceTime > 0.01) ? Math.Max(fg, (FogEnhanceTime < 2 ? (FogEnhanceStrength - (1.0f - (float)FogEnhanceTime * 0.5f)) : FogEnhanceStrength)) : fg;
                 MainWorldView.SunLoc = GetSunLocation();
                 MainWorldView.Render();
                 ReverseEntitiesOrder();
@@ -525,6 +528,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 TotalSpikeTime = TotalTime;
             }
         }
+
+        public double FogEnhanceTime = 0;
+
+        public float FogEnhanceStrength = 0.3f;
 
         public float GetSecondSkyDistance()
         {

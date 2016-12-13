@@ -248,19 +248,27 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 CameraFinalTarget = h ? new Location(rcr.HitData.Location) - new Location(rcr.HitData.Normal).Normalize() * 0.01: PlayerEyePosition + forw * 100;
                 CameraImpactNormal = h ? new Location(rcr.HitData.Normal).Normalize() : Location.Zero;
                 CameraDistance = h ? rcr.HitData.T: 100;
+                double cping = Math.Max(LastPingValue, GlobalTickTimeLocal - LastPingTime);
+                AveragePings.Push(new KeyValuePair<double, double>(GlobalTickTimeLocal, cping));
+                while ((GlobalTickTimeLocal - AveragePings.Peek().Key) > 1)
+                {
+                    AveragePings.Pop();
+                }
+                APing = 0;
+                for (int i = 0; i < AveragePings.Length; i++)
+                {
+                    APing += AveragePings[i].Value;
+                }
+                APing /= (double)AveragePings.Length;
+                if (FogEnhanceTime > 0.0)
+                {
+                    FogEnhanceTime -= Delta;
+                }
+                else
+                {
+                    FogEnhanceTime = 0.0;
+                }
             }
-            double cping = Math.Max(LastPingValue, GlobalTickTimeLocal - LastPingTime);
-            AveragePings.Push(new KeyValuePair<double, double>(GlobalTickTimeLocal, cping));
-            while ((GlobalTickTimeLocal - AveragePings.Peek().Key) > 1)
-            {
-                AveragePings.Pop();
-            }
-            APing = 0;
-            for (int i = 0; i < AveragePings.Length; i++)
-            {
-                APing += AveragePings[i].Value;
-            }
-            APing /= (double)AveragePings.Length;
         }
 
         public Location PlayerEyePosition;
