@@ -430,11 +430,11 @@ namespace Voxalia.ClientGame.AudioSystem
             {
                 throw new NotSupportedException("Not a DATA .wav file: " + data_signature);
             }
-            /*int data_chunk_size = */dr.ReadInt32();
+            int data_chunk_size = dr.ReadInt32();
             channels = num_channels;
             bits = bits_per_sample;
             rate = sample_rate;
-            return dr.ReadBytes((int)dr.BaseStream.Length);
+            return dr.ReadBytes(data_chunk_size);
         }
     }
 }
