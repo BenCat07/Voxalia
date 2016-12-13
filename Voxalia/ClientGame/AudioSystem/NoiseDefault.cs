@@ -9,6 +9,7 @@ namespace Voxalia.ClientGame.AudioSystem
 {
     class NoiseDefault
     {
+        // TODO: better quality noise sample!
         public static string NoiseB64 = "UklGRgcuAABXQVZFZm10IBAAAAABAAEAIlYAACJWAAABAAgAZGF0YeMtAACAgICAgICAgICAgICA" +
 "gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA" +
 "gICAgICAgICAgICAgICAgICAgICAgICAgH+AgICAgICAgICAgICAgICAgYGAgICAgICAgICAgICA" +

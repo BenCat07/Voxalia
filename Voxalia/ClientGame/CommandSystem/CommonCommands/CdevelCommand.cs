@@ -168,6 +168,12 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         TheClient.FogEnhanceTime = time;
                         break;
                     }
+                case "earRing":
+                    {
+                        double time = NumberTag.TryFor(entry.GetArgumentObject(queue, 1)).Internal;
+                        TheClient.Sounds.Deafen(time);
+                        break;
+                    }
                 default:
                     ShowUsage(queue, entry);
                     break;

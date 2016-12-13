@@ -17,6 +17,7 @@ using Voxalia.Shared.Files;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.ClientGame.ClientMainSystem;
 using FreneticScript;
+using System.Threading;
 
 namespace Voxalia.ClientGame.AudioSystem
 {
@@ -64,6 +65,9 @@ namespace Voxalia.ClientGame.AudioSystem
             Effects = new Dictionary<string, SoundEffect>();
             PlayingNow = new List<ActiveSound>();
             Noise = LoadSound(new DataStream(Convert.FromBase64String(NoiseDefault.NoiseB64)), "noise");
+            DeafStart = GetSound("sfx/ringing/earring_start");
+            DeafLoop = GetSound("sfx/ringing/earring_loop");
+            DeafEnd = GetSound("sfx/ringing/earring_stop");
         }
 
         public void StopAll()
@@ -77,6 +81,12 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public bool Selected;
 
+        SoundEffect DeafStart;
+        SoundEffect DeafLoop;
+        SoundEffect DeafEnd;
+
+        public ActiveSound DeafNoise = null;
+
         public void Update(Location position, Location forward, Location up, Location velocity, bool selected)
         {
             ALError err = AL.GetError();
@@ -88,6 +98,52 @@ namespace Voxalia.ClientGame.AudioSystem
             }
             bool sel = CVars.a_quietondeselect.ValueB ? selected : true;
             Selected = sel;
+            if (Deafness == DeafenState.NOT)
+            {
+                if (DeafNoise != null)
+                {
+                    DeafNoise.Stop();
+                    DeafNoise.Destroy();
+                    DeafNoise = null;
+                }
+                if (DeafenTime > 0)
+                {
+                    Deafness = DeafenState.START;
+                }
+            }
+            if (Deafness == DeafenState.START)
+            {
+                if (DeafNoise == null)
+                {
+                    DeafNoise = PlaySimpleInternal(DeafStart, false);
+                }
+                if (!DeafNoise.IsPlaying())
+                {
+                    Deafness = DeafenState.LOOP;
+                    DeafNoise = PlaySimpleInternal(DeafLoop, true);
+                }
+            }
+            else if (Deafness == DeafenState.LOOP)
+            {
+                if (DeafenTime < 1.0)
+                {
+                    DeafNoise.Stop();
+                    DeafNoise.Destroy();
+                    DeafNoise = PlaySimpleInternal(DeafEnd, false);
+                    Deafness = DeafenState.STOP;
+                }
+            }
+            else if (Deafness == DeafenState.STOP)
+            {
+                if (!DeafNoise.IsPlaying())
+                {
+                    DeafNoise.Destroy();
+                    DeafNoise = null;
+                    Deafness = DeafenState.NOT;
+                }
+            }
+            TimeDeaf += TheClient.Delta;
+            DeafenTime -= TheClient.Delta;
             for (int i = 0; i < PlayingNow.Count; i++)
             {
                 if (!PlayingNow[i].Exists || AL.GetSourceState(PlayingNow[i].Src) == ALSourceState.Stopped)
@@ -95,16 +151,36 @@ namespace Voxalia.ClientGame.AudioSystem
                     PlayingNow[i].Destroy();
                     PlayingNow.RemoveAt(i);
                     i--;
+                    continue;
                 }
-                else if (!sel && PlayingNow[i].IsBackground && !PlayingNow[i].Backgrounded)
+                if (Deafness != DeafenState.NOT && sel && !PlayingNow[i].IsBackground)
+                {
+                    PlayingNow[i].IsDeafened = true;
+                    float lesser = (float)Math.Min(DeafenTime, TimeDeaf);
+                    if (lesser < 0.999)
+                    {
+                        AL.Source(PlayingNow[i].Src, ALSourcef.Gain, PlayingNow[i].Gain * (1.0f - lesser));
+                    }
+                    else
+                    {
+                        AL.Source(PlayingNow[i].Src, ALSourcef.Gain, 0.0001f);
+                    }
+                }
+                else if (Deafness == DeafenState.NOT && sel && !PlayingNow[i].IsBackground)
+                {
+                    AL.Source(PlayingNow[i].Src, ALSourcef.Gain, PlayingNow[i].Gain);
+                    PlayingNow[i].IsDeafened = false;
+                }
+                if (Deafness == DeafenState.NOT && !sel && PlayingNow[i].IsBackground && !PlayingNow[i].Backgrounded)
                 {
                     AL.Source(PlayingNow[i].Src, ALSourcef.Gain, 0.0001f);
                     PlayingNow[i].Backgrounded = true;
                 }
-                else if (sel && PlayingNow[i].Backgrounded)
+                else if (Deafness == DeafenState.NOT && sel && PlayingNow[i].Backgrounded)
                 {
                     AL.Source(PlayingNow[i].Src, ALSourcef.Gain, PlayingNow[i].Gain);
                     PlayingNow[i].Backgrounded = false;
+                    PlayingNow[i].IsDeafened = false;
                 }
             }
             if (Microphone != null)
@@ -182,6 +258,30 @@ namespace Voxalia.ClientGame.AudioSystem
             playSound();
         }
 
+        public ActiveSound PlaySimpleInternal(SoundEffect sfx, bool loop)
+        {
+            Func<ActiveSound> playSound = () =>
+            {
+                ActiveSound actsfx = new ActiveSound(sfx);
+                actsfx.Engine = this;
+                actsfx.Position = Location.NaN;
+                actsfx.Pitch = 1.0f;
+                actsfx.Gain = 1.0f;
+                actsfx.Loop = loop;
+                actsfx.Create();
+                actsfx.Play();
+                return actsfx;
+            };
+            lock (sfx)
+            {
+                if (sfx.Internal == -1)
+                {
+                    return null; // TODO: Enforce load-NOW?
+                }
+            }
+            return playSound();
+        }
+
         public SoundEffect GetSound(string name)
         {
             string namelow = name.ToLowerFast();
@@ -250,6 +350,25 @@ namespace Voxalia.ClientGame.AudioSystem
                 return null;
             }
         }
+
+        public void Deafen(double time)
+        {
+            DeafenTime = time;
+        }
+
+        public enum DeafenState
+        {
+            NOT = 0,
+            START = 1,
+            LOOP = 2,
+            STOP = 3
+        }
+
+        public DeafenState Deafness;
+
+        public double DeafenTime = 0.0;
+
+        public double TimeDeaf = 0.0;
 
         public SoundEffect LoadVorbisSound(DataStream stream, string name)
         {

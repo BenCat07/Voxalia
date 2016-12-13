@@ -77,6 +77,8 @@ namespace Voxalia.ClientGame.AudioSystem
             AL.Source(Src, ALSourcef.Pitch, Pitch);
         }
 
+        public bool IsDeafened = false;
+
         public void UpdateGain()
         {
             bool sel = Engine.Selected;
@@ -110,6 +112,11 @@ namespace Voxalia.ClientGame.AudioSystem
         public void Stop()
         {
             AL.SourceStop(Src);
+        }
+
+        public bool IsPlaying()
+        {
+            return (AL.GetSourceState(Src) == ALSourceState.Playing);
         }
 
         public void Destroy()
