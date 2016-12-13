@@ -40,8 +40,16 @@ layout (location = 5) uniform float minimum_light = 0.2;
 // ...
 layout (location = 10) uniform vec3 sunlightDir = vec3(0.0, 0.0, -1.0);
 layout (location = 11) uniform vec3 maximum_light = vec3(0.9, 0.9, 0.9);
+layout (location = 12) uniform vec4 fogCol = vec4(0.0);
+layout (location = 13) uniform float znear = 1.0;
+layout (location = 14) uniform float zfar = 1000.0;
 
 layout (location = 0) out vec4 color;
+
+float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a linear distance (still from 0.0 to 1.0).
+{
+	return (2.0 * znear) / (zfar + znear - rinput * (zfar - znear));
+}
 
 void main()
 {
@@ -70,4 +78,7 @@ void main()
 	// TODO: Maybe read the normal texture too, to increase "prettiness"? (Optionally, probably!)
 	color.xyz *= min(max(dot(-fi.norm, sunlightDir) * maximum_light, max(0.2, minimum_light)), 1.0);
 #endif
+	float dist = linearizeDepth(gl_FragCoord.z);
+	float fogMod = dist * exp(fogCol.w) * fogCol.w;
+	color.xyz = color.xyz * (1.0 - fogMod) + fogCol.xyz * fogMod;
 }
