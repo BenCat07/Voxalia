@@ -770,6 +770,37 @@ namespace Voxalia.ClientGame.EntitySystem
                         ItemLeft = false;
                         PVRItemLeft = false;
                     }
+                    bool rtptouched = TheClient.VR.Right.Touched.HasFlag(VRButtons.TRACKPAD);
+                    if (rtptouched && !VRRTouched)
+                    {
+                        VRRTouchDown = TheClient.VR.Right.TrackPad;
+                        VRRTouched = true;
+                    }
+                    if (rtptouched)
+                    {
+                        VRRTouchLast = TheClient.VR.Right.TrackPad;
+                    }
+                    const float VR_ADJMIN = 0.5f;
+                    if (!rtptouched && (VRRTouchLast.X != 0.0f || VRRTouchLast.Y != 0.0f))
+                    {
+                        if (VRRTouchDown.X < -VR_ADJMIN && VRRTouchLast.X > VR_ADJMIN)
+                        {
+                            TheClient.Commands.ExecuteCommands("itemprev");
+                        }
+                        else if (VRRTouchDown.X > VR_ADJMIN && VRRTouchLast.X < -VR_ADJMIN)
+                        {
+                            TheClient.Commands.ExecuteCommands("itemnext");
+                        }
+                        if (VRRTouchDown.Y < -VR_ADJMIN && VRRTouchLast.Y > VR_ADJMIN)
+                        {
+                            TheClient.Commands.ExecuteCommands("echo 'Wow! You swiped up! Behavior for this coming SOON!'");
+                        }
+                        else if (VRRTouchDown.Y > VR_ADJMIN && VRRTouchLast.Y < -VR_ADJMIN)
+                        {
+                            TheClient.Commands.ExecuteCommands("weaponreload");
+                        }
+                        VRRTouchLast = OpenTK.Vector2.Zero;
+                    }
                 }
             }
             TryToJump();
@@ -828,6 +859,12 @@ namespace Voxalia.ClientGame.EntitySystem
                 }
             }
         }
+
+        public OpenTK.Vector2 VRRTouchDown = OpenTK.Vector2.Zero;
+
+        public OpenTK.Vector2 VRRTouchLast = OpenTK.Vector2.Zero;
+
+        public bool VRRTouched = false;
 
         public bool ConsoleWasOpen = false;
 
