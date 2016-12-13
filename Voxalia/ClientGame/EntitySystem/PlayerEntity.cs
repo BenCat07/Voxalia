@@ -446,6 +446,10 @@ namespace Voxalia.ClientGame.EntitySystem
         public bool PVRPrimary;
         public bool PVRSecondary;
         public bool PVRUse;
+        public bool PVRItemLeft;
+        public bool PVRItemRight;
+        public bool PVRItemUp;
+        public bool PVRItemDown;
 
         public override void Tick()
         {
@@ -722,6 +726,49 @@ namespace Voxalia.ClientGame.EntitySystem
                     {
                         Use = false;
                         PVRUse = false;
+                    }
+                    bool rtppressed = TheClient.VR.Right.Pressed.HasFlag(VRButtons.TRACKPAD);
+                    OpenTK.Vector2 rtp = TheClient.VR.Right.TrackPad;
+                    float yxdiff = Math.Abs(rtp.Y) - Math.Abs(rtp.X);
+                    if (rtppressed && rtp.Y > 0.01 && (yxdiff > 0.01))
+                    {
+                        ItemUp = true;
+                        PVRItemUp = true;
+                    }
+                    else if (PVRItemUp)
+                    {
+                        ItemUp = false;
+                        PVRItemUp = false;
+                    }
+                    if (rtppressed && rtp.Y < 0.01 && (yxdiff > 0.01))
+                    {
+                        ItemDown = true;
+                        PVRItemDown = true;
+                    }
+                    else if (PVRItemDown)
+                    {
+                        ItemDown = false;
+                        PVRItemDown = false;
+                    }
+                    if (rtppressed && rtp.X > 0.01 && (yxdiff < -0.01))
+                    {
+                        ItemRight = true;
+                        PVRItemRight = true;
+                    }
+                    else if (PVRItemRight)
+                    {
+                        ItemRight = false;
+                        PVRItemRight = false;
+                    }
+                    if (rtppressed && rtp.X < 0.01 && (yxdiff < -0.01))
+                    {
+                        ItemLeft = true;
+                        PVRItemLeft = true;
+                    }
+                    else if (PVRItemLeft)
+                    {
+                        ItemLeft = false;
+                        PVRItemLeft = false;
                     }
                 }
             }
