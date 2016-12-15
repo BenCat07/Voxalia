@@ -785,19 +785,19 @@ namespace Voxalia.ClientGame.EntitySystem
                     {
                         if (VRRTouchDown.X < -VR_ADJMIN && VRRTouchLast.X > VR_ADJMIN)
                         {
-                            TheClient.Commands.ExecuteCommands("itemprev");
+                            TheClient.Commands.ExecuteCommands("itemprev"); // TODO: Less lazy!
                         }
                         else if (VRRTouchDown.X > VR_ADJMIN && VRRTouchLast.X < -VR_ADJMIN)
                         {
-                            TheClient.Commands.ExecuteCommands("itemnext");
+                            TheClient.Commands.ExecuteCommands("itemnext"); // TODO: Less lazy!
                         }
                         if (VRRTouchDown.Y < -VR_ADJMIN && VRRTouchLast.Y > VR_ADJMIN)
                         {
-                            TheClient.Commands.ExecuteCommands("echo 'Wow! You swiped up! Behavior for this coming SOON!'");
+                            TheClient.Commands.ExecuteCommands("echo 'Wow! You swiped up! Behavior for this coming SOON!'"); // TODO: Less lazy!
                         }
                         else if (VRRTouchDown.Y > VR_ADJMIN && VRRTouchLast.Y < -VR_ADJMIN)
                         {
-                            TheClient.Commands.ExecuteCommands("weaponreload");
+                            TheClient.Commands.ExecuteCommands("weaponreload"); // TODO: Less lazy!
                         }
                         VRRTouchLast = OpenTK.Vector2.Zero;
                     }
