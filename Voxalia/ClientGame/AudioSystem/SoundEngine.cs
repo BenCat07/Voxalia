@@ -87,13 +87,29 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public ActiveSound DeafNoise = null;
 
-        public void Update(Location position, Location forward, Location up, Location velocity, bool selected)
+        public void CheckError(string inp)
         {
+#if !AUDIO_ERROR_CHECK
             ALError err = AL.GetError();
             if (err != ALError.NoError)
             {
-                SysConsole.Output(OutputType.WARNING, "Found audio error " + err + ", rebuilding audio...");
-                Init(TheClient, CVars);
+                SysConsole.Output(OutputType.WARNING, "Found audio error " + err + " for " + inp);
+                //init(TheClient, CVars);
+                return;
+            }
+#endif
+        }
+
+        public Location CPosition = Location.Zero;
+
+        public void Update(Location position, Location forward, Location up, Location velocity, bool selected)
+        {
+            CPosition = position;
+            ALError err = AL.GetError();
+            if (err != ALError.NoError)
+            {
+                SysConsole.Output(OutputType.WARNING, "Found audio error " + err + "!");
+                //init(TheClient, CVars);
                 return;
             }
             bool sel = CVars.a_quietondeselect.ValueB ? selected : true;
@@ -110,6 +126,11 @@ namespace Voxalia.ClientGame.AudioSystem
                 {
                     Deafness = DeafenState.START;
                 }
+            }
+            else
+            {
+                TimeDeaf += TheClient.Delta;
+                DeafenTime -= TheClient.Delta;
             }
             if (Deafness == DeafenState.START)
             {
@@ -143,13 +164,12 @@ namespace Voxalia.ClientGame.AudioSystem
                     Deafness = DeafenState.NOT;
                 }
             }
-            TimeDeaf += TheClient.Delta;
-            DeafenTime -= TheClient.Delta;
             for (int i = 0; i < PlayingNow.Count; i++)
             {
-                if (!PlayingNow[i].Exists || AL.GetSourceState(PlayingNow[i].Src) == ALSourceState.Stopped)
+                if (!PlayingNow[i].Exists || PlayingNow[i].Src < 0 || AL.GetSourceState(PlayingNow[i].Src) == ALSourceState.Stopped)
                 {
                     PlayingNow[i].Destroy();
+                    CheckError("Destroy:" + PlayingNow[i].Effect.Name);
                     PlayingNow.RemoveAt(i);
                     i--;
                     continue;
@@ -184,10 +204,12 @@ namespace Voxalia.ClientGame.AudioSystem
                     PlayingNow[i].IsDeafened = false;
                 }
             }
+            CheckError("Setup");
             if (Microphone != null)
             {
                 Microphone.Tick();
             }
+            CheckError("Microphone");
             Vector3 pos = ClientUtilities.Convert(position);
             Vector3 forw = ClientUtilities.Convert(forward);
             Vector3 upvec = ClientUtilities.Convert(up);
@@ -195,19 +217,45 @@ namespace Voxalia.ClientGame.AudioSystem
             AL.Listener(ALListener3f.Position, ref pos);
             AL.Listener(ALListenerfv.Orientation, ref forw, ref upvec);
             AL.Listener(ALListener3f.Velocity, ref vel);
+            CheckError("Positioning");
             float globvol = CVars.a_globalvolume.ValueF;
             AL.Listener(ALListenerf.Gain, globvol <= 0 ? 0.001f: (globvol > 1 ? 1: globvol));
+            CheckError("Gain");
         }
 
         public Dictionary<string, SoundEffect> Effects;
 
         public List<ActiveSound> PlayingNow;
 
+        public bool CanClean()
+        {
+            bool cleaned = false;
+            for (int i = 0; i < PlayingNow.Count; i++)
+            {
+                ActiveSound sound = PlayingNow[i];
+                if (sound.Gain < 0.05 || (sound.Position.DistanceSquared(CPosition) > 30 * 30))
+                {
+                    sound.Destroy();
+                    PlayingNow.RemoveAt(i);
+                    i--;
+                    cleaned = true;
+                }
+            }
+            return cleaned;
+        }
+
         /// <summary>
-        /// NOTE: *NOT* guaranteed to play a sound effect immediately, regardless of input! Some sound effects will be delayed!
+        /// NOTE: *NOT* guaranteed to play a sound effect immediately, regardless of input! Some sound effects will be delayed! If too many audible sounds are already playing, this will refuse to play.
         /// </summary>
         public void Play(SoundEffect sfx, bool loop, Location pos, float pitch = 1, float volume = 1, float seek_seconds = 0, Action<ActiveSound> callback = null)
         {
+            if (PlayingNow.Count > 200)
+            {
+                if (!CanClean())
+                {
+                    return;
+                }
+            }
             if (sfx.Internal == -2)
             {
                 Play(GetSound(sfx.Name), loop, pos, pitch, volume, seek_seconds, callback);
@@ -234,7 +282,11 @@ namespace Voxalia.ClientGame.AudioSystem
                 actsfx.Gain = volume;
                 actsfx.Loop = loop;
                 actsfx.Create();
-                actsfx.Play();
+                if (actsfx.Src < 0)
+                {
+                    return;
+                }
+                CheckError("Create:" + sfx.Name);
                 if (Deafness != DeafenState.NOT)
                 {
                     actsfx.IsDeafened = true;
@@ -244,6 +296,9 @@ namespace Voxalia.ClientGame.AudioSystem
                 {
                     actsfx.Seek(seek_seconds);
                 }
+                CheckError("Preconfig:" + sfx.Name);
+                actsfx.Play();
+                CheckError("Play:" + sfx.Name);
                 PlayingNow.Add(actsfx);
                 if (callback != null)
                 {
