@@ -47,7 +47,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 return;
             }
             PlayerEntity player = (PlayerEntity)entity;
-            Location end = player.GetEyePosition() + player.ForwardVector() * 5;
+            Location end = player.ItemSource() + player.ItemDir * 5;
             CollisionResult cr = player.TheRegion.Collision.CuboidLineTrace(new Location(0.1, 0.1, 0.1), player.GetEyePosition(), end, player.IgnoreThis);
             if (cr.Hit && cr.HitEnt != null)
             {

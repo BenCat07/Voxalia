@@ -50,8 +50,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public int Height;
 
-        public Material Headmat = Material.AIR;
+        public Location FogCol = new Location(0.7);
 
+        public float FogAlpha = 1.0f;
+        
         public Location SunLoc = Location.NaN;
 
         public Client TheClient;
@@ -616,11 +618,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+            GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
             TheClient.s_forw_vox.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+            GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
             GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
@@ -628,6 +636,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+            GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
             GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
@@ -656,11 +667,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+            GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
             TheClient.s_forw_trans.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+            GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
             if (PostFirstRender != null)
             {
@@ -1116,7 +1133,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(10, MainEXP * TheClient.CVars.r_exposure.ValueF);
             GL.Uniform1(16, TheClient.CVars.r_znear.ValueF);
             GL.Uniform1(17, TheClient.ZFar());
-            GL.Uniform4(18, new Vector4(ClientUtilities.Convert(Headmat.GetFogColor()), (float)Headmat.GetFogAlpha()));
+            GL.Uniform4(18, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
             // TODO: If thick fog, blur the environment? Or some similar head-in-a-block effect!
             GL.Uniform1(19, DesaturationAmount);
             GL.Uniform3(20, new Vector3(0, 0, 0));

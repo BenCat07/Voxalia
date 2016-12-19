@@ -33,8 +33,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             {
                 return;
             }
-            Location eye = player.GetEyePosition();
-            Location adj = player.ForwardVector() * 20f;
+            Location eye = player.ItemSource();
+            Location adj = player.ItemDir * 20f;
             CollisionResult cr = player.TheRegion.Collision.CuboidLineTrace(new Location(0.1f), eye, eye + adj, player.IgnoreThis);
             if (!cr.Hit)
             {

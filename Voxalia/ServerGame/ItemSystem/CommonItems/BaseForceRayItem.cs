@@ -39,8 +39,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             CharacterEntity character = (CharacterEntity)entity;
             double range = RangeBase * item.GetAttributeF("range_mod", 1f);
             double strength = StrengthBase * item.GetAttributeF("strength_mod", 1f) * GetStrength();
-            Location start = character.GetEyePosition(); // TODO: ItemPosition?
-            Location forw = character.ForwardVector();
+            Location start = character.ItemSource();
+            Location forw = character.ItemDir;
             Location mid = start + forw * range;
             // TODO: base the pull on extent of the entity rather than its center. IE, if the side of a big ent is targeted, it should be rotated by the force.
             List<Entity> ents = character.TheRegion.GetEntitiesInRadius(mid, range);

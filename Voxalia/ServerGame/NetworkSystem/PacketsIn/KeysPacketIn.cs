@@ -18,7 +18,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
     {
         public override bool ParseBytesAndExecute(byte[] data)
         {
-            if (data.Length != 8 + 2 + 4 + 4 + 4 + 4 + 24 + 24 + 4)
+            if (data.Length != 8 + 2 + 4 + 4 + 4 + 4 + 24 + 24 + 4 + 24 + 24)
             {
                 return false;
             }
@@ -41,10 +41,20 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
             Location pos = Location.FromDoubleBytes(data, s);
             Location vel = Location.FromDoubleBytes(data, s + 24);
             double sow = Utilities.BytesToFloat(Utilities.BytesPartial(data, s + 24 + 24, 4));
+            Location itemdir = Location.FromDoubleBytes(data, s + 24 + 24 + 4);
+            Location isRel = Location.FromDoubleBytes(data, s + 24 + 24 + 4 + 24);
             Vector2 tmove = new Vector2(x, y);
-            if (tmove.LengthSquared() > 1f)
+            if (tmove.LengthSquared() > 1.0)
             {
                 tmove.Normalize();
+            }
+            if (itemdir.LengthSquared() != 1.0)
+            {
+                itemdir = itemdir.Normalize();
+            }
+            if (isRel.LengthSquared() > 3.0 * 3.0)
+            {
+                isRel = isRel.Normalize() * 3.0;
             }
             if (Player.Upward != upw || Player.Downward != downw || Player.Click != click || Player.AltClick != aclick
                 || Player.Use != use || Math.Abs(Player.Direction.Yaw - yaw) > 0.05 || Math.Abs(Player.Direction.Pitch - pitch) > 0.05
@@ -63,6 +73,8 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
             Player.ItemDown = idown;
             Player.LastKPI = Player.TheRegion.GlobalTickTime;
             Player.SprintOrWalk = sow;
+            Player.ItemDir = itemdir;
+            Player.ItemSourceRelative = isRel;
             if (Player.Flags.HasFlag(YourStatusFlags.NO_ROTATE))
             {
                 Player.AttemptedDirectionChange.Yaw += yaw;

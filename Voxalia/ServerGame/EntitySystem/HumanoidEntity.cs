@@ -105,7 +105,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             base.Tick();
             Body.ActivityInformation.Activate();
-            CursorMarker.SetPosition(GetEyePosition() + ForwardVector() * 0.9f);
+            CursorMarker.SetPosition(ItemSource() + ItemDir * 0.9f);
             CursorMarker.SetOrientation(Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), (double)(Direction.Pitch * Utilities.PI180)) *
                 Quaternion.CreateFromAxisAngle(new Vector3(0, 0, 1), (double)(Direction.Yaw * Utilities.PI180)));
         }

@@ -498,6 +498,15 @@ namespace Voxalia.ServerGame.EntitySystem
             CBody.Body.AngularVelocity = Vector3.Zero;
         }
 
+        public Location ItemDir = Location.UnitX;
+
+        public Location ItemSourceRelative = Location.UnitZ;
+
+        public Location ItemSource()
+        {
+            return GetPosition() + ItemSourceRelative;
+        }
+
         public Stance DesiredStance = Stance.Standing;
 
         public EntityUseable UsedNow = null;

@@ -509,7 +509,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 sortEntities();
                 Particles.Sort();
-                MainWorldView.Headmat = TheRegion.GetBlockMaterial(MainWorldView.CameraPos);
+                Material headMat = TheRegion.GetBlockMaterial(VR == null ? MainWorldView.CameraPos : Player.GetBasicEyePos());
+                MainWorldView.FogCol = headMat.GetFogColor();
+                float fg = (float)headMat.GetFogAlpha();
+                MainWorldView.FogAlpha = (FogEnhanceTime > 0.01) ? Math.Max(fg, (FogEnhanceTime < 1.0 ? (FogEnhanceStrength - ((1.0f - (float)FogEnhanceTime) * FogEnhanceStrength)) : FogEnhanceStrength)) : fg;
                 MainWorldView.SunLoc = GetSunLocation();
                 MainWorldView.Render();
                 ReverseEntitiesOrder();
@@ -525,6 +528,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 TotalSpikeTime = TotalTime;
             }
         }
+
+        public double FogEnhanceTime = 0;
+
+        public float FogEnhanceStrength = 0.3f;
 
         public float GetSecondSkyDistance()
         {
@@ -543,7 +550,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         public void RenderSkybox()
         {
-            Rendering.SetMinimumLight(1);
+            float skyAlpha = (float)Math.Max(Math.Min((SunAngle.Pitch - 70.0) / (-90.0), 1.0), 0.06);
+            GL.ActiveTexture(TextureUnit.Texture3);
+            Textures.Black.Bind();
+            GL.ActiveTexture(TextureUnit.Texture2);
+            Textures.Black.Bind();
+            GL.ActiveTexture(TextureUnit.Texture1);
+            Textures.NormalDef.Bind();
+            GL.ActiveTexture(TextureUnit.Texture0);
+            Rendering.SetMinimumLight(Math.Max(1.6f * skyAlpha, 1.0f));
             GL.Disable(EnableCap.CullFace);
             Rendering.SetColor(Color4.White);
             Matrix4 scale = Matrix4.CreateScale(GetSecondSkyDistance());
@@ -561,7 +576,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             skybox[4].Render(false);
             Textures.GetTexture("skies/" + CVars.r_skybox.Value + "_night/yp").Bind();
             skybox[5].Render(false);
-            Rendering.SetColor(new Vector4(1, 1, 1, (float)Math.Max(Math.Min((SunAngle.Pitch - 70.0) / (-90.0), 1.0), 0.06)));
+            Rendering.SetColor(new Vector4(1, 1, 1, skyAlpha));
             scale = Matrix4.CreateScale(GetSkyDistance());
             GL.UniformMatrix4(2, false, ref scale);
             // TODO: Save textures!
@@ -840,33 +855,26 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Textures.White.Bind();
             Rendering.SetMinimumLight(1);
             Model tmod = Models.GetModel("vr/controller/vive"); // TODO: Store the model in a var somewhere?
+            VBO mmcircle = tmod.MeshFor("circle").vbo;
             tmod.LoadSkin(Textures);
             // TODO: Special dynamic controller models!
             if (VR.Left != null)
             {
-                Matrix4 pos = Matrix4.CreateScale(0.66666f) * VR.Left.Position;
+                Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Left.Position;
+                VR.LeftTexture.CalcTexture(VR.Left, GlobalTickTimeLocal);
+                isVox = true;
+                SetEnts();
+                mmcircle.Tex = new Texture() { Internal_Texture = VR.LeftTexture.Texture, Engine = Textures };
                 GL.UniformMatrix4(2, false, ref pos);
                 tmod.Draw();
-                // TEMPORARY
-                Quaternion oquat = VR.Left.Position.ExtractRotation(true);
-                BEPUutilities.Quaternion quat = new BEPUutilities.Quaternion(oquat.X, oquat.Y, oquat.Z, oquat.W);
-                BEPUutilities.Vector3 face = -BEPUutilities.Quaternion.Transform(BEPUutilities.Vector3.UnitZ, quat);
-                Vector3 forw = ClientUtilities.Convert(new Location(face));
-                Vector3 ospot = VR.Left.Position.ExtractTranslation();
-                Vector3 goal = ospot + forw * 0.5f;
-                Matrix4 trans = Matrix4.CreateTranslation(goal);
-                GL.UniformMatrix4(2, false, ref trans);
-                tmod.Draw();
-                Textures.White.Bind();
-                Rendering.SetColor(Color4.Red);
-                GL.LineWidth(3);
-                Rendering.RenderLine(MainWorldView.CameraPos + ClientUtilities.Convert(ospot), MainWorldView.CameraPos + ClientUtilities.Convert(goal));
-                GL.LineWidth(1);
-                Rendering.SetColor(Color4.White);
             }
             if (VR.Right != null)
             {
-                Matrix4 pos = Matrix4.CreateScale(0.66666f) * VR.Right.Position;
+                Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Right.Position;
+                VR.RightTexture.CalcTexture(VR.Right, GlobalTickTimeLocal);
+                isVox = true;
+                SetEnts();
+                mmcircle.Tex = new Texture() { Internal_Texture = VR.RightTexture.Texture, Engine = Textures };
                 GL.UniformMatrix4(2, false, ref pos);
                 tmod.Draw();
             }
@@ -961,7 +969,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.ActiveTexture(TextureUnit.Texture0);
             }
             Textures.White.Bind();
-            Location mov = (CameraFinalTarget - MainWorldView.CameraPos) / CameraDistance;
+            Location itemSource = Player.ItemSource();
+            Location mov = (CameraFinalTarget - itemSource) / CameraDistance;
             Location cpos = CameraFinalTarget - (CameraImpactNormal * 0.01f);
             Location cpos2 = CameraFinalTarget + (CameraImpactNormal * 0.91f);
             // TODO: 5 -> Variable length (Server controlled?)
@@ -975,6 +984,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     Rendering.SetMinimumLight(1.0f);
                     Rendering.RenderLineBox(cft - mov * 0.01f, cft + Location.One - mov * 0.01f);
                     GL.LineWidth(1);
+                    if (VR != null && VR.Right != null)
+                    {
+                        Rendering.SetColor(Color4.Red);
+                        Rendering.RenderLine(itemSource, CameraFinalTarget);
+                    }
                 }
                 if (CVars.u_highlight_placeblock.ValueB)
                 {

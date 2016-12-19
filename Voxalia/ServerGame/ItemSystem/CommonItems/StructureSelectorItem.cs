@@ -61,8 +61,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             }
             PlayerEntity player = (PlayerEntity)entity;
             // TODO: Generic 'player.gettargetblock'?
-            Location eye = player.GetEyePosition();
-            Location forw = player.ForwardVector();
+            Location eye = player.ItemSource();
+            Location forw = player.ItemDir;
             RayCastResult rcr;
             bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, 5, MaterialSolidity.ANY, player.IgnoreThis, out rcr);
             if (h)
@@ -93,8 +93,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             }
             PlayerEntity player = (PlayerEntity)entity;
             // TODO: Generic 'player.gettargetblock'?
-            Location eye = player.GetEyePosition();
-            Location forw = player.ForwardVector();
+            Location eye = player.ItemSource();
+            Location forw = player.ItemDir;
             RayCastResult rcr;
             bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, 5, MaterialSolidity.ANY, player.IgnoreThis, out rcr);
             if (h)

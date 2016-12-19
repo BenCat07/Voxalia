@@ -241,26 +241,34 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     SysConsole.Output(OutputType.ERROR, "Ticking: " + ex.ToString());
                 }
-                PlayerEyePosition = Player.GetCameraPosition();
+                PlayerEyePosition = Player.ItemSource();
                 RayCastResult rcr;
-                Location forw = Player.ForwardVector();
+                Location forw = Player.ItemDir();
                 bool h = TheRegion.SpecialCaseRayTrace(PlayerEyePosition, forw, 100, MaterialSolidity.ANY, IgnorePlayer, out rcr);
                 CameraFinalTarget = h ? new Location(rcr.HitData.Location) - new Location(rcr.HitData.Normal).Normalize() * 0.01: PlayerEyePosition + forw * 100;
                 CameraImpactNormal = h ? new Location(rcr.HitData.Normal).Normalize() : Location.Zero;
                 CameraDistance = h ? rcr.HitData.T: 100;
+                double cping = Math.Max(LastPingValue, GlobalTickTimeLocal - LastPingTime);
+                AveragePings.Push(new KeyValuePair<double, double>(GlobalTickTimeLocal, cping));
+                while ((GlobalTickTimeLocal - AveragePings.Peek().Key) > 1)
+                {
+                    AveragePings.Pop();
+                }
+                APing = 0;
+                for (int i = 0; i < AveragePings.Length; i++)
+                {
+                    APing += AveragePings[i].Value;
+                }
+                APing /= (double)AveragePings.Length;
+                if (FogEnhanceTime > 0.0)
+                {
+                    FogEnhanceTime -= Delta;
+                }
+                else
+                {
+                    FogEnhanceTime = 0.0;
+                }
             }
-            double cping = Math.Max(LastPingValue, GlobalTickTimeLocal - LastPingTime);
-            AveragePings.Push(new KeyValuePair<double, double>(GlobalTickTimeLocal, cping));
-            while ((GlobalTickTimeLocal - AveragePings.Peek().Key) > 1)
-            {
-                AveragePings.Pop();
-            }
-            APing = 0;
-            for (int i = 0; i < AveragePings.Length; i++)
-            {
-                APing += AveragePings[i].Value;
-            }
-            APing /= (double)AveragePings.Length;
         }
 
         public Location PlayerEyePosition;

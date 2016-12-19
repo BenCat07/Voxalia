@@ -319,7 +319,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// All the meshes this model has.
         /// </summary>
         public List<ModelMesh> Meshes;
-
+        
         public ModelNode RootNode;
 
         public ModelMesh MeshFor(string name)
@@ -489,6 +489,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             if (Engine.TheClient.Files.Exists("models/" + Name + ".skin"))
             {
                 string[] data = Engine.TheClient.Files.ReadText("models/" + Name + ".skin").SplitFast('\n');
+                int c = 0;
                 foreach (string datum in data)
                 {
                     if (datum.Length > 0)
@@ -525,6 +526,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     {
                                         SysConsole.Output(OutputType.WARNING, "Unknown skin entry typer: '" + typer + "', expected reflectivity, specular, or simply no specification!");
                                     }
+                                    c++;
                                     success = true;
                                 }
                             }
@@ -540,6 +542,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             }
                         }
                     }
+                }
+                if (c == 0)
+                {
+                    SysConsole.Output(OutputType.WARNING, "No entries in " + Name + ".skin");
                 }
             }
             else

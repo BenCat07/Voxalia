@@ -297,12 +297,27 @@ namespace Voxalia.ClientGame.EntitySystem
                 Location loc = new Location();
                 loc.Yaw = tyaw;
                 loc.Pitch = tpitch;
-                TheClient.Network.SendPacket(new KeysPacketOut(lUIS.ID, kpd, loc, lUIS.XMove, lUIS.YMove, GetPosition(), GetVelocity(), lUIS.SprintOrWalk));
+                TheClient.Network.SendPacket(new KeysPacketOut(lUIS.ID, kpd, loc, lUIS.XMove, lUIS.YMove, GetPosition(), GetVelocity(), lUIS.SprintOrWalk, ItemDir(), ItemSourceRelative()));
             }
             else
             {
-                TheClient.Network.SendPacket(new KeysPacketOut(lUIS.ID, kpd, Direction, lUIS.XMove, lUIS.YMove, GetPosition(), GetVelocity(), lUIS.SprintOrWalk));
+                TheClient.Network.SendPacket(new KeysPacketOut(lUIS.ID, kpd, Direction, lUIS.XMove, lUIS.YMove, GetPosition(), GetVelocity(), lUIS.SprintOrWalk, ItemDir(), ItemSourceRelative()));
             }
+        }
+
+        public Location ItemDir()
+        {
+            return (TheClient.VR == null || TheClient.VR.Right == null) ? ForwardVector() : TheClient.VR.Right.ForwardVector();
+        }
+
+        public Location ItemSourceRelative()
+        {
+            return ItemSource() - GetPosition();
+        }
+
+        public Location ItemSource()
+        {
+            return (TheClient.VR == null || TheClient.VR.Right == null) ? GetEyePosition() : GetPosition() + ClientUtilities.Convert(TheClient.VR.Right.Position.ExtractTranslation());
         }
 
         public void SetBodyMovement(CharacterController cc, UserInputSet uis)
@@ -426,6 +441,15 @@ namespace Voxalia.ClientGame.EntitySystem
         public bool ItemDown;
         double tyaw = 0;
         double tpitch = 0;
+
+        public bool PVRJump;
+        public bool PVRPrimary;
+        public bool PVRSecondary;
+        public bool PVRUse;
+        public bool PVRItemLeft;
+        public bool PVRItemRight;
+        public bool PVRItemUp;
+        public bool PVRItemDown;
 
         public override void Tick()
         {
@@ -643,22 +667,140 @@ namespace Voxalia.ClientGame.EntitySystem
                 Vector3 face = -Quaternion.Transform(Vector3.UnitZ, quat);
                 Direction = Utilities.VectorToAngles(new Location(face));
                 //OpenTK.Vector3 headSpot = TheClient.VR.BasicHeadMat.ExtractTranslation();
-                if (TheClient.VR.Left != null && TheClient.VR.Left.Trigger > 0.01f)
+                if (TheClient.VR.Left != null)
                 {
-                    OpenTK.Quaternion loquat = TheClient.VR.Left.Position.ExtractRotation(true);
-                    Quaternion lquat = new Quaternion(loquat.X, loquat.Y, loquat.Z, loquat.W);
-                    Vector3 lforw = -Quaternion.Transform(Vector3.UnitZ, lquat);
-                    Location ldir = Utilities.VectorToAngles(new Location(lforw));
-                    double goalyaw = ldir.Yaw - Direction.Yaw;
-                    Vector2 resmove = new Vector2(Math.Sin(goalyaw * Utilities.PI180), Math.Cos(goalyaw * Utilities.PI180));
-                    double len = resmove.Length();
-                    SprintOrWalk = (float)(len * 2.0 - 1.0);
-                    if (len > 1.0)
+                    if (TheClient.VR.Left.Trigger > 0.01f)
                     {
-                        resmove /= len;
+                        Location lforw = TheClient.VR.Left.ForwardVector();
+                        Location ldir = Utilities.VectorToAngles(lforw);
+                        double goalyaw = ldir.Yaw - Direction.Yaw;
+                        Vector2 resmove = new Vector2(Math.Sin(goalyaw * Utilities.PI180), Math.Cos(goalyaw * Utilities.PI180));
+                        double len = resmove.Length();
+                        SprintOrWalk = (float)(len * 2.0 - 1.0);
+                        if (len > 1.0)
+                        {
+                            resmove /= len;
+                        }
+                        XMove = -(float)resmove.X;
+                        YMove = (float)resmove.Y;
                     }
-                    XMove = -(float)resmove.X;
-                    YMove = (float)resmove.Y;
+                    if (TheClient.VR.Left.Pressed.HasFlag(VRButtons.SIDE_GRIP))
+                    {
+                        Upward = true;
+                        PVRJump = true;
+                    }
+                    else
+                    {
+                        Upward = false;
+                        PVRJump = false;
+                    }
+                }
+                if (TheClient.VR.Right != null)
+                {
+                    if (TheClient.VR.Right.Pressed.HasFlag(VRButtons.TRIGGER))
+                    {
+                        Click = true;
+                        PVRPrimary = true;
+                    }
+                    else if (PVRPrimary)
+                    {
+                        Click = false;
+                        PVRPrimary = false;
+                    }
+                    if (TheClient.VR.Right.Pressed.HasFlag(VRButtons.MENU_BUTTON))
+                    {
+                        AltClick = true;
+                        PVRSecondary = true;
+                    }
+                    else if (PVRSecondary)
+                    {
+                        AltClick = false;
+                        PVRSecondary = false;
+                    }
+                    if (TheClient.VR.Right.Pressed.HasFlag(VRButtons.SIDE_GRIP))
+                    {
+                        Use = true;
+                        PVRUse = true;
+                    }
+                    else if (PVRUse)
+                    {
+                        Use = false;
+                        PVRUse = false;
+                    }
+                    bool rtppressed = TheClient.VR.Right.Pressed.HasFlag(VRButtons.TRACKPAD);
+                    OpenTK.Vector2 rtp = TheClient.VR.Right.TrackPad;
+                    float yxdiff = Math.Abs(rtp.Y) - Math.Abs(rtp.X);
+                    if (rtppressed && rtp.Y > 0.01 && (yxdiff > 0.01))
+                    {
+                        ItemUp = true;
+                        PVRItemUp = true;
+                    }
+                    else if (PVRItemUp)
+                    {
+                        ItemUp = false;
+                        PVRItemUp = false;
+                    }
+                    if (rtppressed && rtp.Y < 0.01 && (yxdiff > 0.01))
+                    {
+                        ItemDown = true;
+                        PVRItemDown = true;
+                    }
+                    else if (PVRItemDown)
+                    {
+                        ItemDown = false;
+                        PVRItemDown = false;
+                    }
+                    if (rtppressed && rtp.X > 0.01 && (yxdiff < -0.01))
+                    {
+                        ItemRight = true;
+                        PVRItemRight = true;
+                    }
+                    else if (PVRItemRight)
+                    {
+                        ItemRight = false;
+                        PVRItemRight = false;
+                    }
+                    if (rtppressed && rtp.X < 0.01 && (yxdiff < -0.01))
+                    {
+                        ItemLeft = true;
+                        PVRItemLeft = true;
+                    }
+                    else if (PVRItemLeft)
+                    {
+                        ItemLeft = false;
+                        PVRItemLeft = false;
+                    }
+                    bool rtptouched = TheClient.VR.Right.Touched.HasFlag(VRButtons.TRACKPAD);
+                    if (rtptouched && !VRRTouched)
+                    {
+                        VRRTouchDown = TheClient.VR.Right.TrackPad;
+                        VRRTouched = true;
+                    }
+                    if (rtptouched)
+                    {
+                        VRRTouchLast = TheClient.VR.Right.TrackPad;
+                    }
+                    const float VR_ADJMIN = 0.5f;
+                    if (!rtptouched && (VRRTouchLast.X != 0.0f || VRRTouchLast.Y != 0.0f))
+                    {
+                        if (VRRTouchDown.X < -VR_ADJMIN && VRRTouchLast.X > VR_ADJMIN)
+                        {
+                            TheClient.Commands.ExecuteCommands("itemprev"); // TODO: Less lazy!
+                        }
+                        else if (VRRTouchDown.X > VR_ADJMIN && VRRTouchLast.X < -VR_ADJMIN)
+                        {
+                            TheClient.Commands.ExecuteCommands("itemnext"); // TODO: Less lazy!
+                        }
+                        if (VRRTouchDown.Y < -VR_ADJMIN && VRRTouchLast.Y > VR_ADJMIN)
+                        {
+                            TheClient.Commands.ExecuteCommands("echo 'Wow! You swiped up! Behavior for this coming SOON!'"); // TODO: Less lazy!
+                        }
+                        else if (VRRTouchDown.Y > VR_ADJMIN && VRRTouchLast.Y < -VR_ADJMIN)
+                        {
+                            TheClient.Commands.ExecuteCommands("weaponreload"); // TODO: Less lazy!
+                        }
+                        VRRTouchLast = OpenTK.Vector2.Zero;
+                    }
                 }
             }
             TryToJump();
@@ -717,6 +859,12 @@ namespace Voxalia.ClientGame.EntitySystem
                 }
             }
         }
+
+        public OpenTK.Vector2 VRRTouchDown = OpenTK.Vector2.Zero;
+
+        public OpenTK.Vector2 VRRTouchLast = OpenTK.Vector2.Zero;
+
+        public bool VRRTouched = false;
 
         public bool ConsoleWasOpen = false;
 

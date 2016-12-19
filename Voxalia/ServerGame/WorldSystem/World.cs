@@ -124,19 +124,21 @@ namespace Voxalia.ServerGame.WorldSystem
             DeltaCounter.Start();
             return d + TotalDelta;
         }
+
+        public double TargetDelta;
         
         private void MainThread()
         {
             LoadConfig();
             LoadRegion();
             // Tick
-            double TARGETFPS = 30d;
+            double TARGETFPS = 30.0;
             Stopwatch Counter = new Stopwatch();
             DeltaCounter = new Stopwatch();
             DeltaCounter.Start();
             TotalDelta = 0;
-            double CurrentDelta = 0d;
-            double TargetDelta = 0d;
+            double CurrentDelta = 0.0;
+            TargetDelta = 0.0;
             int targettime = 0;
             try
             {
@@ -162,13 +164,14 @@ namespace Voxalia.ServerGame.WorldSystem
                     TargetDelta = (1d / TARGETFPS);
                     // How much delta has been built up
                     TotalDelta += CurrentDelta;
-                    while (TotalDelta > TargetDelta * 3)
+                    double tdelt = TargetDelta;
+                    while (TotalDelta > tdelt * 3)
                     {
                         // Lagging - cheat to catch up!
-                        TargetDelta *= 2;
+                        tdelt *= 2;
                     }
                     // As long as there's more delta built up than delta wanted, tick
-                    while (TotalDelta > TargetDelta)
+                    while (TotalDelta > tdelt)
                     {
                         if (NeedShutdown)
                         {
@@ -177,9 +180,9 @@ namespace Voxalia.ServerGame.WorldSystem
                         }
                         lock (TickLock)
                         {
-                            Tick(TargetDelta);
+                            Tick(tdelt);
                         }
-                        TotalDelta -= TargetDelta;
+                        TotalDelta -= tdelt;
                     }
                     // The tick is done, stop measuring it
                     Counter.Stop();

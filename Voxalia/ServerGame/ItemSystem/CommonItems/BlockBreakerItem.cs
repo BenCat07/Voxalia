@@ -34,9 +34,10 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 return;
             }
             PlayerEntity player = (PlayerEntity)ent;
-            Location eye = player.GetEyePosition();
-            Location forw = player.ForwardVector();
+            Location eye = player.ItemSource();
+            Location forw = player.ItemDir;
             RayCastResult rcr;
+            // TODO: 5 -> Player Range Setting
             bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, 5, MaterialSolidity.FULLSOLID, player.IgnoreThis, out rcr);
             if (h)
             {

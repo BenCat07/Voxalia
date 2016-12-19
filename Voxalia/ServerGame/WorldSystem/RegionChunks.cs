@@ -53,7 +53,7 @@ namespace Voxalia.ServerGame.WorldSystem
             PhysicsWorld.Remove(mesh);
         }
 
-        public Dictionary<Vector3i, Chunk> LoadedChunks = new Dictionary<Vector3i, Chunk>();
+        public Dictionary<Vector3i, Chunk> LoadedChunks = new Dictionary<Vector3i, Chunk>(1000);
 
         public bool IsAllowedToBreak(CharacterEntity ent, Location block, Material mat)
         {

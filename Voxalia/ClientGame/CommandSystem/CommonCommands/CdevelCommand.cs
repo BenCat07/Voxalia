@@ -96,7 +96,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                             break;
                         }
                         bool male = !entry.GetArgument(queue, 1).ToString().ToLowerFast().StartsWith("f");
-                        TextToSpeech.Speak(entry.GetArgument(queue, 2), male);
+                        TextToSpeech.Speak(entry.GetArgument(queue, 2), male, entry.Arguments.Count > 3 ? (int)IntegerTag.TryFor(entry.GetArgumentObject(queue, 3)).Internal : 0);
                         break;
                     }
                 case "chunkInfo":
@@ -158,6 +158,20 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                             break;
                         }
                         TheClient.VR = VRSupport.TryInit(TheClient);
+                        break;
+                    }
+                case "fogEnhance":
+                    {
+                        double time = NumberTag.TryFor(entry.GetArgumentObject(queue, 1)).Internal;
+                        double fogVal = NumberTag.TryFor(entry.GetArgumentObject(queue, 2)).Internal;
+                        TheClient.FogEnhanceStrength = (float)fogVal;
+                        TheClient.FogEnhanceTime = time;
+                        break;
+                    }
+                case "earRing":
+                    {
+                        double time = NumberTag.TryFor(entry.GetArgumentObject(queue, 1)).Internal;
+                        TheClient.Sounds.Deafen(time);
                         break;
                     }
                 default:

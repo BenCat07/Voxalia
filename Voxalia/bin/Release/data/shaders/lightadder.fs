@@ -43,7 +43,7 @@ void main() // Let's put all code in main, why not...
 	vec3 renderhint = texture(renderhinttex, f.texcoord).xyz;
 	vec4 diffuset = texture(diffusetex, f.texcoord);
 	// Loop over lights
-	int count = int(lights_used);
+	int count = renderhint.z >= 1.0 ? 0 : int(lights_used);
 	for (int i = 0; i < count; i++)
 	{
 	mat4 light_data = light_data_array[i];

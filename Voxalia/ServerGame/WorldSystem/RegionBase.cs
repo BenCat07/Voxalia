@@ -172,7 +172,15 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            PhysicsWorld.Update((double)delta);
+            if (Delta > TheWorld.TargetDelta * 2)
+            {
+                PhysicsWorld.TimeStepSettings.TimeStepDuration = Delta * 0.5;
+            }
+            else
+            {
+                PhysicsWorld.TimeStepSettings.TimeStepDuration = TheWorld.TargetDelta;
+            }
+            PhysicsWorld.Update(delta);
             sw.Stop();
             TheServer.PhysicsTimeC += sw.Elapsed.TotalMilliseconds;
             TheServer.PhysicsTimes++;

@@ -31,7 +31,7 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public float Gain = 1f;
 
-        public int Src;
+        public int Src = -1;
 
         public bool Exists = false;
 
@@ -43,9 +43,16 @@ namespace Voxalia.ClientGame.AudioSystem
         {
             if (!Exists)
             {
+                Engine.CheckError("PRECREATE:" + Effect.Name);
                 Src = AL.GenSource();
+                if (Src < 0 || AL.GetError() != ALError.NoError)
+                {
+                    Src = -1;
+                    return;
+                }
                 AL.Source(Src, ALSourcei.Buffer, Effect.Internal);
                 AL.Source(Src, ALSourceb.Looping, Loop);
+                Engine.CheckError("Preconfig:" + Effect.Name);
                 if (Pitch != 1f)
                 {
                     UpdatePitch();
@@ -54,6 +61,7 @@ namespace Voxalia.ClientGame.AudioSystem
                 {
                     UpdateGain();
                 }
+                Engine.CheckError("GP:" + Effect.Name);
                 if (!Position.IsNaN())
                 {
                     Vector3 zero = Vector3.Zero;
@@ -63,10 +71,12 @@ namespace Voxalia.ClientGame.AudioSystem
                     AL.Source(Src, ALSource3f.Position, ref vec);
                     AL.Source(Src, ALSourceb.SourceRelative, false);
                     AL.Source(Src, ALSourcef.EfxAirAbsorptionFactor, 1f);
+                    Engine.CheckError("Positioning:" + Effect.Name);
                 }
                 else
                 {
                     AL.Source(Src, ALSourceb.SourceRelative, true);
+                    Engine.CheckError("Relative:" + Effect.Name);
                 }
                 Exists = true;
             }
@@ -76,6 +86,8 @@ namespace Voxalia.ClientGame.AudioSystem
         {
             AL.Source(Src, ALSourcef.Pitch, Pitch);
         }
+
+        public bool IsDeafened = false;
 
         public void UpdateGain()
         {
@@ -94,26 +106,55 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public void Play()
         {
+            if (Src < 0)
+            {
+                return;
+            }
             AL.SourcePlay(Src);
         }
 
         public void Seek(float f)
         {
+            if (Src < 0)
+            {
+                return;
+            }
             AL.Source(Src, ALSourcef.SecOffset, f);
         }
 
         public void Pause()
         {
+            if (Src < 0)
+            {
+                return;
+            }
             AL.SourcePause(Src);
         }
 
         public void Stop()
         {
+            if (Src < 0)
+            {
+                return;
+            }
             AL.SourceStop(Src);
+        }
+
+        public bool IsPlaying()
+        {
+            if (Src < 0)
+            {
+                return false;
+            }
+            return (AL.GetSourceState(Src) == ALSourceState.Playing);
         }
 
         public void Destroy()
         {
+            if (Src < 0)
+            {
+                return;
+            }
             if (Exists)
             {
                 AL.DeleteSource(Src);
