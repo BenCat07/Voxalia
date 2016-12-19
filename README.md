@@ -27,6 +27,7 @@ Also used libraries:
 - Requires LibOpus.
 - Requires fully up to date non-Intel graphics drivers (Must support OpenGL 4.3).
 - Requires "espeak" program/package. Must be a valid "espeak" executable in path.
+- Launcher requires "libgluezilla" program/package.
 - Requires a 64-bit system.
 - Linux build is primarily tested on Ubuntu 16.04 with latest NVidia drivers.
 

@@ -224,7 +224,7 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
-        bool wasEverVis = false;
+        //bool wasEverVis = false;
 
         void NetworkTick()
         {
@@ -303,7 +303,7 @@ namespace Voxalia.ServerGame.EntitySystem
                     }
                     */
                 }
-                wasEverVis = true;
+                //wasEverVis = true;
             }
         }
 

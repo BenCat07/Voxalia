@@ -146,7 +146,7 @@ namespace Voxalia.Shared.Collision
                     }
                     int id = BlockIndex(np.X, np.Y, np.Z);
                     int id2 = BlockIndex(tp.X, tp.Y, tp.Z);
-                    if (!traced[BlockIndex(tp.X, tp.Y, tp.Z)] && !Blocks[id].IsOpaque())
+                    if (!traced[id2] && !Blocks[id].IsOpaque())
                     {
                         toTrace.Enqueue(np);
                         traced[id] = true;

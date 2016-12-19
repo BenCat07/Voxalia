@@ -169,16 +169,6 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             if (e.NetworkMe)
             {
-                Location lpos = Location.NaN;
-                if (e is PhysicsEntity)
-                {
-                    lpos = ((PhysicsEntity)e).lPos;
-                }
-                else if (e is PrimitiveEntity)
-                {
-                    lpos = ((PrimitiveEntity)e).lPos;
-                }
-                Location tpos = e.GetPosition();
                 DespawnEntityPacketOut desppack = new DespawnEntityPacketOut(e.EID);
                 foreach (PlayerEntity player in Players)
                 {
