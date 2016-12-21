@@ -360,7 +360,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                             rh.THVs.Add(new Vector4((float)ths.Item1[i].X, (float)ths.Item1[i].Y, (float)ths.Item1[i].Z, (float)ths.Item1[i].W));
                                             rh.THWs.Add(new Vector4((float)ths.Item2[i].X, (float)ths.Item2[i].Y, (float)ths.Item2[i].Z, (float)ths.Item2[i].W));
                                             rh.THVs2.Add(new Vector4((float)ths.Item3[i].X, (float)ths.Item3[i].Y, (float)ths.Item3[i].Z, (float)ths.Item3[i].W));
-                                            rh.THWs2.Add(new Vector4((float)ths.Item4[i].X, (float)ths.Item4[i].Y, (float)ths.Item3[i].Z, (float)ths.Item4[i].W));
+                                            rh.THWs2.Add(new Vector4((float)ths.Item4[i].X, (float)ths.Item4[i].Y, (float)ths.Item4[i].Z, (float)ths.Item4[i].W));
                                         }
                                         else
                                         {

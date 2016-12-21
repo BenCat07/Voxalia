@@ -220,7 +220,7 @@ namespace Voxalia.Shared.BlockShapes
                 double vym = YM.IsOpaque() ? 1 : 0;
                 double txpyp = XPYP.Material.TextureID(MaterialSide.TOP);
                 double txpym = XPYM.Material.TextureID(MaterialSide.TOP);
-                double txmyp = XPYP.Material.TextureID(MaterialSide.TOP);
+                double txmyp = XMYP.Material.TextureID(MaterialSide.TOP);
                 double txmym = XMYM.Material.TextureID(MaterialSide.TOP);
                 double vxpyp = XPYP.IsOpaque() ? 1 : 0;
                 double vxpym = XPYM.IsOpaque() ? 1 : 0;
