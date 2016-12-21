@@ -72,35 +72,74 @@ void main()
 	}
 #endif
 	vec4 col = texture(s, f.texcoord);
-	vec4 thval = vec4(0.0); // Value
+	vec3 t_normal = texture(normal_tex, f.texcoord).xyz;
+	// Setup
+	vec3 thval = vec3(0.0); // Value
 	float thstr = 0.0; // Strength
-	float ftcxm = 1.0 - f.texcoord.x;
-	float ftcym = 1.0 - f.texcoord.y;
-	vec4 th_weight = min(max((f.thw - (vec4(ftcxm, f.texcoord.x, ftcym, f.texcoord.y) * 4.0)), vec4(0.0)), vec4(1.0));
-	thstr += th_weight.x;
-	vec4 th_xp = texture(s, vec3(vec2(1.0 - f.texcoord.x, f.texcoord.y), f.thv.x)) * th_weight.x;
-	thstr += th_weight.y;
-	vec4 th_xm = texture(s, vec3(vec2(1.0 - f.texcoord.x, f.texcoord.y), f.thv.y)) * th_weight.y;
-	thstr += th_weight.z;
-	vec4 th_yp = texture(s, vec3(vec2(f.texcoord.x, 1.0 - f.texcoord.y), f.thv.z)) * th_weight.z;
-	thstr += th_weight.w;
-	vec4 th_ym = texture(s, vec3(vec2(f.texcoord.x, 1.0 - f.texcoord.y), f.thv.w)) * th_weight.w;
-	thval += th_xp + th_xm + th_yp + th_ym;
-	vec4 th_weight2 = min(max((f.thw2 * 0.75 - (vec4(ftcxm + ftcym, ftcxm + f.texcoord.y, f.texcoord.x + ftcym, f.texcoord.x + f.texcoord.y) * 2.0)), vec4(0.0)), vec4(1.0));
-	thstr += th_weight2.x * th_weight.x * th_weight.y;
-	thval += (th_xp + th_yp) * (th_weight2.x * th_weight.x * th_weight.y);
-	thstr += th_weight2.y * th_weight.x * th_weight.z;
-	thval += (th_xp + th_ym) * (th_weight2.y * th_weight.x * th_weight.z);
-	thstr += th_weight2.z * th_weight.y * th_weight.z;
-	thval += (th_xm + th_yp) * (th_weight2.z * th_weight.y * th_weight.z);
-	thstr += th_weight2.w * th_weight.y * th_weight.w;
-	thval += (th_xm + th_ym) * (th_weight2.w * th_weight.y * th_weight.w);
-	float tw = col.w;
+	vec3 thnorm = vec3(0.0); // Normal
+	vec2 th_pos = vec2(f.texcoord.x - 0.5, f.texcoord.y - 0.5);
+	float sep = 1.5;
+	// Self (0,0)
+	float t_w = max(1.0 - (dot(th_pos, th_pos) * sep), 0.0);
+	thval += col.xyz * t_w;
+	thnorm += t_normal * t_w;
+	thstr += t_w;
+	// X+ (1,0)
+	vec2 t_r = th_pos - vec2(1.0, 0.0);
+	const float MULTO = 2.0;
+	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.x * MULTO, 0.0);
+	thval += texture(s, vec3(f.texcoord.xy, f.thv.x)).xyz * t_w;
+	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.x)).xyz * t_w;
+	thstr += t_w;
+	// X- (-1,0)
+	t_r = th_pos - vec2(-1.0, 0.0);
+	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.y * MULTO, 0.0);
+	thval += texture(s, vec3(f.texcoord.xy, f.thv.y)).xyz * t_w;
+	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.y)).xyz * t_w;
+	thstr += t_w;
+	// Y+ (0,1)
+	t_r = th_pos - vec2(0.0, 1.0);
+	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.z * MULTO, 0.0);
+	thval += texture(s, vec3(f.texcoord.xy, f.thv.z)).xyz * t_w;
+	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.z)).xyz * t_w;
+	thstr += t_w;
+	// Y- (0,-1)
+	t_r = th_pos - vec2(0.0, -1.0);
+	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.w * MULTO, 0.0);
+	thval += texture(s, vec3(f.texcoord.xy, f.thv.w)).xyz * t_w;
+	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.w)).xyz * t_w;
+	thstr += t_w;
+	// X+Y+ (1,1)
+	t_r = th_pos - vec2(1.0, 1.0);
+	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.x * MULTO, 0.0);
+	thval += texture(s, vec3(f.texcoord.xy, f.thv2.x)).xyz * t_w;
+	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.x)).xyz * t_w;
+	thstr += t_w;
+	// X+Y- (1,-1)
+	t_r = th_pos - vec2(1.0, -1.0);
+	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.y * MULTO, 0.0);
+	thval += texture(s, vec3(f.texcoord.xy, f.thv2.y)).xyz * t_w;
+	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.y)).xyz * t_w;
+	thstr += t_w;
+	// X-Y+ (-1,1)
+	t_r = th_pos - vec2(-1.0, 1.0);
+	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.z * MULTO, 0.0);
+	thval += texture(s, vec3(f.texcoord.xy, f.thv2.z)).xyz * t_w;
+	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.z)).xyz * t_w;
+	thstr += t_w;
+	// X-Y- (-1,-1)
+	t_r = th_pos - vec2(-1.0, -1.0);
+	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.w * MULTO, 0.0);
+	thval += texture(s, vec3(f.texcoord.xy, f.thv2.w)).xyz * t_w;
+	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.w)).xyz * t_w;
+	thstr += t_w;
+	/*
 	float trel = max(min(1.0 - thstr, 1.0), 0.0);
-	thval += col * trel;
+	thval += col.xyz * trel;
 	thstr += trel;
-	col = thval / thstr;
-	col.w = tw;
+	*/
+	col.xyz = thval / thstr;
+	t_normal = thnorm / thstr;
 	float rhBlur = 0.0;
     float spec = dets.x;
     float refl = dets.y;
@@ -133,7 +172,7 @@ void main()
 		discard;
 	}
 	vec3 lightcol = f.color.xyz;
-	vec3 norms = texture(normal_tex, f.texcoord).xyz * 2.0 - vec3(1.0);
+	vec3 norms = t_normal * 2.0 - vec3(1.0);
 	color = col * v_color;
 	position = vec4(f.position.xyz, 1.0);
 	normal = vec4(normalize(f.tbn * norms), 1.0);
