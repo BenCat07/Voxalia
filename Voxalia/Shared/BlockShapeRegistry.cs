@@ -235,6 +235,9 @@ namespace Voxalia.Shared
             BEPUphysics.CollisionShapes.EntityShape es = GetShape(DamageMode, out offset, false);
             Coll = es.GetCollidableInstance();
             Coll.LocalPosition = -offset.ToBVector();
+            BEPUphysics.CollisionShapes.EntityShape es2 = GetShape(DamageMode, out offset, true);
+            EntityCollidable tColl = es2.GetCollidableInstance();
+            tColl.LocalPosition = -offset.ToBVector();
         }
 
         private void Damage()
@@ -400,7 +403,9 @@ namespace Voxalia.Shared
             if ((shrink ? ShrunkBlockShapeCache : BlockShapeCache) != null)
             {
                 offset = (shrink ? ShrunkOffsetCache : OffsetCache);
-                return (shrink ? ShrunkBlockShapeCache : BlockShapeCache);
+                EntityShape es = (shrink ? ShrunkBlockShapeCache : BlockShapeCache);
+                es.ClearShapeChanged();
+                return es;
             }
             List<Vector3> vecs = GetVertices(new Vector3(0, 0, 0), false, false, false, false, false, false);
             Vector3 offs;
