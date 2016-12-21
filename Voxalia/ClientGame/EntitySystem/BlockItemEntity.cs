@@ -60,6 +60,8 @@ namespace Voxalia.ClientGame.EntitySystem
             vbo.Tangents = new List<Vector3>();
             vbo.THVs = new List<Vector4>();
             vbo.THWs = new List<Vector4>();
+            vbo.THVs2 = new List<Vector4>();
+            vbo.THWs2 = new List<Vector4>();
             System.Drawing.Color tcol = Voxalia.Shared.Colors.ForByte(Paint);
             for (int i = 0; i < vecs.Count; i++)
             {
@@ -87,6 +89,8 @@ namespace Voxalia.ClientGame.EntitySystem
                     vbo.Tangents.Add(tangent);
                     vbo.THVs.Add(new Vector4(0, 0, 0, 0));
                     vbo.THWs.Add(new Vector4(0, 0, 0, 0));
+                    vbo.THVs2.Add(new Vector4(0, 0, 0, 0));
+                    vbo.THWs2.Add(new Vector4(0, 0, 0, 0));
                 }
             }
             vbo.GenerateVBO();

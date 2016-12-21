@@ -138,6 +138,10 @@ namespace Voxalia.ClientGame.WorldSystem
             Chunk c_zpxm = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, -1, 1));
             Chunk c_zpyp = OwningRegion.GetChunk(WorldPosition + new Vector3i(1, 0, 1));
             Chunk c_zpym = OwningRegion.GetChunk(WorldPosition + new Vector3i(-1, 0, 1));
+            Chunk c_xpyp = OwningRegion.GetChunk(WorldPosition + new Vector3i(1, 1, 0));
+            Chunk c_xpym = OwningRegion.GetChunk(WorldPosition + new Vector3i(1, -1, 0));
+            Chunk c_xmyp = OwningRegion.GetChunk(WorldPosition + new Vector3i(-1, 1, 0));
+            Chunk c_xmym = OwningRegion.GetChunk(WorldPosition + new Vector3i(-1, -1, 0));
             List<Chunk> potentials = new List<Chunk>();
             for (int x = -1; x <= 1; x++)
             {
@@ -155,7 +159,7 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             bool plants = PosMultiplier == 1 && OwningRegion.TheClient.CVars.r_plants.ValueB;
             bool shaped = OwningRegion.TheClient.CVars.r_noblockshapes.ValueB;
-            Action a = () => VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, potentials, plants, shaped);
+            Action a = () => VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped);
             if (rendering != null)
             {
                 ASyncScheduleItem item = OwningRegion.TheClient.Schedule.AddASyncTask(a);
@@ -199,7 +203,9 @@ namespace Voxalia.ClientGame.WorldSystem
             return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
         }
         
-        void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym, List<Chunk> potentials, bool plants, bool shaped)
+        void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym,
+            Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym
+            , List<Chunk> potentials, bool plants, bool shaped)
         {
             try
             {
@@ -241,6 +247,10 @@ namespace Voxalia.ClientGame.WorldSystem
                                 BlockInternal zpym;
                                 BlockInternal zpxp;
                                 BlockInternal zpxm;
+                                BlockInternal xpyp;
+                                BlockInternal xpym;
+                                BlockInternal xmyp;
+                                BlockInternal xmym;
                                 if (z + 1 >= CSize)
                                 {
                                     zpyp = y + 1 < CSize ? (c_zp == null ? t_air : GetLODRelative(c_zp, x, y + 1, z + 1 - CSize)) : (c_zpyp == null ? t_air : GetLODRelative(c_zpyp, x, y + 1 - CSize, z + 1 - CSize));
@@ -255,12 +265,34 @@ namespace Voxalia.ClientGame.WorldSystem
                                     zpxp = x + 1 < CSize ? GetBlockAt(x + 1, y, z + 1) : (c_xp == null ? t_air : GetLODRelative(c_xp, x + 1 - CSize, y, z + 1));
                                     zpxm = x > 0 ? GetBlockAt(x - 1, y, z + 1) : (c_xm == null ? t_air : GetLODRelative(c_xm, x - 1 + CSize, y, z + 1));
                                 }
+                                if (x + 1 >= CSize)
+                                {
+                                    xpyp = y + 1 < CSize ? (c_xp == null ? t_air : GetLODRelative(c_xp, x + 1 - CSize, y + 1, z)) : (c_xpyp == null ? t_air : GetLODRelative(c_xpyp, x + 1 - CSize, y + 1 - CSize, z));
+                                    xpym = y > 0 ? (c_xp == null ? t_air : GetLODRelative(c_xp, x + 1 - CSize, y - 1, z)) : (c_xpym == null ? t_air : GetLODRelative(c_xpym, x + 1 - CSize, y - 1 + CSize, z));
+                                }
+                                else
+                                {
+                                    xpyp = y + 1 < CSize ? GetBlockAt(x + 1, y + 1, z) : (c_yp == null ? t_air : GetLODRelative(c_yp, x + 1, y + 1 - CSize, z));
+                                    xpym = y > 0 ? GetBlockAt(x + 1, y - 1, z) : (c_ym == null ? t_air : GetLODRelative(c_ym, x + 1, y - 1 + CSize, z));
+                                }
+                                if (x - 1 < 0)
+                                {
+                                    xmyp = y + 1 < CSize ? (c_xm == null ? t_air : GetLODRelative(c_xm, x - 1 + CSize, y + 1, z)) : (c_xmyp == null ? t_air : GetLODRelative(c_xmyp, x - 1 + CSize, y + 1 - CSize, z));
+                                    xmym = y > 0 ? (c_xm == null ? t_air : GetLODRelative(c_xm, x - 1 + CSize, y - 1, z)) : (c_xmym == null ? t_air : GetLODRelative(c_xmym, x - 1 + CSize, y - 1 + CSize, z));
+                                }
+                                else
+                                {
+                                    xmyp = y + 1 < CSize ? GetBlockAt(x - 1, y, z) : (c_yp == null ? t_air : GetLODRelative(c_yp, x - 1, y + 1 - CSize, z));
+                                    xmym = y > 0 ? GetBlockAt(x - 1, y, z) : (c_ym == null ? t_air : GetLODRelative(c_ym, x - 1, y - 1 + CSize, z));
+                                }
                                 int index_bssd = (xps ? 1 : 0) | (xms ? 2 : 0) | (yps ? 4 : 0) | (yms ? 8 : 0) | (zps ? 16 : 0) | (zms ? 32 : 0);
                                 List<BEPUutilities.Vector3> vecsi = BlockShapeRegistry.BSD[shaped ? 0 : c.BlockData].Damaged[shaped ? 0 : c.DamageData].BSSD.Verts[index_bssd];
                                 List<BEPUutilities.Vector3> normsi = BlockShapeRegistry.BSD[shaped ? 0 : c.BlockData].Damaged[shaped ? 0 : c.DamageData].BSSD.Norms[index_bssd];
-                                BEPUutilities.Vector3[] tci = BlockShapeRegistry.BSD[shaped ? 0 : c.BlockData].Damaged[shaped ? 0 : c.DamageData].GetTCoordsQuick(index_bssd, c.Material, new Vector3i(x, y, z));
-                                KeyValuePair<List<BEPUutilities.Vector4>, List<BEPUutilities.Vector4>> ths = !c.BlockShareTex ? default(KeyValuePair<List<BEPUutilities.Vector4>, List<BEPUutilities.Vector4>>) :
-                                    BlockShapeRegistry.BSD[shaped ? 0 : c.BlockData].GetStretchData(new BEPUutilities.Vector3(x, y, z), vecsi, xp, xm, yp, ym, zp, zm, xps, xms, yps, yms, zps, zms);
+                                BEPUutilities.Vector3[] tci = BlockShapeRegistry.BSD[shaped ? 0 : c.BlockData].Damaged[shaped ? 0 : c.DamageData].GetTCoordsQuick(index_bssd, c.Material, new Vector3i(x, y, z) + WorldPosition);
+                                Tuple<List<BEPUutilities.Vector4>, List<BEPUutilities.Vector4>, List<BEPUutilities.Vector4>, List<BEPUutilities.Vector4>> ths = !c.BlockShareTex ?
+                                    default(Tuple<List<BEPUutilities.Vector4>, List<BEPUutilities.Vector4>, List<BEPUutilities.Vector4>, List<BEPUutilities.Vector4>>) :
+                                    BlockShapeRegistry.BSD[shaped ? 0 : c.BlockData].GetStretchData(new BEPUutilities.Vector3(x, y, z), vecsi, xp, xm, yp, ym, zp, zm, xps, xms, yps, yms, zps, zms,
+                                    zpxp, zpxm, zpyp, zpym, xpyp, xpym, xmyp, xmym);
                                 for (int i = 0; i < vecsi.Count; i++)
                                 {
                                     Vector3 vt = new Vector3((float)(x + vecsi[i].X) * PosMultiplier, (float)(y + vecsi[i].Y) * PosMultiplier, (float)(z + vecsi[i].Z) * PosMultiplier);
@@ -296,15 +328,19 @@ namespace Voxalia.ClientGame.WorldSystem
                                     Location lcol = OwningRegion.GetLightAmountForSkyValue(ClientUtilities.Convert(vt) + WorldPosition.ToLocation() * CHUNK_SIZE, ClientUtilities.Convert(nt), potentials, reldat / 255f);
                                     rh.Cols.Add(new Vector4((float)lcol.X, (float)lcol.Y, (float)lcol.Z, 1));
                                     rh.TCols.Add(OwningRegion.TheClient.Rendering.AdaptColor(wp + ClientUtilities.ConvertToD(vt), Colors.ForByte(c.BlockPaint)));
-                                    if (ths.Key != null)
+                                    if (ths != null && ths.Item1 != null)
                                     {
-                                        rh.THVs.Add(new Vector4((float)ths.Key[i].X, (float)ths.Key[i].Y, (float)ths.Key[i].Z, (float)ths.Key[i].W));
-                                        rh.THWs.Add(new Vector4((float)ths.Value[i].X, (float)ths.Value[i].Y, (float)ths.Value[i].Z, (float)ths.Value[i].W));
+                                        rh.THVs.Add(new Vector4((float)ths.Item1[i].X, (float)ths.Item1[i].Y, (float)ths.Item1[i].Z, (float)ths.Item1[i].W));
+                                        rh.THWs.Add(new Vector4((float)ths.Item2[i].X, (float)ths.Item2[i].Y, (float)ths.Item2[i].Z, (float)ths.Item2[i].W));
+                                        rh.THVs2.Add(new Vector4((float)ths.Item3[i].X, (float)ths.Item3[i].Y, (float)ths.Item3[i].Z, (float)ths.Item3[i].W));
+                                        rh.THWs2.Add(new Vector4((float)ths.Item4[i].X, (float)ths.Item4[i].Y, (float)ths.Item4[i].Z, (float)ths.Item4[i].W));
                                     }
                                     else
                                     {
                                         rh.THVs.Add(Vector4.Zero);
                                         rh.THWs.Add(Vector4.Zero);
+                                        rh.THVs2.Add(Vector4.Zero);
+                                        rh.THWs2.Add(Vector4.Zero);
                                     }
                                 }
                                 if (!c.IsOpaque() && BlockShapeRegistry.BSD[shaped ? 0 : c.BlockData].BackTextureAllowed)
@@ -319,15 +355,19 @@ namespace Voxalia.ClientGame.WorldSystem
                                         rh.TCols.Add(rh.TCols[tx]);
                                         rh.Norms.Add(new Vector3((float)-normsi[i].X, (float)-normsi[i].Y, (float)-normsi[i].Z));
                                         rh.TCoords.Add(new Vector3((float)tci[i].X, (float)tci[i].Y, (float)tci[i].Z));
-                                        if (ths.Key != null)
+                                        if (ths != null && ths.Item1 != null)
                                         {
-                                            rh.THVs.Add(new Vector4((float)ths.Key[i].X, (float)ths.Key[i].Y, (float)ths.Key[i].Z, (float)ths.Key[i].W));
-                                            rh.THWs.Add(new Vector4((float)ths.Value[i].X, (float)ths.Value[i].Y, (float)ths.Value[i].Z, (float)ths.Value[i].W));
+                                            rh.THVs.Add(new Vector4((float)ths.Item1[i].X, (float)ths.Item1[i].Y, (float)ths.Item1[i].Z, (float)ths.Item1[i].W));
+                                            rh.THWs.Add(new Vector4((float)ths.Item2[i].X, (float)ths.Item2[i].Y, (float)ths.Item2[i].Z, (float)ths.Item2[i].W));
+                                            rh.THVs2.Add(new Vector4((float)ths.Item3[i].X, (float)ths.Item3[i].Y, (float)ths.Item3[i].Z, (float)ths.Item3[i].W));
+                                            rh.THWs2.Add(new Vector4((float)ths.Item4[i].X, (float)ths.Item4[i].Y, (float)ths.Item3[i].Z, (float)ths.Item4[i].W));
                                         }
                                         else
                                         {
                                             rh.THVs.Add(Vector4.Zero);
                                             rh.THWs.Add(Vector4.Zero);
+                                            rh.THVs2.Add(Vector4.Zero);
+                                            rh.THWs2.Add(Vector4.Zero);
                                         }
                                     }
                                 }
@@ -409,6 +449,8 @@ namespace Voxalia.ClientGame.WorldSystem
                 tVBO.TCOLs = rh.TCols;
                 tVBO.THVs = rh.THVs;
                 tVBO.THWs = rh.THWs;
+                tVBO.THVs2 = rh.THVs2;
+                tVBO.THWs2 = rh.THWs2;
                 tVBO.Tangents = rh.Tangs;
                 tVBO.BoneWeights = null;
                 tVBO.BoneIDs = null;
@@ -503,6 +545,7 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public ChunkRenderHelper()
         {
+            // TODO: Should these be so big?
             Vertices = new List<Vector3>(CSize * CSize * CSize);
             TCoords = new List<Vector3>(CSize * CSize * CSize);
             Norms = new List<Vector3>(CSize * CSize * CSize);
@@ -510,6 +553,8 @@ namespace Voxalia.ClientGame.WorldSystem
             TCols = new List<Vector4>(CSize * CSize * CSize);
             THVs = new List<Vector4>(CSize * CSize * CSize);
             THWs = new List<Vector4>(CSize * CSize * CSize);
+            THVs2 = new List<Vector4>(CSize * CSize * CSize);
+            THWs2 = new List<Vector4>(CSize * CSize * CSize);
             Tangs = new List<Vector3>(CSize * CSize * CSize);
     }
         public List<Vector3> Vertices;
@@ -519,6 +564,8 @@ namespace Voxalia.ClientGame.WorldSystem
         public List<Vector4> TCols;
         public List<Vector4> THVs;
         public List<Vector4> THWs;
+        public List<Vector4> THVs2;
+        public List<Vector4> THWs2;
         public List<Vector3> Tangs;
     }
 }

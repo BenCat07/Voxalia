@@ -5,6 +5,7 @@
 // If these are not available, see https://opensource.org/licenses/MIT
 //
 
+using System;
 using System.Collections.Generic;
 using BEPUutilities;
 using BEPUphysics.CollisionShapes;
@@ -199,22 +200,32 @@ namespace Voxalia.Shared.BlockShapes
             return TCoords;
         }
 
-        public override KeyValuePair<List<Vector4>, List<Vector4>> GetStretchData(Vector3 blockpos, List<Vector3> vertices, BlockInternal XP, BlockInternal XM,
-            BlockInternal YP, BlockInternal YM, BlockInternal ZP, BlockInternal ZM, bool bxp, bool bxm, bool byp, bool bym, bool bzp, bool bzm)
+        public override Tuple<List<Vector4>, List<Vector4>, List<Vector4>, List<Vector4>> GetStretchData(Vector3 blockpos, List<Vector3> vertices, BlockInternal XP, BlockInternal XM,
+            BlockInternal YP, BlockInternal YM, BlockInternal ZP, BlockInternal ZM, bool bxp, bool bxm, bool byp, bool bym, bool bzp, bool bzm,
+            BlockInternal ZPXP, BlockInternal ZPXM, BlockInternal ZPYP, BlockInternal ZPYM, BlockInternal XPYP, BlockInternal XPYM, BlockInternal XMYP, BlockInternal XMYM)
         {
             List<Vector4> sdat = new List<Vector4>();
             List<Vector4> swei = new List<Vector4>();
+            List<Vector4> sdat2 = new List<Vector4>();
+            List<Vector4> swei2 = new List<Vector4>();
             if (!bzp)
             {
                 double txp = XP.Material.TextureID(MaterialSide.TOP);
                 double txm = XM.Material.TextureID(MaterialSide.TOP);
                 double typ = YP.Material.TextureID(MaterialSide.TOP);
                 double tym = YM.Material.TextureID(MaterialSide.TOP);
-                //double zer = 0;
                 double vxp = XP.IsOpaque() ? 1 : 0;
                 double vxm = XM.IsOpaque() ? 1 : 0;
                 double vyp = YP.IsOpaque() ? 1 : 0;
                 double vym = YM.IsOpaque() ? 1 : 0;
+                double txpyp = XPYP.Material.TextureID(MaterialSide.TOP);
+                double txpym = XPYM.Material.TextureID(MaterialSide.TOP);
+                double txmyp = XPYP.Material.TextureID(MaterialSide.TOP);
+                double txmym = XMYM.Material.TextureID(MaterialSide.TOP);
+                double vxpyp = XPYP.IsOpaque() ? 1 : 0;
+                double vxpym = XPYM.IsOpaque() ? 1 : 0;
+                double vxmyp = XMYP.IsOpaque() ? 1 : 0;
+                double vxmym = XMYM.IsOpaque() ? 1 : 0;
                 if (XP.BlockShareTex)
                 {
                     vxp *= 0.5;
@@ -231,95 +242,81 @@ namespace Voxalia.Shared.BlockShapes
                 {
                     vym *= 0.5;
                 }
+                if (XPYP.BlockShareTex)
+                {
+                    vxpyp *= 0.5;
+                }
+                if (XPYM.BlockShareTex)
+                {
+                    vxpym *= 0.5;
+                }
+                if (XMYP.BlockShareTex)
+                {
+                    vxmyp *= 0.5;
+                }
+                if (XMYM.BlockShareTex)
+                {
+                    vxmym *= 0.5;
+                }
                 for (int i = 0; i < 6; i++)
                 {
                     sdat.Add(new Vector4(txp, txm, typ, tym));
                     swei.Add(new Vector4(vxp, vxm, vyp, vym));
+                    sdat2.Add(new Vector4(txpyp, txpym, txmyp, txmym));
+                    swei2.Add(new Vector4(vxpyp, vxpym, vxmyp, vxmym));
                 }
-                /*
-                swei.Add(new Vector4(zer, vxm, vyp, zer));
-                swei.Add(new Vector4(vxp, zer, vyp, zer));
-                swei.Add(new Vector4(zer, vxm, zer, vym));
-                swei.Add(new Vector4(vxp, zer, vyp, zer));
-                swei.Add(new Vector4(vxp, zer, zer, vym));
-                swei.Add(new Vector4(zer, vxm, zer, vym));*/
             }
             if (!bzm)
             {
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
+                for (int i = 0; i < 6; i++)
+                {
+                    sdat.Add(new Vector4(5, 5, 5, 5));
+                    swei.Add(new Vector4(1, 1, 1, 1));
+                    sdat2.Add(new Vector4(5, 5, 5, 5));
+                    swei2.Add(new Vector4(1, 1, 1, 1));
+                }
             }
             if (!bxp)
             {
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
+                for (int i = 0; i < 6; i++)
+                {
+                    sdat.Add(new Vector4(5, 5, 5, 5));
+                    swei.Add(new Vector4(1, 1, 1, 1));
+                    sdat2.Add(new Vector4(5, 5, 5, 5));
+                    swei2.Add(new Vector4(1, 1, 1, 1));
+                }
             }
             if (!bxm)
             {
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
+                for (int i = 0; i < 6; i++)
+                {
+                    sdat.Add(new Vector4(5, 5, 5, 5));
+                    swei.Add(new Vector4(1, 1, 1, 1));
+                    sdat2.Add(new Vector4(5, 5, 5, 5));
+                    swei2.Add(new Vector4(1, 1, 1, 1));
+                }
             }
             if (!byp)
             {
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
+                for (int i = 0; i < 6; i++)
+                {
+                    sdat.Add(new Vector4(5, 5, 5, 5));
+                    swei.Add(new Vector4(1, 1, 1, 1));
+                    sdat2.Add(new Vector4(5, 5, 5, 5));
+                    swei2.Add(new Vector4(1, 1, 1, 1));
+                }
             }
             if (!bym)
             {
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
-                sdat.Add(new Vector4(5, 5, 5, 5));
-                swei.Add(new Vector4(1, 1, 1, 1));
+                for (int i = 0; i < 6;i++)
+                {
+                    sdat.Add(new Vector4(5, 5, 5, 5));
+                    swei.Add(new Vector4(1, 1, 1, 1));
+                    sdat2.Add(new Vector4(5, 5, 5, 5));
+                    swei2.Add(new Vector4(1, 1, 1, 1));
+                }
             }
-            return new KeyValuePair<List<Vector4>, List<Vector4>>(sdat, swei);
+            return new Tuple<List<Vector4>, List<Vector4>, List<Vector4>, List<Vector4>>(sdat, swei, sdat2, swei2);
         }
 
         public override bool OccupiesXP()

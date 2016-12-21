@@ -21,6 +21,8 @@ in struct vox_out
 	mat3 tbn;
 	vec4 thv;
 	vec4 thw;
+	vec4 thv2;
+	vec4 thw2;
 } f;
 
 layout (location = 0) out vec4 color;
@@ -70,9 +72,11 @@ void main()
 	}
 #endif
 	vec4 col = texture(s, f.texcoord);
-	vec4 thval = vec4(0.0);
-	float thstr = 0.0;
-	vec4 th_weight = min(max((f.thw - (vec4(1.0 - f.texcoord.x, f.texcoord.x, 1.0 - f.texcoord.y, f.texcoord.y) * 4.0)), vec4(0.0)), vec4(1.0));
+	vec4 thval = vec4(0.0); // Value
+	float thstr = 0.0; // Strength
+	float ftcxm = 1.0 - f.texcoord.x;
+	float ftcym = 1.0 - f.texcoord.y;
+	vec4 th_weight = min(max((f.thw - (vec4(ftcxm, f.texcoord.x, ftcym, f.texcoord.y) * 4.0)), vec4(0.0)), vec4(1.0));
 	thstr += th_weight.x;
 	thval += texture(s, vec3(vec2(1.0 - f.texcoord.x, f.texcoord.y), f.thv.x)) * th_weight.x;
 	thstr += th_weight.y;
@@ -81,8 +85,17 @@ void main()
 	thval += texture(s, vec3(vec2(f.texcoord.x, 1.0 - f.texcoord.y), f.thv.z)) * th_weight.z;
 	thstr += th_weight.w;
 	thval += texture(s, vec3(vec2(f.texcoord.x, 1.0 - f.texcoord.y), f.thv.w)) * th_weight.w;
+	vec4 th_weight2 = min(max((f.thw2 - (vec4(ftcxm + ftcym, ftcxm + f.texcoord.y, f.texcoord.x + ftcym, f.texcoord.x + f.texcoord.y) * 2.0)), vec4(0.0)), vec4(1.0));
+	thstr += th_weight2.x;
+	thval += texture(s, vec3(vec2(1.0 - f.texcoord.x, 1.0 - f.texcoord.y), f.thv2.x)) * th_weight2.x;
+	thstr += th_weight2.y;
+	thval += texture(s, vec3(vec2(1.0 - f.texcoord.x, 1.0 - f.texcoord.y), f.thv2.y)) * th_weight2.y;
+	thstr += th_weight2.z;
+	thval += texture(s, vec3(vec2(1.0 - f.texcoord.x, 1.0 - f.texcoord.y), f.thv2.z)) * th_weight2.z;
+	thstr += th_weight2.w;
+	thval += texture(s, vec3(vec2(1.0 - f.texcoord.x, 1.0 - f.texcoord.y), f.thv2.w)) * th_weight2.w;
 	float tw = col.w;
-	float trel = min(1.0 - thstr, 1.0);
+	float trel = max(min(1.0 - thstr, 1.0), 0.0);
 	thval += col * trel;
 	thstr += trel;
 	col = thval / thstr;

@@ -5,7 +5,4 @@ Breaker=Shovel
 Plant=blocks/transparent/tallgrass
 TextureBasic=blocks/solid/natural/grass_forest_side
 Texture_TOP=blocks/solid/natural/grass_forest
-Texture_TOP_ADD=blocks/solid/natural/grass_forest_2
-Texture_TOP_ADD=blocks/solid/natural/grass_forest_3
-Texture_TOP_ADD=blocks/solid/natural/grass_forest_4
 Texture_BOTTOM=blocks/solid/natural/dirt
