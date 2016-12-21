@@ -30,10 +30,12 @@ Also used libraries:
 - Launcher requires "libgluezilla" program/package.
 - Requires a 64-bit system.
 - Linux build is primarily tested on Ubuntu 16.04 with latest NVidia drivers.
+- Swap the folder `xulrunner` for the one in the Linux tarball.
 
 ## Mac Install Notes
 
 - Should be similar to Linux requirements...
+- Swap the folder `xulrunner` for the one in the Mac compressed folder.
 - ??? (Untested!)
 
 ## Compiling

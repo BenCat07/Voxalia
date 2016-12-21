@@ -553,7 +553,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         public void FixMouse()
         {
-            if (InvShown() || !Window.Focused || UIConsole.Open || IsChatVisible() || CScreen != TheGameScreen)
+            if (InvShown() || !Window.Focused || UIConsole.Open || IsChatVisible() || CScreen != TheGameScreen) // TODO: CScreen.ShouldCaptureMouse?
             {
                 MouseHandler.ReleaseMouse();
             }

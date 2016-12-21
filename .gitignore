@@ -11,6 +11,7 @@ SkeletalAnimationExtractor/bin/Release/*.pdb
 clientdefaultsettings.cfg
 serverdefaultsettings.cfg
 x64/
+x86/
 models/
 fonts/
 sounds/
@@ -35,3 +36,5 @@ logindata.dat
 server_eid.txt
 LicenseInjector.exe
 logs/
+xulrunner/
+

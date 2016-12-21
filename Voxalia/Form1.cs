@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Web;
 using System.Threading;
+using Gecko;
 
 namespace VoxaliaLauncher
 {
@@ -29,17 +30,44 @@ namespace VoxaliaLauncher
 
         public Form1()
         {
-            try
-            {
-                Microsoft.Win32.Registry.SetValue("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Internet Explorer\\Main\\FeatureControl\\FEATURE_BROWSER_EMULATION", "VoxaliaLauncher.exe", 11001, Microsoft.Win32.RegistryValueKind.DWord);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Failed to update registry: " + ex.ToString());
-            }
+            // XUL Runner Acquired from XUL: https://ftp.mozilla.org/pub/xulrunner/releases/33.0b9/runtimes/
+            string app_dir = Path.GetDirectoryName(Application.ExecutablePath);
+            Xpcom.Initialize(Path.Combine(app_dir, "xulrunner"));
             InitializeComponent();
             UpdateLoginDataFromFile();
-            webBrowser1.Url = new Uri("https://github.com/FreneticXYZ/Voxalia/blob/master/README.md#voxalia");
+            geckoWebBrowser1.DocumentCompleted += GeckoWebBrowser1_DocumentCompleted;
+            GeckoPreferences.User["javascript.enabled"] = false;
+            geckoWebBrowser1.Navigate("https://github.com/FreneticXYZ/Voxalia/blob/master/README.md#voxalia");
+            geckoWebBrowser1.DomClick += GeckoWebBrowser1_DomClick;
+            geckoWebBrowser1.DomDoubleClick += GeckoWebBrowser1_DomDoubleClick;
+            geckoWebBrowser1.DomKeyPress += GeckoWebBrowser1_DomKeyPress;
+            geckoWebBrowser1.DomKeyDown += GeckoWebBrowser1_DomKeyDown;
+        }
+
+        private void GeckoWebBrowser1_DomKeyDown(object sender, DomKeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void GeckoWebBrowser1_DomKeyPress(object sender, DomKeyEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void GeckoWebBrowser1_DomDoubleClick(object sender, DomMouseEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void GeckoWebBrowser1_DomClick(object sender, DomMouseEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void GeckoWebBrowser1_DocumentCompleted(object sender, Gecko.Events.GeckoDocumentCompletedEventArgs e)
+        {
+            e.Window.TextZoom = 0.75f;
+            e.Window.ScrollTo(0, 400);
         }
 
         public string UserName = null;
@@ -172,11 +200,6 @@ namespace VoxaliaLauncher
             }
             UserName = null;
             FixButtons();
-        }
-
-        private void webBrowser1_DocumentCompleted(object sender, WebBrowserDocumentCompletedEventArgs e)
-        {
-            webBrowser1.Document.Body.Style = "zoom:75%";
         }
     }
 

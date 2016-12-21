@@ -44,9 +44,9 @@ namespace VoxaliaLauncher
             this.playButton = new System.Windows.Forms.Button();
             this.logoutButton = new System.Windows.Forms.Button();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.webBrowser1 = new System.Windows.Forms.WebBrowser();
             this.label3 = new System.Windows.Forms.Label();
             this.tfaBox = new System.Windows.Forms.TextBox();
+            this.geckoWebBrowser1 = new VoxaliaLauncher.NoTouchBrowser();
             this.SuspendLayout();
             // 
             // loggedAs
@@ -129,20 +129,6 @@ namespace VoxaliaLauncher
             this.progressBar1.Size = new System.Drawing.Size(208, 19);
             this.progressBar1.TabIndex = 8;
             // 
-            // webBrowser1
-            // 
-            this.webBrowser1.AllowNavigation = false;
-            this.webBrowser1.AllowWebBrowserDrop = false;
-            this.webBrowser1.IsWebBrowserContextMenuEnabled = false;
-            this.webBrowser1.Location = new System.Drawing.Point(12, 69);
-            this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
-            this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(917, 488);
-            this.webBrowser1.TabIndex = 9;
-            this.webBrowser1.Url = new System.Uri("https://github.com/FreneticXYZ/Voxalia/blob/master/README.md", System.UriKind.Absolute);
-            this.webBrowser1.WebBrowserShortcutsEnabled = false;
-            this.webBrowser1.DocumentCompleted += new System.Windows.Forms.WebBrowserDocumentCompletedEventHandler(this.webBrowser1_DocumentCompleted);
-            // 
             // label3
             // 
             this.label3.AutoSize = true;
@@ -159,14 +145,26 @@ namespace VoxaliaLauncher
             this.tfaBox.Size = new System.Drawing.Size(83, 20);
             this.tfaBox.TabIndex = 11;
             // 
+            // geckoWebBrowser1
+            // 
+            this.geckoWebBrowser1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.geckoWebBrowser1.Location = new System.Drawing.Point(12, 68);
+            this.geckoWebBrowser1.Name = "geckoWebBrowser1";
+            this.geckoWebBrowser1.NoDefaultContextMenu = true;
+            this.geckoWebBrowser1.Size = new System.Drawing.Size(917, 489);
+            this.geckoWebBrowser1.TabIndex = 12;
+            this.geckoWebBrowser1.UseHttpActivityObserver = false;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(941, 598);
+            this.Controls.Add(this.geckoWebBrowser1);
             this.Controls.Add(this.tfaBox);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.logoutButton);
             this.Controls.Add(this.playButton);
@@ -196,9 +194,9 @@ namespace VoxaliaLauncher
         private System.Windows.Forms.Button playButton;
         private System.Windows.Forms.Button logoutButton;
         private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.WebBrowser webBrowser1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tfaBox;
+        private VoxaliaLauncher.NoTouchBrowser geckoWebBrowser1;
     }
 }
 
