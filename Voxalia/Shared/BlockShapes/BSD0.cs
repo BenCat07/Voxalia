@@ -329,9 +329,9 @@ namespace Voxalia.Shared.BlockShapes
                 for (int i = 0; i < 6; i++)
                 {
                     sdat.Add(new Vector4(5, 5, 5, 5));
-                    swei.Add(new Vector4(1, 1, 1, 1));
+                    swei.Add(new Vector4(0, 0, 0, 0));
                     sdat2.Add(new Vector4(5, 5, 5, 5));
-                    swei2.Add(new Vector4(1, 1, 1, 1));
+                    swei2.Add(new Vector4(0, 0, 0, 0));
                 }
             }
             if (!bxm)
@@ -339,9 +339,9 @@ namespace Voxalia.Shared.BlockShapes
                 for (int i = 0; i < 6; i++)
                 {
                     sdat.Add(new Vector4(5, 5, 5, 5));
-                    swei.Add(new Vector4(1, 1, 1, 1));
+                    swei.Add(new Vector4(0, 0, 0, 0));
                     sdat2.Add(new Vector4(5, 5, 5, 5));
-                    swei2.Add(new Vector4(1, 1, 1, 1));
+                    swei2.Add(new Vector4(0, 0, 0, 0));
                 }
             }
             if (!byp)
@@ -349,9 +349,9 @@ namespace Voxalia.Shared.BlockShapes
                 for (int i = 0; i < 6; i++)
                 {
                     sdat.Add(new Vector4(5, 5, 5, 5));
-                    swei.Add(new Vector4(1, 1, 1, 1));
+                    swei.Add(new Vector4(0, 0, 0, 0));
                     sdat2.Add(new Vector4(5, 5, 5, 5));
-                    swei2.Add(new Vector4(1, 1, 1, 1));
+                    swei2.Add(new Vector4(0, 0, 0, 0));
                 }
             }
             if (!bym)
@@ -359,9 +359,9 @@ namespace Voxalia.Shared.BlockShapes
                 for (int i = 0; i < 6;i++)
                 {
                     sdat.Add(new Vector4(5, 5, 5, 5));
-                    swei.Add(new Vector4(1, 1, 1, 1));
+                    swei.Add(new Vector4(0, 0, 0, 0));
                     sdat2.Add(new Vector4(5, 5, 5, 5));
-                    swei2.Add(new Vector4(1, 1, 1, 1));
+                    swei2.Add(new Vector4(0, 0, 0, 0));
                 }
             }
             return new Tuple<List<Vector4>, List<Vector4>, List<Vector4>, List<Vector4>>(sdat, swei, sdat2, swei2);
