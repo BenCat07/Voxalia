@@ -268,12 +268,60 @@ namespace Voxalia.Shared.BlockShapes
             }
             if (!bzm)
             {
+                double txp = XP.Material.TextureID(MaterialSide.BOTTOM);
+                double txm = XM.Material.TextureID(MaterialSide.BOTTOM);
+                double typ = YP.Material.TextureID(MaterialSide.BOTTOM);
+                double tym = YM.Material.TextureID(MaterialSide.BOTTOM);
+                double vxp = XP.IsOpaque() ? 1 : 0;
+                double vxm = XM.IsOpaque() ? 1 : 0;
+                double vyp = YP.IsOpaque() ? 1 : 0;
+                double vym = YM.IsOpaque() ? 1 : 0;
+                double txpyp = XPYP.Material.TextureID(MaterialSide.BOTTOM);
+                double txpym = XPYM.Material.TextureID(MaterialSide.BOTTOM);
+                double txmyp = XMYP.Material.TextureID(MaterialSide.BOTTOM);
+                double txmym = XMYM.Material.TextureID(MaterialSide.BOTTOM);
+                double vxpyp = XPYP.IsOpaque() ? 1 : 0;
+                double vxpym = XPYM.IsOpaque() ? 1 : 0;
+                double vxmyp = XMYP.IsOpaque() ? 1 : 0;
+                double vxmym = XMYM.IsOpaque() ? 1 : 0;
+                if (XP.BlockShareTex)
+                {
+                    vxp *= 0.5;
+                }
+                if (XM.BlockShareTex)
+                {
+                    vxm *= 0.5;
+                }
+                if (YP.BlockShareTex)
+                {
+                    vyp *= 0.5;
+                }
+                if (YM.BlockShareTex)
+                {
+                    vym *= 0.5;
+                }
+                if (XPYP.BlockShareTex)
+                {
+                    vxpyp *= 0.5;
+                }
+                if (XPYM.BlockShareTex)
+                {
+                    vxpym *= 0.5;
+                }
+                if (XMYP.BlockShareTex)
+                {
+                    vxmyp *= 0.5;
+                }
+                if (XMYM.BlockShareTex)
+                {
+                    vxmym *= 0.5;
+                }
                 for (int i = 0; i < 6; i++)
                 {
-                    sdat.Add(new Vector4(5, 5, 5, 5));
-                    swei.Add(new Vector4(1, 1, 1, 1));
-                    sdat2.Add(new Vector4(5, 5, 5, 5));
-                    swei2.Add(new Vector4(1, 1, 1, 1));
+                    sdat.Add(new Vector4(txp, txm, typ, tym));
+                    swei.Add(new Vector4(vxp, vxm, vyp, vym));
+                    sdat2.Add(new Vector4(txpyp, txpym, txmyp, txmym));
+                    swei2.Add(new Vector4(vxpyp, vxpym, vxmyp, vxmym));
                 }
             }
             if (!bxp)
