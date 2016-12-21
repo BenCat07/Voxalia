@@ -210,21 +210,39 @@ namespace Voxalia.Shared.BlockShapes
                 double txm = XM.Material.TextureID(MaterialSide.TOP);
                 double typ = YP.Material.TextureID(MaterialSide.TOP);
                 double tym = YM.Material.TextureID(MaterialSide.TOP);
-                double zer = 0;
+                //double zer = 0;
                 double vxp = XP.IsOpaque() ? 1 : 0;
                 double vxm = XM.IsOpaque() ? 1 : 0;
                 double vyp = YP.IsOpaque() ? 1 : 0;
-                double vym = XM.IsOpaque() ? 1 : 0;
+                double vym = YM.IsOpaque() ? 1 : 0;
+                if (XP.BlockShareTex)
+                {
+                    vxp *= 0.5;
+                }
+                if (XM.BlockShareTex)
+                {
+                    vxm *= 0.5;
+                }
+                if (YP.BlockShareTex)
+                {
+                    vyp *= 0.5;
+                }
+                if (YM.BlockShareTex)
+                {
+                    vym *= 0.5;
+                }
                 for (int i = 0; i < 6; i++)
                 {
                     sdat.Add(new Vector4(txp, txm, typ, tym));
+                    swei.Add(new Vector4(vxp, vxm, vyp, vym));
                 }
+                /*
                 swei.Add(new Vector4(zer, vxm, vyp, zer));
                 swei.Add(new Vector4(vxp, zer, vyp, zer));
                 swei.Add(new Vector4(zer, vxm, zer, vym));
                 swei.Add(new Vector4(vxp, zer, vyp, zer));
                 swei.Add(new Vector4(vxp, zer, zer, vym));
-                swei.Add(new Vector4(zer, vxm, zer, vym));
+                swei.Add(new Vector4(zer, vxm, zer, vym));*/
             }
             if (!bzm)
             {
