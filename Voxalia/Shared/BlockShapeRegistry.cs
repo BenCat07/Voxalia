@@ -15,6 +15,7 @@ using BEPUphysics.CollisionShapes;
 using BEPUutilities;
 using FreneticScript;
 using Voxalia.Shared.ModelManagement;
+using Voxalia.Shared.Collision;
 
 namespace Voxalia.Shared
 {
@@ -112,19 +113,25 @@ namespace Voxalia.Shared
             BSD[127] = new BSD52a127(0f, 1f, 1f);
             // ...
             // Final setup
-            int[] DB_TID = MaterialHelpers.ALL_MATS[(int)Material.DEBUG].TID;
+            int[][] DB_TID = MaterialHelpers.ALL_MATS[(int)Material.DEBUG].TID;
             int lim = 0;
             for (int i = 0; i < DB_TID.Length; i++)
             {
-                if (DB_TID[i] > lim)
+                for (int x = 0; x < (DB_TID[i]).Length; x++)
                 {
-                    lim = DB_TID[i];
+                    if ((DB_TID[i])[x] > lim)
+                    {
+                        lim = (DB_TID[i])[x];
+                    }
                 }
             }
             int[] rlok = new int[lim + 1];
             for (int i = 0; i < DB_TID.Length; i++)
             {
-                rlok[DB_TID[i]] = i;
+                for (int x = 0; x < (DB_TID[i]).Length; x++)
+                {
+                    rlok[(DB_TID[i])[x]] = i;
+                }
             }
             for (int i = 0; i < 256; i++)
             {
@@ -329,18 +336,31 @@ namespace Voxalia.Shared
 
         private int[] DB_RLOK;
 
-        public Vector3[] GetTCoordsQuick(int index, Material mat)
+        public Vector3[] GetTCoordsQuick(int index, Material mat, Vector3i coord)
         {
             // NOTE: This method is called very often by the client. Any optimization here will be very useful!
             Vector3[] set = BSSD.TCrds[index];
             int len = set.Length;
             Vector3[] vecs = new Vector3[len];
             Vector3 temp;
-            int[] helper = MaterialHelpers.ALL_MATS[(int)mat].TID;
+            int[][] helper = MaterialHelpers.ALL_MATS[(int)mat].TID;
+            int choice = -1;
             for (int i = 0; i < len; i++)
             {
                 temp = set[i];
-                temp.Z = helper[DB_RLOK[(int)temp.Z]];
+                int[] opts = helper[DB_RLOK[(int)temp.Z]];
+                if (opts.Length == 1)
+                {
+                    temp.Z = opts[0];
+                }
+                else
+                {
+                    if (choice == -1)
+                    {
+                        choice = new MTRandom(39, (ulong)(SimplexNoise.Generate(coord.X, coord.Y, coord.Z) * 1000 * 1000)).Next(10000);
+                    }
+                    temp.Z = opts[choice % opts.Length];
+                }
                 vecs[i] = temp;
             }
             return vecs;

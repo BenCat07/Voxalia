@@ -19,7 +19,7 @@ namespace Voxalia.Shared
     {
         AIR = 0,
         STONE = 1,
-        GRASS_FOREST = 2,
+        GRASS_FOREST_TALL = 2,
         DIRT = 3,
         WATER = 4,
         DEBUG = 5,
@@ -33,7 +33,7 @@ namespace Voxalia.Shared
         SAND = 13,
         STEEL_SOLID = 14,
         STEEL_PLATE = 15,
-        GRASS_PLAINS = 16,
+        GRASS_PLAINS_TALL = 16,
         SANDSTONE = 17,
         TIN_ORE = 18,
         TIN_ORE_SPARSE = 19,
@@ -53,13 +53,14 @@ namespace Voxalia.Shared
         COBBLESTONE = 33,
         HELLSTONE = 34,
         LAVA = 35,
-        // 36!
+        GRASS_FOREST = 36,
         BRICKS = 37,
         FIRE = 38,
+        GRASS_PLAINS = 39,
         /// <summary>
         /// How many materials there are by default. Only for use with direct handling of this enumeration (shouldn't happen often.)
         /// </summary>
-        NUM_DEFAULT = 39,
+        NUM_DEFAULT = 40,
         /// <summary>
         /// How many materials there theoretically can be.
         /// </summary>
@@ -172,27 +173,51 @@ namespace Voxalia.Shared
                             {
                                 if (inf.Texture[t] == null)
                                 {
-                                    inf.Texture[t] = opt[1].ToLowerFast();
+                                    inf.Texture[t] = new List<string>() { opt[1].ToLowerFast() };
                                 }
                             }
                             break;
                         case "texture_top":
-                            inf.Texture[(int)MaterialSide.TOP] = opt[1].ToLowerFast();
+                            inf.Texture[(int)MaterialSide.TOP] = new List<string>() { opt[1].ToLowerFast() };
                             break;
                         case "texture_bottom":
-                            inf.Texture[(int)MaterialSide.BOTTOM] = opt[1].ToLowerFast();
+                            inf.Texture[(int)MaterialSide.BOTTOM] = new List<string>() { opt[1].ToLowerFast() };
                             break;
                         case "texture_xp":
-                            inf.Texture[(int)MaterialSide.XP] = opt[1].ToLowerFast();
+                            inf.Texture[(int)MaterialSide.XP] = new List<string>() { opt[1].ToLowerFast() };
                             break;
                         case "texture_xm":
-                            inf.Texture[(int)MaterialSide.XM] = opt[1].ToLowerFast();
+                            inf.Texture[(int)MaterialSide.XM] = new List<string>() { opt[1].ToLowerFast() };
                             break;
                         case "texture_yp":
-                            inf.Texture[(int)MaterialSide.YP] = opt[1].ToLowerFast();
+                            inf.Texture[(int)MaterialSide.YP] = new List<string>() { opt[1].ToLowerFast() };
                             break;
                         case "texture_ym":
-                            inf.Texture[(int)MaterialSide.YM] = opt[1].ToLowerFast();
+                            inf.Texture[(int)MaterialSide.YM] = new List<string>() { opt[1].ToLowerFast() };
+                            break;
+                        case "texturebasic_add":
+                            for (int t = 0; t < (int)MaterialSide.COUNT; t++)
+                            {
+                                inf.Texture[t].Add(opt[1].ToLowerFast());
+                            }
+                            break;
+                        case "texture_top_add":
+                            inf.Texture[(int)MaterialSide.TOP].Add(opt[1].ToLowerFast());
+                            break;
+                        case "texture_bottom_add":
+                            inf.Texture[(int)MaterialSide.BOTTOM].Add(opt[1].ToLowerFast());
+                            break;
+                        case "texture_xp_add":
+                            inf.Texture[(int)MaterialSide.XP].Add(opt[1].ToLowerFast());
+                            break;
+                        case "texture_xm_add":
+                            inf.Texture[(int)MaterialSide.XM].Add(opt[1].ToLowerFast());
+                            break;
+                        case "texture_yp_add":
+                            inf.Texture[(int)MaterialSide.YP].Add(opt[1].ToLowerFast());
+                            break;
+                        case "texture_ym_add":
+                            inf.Texture[(int)MaterialSide.YM].Add(opt[1].ToLowerFast());
                             break;
                         default:
                             SysConsole.Output(OutputType.WARNING, "Invalid material option: " + opt[0]);
@@ -205,7 +230,7 @@ namespace Voxalia.Shared
                     place.SetName("errno_" + allmats.Count);
                     for (int t = 0; t < (int)MaterialSide.COUNT; t++)
                     {
-                            place.Texture[t] = "white";
+                        place.Texture[t] = null;
                     }
                     allmats.Add(place);
                 }
@@ -217,19 +242,28 @@ namespace Voxalia.Shared
             {
                 for (int t = 0; t < (int)MaterialSide.COUNT; t++)
                 {
-                    string tex = allmats[i].Texture[t];
-                    int res;
-                    if (TexturesToIDs.ContainsKey(tex))
+                    if (allmats[i].Texture[t] == null)
                     {
-                        res = TexturesToIDs[tex];
+                        allmats[i].Texture[t] = new List<string>() { "white" };
+                        SysConsole.Output(OutputType.WARNING, "Texture unset for " + ((Material)i) + " side " + ((MaterialSide)t));
                     }
-                    else
+                    List<string> tex = allmats[i].Texture[t];
+                    allmats[i].TID[t] = new int[tex.Count];
+                    for (int x = 0; x < tex.Count; x++)
                     {
-                        TexturesToIDs[tex] = c;
-                        res = c;
-                        c++;
+                        int res;
+                        if (TexturesToIDs.ContainsKey(tex[x]))
+                        {
+                            res = TexturesToIDs[tex[x]];
+                        }
+                        else
+                        {
+                            TexturesToIDs[tex[x]] = c;
+                            res = c;
+                            c++;
+                        }
+                        (allmats[i].TID[t])[x] = res;
                     }
-                    allmats[i].TID[t] = res;
                 }
             }
             Textures = new string[c];
@@ -276,14 +310,19 @@ namespace Voxalia.Shared
             return ALL_MATS[(int)mat].BreaksFromOtherTools;
         }
 
-        public static string Texture(this Material mat, MaterialSide side)
+        public static List<string> Texture(this Material mat, MaterialSide side)
         {
             return ALL_MATS[(int)mat].Texture[(int)side];
         }
 
-        public static int TextureID(this Material mat, MaterialSide side)
+        public static int[] TextureIDSet(this Material mat, MaterialSide side)
         {
             return ALL_MATS[(int)mat].TID[(int)side];
+        }
+
+        public static int TextureID(this Material mat, MaterialSide side)
+        {
+            return ALL_MATS[(int)mat].TID[(int)side][0];
         }
 
         public static MaterialSound Sound(this Material mat)
@@ -495,10 +534,6 @@ namespace Voxalia.Shared
         public MaterialInfo(int _ID)
         {
             ID = _ID;
-            for (int i = 0; i < (int)MaterialSide.COUNT; i++)
-            {
-                TID[i] = ID;
-            }
             SetName(((Material)ID).ToString());
             BreaksInto = (Material)ID;
             SolidifiesInto = (Material)ID;
@@ -598,12 +633,12 @@ namespace Voxalia.Shared
         /// <summary>
         /// The textures for this material.
         /// </summary>
-        public string[] Texture = new string[(int)MaterialSide.COUNT];
+        public List<string>[] Texture = new List<string>[(int)MaterialSide.COUNT];
 
         /// <summary>
         /// Texture IDs for this material: to be populated.
         /// </summary>
-        public int[] TID = new int[(int)MaterialSide.COUNT];
+        public int[][] TID = new int[(int)MaterialSide.COUNT][];
 
         /// <summary>
         /// What tool type breaks this material.

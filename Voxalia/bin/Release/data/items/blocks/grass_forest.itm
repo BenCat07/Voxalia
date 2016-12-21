@@ -5,6 +5,6 @@ description: Grassy!
 color: 1,1,1
 model: block
 bound: false
-datum: 2
+datum: 36
 weight: 1
 volume: 1

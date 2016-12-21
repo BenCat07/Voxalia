@@ -55,7 +55,7 @@ namespace Voxalia.Shared
 
         public int Next(int cap)
         {
-            return Next() / (int.MaxValue / cap);
+            return (int)(Next() / (int.MaxValue / (double)cap)); // TODO: Sanity!
         }
 
         public int Next(int min, int max)
