@@ -72,23 +72,95 @@ Also used libraries:
 
 ### The short of the license is:
 
+(This portion is not a legal notice, only the "long version" is!)
+
 - You can do basically whatever you want (within reason), except you may not hold any developer liable for what you do with the software.
+- You may also not sell or relicense the game without explicit permission granted by FreneticXYZ.
+
+### "In Human Terms":
+
+(This portion is not a legal notice, only the "long version" is!)
+
+- The license is complete and shouldn't be relied on or considered final.
+- Anyone can do what they want with the code, excluding:
+	- We own this software and we can sell this software. You do not own the software, nor can you sell it!
+	- You can also not change the license at all, ever.
+	- We can do what we want with this code, and the license for it.
+	- If you copy out the code or any big piece of it, you MUST include a copy of the license!
+	- There are things in here under their own licenses, both those licenses and the main license apply to those pieces if they are acquired from within here.
+	- You may not hold a developer liable or at fault for anything you or anyone else does with this software.
 
 ### The long version of the license follows:
 
-The MIT License (MIT)
+The Frenetic License (FreneticLicense)
 
-Copyright (c) 2016 FreneticXYZ
+Based upon the MIT license, though heavily modified.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Copyright (C) 2016 FreneticXYZ
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+WARNING: This license is not yet fully reviewed and complete!
+AS SUCH: we do not recommend using it!
+FURTHER: for this specific version of the license,
+if a future version of this license exists within reasonable
+access, it is assumed to supersede this license, even for this
+older copy of the Software (as defined below) containing this
+early notice.
+
+Permission is hereby granted, free of charge, to any and all persons
+or parties obtaining a copy of this software (IE code and any associated
+documentation files, the "Software"), to deal in the Software with
+minimal restriction, including without limitation the rights to use,
+copy, modify, merge, publish, and/or distribute copies of the Software,
+and to permit any parties or persons to whom the Software is distributed
+to do so, subject to the following conditions:
+
+A: The Software, or any substantial portion of the Software
+shall not be sold, sub-licensed, or relicensed by any person or party other
+than that which is named by the copyright notice above (the "Software Owner"),
+as denoted by the "Copyright (C) yyyy" prefix.
+The software may additionally be sold or sub-licensed (but not relicensed)
+by any person or party permitted to do so by the Software Owner,
+as granted at the Software Owner's discretion. Further, the Software Owner
+may permit, at the Softwar Owner's discretion, any seller of the Software
+to themselves grant this special right to other persons or parties.
+
+B: Any relicensing of the software is to be done and handled at the
+Software Owner's own discretion and control.
+No party, whether external or internal to the Software Owner's party,
+shall restrict or induce this action in any way, excluding through
+an official declaration from the Software Owner's party in and of
+itself. (EG in the case of a single person, that person alone may perform
+this action).
+
+C: Any portions of the Software not written or created by the Software Owner,
+but distributed with this license and same copyright holding notice,
+shall be considered copyright to the Software Owner,
+under the terms of this license, including all notices and final remarks.
+
+D: The above copyright notice, any associated warnings and notices,
+the titling for this license, and this permission notice shall all be
+included in full unmodified form in all copies or substantial portions of
+the Software.
+
+E: Portions of the Software imported from elsewhere, as denoted by them
+containing their own license notice within reasonable availability,
+shall be considered to be primarily licensed under the license included
+with said portion. HOWEVER, any usage of that portion of the software
+must be kept within the terms of this license if acquired from
+within this Software's distributions. To use any external software or
+software portion fully and solely within its own license,
+acquire that software or software portion from original distributions
+dedicated to that software or software portion, or distributions that
+license that software or software portion under terms that do not contain
+this notice or a similar notice.
+The above applies in particular to cases in which the software or
+software portion in question have been modified beyond original form.
+
+NOTE: In specific terms, one can generally safely copy less
+than one file's worth of code without it being considered substantial.
+Any amounts higher than that can be decided at the Software Owner's
+discretion or a court's decisions. If uncertain, contact the
+Software Owner first where possible.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
