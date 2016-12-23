@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Gecko;
 
-namespace VoxaliaLauncher
+namespace VoxaliaBrowser
 {
     public class NoTouchBrowser : GeckoWebBrowser
     {

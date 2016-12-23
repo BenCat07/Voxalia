@@ -23,7 +23,7 @@ namespace Voxalia.Shared
         public static Encoding encoding = new UTF8Encoding(false);
 
         /// <summary>
-        /// A static random object for all non-determistic objects to use.
+        /// A static random object for all non-deterministic objects to use.
         /// </summary>
         public static MTRandom UtilRandom
         {
@@ -38,7 +38,7 @@ namespace Voxalia.Shared
         }
 
         [ThreadStatic]
-        private static MTRandom intRandom = new MTRandom();
+        private static MTRandom intRandom;
 
         public static SHA512Managed sha512 = new SHA512Managed();
 

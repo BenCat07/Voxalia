@@ -46,7 +46,7 @@ namespace VoxaliaLauncher
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.label3 = new System.Windows.Forms.Label();
             this.tfaBox = new System.Windows.Forms.TextBox();
-            this.geckoWebBrowser1 = new VoxaliaLauncher.NoTouchBrowser();
+            this.geckoWebBrowser1 = new VoxaliaBrowser.NoTouchBrowser();
             this.SuspendLayout();
             // 
             // loggedAs
@@ -196,7 +196,7 @@ namespace VoxaliaLauncher
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox tfaBox;
-        private VoxaliaLauncher.NoTouchBrowser geckoWebBrowser1;
+        private VoxaliaBrowser.NoTouchBrowser geckoWebBrowser1;
     }
 }
 
