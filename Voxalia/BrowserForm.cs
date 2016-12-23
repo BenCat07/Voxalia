@@ -37,14 +37,14 @@ namespace VoxaliaBrowser
             Xpcom.Initialize(Path.Combine(app_dir, "xulrunner"));
             InitializeComponent();
             geckoWebBrowser1.DocumentCompleted += GeckoWebBrowser1_DocumentCompleted;
-            GeckoPreferences.User["javascript.enabled"] = false;
+            //GeckoPreferences.User["javascript.enabled"] = false;
             geckoWebBrowser1.Navigate(page);
             geckoWebBrowser1.DomClick += GeckoWebBrowser1_DomClick;
             geckoWebBrowser1.DomDoubleClick += GeckoWebBrowser1_DomDoubleClick;
             geckoWebBrowser1.DomKeyPress += GeckoWebBrowser1_DomKeyPress;
             geckoWebBrowser1.DomKeyDown += GeckoWebBrowser1_DomKeyDown;
             timey.Tick += T_Tick;
-            timey.Interval = 1000;
+            timey.Interval = 500; // 2 FPS! Eck!
             timey.Start();
         }
 
@@ -83,15 +83,15 @@ namespace VoxaliaBrowser
         {
             ready = true;
         }
-
+        
         private void T_Tick(object sender, EventArgs e)
         {
             if (!ready)
             {
                 return;
             }
-            timey.Stop();
             ImageCreator ic = new ImageCreator(geckoWebBrowser1);
+            // TODO: Clean and speed up this nonsense!
             byte[] b = ic.CanvasGetPngImage(0, 0, (uint)geckoWebBrowser1.Width, (uint)geckoWebBrowser1.Height);
             using (MemoryStream ms = new MemoryStream(b))
             {

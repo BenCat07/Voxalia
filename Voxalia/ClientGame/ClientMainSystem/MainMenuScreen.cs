@@ -47,10 +47,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             UILabel label = new UILabel("^0^e^7" + hints[Utilities.UtilRandom.Next(hints.Count)], TheClient.FontSets.Standard, UIAnchor.BOTTOM_LEFT, () => 0, () => -(int)TheClient.Fonts.Standard.Height * 3, () => TheClient.Window.Width);
             AddChild(label);
             BView = new BrowserView(TheClient);
+            //BView.Terminates = false;
             SysConsole.Output(OutputType.INIT, "Loading main menu browser image...");
             BView.ReadPage("https://voxalia.xyz/", () =>
             {
-                SysConsole.Output(OutputType.INIT, "Loaded main menu browser image!");
+                BView.ClearTexture();
                 int tex = BView.GenTexture();
                 BrowserShow.Image = new Texture()
                 {

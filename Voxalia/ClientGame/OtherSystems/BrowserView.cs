@@ -25,28 +25,31 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public Client TheClient;
 
-        public bool Terminates = true; // TODO: terminates-false support!
+        public bool Terminates = true;
 
         public bool IsLinux = false;
 
         public ASyncScheduleItem Scheduled;
 
+        public Process Current = null;
+
         public void ReadPage(string page, Action callback = null)
         {
             Scheduled = TheClient.Schedule.StartASyncTask(() =>
             {
-                SysConsole.Output(OutputType.DEBUG, "Trying to load process...");
                 Process p = null;
+                if (!Terminates)
+                {
+                    page = "{T}" + page;
+                }
                 if (IsLinux)
                 {
-                    SysConsole.Output(OutputType.DEBUG, "Load as Linux!");
                     p = StartProc("mono", "VoxaliaBrowser.exe " + page);
                 }
                 else
                 {
                     try
                     {
-                        SysConsole.Output(OutputType.DEBUG, "Load as Windows!");
                         p = StartProc("VoxaliaBrowser.exe", page);
                     }
                     catch (Exception ex)
@@ -55,42 +58,62 @@ namespace Voxalia.ClientGame.OtherSystems
                     }
                     if (p == null)
                     {
-                        SysConsole.Output(OutputType.DEBUG, "Backup, load as Linux!");
                         IsLinux = true;
                         p = StartProc("mono", "VoxaliaBrowser.exe " + page);
                     }
                 }
-                SysConsole.Output(OutputType.DEBUG, "[Browser] Loaded: " + p.ProcessName);
+                Current = p;
+                TheClient.OnClosed += CleanUp;
                 StreamReader sr = p.StandardOutput;
-                byte[] lenbytes = new byte[4];
-                int pos = 0;
-                while (pos < 4)
+                bool first = true;
+                while (!Terminates || first)
                 {
-                    pos += sr.BaseStream.Read(lenbytes, pos, lenbytes.Length - pos);
+                    first = false;
+                    byte[] lenbytes = new byte[4];
+                    int pos = 0;
+                    while (pos < 4)
+                    {
+                        pos += sr.BaseStream.Read(lenbytes, pos, lenbytes.Length - pos);
+                    }
+                    int len = BitConverter.ToInt32(lenbytes, 0);
+                    if (len < 0 || len > 1024 * 1024 * 64)
+                    {
+                        SysConsole.Output(OutputType.WARNING, "Failed to read browser drawn view, invalid length: " + len);
+                        return;
+                    }
+                    byte[] resbytes = new byte[len];
+                    pos = 0;
+                    while (pos < len)
+                    {
+                        pos += sr.BaseStream.Read(resbytes, pos, len - pos);
+                    }
+                    DataStream ds = new DataStream(resbytes);
+                    Image img = Bitmap.FromStream(ds, false, false);
+                    Bitmap bmp = new Bitmap(img);
+                    TheClient.Schedule.ScheduleSyncTask(() =>
+                    {
+                        Loops++;
+                        if (Bitmap != null)
+                        {
+                            Bitmap.Dispose();
+                        }
+                        Bitmap = bmp;
+                        callback?.Invoke();
+                    });
                 }
-                int len = BitConverter.ToInt32(lenbytes, 0);
-                if (len < 0 || len > 1024 * 1024 * 64)
-                {
-                    SysConsole.Output(OutputType.WARNING, "Failed to read browser drawn view, invalid length: " + len);
-                    return;
-                }
-                SysConsole.Output(OutputType.DEBUG, "[Browser] Awaiting: " + len + " bytes");
-                byte[] resbytes = new byte[len];
-                pos = 0;
-                while (pos < len)
-                {
-                    pos += sr.BaseStream.Read(resbytes, pos, len - pos);
-                    SysConsole.Output(OutputType.DEBUG, "[Browser] Now have: " + pos + " bytes");
-                }
-                DataStream ds = new DataStream(resbytes);
-                Image img = Bitmap.FromStream(ds, false, false);
-                Bitmap bmp = new Bitmap(img);
-                TheClient.Schedule.ScheduleSyncTask(() =>
-                {
-                    Bitmap = bmp;
-                    callback?.Invoke();
-                });
+                CleanUp();
+                TheClient.OnClosed -= CleanUp;
             });
+        }
+
+        public int Loops = 0;
+
+        public void CleanUp()
+        {
+            if (!Current.HasExited)
+            {
+                Current.Kill();
+            }
         }
 
         private Process StartProc(string file, string arg)
@@ -111,6 +134,15 @@ namespace Voxalia.ClientGame.OtherSystems
                 Bitmap.Dispose();
                 Bitmap = null;
             }
+            if (CTexture != -1)
+            {
+                GL.DeleteTexture(CTexture);
+                CTexture = -1;
+            }
+        }
+
+        public void ClearTexture()
+        {
             if (CTexture != -1)
             {
                 GL.DeleteTexture(CTexture);

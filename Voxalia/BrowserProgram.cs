@@ -45,6 +45,7 @@ namespace VoxaliaBrowser
                     }
                 }
             }
+            page = page.Trim();
             if (page.StartsWith("\"") && page.EndsWith("\""))
             {
                 page = page.Substring(1, page.Length - 2);

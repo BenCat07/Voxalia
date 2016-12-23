@@ -178,8 +178,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
             }
             // TODO: Cleanup!
+            OnClosed?.Invoke();
             Environment.Exit(0);
         }
+
+        public event Action OnClosed = null;
 
         /// <summary>
         /// The system that manages textures (images) on the client.
