@@ -52,7 +52,6 @@ namespace VoxaliaBrowser
             // 
             // Form1
             // 
-            this.Visible = false;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1920, 1053);
@@ -61,6 +60,7 @@ namespace VoxaliaBrowser
             this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Voxalia Browser";
+            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
 

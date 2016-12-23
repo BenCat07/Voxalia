@@ -29,9 +29,78 @@ namespace VoxaliaBrowser
         public static Encoding encoding = new UTF8Encoding(false);
 
         public bool Terminates;
+
+#if LINUX
+        public const bool LINUX = true;
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+        }
+#else
+        public const bool LINUX = false;
+        [DllImport("user32.dll")]
+        public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetWindowDC(IntPtr hWnd);
+        protected override bool ShowWithoutActivation
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        const int WS_EX_NOACTIVATE = 0x08000000;
+
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams param = base.CreateParams;
+                param.ExStyle |= WS_EX_NOACTIVATE;
+                return param;
+            }
+        }
+
+        private enum GWL : int
+        {
+            ExStyle = -20
+        }
+
+        private enum WS_EX : int
+        {
+            Transparent = 0x20,
+            Layered = 0x80000
+        }
+
+        public enum LWA : int
+        {
+            ColorKey = 0x1,
+            Alpha = 0x2
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            SetWindowLong(this.Handle, (int)GWL.ExStyle, (int)WS_EX.Layered | (int)WS_EX.Transparent);
+            SetLayeredWindowAttributes(this.Handle, 0, 0, (uint)LWA.Alpha);
+        }
+
+        [DllImport("user32.dll")]
+        private extern static IntPtr SetActiveWindow(IntPtr handle);
+        private const int WM_ACTIVATE = 6;
+        private const int WA_INACTIVE = 0;
         
+        [DllImport("user32.dll")]
+        static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+        [DllImport("user32.dll")]
+        static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
+
+#endif
+
         public Form1(string page, bool term)
         {
+            ShowInTaskbar = false;
             Terminates = term;
             // XUL Runner Acquired from XUL: https://ftp.mozilla.org/pub/xulrunner/releases/33.0b9/runtimes/
             string app_dir = Path.GetDirectoryName(Application.ExecutablePath);
@@ -45,11 +114,12 @@ namespace VoxaliaBrowser
             geckoWebBrowser1.DomKeyPress += GeckoWebBrowser1_DomKeyPress;
             geckoWebBrowser1.DomKeyDown += GeckoWebBrowser1_DomKeyDown;
             timey.Tick += T_Tick;
-            timey.Interval = 500; // 2 FPS! Eck!
+            timey.Interval = LINUX ? 1000 : 50; // 1 FPS on Linux! Eck!
             timey.Start();
+            //Location = new Point(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Width - 1, System.Windows.Forms.Screen.PrimaryScreen.Bounds.Height - 1);
         }
 
-        bool IsVisible = false;
+        bool IsVisible = true;
 
         protected override void SetVisibleCore(bool value)
         {
@@ -85,13 +155,6 @@ namespace VoxaliaBrowser
             ready = true;
         }
 
-#if !LINUX
-        [DllImport("user32.dll")]
-        public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
-        [DllImport("user32.dll")]
-        public static extern IntPtr GetWindowDC(IntPtr hWnd);
-#endif
-
         public void LinuxSend()
         {
             ImageCreator ic = new ImageCreator(geckoWebBrowser1);
@@ -114,7 +177,7 @@ namespace VoxaliaBrowser
                 }
             }
         }
-        
+
         private void T_Tick(object sender, EventArgs e)
         {
             if (!ready)
@@ -123,13 +186,18 @@ namespace VoxaliaBrowser
             }
 #if LINUX
             LinuxSend();
-#elif THIS_IS_BROKEN
-            // This just sends black screens :(
+#else
+            //#elif THIS_IS_BROKEN
             try
             {
-                IntPtr hWnd = geckoWebBrowser1.BaseWindow.GetParentNativeWindowAttribute();
-                Rectangle rctForm = new Rectangle(0, 0, 1920, 1080);
-                Bitmap img = new Bitmap(rctForm.Width, rctForm.Height);
+                // This is really stupid. Workaround needed!
+                if (WindowState != FormWindowState.Normal)
+                {
+                    WindowState = FormWindowState.Normal;
+                }
+                //Invalidate();
+                IntPtr hWnd = Handle;
+                Bitmap img = new Bitmap(Width, Height);
                 Graphics graphics = Graphics.FromImage(img);
                 IntPtr hDC = graphics.GetHdc();
                 //paint control onto graphics using provided options        
@@ -142,6 +210,7 @@ namespace VoxaliaBrowser
                     graphics.ReleaseHdc(hDC);
                     graphics.Dispose();
                 }
+               // WindowState = FormWindowState.Minimized;
                 using (Bitmap bmp = new Bitmap(img, 800, 450))
                 {
                     MemoryStream res = new MemoryStream();
@@ -153,21 +222,18 @@ namespace VoxaliaBrowser
                     Program.STDOut.Flush();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                File.AppendAllText("browser_error.log", ex.ToString() + "\n\n\n\n");
                 LinuxSend();
             }
-#else
-            LinuxSend();
+            //#else
+            //LinuxSend();
 #endif
             if (Terminates)
             {
                 Environment.Exit(0);
             }
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
         }
     }
 
