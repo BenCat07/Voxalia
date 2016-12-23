@@ -27,7 +27,11 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public bool Terminates = true;
 
+#if LINUX
+        public bool IsLinux = true;
+#else
         public bool IsLinux = false;
+#endif
 
         public ASyncScheduleItem Scheduled;
 

@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Web;
 using Gecko;
+using System.Runtime.InteropServices;
 
 namespace VoxaliaBrowser
 {
@@ -83,13 +84,16 @@ namespace VoxaliaBrowser
         {
             ready = true;
         }
-        
-        private void T_Tick(object sender, EventArgs e)
+
+#if !LINUX
+        [DllImport("user32.dll")]
+        public static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetWindowDC(IntPtr hWnd);
+#endif
+
+        public void LinuxSend()
         {
-            if (!ready)
-            {
-                return;
-            }
             ImageCreator ic = new ImageCreator(geckoWebBrowser1);
             // TODO: Clean and speed up this nonsense!
             byte[] b = ic.CanvasGetPngImage(0, 0, (uint)geckoWebBrowser1.Width, (uint)geckoWebBrowser1.Height);
@@ -109,6 +113,53 @@ namespace VoxaliaBrowser
                     }
                 }
             }
+        }
+        
+        private void T_Tick(object sender, EventArgs e)
+        {
+            if (!ready)
+            {
+                return;
+            }
+#if LINUX
+            LinuxSend();
+#elif THIS_IS_BROKEN
+            // This just sends black screens :(
+            try
+            {
+                IntPtr hWnd = geckoWebBrowser1.BaseWindow.GetParentNativeWindowAttribute();
+                Rectangle rctForm = new Rectangle(0, 0, 1920, 1080);
+                Bitmap img = new Bitmap(rctForm.Width, rctForm.Height);
+                Graphics graphics = Graphics.FromImage(img);
+                IntPtr hDC = graphics.GetHdc();
+                //paint control onto graphics using provided options        
+                try
+                {
+                    PrintWindow(hWnd, hDC, (uint)0);
+                }
+                finally
+                {
+                    graphics.ReleaseHdc(hDC);
+                    graphics.Dispose();
+                }
+                using (Bitmap bmp = new Bitmap(img, 800, 450))
+                {
+                    MemoryStream res = new MemoryStream();
+                    bmp.Save(res, ImageFormat.Png);
+                    byte[] result = res.ToArray();
+                    byte[] len = BitConverter.GetBytes((int)res.Length);
+                    Program.STDOut.Write(len, 0, 4);
+                    Program.STDOut.Write(result, 0, (int)res.Length);
+                    Program.STDOut.Flush();
+                }
+            }
+            catch (Exception)
+            {
+                LinuxSend();
+            }
+#else
+            LinuxSend();
+#endif
             if (Terminates)
             {
                 Environment.Exit(0);
