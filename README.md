@@ -68,6 +68,7 @@ Also used libraries:
 - If you make any changes that could benefit the community as a whole, please contribute upstream.
 - Also, please do not claim or sell the game (or any substantial portion of it) as your own.
 	- You are, of course, still free to include small snippets of code from this game in your own projects.
+- Also do note that this license pertains only to the files that are code (CS, FS, VS, similar), all else is considered All Rights Reserved.
 
 ### The short of the license is:
 
