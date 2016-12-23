@@ -105,6 +105,7 @@ namespace VoxaliaBrowser
                         byte[] len = BitConverter.GetBytes((int)res.Length);
                         Program.STDOut.Write(len, 0, 4);
                         Program.STDOut.Write(result, 0, (int)res.Length);
+                        Program.STDOut.Flush();
                     }
                 }
             }

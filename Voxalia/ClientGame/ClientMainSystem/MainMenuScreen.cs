@@ -13,6 +13,7 @@ using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.UISystem;
 using Voxalia.ClientGame.UISystem.MenuSystem;
 using Voxalia.Shared;
+using Voxalia.ClientGame.OtherSystems;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -20,10 +21,21 @@ namespace Voxalia.ClientGame.ClientMainSystem
     {
         public UIImage Background;
 
+        public UIImage BrowserShow;
+
+        public BrowserView BView;
+
+        public int Zero()
+        {
+            return 0;
+        }
+        
         public MainMenuScreen(Client tclient) : base(tclient)
         {
-            Background = new UIImage(TheClient.Textures.GetTexture("ui/menus/menuback"), UIAnchor.TOP_LEFT, GetWidth, GetHeight, () => 0, () => 0);
+            Background = new UIImage(TheClient.Textures.GetTexture("ui/menus/menuback"), UIAnchor.TOP_LEFT, GetWidth, GetHeight, Zero, Zero);
             AddChild(Background);
+            BrowserShow = new UIImage(TheClient.Textures.GetTexture("clear"), UIAnchor.CENTER, () => 800, () => 450, Zero, Zero);
+            AddChild(BrowserShow);
             FontSet font = TheClient.FontSets.SlightlyBigger;
             UITextLink quit = new UITextLink(null, "^%Q^7uit", "^%Q^e^7uit", "^7^e^%Q^0uit", font, () => TheClient.Window.Close(), UIAnchor.BOTTOM_RIGHT, () => -100, () => -100);
             AddChild(quit);
@@ -34,6 +46,23 @@ namespace Voxalia.ClientGame.ClientMainSystem
             List<string> hints = TheClient.Languages.GetTextList(TheClient.Files, "voxalia", "hints.common");
             UILabel label = new UILabel("^0^e^7" + hints[Utilities.UtilRandom.Next(hints.Count)], TheClient.FontSets.Standard, UIAnchor.BOTTOM_LEFT, () => 0, () => -(int)TheClient.Fonts.Standard.Height * 3, () => TheClient.Window.Width);
             AddChild(label);
+            BView = new BrowserView(TheClient);
+            SysConsole.Output(OutputType.INIT, "Loading main menu browser image...");
+            BView.ReadPage("https://voxalia.xyz/", () =>
+            {
+                SysConsole.Output(OutputType.INIT, "Loaded main menu browser image!");
+                int tex = BView.GenTexture();
+                BrowserShow.Image = new Texture()
+                {
+                    Width = BView.Bitmap.Width,
+                    Height = BView.Bitmap.Height,
+                    Engine = TheClient.Textures,
+                    Internal_Texture = tex,
+                    Original_InternalID = tex,
+                    LoadedProperly = true,
+                    Name = "__browser_view"
+                };
+            });
         }
 
         public override void SwitchTo()

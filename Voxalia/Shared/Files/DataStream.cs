@@ -22,7 +22,7 @@ namespace Voxalia.Shared.Files
             : base(bytes)
         {
         }
-
+        
         /// <summary>
         /// Constructs an empty data stream.
         /// </summary>
