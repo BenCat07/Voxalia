@@ -27,7 +27,6 @@ Also used libraries:
 - Requires LibOpus.
 - Requires fully up to date non-Intel graphics drivers (Must support OpenGL 4.3).
 - Requires "espeak" program/package. Must be a valid "espeak" executable in path.
-- Launcher requires "libgluezilla" program/package.
 - Requires a 64-bit system.
 - Linux build is primarily tested on Ubuntu 16.04 with latest NVidia drivers.
 - Swap the folder `xulrunner` for the one in the Linux tarball.
@@ -35,14 +34,22 @@ Also used libraries:
 ## Mac Install Notes
 
 - Should be similar to Linux requirements...
-- Swap the folder `xulrunner` for the one in the Mac compressed folder.
+- Swap the contents of the folder `xulrunner` for that in the Mac compressed folder. May require some trickery here...
 - ??? (Untested!)
 
 ## Compiling
 
-- Open the .sln in Microsoft Visual Studio 2015
-- Switch the configuration to Release|x64
+- Open the `Voxalia.sln` file in Microsoft Visual Studio 2015
+- Switch the configuration to `Release|x64`
 - Build -> Build Solution!
+
+## Compiling on Linux/Mac
+
+- open the `Voxalia.sln` file in MonoDevelop
+- Switch the configuration to `Release (Linux)|x64`
+- Build as per normal
+- Be aware that some things may not function properly!
+	- If you are a Linux/Mac|mono|C# developer, consider trying to improve what you can and sending it back through a Github pull request to FreneticXYZ!
 
 ## Playing
 
