@@ -193,9 +193,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="transmod">Transparency modifier (EG, 0.5 = half opacity) (0.0 - 1.0).</param>
         /// <param name="extrashadow">Whether to always have a mini drop-shadow.</param>
         public void DrawColoredText(string Text, Location Position, int MaxY = int.MaxValue, float transmod = 1, bool extrashadow = false, string bcolor = "^r^7",
-            int color = DefaultColor, bool bold = false, bool italic = false, bool underline = false, bool strike = false, bool overline = false, bool highlight = false, bool emphasis = false,
-            int ucolor = DefaultColor, int scolor = DefaultColor, int ocolor = DefaultColor, int hcolor = DefaultColor, int ecolor = DefaultColor,
-            bool super = false, bool sub = false, bool flip = false, bool pseudo = false, bool jello = false, bool obfu = false, bool random = false, bool shadow = false, GLFont font = null)
+            int _color = DefaultColor, bool _bold = false, bool _italic = false, bool _underline = false, bool _strike = false, bool _overline = false, bool _highlight = false, bool _emphasis = false,
+            int _ucolor = DefaultColor, int _scolor = DefaultColor, int _ocolor = DefaultColor, int _hcolor = DefaultColor, int _ecolor = DefaultColor,
+            bool _super = false, bool _sub = false, bool _flip = false, bool _pseudo = false, bool _jello = false, bool _obfu = false, bool _random = false, bool _shadow = false, GLFont _font = null)
         {
             r_depth++;
             if (r_depth >= 100 && Text != "{{Recursion error}}")
@@ -208,6 +208,28 @@ namespace Voxalia.ClientGame.GraphicsSystems
             string[] lines = Text.Replace('\r', ' ').Replace(' ', (char)0x00A0).Replace("^q", "\"").SplitFast('\n');
             Action<string, float, TextVBO> render = (line, Y, vbo) =>
             {
+                int color = _color;
+                bool bold = _bold;
+                bool italic = _italic;
+                bool underline = _underline;
+                bool strike = _strike;
+                bool overline = _overline;
+                bool highlight = _highlight;
+                bool emphasis = _emphasis;
+                int ucolor = _ucolor;
+                int scolor = _scolor;
+                int ocolor = _ocolor;
+                int hcolor = _hcolor;
+                int ecolor = _ecolor;
+                bool super = _super;
+                bool sub = _sub;
+                bool flip = _flip;
+                bool pseudo = _pseudo;
+                bool jello = _jello;
+                bool obfu = _obfu;
+                bool random = _random;
+                bool shadow = _shadow;
+                GLFont font = _font;
                 int trans = (int)(255 * transmod);
                 int otrans = (int)(255 * transmod);
                 int etrans = (int)(255 * transmod);
@@ -524,6 +546,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 float Y = (float)Position.Y;
                 List<Task> tasks = new List<Task>(lines.Length);
                 List<TextVBO> vbos = new List<TextVBO>(lines.Length);
+                string tcol = "";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     string line = lines[i];
@@ -532,7 +555,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         TextVBO tvbo = new TextVBO(Engine.GLFonts);
                         vbos.Add(tvbo);
                         float ty = Y;
-                        tasks.Add(Task.Factory.StartNew(() => render(line, ty, tvbo)));
+                        string tcc = tcol;
+                        tasks.Add(Task.Factory.StartNew(() => render(tcc + line, ty, tvbo)));
+                        tcol += GrabAllColors(lines[i]);
                     }
                     Y += font_default.Height;
                 }
@@ -558,6 +583,41 @@ namespace Voxalia.ClientGame.GraphicsSystems
             cVBO.Render();
             Engine.GLFonts.Shaders.ColorMultShader.Bind();
             r_depth--;
+        }
+
+        public string GrabAllColors(string input)
+        {
+            StringBuilder res = new StringBuilder();
+            int cap = input.Length - 1;
+            for (int i = 0; i < cap; i++)
+            {
+                if (input[i] == '^' && IsColorSymbol(input[i + 1]))
+                {
+                    res.Append("^" + input[i + 1]);
+                }
+                else if (input[i] == '^' && input[i + 1] == '[')
+                {
+                    int c = 1;
+                    while (i < cap)
+                    {
+                        res.Append(input[i]);
+                        if (input[i] == '[')
+                        {
+                            c++;
+                        }
+                        else if (input[i] == ']')
+                        {
+                            c--;
+                            if (c == 0)
+                            {
+                                break;
+                            }
+                        }
+                        i++;
+                    }
+                }
+            }
+            return res.ToString();
         }
 
         TextVBO cVBO;
@@ -848,7 +908,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     start = i;
                 }
-                else if (MeasureFancyText(text.Substring(start, i - start)) > maxX) // TODO: Don't remeasure every time, only measure the added bits... requires a fair bit of work, be warned!
+                else if (MeasureFancyText(text.Substring(start, i - start)) > maxX) // TODO: Don't remeasure every time, only measure the added bits... may require a fair bit of work, be warned!
                 {
                     int x = i;
                     bool safe = false;
