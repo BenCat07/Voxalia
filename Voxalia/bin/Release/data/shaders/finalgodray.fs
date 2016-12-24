@@ -99,7 +99,7 @@ vec2 getHDRValue()
 	}
 	float exp = 1.0 / max(min(tc, 3.0), 0.33);
 	float flare = 3.0 + exp * 4.0;
-	float stepUp = delta * 0.05;
+	float stepUp = frameDelta * 0.05;
 	float stepDown = stepUp * 5.0;
 	if (exp > hdrOldExp + stepUp)
 	{
