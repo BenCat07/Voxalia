@@ -101,10 +101,19 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public UIScreen CScreen;
 
+        /// <summary>
+        /// Handles all internationalization / relanguaging systems for the client.
+        /// </summary>
         public LanguageEngine Languages = new LanguageEngine();
 
+        /// <summary>
+        /// The rescaling of the screen that needs to be accounted for.
+        /// </summary>
         public float DPIScale = 1f;
 
+        /// <summary>
+        /// All systems necessary to support VR (Virtual Reality).
+        /// </summary>
         public VRSupport VR;
 
         /// <summary>
@@ -158,8 +167,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
         
+        /// <summary>
+        /// Special raw handler for gamepads connected to windows, to enable features not supported by OpenTK yet (in particular, vibration feedback),.
+        /// </summary>
         public XInput RawGamePad = null;
 
+        /// <summary>
+        /// Called when the window closes, used to shutdown client systems.
+        /// </summary>
         private void Window_Closed(object sender, EventArgs e)
         {
             if (VR != null)
@@ -194,6 +209,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Environment.Exit(0);
         }
 
+        /// <summary>
+        /// Add event handlers to this to react to closing of the client window.
+        /// WARNING: Not guaranteed to fire /always/.
+        /// </summary>
         public event Action OnClosed = null;
 
         /// <summary>
@@ -267,8 +286,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public string GLRenderer;
 
+        /// <summary>
+        /// All constructors for known entity types.
+        /// </summary>
         public Dictionary<NetworkEntityType, EntityTypeConstructor> EntityConstructors = new Dictionary<NetworkEntityType, EntityTypeConstructor>();
 
+        /// <summary>
+        /// Set up the default constructors for entity types (IE, ones in the base unmodified game!)
+        /// </summary>
         public void RegisterDefaultEntityTypes()
         {
             EntityConstructors[NetworkEntityType.BULLET] = new BulletEntityConstructor();
@@ -472,6 +497,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             });
         }
 
+        /// <summary>
+        /// Called when the microphone echo volume CVar is changed, used to adapt that immediately.
+        /// </summary>
         public void OnEchoVolumeChanged(object obj, EventArgs e)
         {
             if (Sounds.Microphone == null)
@@ -492,11 +520,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Called when the music value CVar is changed, used to adapt that immediately.
+        /// </summary>
         public void onMusicChanged(object obj, EventArgs e)
         {
             BackgroundMusic();
         }
 
+        /// <summary>
+        /// Called when the music pitch CVar is changed, used to adapt that immediately.
+        /// </summary>
         public void onMusicPitchChanged(object obj, EventArgs e)
         {
             if (CurrentMusic != null)
@@ -507,6 +541,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Called when the music volume CVar is changed, used to adapt that immediately.
+        /// </summary>
         public void onMusicVolumeChanged(object obj, EventArgs e)
         {
             if (CurrentMusic != null)
@@ -529,6 +566,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Called when the window is resized, to update CVars.
+        /// </summary>
         private void Window_Resize(object sender, EventArgs e)
         {
             if (Window.ClientSize.Width < 1280)
@@ -544,6 +584,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Schedule.ScheduleSyncTask(windowupdatehandle);
         }
 
+        /// <summary>
+        /// Called to update the window to match CVars.
+        /// </summary>
         public void UpdateWindow()
         {
             if (CVars.r_width.ValueI < 1280)
@@ -559,6 +602,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Schedule.ScheduleSyncTask(windowupdatehandle);
         }
 
+        /// <summary>
+        /// Called internally to update the window GL settings and regenerate anything needed.
+        /// </summary>
         void windowupdatehandle()
         {
             GL.Viewport(0, 0, Window.Width, Window.Height);
@@ -566,6 +612,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             FixInvRender();
         }
 
+        /// <summary>
+        /// Backup method to ensure the mouse gets released as needed.
+        /// </summary>
         public void FixMouse()
         {
             if (InvShown() || !Window.Focused || UIConsole.Open || IsChatVisible() || CScreen != TheGameScreen) // TODO: CScreen.ShouldCaptureMouse?
