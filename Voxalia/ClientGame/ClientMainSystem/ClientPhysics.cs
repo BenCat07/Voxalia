@@ -18,23 +18,52 @@ namespace Voxalia.ClientGame.ClientMainSystem
 {
     public partial class Client
     {
+        /// <summary>
+        /// The "Sun" light source.
+        /// </summary>
         public SkyLight TheSun = null;
         
+        /// <summary>
+        /// The "Planet" light source.
+        /// </summary>
         public SkyLight ThePlanet = null;
 
+        /// <summary>
+        /// The "Sun -> Clouds" light source, for enhanced shadow effects.
+        /// </summary>
         public SkyLight TheSunClouds = null;
 
         // Note: the client only has one region loaded at any given time.
         public Region TheRegion = null;
 
+        /// <summary>
+        /// How much light the sun should cast.
+        /// </summary>
         public const float SunLightMod = 1.5f;
-        public const float SunLightModDirect = 3.0f;
 
+        /// <summary>
+        /// How much light the sun shines with when looked directly at.
+        /// </summary>
+        public const float SunLightModDirect = SunLightMod * 2.0f;
+
+        /// <summary>
+        /// The light value (color + strength) the "sun" light source casts.
+        /// </summary>
         public Location SunLightDef = Location.One * SunLightMod * 0.5;
+
+        /// <summary>
+        /// The light value (color + strength) the "sun -> clouds" light source casts.
+        /// </summary>
         public Location CloudSunLightDef = Location.One * SunLightMod * 0.5;
 
+        /// <summary>
+        /// The light value (color + strength) the "planet" light source casts.
+        /// </summary>
         public Location PlanetLightDef = new Location(0.75, 0.3, 0) * 0.25f;
 
+        /// <summary>
+        /// Builds the region data and populates it with minimal data.
+        /// </summary>
         public void BuildWorld()
         {
             // TODO: DESTROY OLD REGION!
@@ -46,7 +75,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             TheRegion.SpawnEntity(Player);
         }
 
-        // TODO: Call this whenenver render distance changes!
+        /// <summary>
+        /// Builds or rebuilds the the light sources for the world.
+        /// TODO: Call this whenenver render distance changes!
+        /// </summary>
         public void BuildLightsForWorld()
         {
             if (TheSun != null)
@@ -69,6 +101,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             onCloudShadowChanged(null, null);
         }
 
+        /// <summary>
+        /// Called automatically when the cloud shadow CVar is changed to update that.
+        /// </summary>
         public void onCloudShadowChanged(object obj, EventArgs e)
         {
             bool cloudsready = MainWorldView.Lights.Contains(TheSunClouds);
@@ -84,21 +119,49 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// What angle the sun is currently at.
+        /// </summary>
         public Location SunAngle = new Location(0, -75, 0);
 
+        /// <summary>
+        /// What angle the planet is currently at.
+        /// </summary>
         public Location PlanetAngle = new Location(0, -56, 90);
 
+        /// <summary>
+        /// The current light value of the planet light source.
+        /// </summary>
         public float PlanetLight = 1;
 
+        /// <summary>
+        /// The calculated distance between the planet and sun, for lighting purposes.
+        /// </summary>
         public float PlanetSunDist = 0;
 
+        /// <summary>
+        /// The base most ambient light value.
+        /// </summary>
         public Location BaseAmbient = new Location(0.1, 0.1, 0.1);
 
+        /// <summary>
+        /// Calculated minimum sunlight.
+        /// </summary>
         public float sl_min = 0;
+
+        /// <summary>
+        /// Calculated maximum sunlight.
+        /// </summary>
         public float sl_max = 1;
 
+        /// <summary>
+        /// The 3D vector direction of the planet.
+        /// </summary>
         Location PlanetDir;
 
+        /// <summary>
+        /// Ticks the region, including all primary calculations and lighting updates.
+        /// </summary>
         public void TickWorld(double delta)
         {
             rTicks++;

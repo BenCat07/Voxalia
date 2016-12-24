@@ -559,7 +559,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.ActiveTexture(TextureUnit.Texture1);
             Textures.NormalDef.Bind();
             GL.ActiveTexture(TextureUnit.Texture0);
-            Rendering.SetMinimumLight(Math.Max(1.6f * skyAlpha, 1.0f));
+            Rendering.SetMinimumLight(Math.Max(1.6f * skyAlpha, 1.0f)); // TODO: 1.6 -> Externally defined constant. SunLightMod? Also, verify this value is used properly!
             GL.Disable(EnableCap.CullFace);
             Rendering.SetColor(Color4.White);
             Matrix4 scale = Matrix4.CreateScale(GetSecondSkyDistance());
