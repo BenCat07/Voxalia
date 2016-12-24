@@ -89,7 +89,7 @@ vec3 desaturate(in vec3 c) // Desaturates color to be closer to the specified de
 
 vec2 getHDRValue()
 {
-	float tc = 0f;
+	float tc = 0.0;
 	for (float x = 0; x < SPREAD; x++)
 	{
 		for (float y = 0; y < SPREAD; y++)
