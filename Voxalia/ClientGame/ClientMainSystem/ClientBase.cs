@@ -144,7 +144,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Window.Resize += Window_Resize;
             Window.Closed += Window_Closed;
             onVsyncChanged(CVars.r_vsync, null);
-            Window.Run(1, CVars.r_maxfps.ValueD);
+            if (CVars.r_maxfps.ValueD < 1.0)
+            {
+                CVars.r_maxfps.Set("60");
+            }
+            if (CVars.r_maxfps.ValueD > 200.0)
+            {
+                Window.Run(1);
+            }
+            else
+            {
+                Window.Run(1, CVars.r_maxfps.ValueD);
+            }
         }
         
         public XInput RawGamePad = null;

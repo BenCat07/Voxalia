@@ -20,9 +20,9 @@ layout (location = 0) in vec2 f_texcoord; // The input texture coordinate (from 
 
 // ...
 layout (location = 8) uniform vec3 cameraTargetPos = vec3(0.0, 0.0, 0.0); // What position the camera is targeting in the world (ray traced).
-layout (location = 9) uniform float cameraTargetDepth = 0.01; // How far away the camera target position is from the camera. (Useful for DOF effects).
+layout (location = 9) uniform float cameraTargetDepth = 0.01; // How far away the camera target position is from the camera. (Useful for DOF effects). // TODO: ???
 layout (location = 10) uniform float hdrOldExp = 1.0; // The previous frame's HDR exposure.
-layout (location = 11) uniform float delta = 0.05; // The current frame's delta.
+layout (location = 11) uniform float frameDelta = 0.05; // The current frame's delta. // TODO: ???
 // ...
 layout (location = 16) uniform float znear = 0.1; // The Z-Near value of the 3D projection.
 layout (location = 17) uniform float zfar = 1000.0; // The Z-Far value of the 3D projection.
