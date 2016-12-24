@@ -21,11 +21,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
     public class MainMenuScreen: UIScreen
     {
         public UIImage Background;
-
-        public UIImage BrowserShow;
-
-        public BrowserView BView;
-
+        
         public int Zero()
         {
             return 0;
@@ -35,8 +31,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             Background = new UIImage(TheClient.Textures.GetTexture("ui/menus/menuback"), UIAnchor.TOP_LEFT, GetWidth, GetHeight, Zero, Zero);
             AddChild(Background);
-            BrowserShow = new UIImage(TheClient.Textures.GetTexture("clear"), UIAnchor.CENTER, () => 800, () => 450, Zero, Zero);
-            AddChild(BrowserShow);
             FontSet font = TheClient.FontSets.SlightlyBigger;
             UITextLink quit = new UITextLink(null, "^%Q^7uit", "^%Q^e^7uit", "^7^e^%Q^0uit", font, () => TheClient.Window.Close(), UIAnchor.BOTTOM_RIGHT, () => -100, () => -100);
             AddChild(quit);
@@ -47,25 +41,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             List<string> hints = TheClient.Languages.GetTextList(TheClient.Files, "voxalia", "hints.common");
             UILabel label = new UILabel("^0^e^7" + hints[Utilities.UtilRandom.Next(hints.Count)], TheClient.FontSets.Standard, UIAnchor.BOTTOM_LEFT, () => 0, () => -(int)TheClient.Fonts.Standard.Height * 3, () => TheClient.Window.Width);
             AddChild(label);
-            BView = new BrowserView(TheClient);
-            BView.Terminates = false;
-            SysConsole.Output(OutputType.INIT, "Loading main menu browser image...");
-            //BView.ReadPage("https://voxalia.xyz/", () =>
-            BView.ReadPage("https://www.youtube.com/watch?v=nohQReM7BpI", () =>
-            {
-                BView.ClearTexture();
-                int tex = BView.GenTexture();
-                BrowserShow.Image = new Texture()
-                {
-                    Width = BView.Bitmap.Width,
-                    Height = BView.Bitmap.Height,
-                    Engine = TheClient.Textures,
-                    Internal_Texture = tex,
-                    Original_InternalID = tex,
-                    LoadedProperly = true,
-                    Name = "__browser_view"
-                };
-            });
         }
 
         public override void SwitchTo()
