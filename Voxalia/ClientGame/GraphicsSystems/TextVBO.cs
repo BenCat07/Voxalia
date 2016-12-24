@@ -31,10 +31,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <summary>
         /// All vertices on this VBO.
         /// </summary>
-        List<Vector3> Vecs = new List<Vector3>(100);
-        
-        List<Vector3> Texs = new List<Vector3>(100);
-        List<Vector4> Cols = new List<Vector4>(100);
+        public List<Vector3> Vecs = new List<Vector3>();
+
+        public List<Vector3> Texs = new List<Vector3>();
+        public List<Vector4> Cols = new List<Vector4>();
 
         //public void AddQuad(Vector2 min, Vector2 max, Vector2 tmin, Vector2 tmax, Vector4 color, int tex)
         public void AddQuad(float minX, float minY, float maxX, float maxY, float tminX, float tminY, float tmaxX, float tmaxY, Vector4 color, int tex)
@@ -86,6 +86,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         bool hasBuffers = false;
 
+        public Vector3[] Positions = null;
+        public Vector3[] TexCoords = null;
+        public Vector4[] Colors = null;
+
         /// <summary>
         /// Turns the local VBO build information into an actual internal GPU-side VBO.
         /// </summary>
@@ -95,18 +99,18 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 BuildBuffers();
             }
-            Vector3[] Positions = Vecs.ToArray();
-            Vector3[] TexCoords = Texs.ToArray();
-            Vector4[] Colors = Cols.ToArray();
+            if (Positions == null)
+            {
+                Positions = Vecs.ToArray();
+                TexCoords = Texs.ToArray();
+                Colors = Cols.ToArray();
+            }
             Length = Positions.Length;
             uint[] Indices = new uint[Length];
             for (uint i = 0; i < Length; i++)
             {
                 Indices[i] = i;
             }
-            Vecs.Clear();
-            Texs.Clear();
-            Cols.Clear();
             GL.BindVertexArray(0);
             // Vertex buffer
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
@@ -136,6 +140,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOIndices);
             // Clean up
             GL.BindVertexArray(0);
+            Vecs.Clear();
+            Texs.Clear();
+            Cols.Clear();
+            Positions = null;
+            TexCoords = null;
+            Colors = null;
         }
         
         /// <summary>

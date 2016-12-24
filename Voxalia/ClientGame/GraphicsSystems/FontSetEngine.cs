@@ -16,6 +16,7 @@ using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
 using FreneticScript;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {
@@ -102,7 +103,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             Name = _name.ToLowerFast();
             Engine = engine;
-            VBO = new TextVBO(Engine.GLFonts);
+            cVBO = new TextVBO(Engine.GLFonts);
         }
 
         public void Load(string fontname, int fontsize)
@@ -205,28 +206,25 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             Text = Text.Replace("^B", bcolor);
             string[] lines = Text.Replace('\r', ' ').Replace(' ', (char)0x00A0).Replace("^q", "\"").SplitFast('\n');
-            int trans = (int)(255 * transmod);
-            int otrans = (int)(255 * transmod);
-            int etrans = (int)(255 * transmod);
-            int htrans = (int)(255 * transmod);
-            int strans = (int)(255 * transmod);
-            int utrans = (int)(255 * transmod);
-            float X = (float)Position.X;
-            float Y = (float)Position.Y;
-            Color bccolor = Color.FromArgb(0, 0, 0, 0);
-            Color ccolor = bccolor;
-            if (font == null)
+            Action<string, float, TextVBO> render = (line, Y, vbo) =>
             {
-                font = font_default;
-            }
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string line = lines[i];
-                if (line.Length == 0)
+                int trans = (int)(255 * transmod);
+                int otrans = (int)(255 * transmod);
+                int etrans = (int)(255 * transmod);
+                int htrans = (int)(255 * transmod);
+                int strans = (int)(255 * transmod);
+                int utrans = (int)(255 * transmod);
+                float X = (float)Position.X;
+                Color bccolor = Color.FromArgb(0, 0, 0, 0);
+                Color ccolor = bccolor;
+                if (font == null)
                 {
-                    Y += font_default.Height;
-                    continue;
+                    font = font_default;
                 }
+                int capa = line.Length * 8;
+                vbo.Vecs.Capacity = capa;
+                vbo.Texs.Capacity = capa;
+                vbo.Cols.Capacity = capa;
                 int start = 0;
                 for (int x = 0; x < line.Length; x++)
                 {
@@ -240,49 +238,49 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             float width = font.MeasureString(drawme);
                             if (highlight)
                             {
-                                DrawRectangle(X, Y, width, font_default.Height, font, ColorFor(hcolor, htrans));
+                                DrawRectangle(X, Y, width, font_default.Height, font, ColorFor(hcolor, htrans), vbo);
                             }
                             if (underline)
                             {
-                                DrawRectangle(X, Y + ((float)font.Height * 4f / 5f), width, 2, font, ColorFor(ucolor, utrans));
+                                DrawRectangle(X, Y + ((float)font.Height * 4f / 5f), width, 2, font, ColorFor(ucolor, utrans), vbo);
                             }
                             if (overline)
                             {
-                                DrawRectangle(X, Y + 2f, width, 2, font, ColorFor(ocolor, otrans));
+                                DrawRectangle(X, Y + 2f, width, 2, font, ColorFor(ocolor, otrans), vbo);
                             }
                             if (extrashadow)
                             {
                                 foreach (Point point in ShadowPoints)
                                 {
-                                    RenderBaseText(X + point.X, Y + point.Y, drawme, font, 0, trans / 2, flip);
+                                    RenderBaseText(vbo, X + point.X, Y + point.Y, drawme, font, 0, trans / 2, flip);
                                 }
                             }
                             if (shadow)
                             {
                                 foreach (Point point in ShadowPoints)
                                 {
-                                    RenderBaseText(X + point.X, Y + point.Y, drawme, font, 0, trans / 2, flip);
+                                    RenderBaseText(vbo, X + point.X, Y + point.Y, drawme, font, 0, trans / 2, flip);
                                 }
                                 foreach (Point point in BetterShadowPoints)
                                 {
-                                    RenderBaseText(X + point.X, Y + point.Y, drawme, font, 0, trans / 4, flip);
+                                    RenderBaseText(vbo, X + point.X, Y + point.Y, drawme, font, 0, trans / 4, flip);
                                 }
                             }
                             if (emphasis)
                             {
                                 foreach (Point point in EmphasisPoints)
                                 {
-                                    RenderBaseText(X + point.X, Y + point.Y, drawme, font, ecolor, etrans, flip);
+                                    RenderBaseText(vbo, X + point.X, Y + point.Y, drawme, font, ecolor, etrans, flip);
                                 }
                                 foreach (Point point in BetterEmphasisPoints)
                                 {
-                                    RenderBaseText(X + point.X, Y + point.Y, drawme, font, ecolor, etrans, flip);
+                                    RenderBaseText(vbo, X + point.X, Y + point.Y, drawme, font, ecolor, etrans, flip);
                                 }
                             }
-                            RenderBaseText(X, Y, drawme, font, color, trans, flip, pseudo, random, jello, obfu, ccolor);
+                            RenderBaseText(vbo, X, Y, drawme, font, color, trans, flip, pseudo, random, jello, obfu, ccolor);
                             if (strike)
                             {
-                                DrawRectangle(X, Y + (font.Height / 2), width, 2, font, ColorFor(scolor, strans));
+                                DrawRectangle(X, Y + (font.Height / 2), width, 2, font, ColorFor(scolor, strans), vbo);
                             }
                             X += width;
                         }
@@ -365,9 +363,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                         if (highl)
                                         {
                                             float widt = font_default.MeasureString(ttext);
-                                            DrawRectangle(X, Y, widt, font_default.Height, font_default, Color.Black);
-                                            RenderBaseText(X, Y, ttext, font_default, 5);
-                                            DrawRectangle(X, Y + ((float)font_default.Height * 4f / 5f), widt, 2, font_default, Color.Blue);
+                                            DrawRectangle(X, Y, widt, font_default.Height, font_default, Color.Black, vbo);
+                                            RenderBaseText(vbo, X, Y, ttext, font_default, 5);
+                                            DrawRectangle(X, Y + ((float)font_default.Height * 4f / 5f), widt, 2, font_default, Color.Blue, vbo);
                                             X += widt;
                                         }
                                         else
@@ -381,7 +379,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                         start = x + 1;
                                     }
                                     break;
-                                case '1': color = 1; ccolor = bccolor;  break;
+                                case '1': color = 1; ccolor = bccolor; break;
                                 case '!': color = 11; ccolor = bccolor; break;
                                 case '2': color = 2; ccolor = bccolor; break;
                                 case '@': color = 12; ccolor = bccolor; break;
@@ -510,27 +508,64 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         }
                     }
                 }
-                Y += font_default.Height;
-                X = (float)Position.X;
-            }
+            };
             Engine.GLFonts.Shaders.TextCleanerShader.Bind();
             GL.UniformMatrix4(1, false, ref Client.Central.Ortho); // TODO: Pass Client reference
             Matrix4 ident = Matrix4.Identity;
             GL.UniformMatrix4(2, false, ref ident);
             Vector3 col = new Vector3(1, 1, 1);
             GL.Uniform3(3, ref col);
-            VBO.Build();
-            VBO.Render();
+            if (lines.Length <= 1)
+            {
+                render(lines[0], (float)Position.Y, cVBO);
+            }
+            else
+            {
+                float Y = (float)Position.Y;
+                List<Task> tasks = new List<Task>(lines.Length);
+                List<TextVBO> vbos = new List<TextVBO>(lines.Length);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    string line = lines[i];
+                    if (line.Length > 0)
+                    {
+                        TextVBO tvbo = new TextVBO(Engine.GLFonts);
+                        vbos.Add(tvbo);
+                        float ty = Y;
+                        tasks.Add(Task.Factory.StartNew(() => render(line, ty, tvbo)));
+                    }
+                    Y += font_default.Height;
+                }
+                int len = 0;
+                for (int i = 0; i < tasks.Count; i++)
+                {
+                    tasks[i].Wait();
+                    len += vbos[i].Vecs.Count;
+                }
+                cVBO.Positions = new Vector3[len];
+                cVBO.TexCoords = new Vector3[len];
+                cVBO.Colors = new Vector4[len];
+                int pos = 0;
+                for (int i = 0; i < vbos.Count; i++)
+                {
+                    vbos[i].Vecs.CopyTo(cVBO.Positions, pos);
+                    vbos[i].Texs.CopyTo(cVBO.TexCoords, pos);
+                    vbos[i].Cols.CopyTo(cVBO.Colors, pos);
+                    pos += vbos[i].Vecs.Count;
+                }
+            }
+            cVBO.Build();
+            cVBO.Render();
             Engine.GLFonts.Shaders.ColorMultShader.Bind();
             r_depth--;
         }
+
+        TextVBO cVBO;
 
         public static string EscapeFancyText(string input)
         {
             return input.Replace("^", "^^n");
         }
-
-        TextVBO VBO;
 
         const double RAND_DIV = 40.0;
 
@@ -549,7 +584,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="jello">Whether to use a jello effect.</param>
         /// <param name="obfu">Whether to randomize letters.</param>
         /// <returns>The length of the rendered text in pixels.</returns>
-        public float RenderBaseText(float X, float Y, string text, GLFont font, int color,
+        public float RenderBaseText(TextVBO vbo, float X, float Y, string text, GLFont font, int color,
             int trans = 255, bool flip = false, bool pseudo = false, bool random = false, bool jello = false, bool obfu = false, Color ccolor = default(Color))
         {
             if (obfu || pseudo || random || jello)
@@ -589,11 +624,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     Vector4 col = new Vector4((float)tcol.R / 255f, (float)tcol.G / 255f, (float)tcol.B / 255f, (float)tcol.A / 255f);
                     if (flip)
                     {
-                        font.DrawSingleCharacterFlipped(chr, X + iX + nX, Y + iY, VBO, col);
+                        font.DrawSingleCharacterFlipped(chr, X + iX + nX, Y + iY, vbo, col);
                     }
                     else
                     {
-                        font.DrawSingleCharacter(chr, X + iX + nX, Y + iY, VBO, col);
+                        font.DrawSingleCharacter(chr, X + iX + nX, Y + iY, vbo, col);
                     }
                     nX += font.RectForSymbol(text[z]).Width;
                 }
@@ -602,7 +637,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             else
             {
                 Color tcol = ccolor.A > 0 ? ccolor : ColorFor(color, trans);
-                return font.DrawString(text, X, Y, new Vector4((float)tcol.R / 255f, (float)tcol.G / 255f, (float)tcol.B / 255f, (float)tcol.A / 255f), VBO, flip);
+                return font.DrawString(text, X, Y, new Vector4((float)tcol.R / 255f, (float)tcol.G / 255f, (float)tcol.B / 255f, (float)tcol.A / 255f), vbo, flip);
             }
         }
 
@@ -680,7 +715,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 font = font_default;
             }
             int start = 0;
-            line = line.Replace("^q", "\"").Replace("^B", bcolor);
+            line = line.Replace("^q", "\"").Replace("^B", bcolor); // TODO: Effic?
             for (int x = 0; x < line.Length; x++)
             {
                 if ((line[x] == '^' && x + 1 < line.Length && (IsColorSymbol(line[x + 1]) || line[x + 1] == '[')) || (x + 1 == line.Length))
@@ -850,9 +885,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="width">The width.</param>
         /// <param name="height">The height.</param>
         /// <param name="c">The color to use.</param>
-        public void DrawRectangle(float X, float Y, float width, float height, GLFont font, Color c)
+        public void DrawRectangle(float X, float Y, float width, float height, GLFont font, Color c, TextVBO vbo)
         {
-            VBO.AddQuad(X, Y,X + width, Y + height, 2f / Engine.GLFonts.bwidth, 2f / Engine.GLFonts.bheight, 4f / Engine.GLFonts.bwidth, 4f / Engine.GLFonts.bheight,
+            vbo.AddQuad(X, Y,X + width, Y + height, 2f / Engine.GLFonts.bwidth, 2f / Engine.GLFonts.bheight, 4f / Engine.GLFonts.bwidth, 4f / Engine.GLFonts.bheight,
                 new Vector4((float)c.R / 255f, (float)c.G / 255f, (float)c.B / 255f, (float)c.A / 255f), font.TexZ);
         }
 
