@@ -30,12 +30,22 @@ namespace Voxalia.ClientGame.ClientMainSystem
 {
     public partial class Client
     {
+        /// <summary>
+        /// Current graphics-delta value.
+        /// </summary>
         public double gDelta = 0;
 
-        public ConcurrentStack<VBO> vbos = new ConcurrentStack<VBO>(); // TODO: Is tracking this actually helpful?
-
-        public Stack<ChunkRenderHelper> RenderHelpers = new Stack<ChunkRenderHelper>(200);
-
+        /// <summary>
+        /// A stack of reusable VBOs, for chunks.
+        /// TODO: Is tracking this actually helpful?
+        /// TODO: Is a ConcurrentStack the best mode here? Perhaps a Queue instead?
+        /// </summary>
+        public ConcurrentStack<VBO> vbos = new ConcurrentStack<VBO>();
+        
+        /// <summary>
+        /// Gets an estimated Video RAM (graphics memory) usage, broken into component usages.
+        /// </summary>
+        /// <returns></returns>
         public List<Tuple<string, long>> CalculateVRAMUsage()
         {
             List<Tuple<string, long>> toret = new List<Tuple<string, long>>();
@@ -70,6 +80,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             return toret;
         }
 
+        /// <summary>
+        /// Early startup call to prepare the rendering system.
+        /// </summary>
         void PreInitRendering()
         {
             GL.Viewport(0, 0, Window.Width, Window.Height);
@@ -80,18 +93,33 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.CullFace(CullFaceMode.Front);
         }
 
+        /// <summary>
+        /// The absolute maximum distance, in chunks, anything should ever reasonably be.
+        /// </summary>
+        /// <returns></returns>
         public float MaximumStraightBlockDistance()
         {
             return (CVars.r_renderdist.ValueI + 3) * Chunk.CHUNK_SIZE;
         }
 
+        /// <summary>
+        /// The current 'Z-Far' value, IE how far away the client can see, as an absolute limitation.
+        /// </summary>
+        /// <returns></returns>
         public float ZFar()
         {
             return MaximumStraightBlockDistance() * 2;
         }
 
+        /// <summary>
+        /// The rendering subsystem for the primary world view.
+        /// This is in some situations temporarily swapped for the currently rendering view as needed.
+        /// </summary>
         public View3D MainWorldView = new View3D();
 
+        /// <summary>
+        /// Early startup call to preparing some rendering systems.
+        /// </summary>
         void InitRendering()
         {
             MainWorldView.CameraModifier = () => Player.GetRelativeQuaternion();
@@ -128,6 +156,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             View3D.CheckError("Load - Rendering - Final");
         }
 
+        /// <summary>
+        /// Grab all the correct shader objects.
+        /// </summary>
         public void ShadersCheck()
         {
             string def = CVars.r_good_graphics.ValueB ? "#MCM_GOOD_GRAPHICS" : "#";
@@ -178,14 +209,34 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SnowCyl.LoadSkin(Textures);
         }
 
+        /// <summary>
+        /// (TEMPORARY) A model for a rain cylinder.
+        /// </summary>
         public Model RainCyl;
 
+        /// <summary>
+        /// (TEMPORARY) A model for a snow cylinder.
+        /// </summary>
         public Model SnowCyl;
 
+        /// <summary>
+        /// FBO for the in-game map.
+        /// </summary>
         int map_fbo_main = -1;
+        
+        /// <summary>
+        /// Texture for the in-game map.
+        /// </summary>
         int map_fbo_texture = -1;
+        
+        /// <summary>
+        /// Depth texture for the in-game map.
+        /// </summary>
         int map_fbo_depthtex = -1;
 
+        /// <summary>
+        /// Prepare the FBO and associated helpers for the in-game map.
+        /// </summary>
         public void generateMapHelpers()
         {
             // TODO: Helper class!
@@ -211,16 +262,35 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
-        public const int GRASS_TEX_COUNT = 32; // TODO: Manageable
+        /// <summary>
+        /// Grass texture count. (For the array of grass texture slots).
+        /// TODO: Manageable
+        /// </summary>
+        public const int GRASS_TEX_COUNT = 32;
 
+        /// <summary>
+        /// How wide the grass textures should be.
+        /// </summary>
         public int GrassTextureWidth = 256;
 
+        /// <summary>
+        /// The texture for all grass types.
+        /// </summary>
         public int GrassTextureID = -1;
 
+        /// <summary>
+        /// The last time any given grass texture was used. Probably not needed.
+        /// </summary>
         public double[] GrassLastTexUse = new double[GRASS_TEX_COUNT];
 
+        /// <summary>
+        /// A map of grass texture names to their locations in the grass texture array.
+        /// </summary>
         public Dictionary<string, int> GrassTextureLocations = new Dictionary<string, int>();
 
+        /// <summary>
+        /// Maps material IDs to grass textures. Uses an array instead of an actual map for simplicity.
+        /// </summary>
         public int[] GrassMatSet;
 
         public void GenerateGrassHelpers()
@@ -252,6 +322,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Gets the grass texture ID for a specific name (may cause it to be loaded!).
+        /// Can return 0 if the grass texture array is full!
+        /// </summary>
         public int GetGrassTextureID(string f)
         {
             int temp;
@@ -273,67 +347,252 @@ namespace Voxalia.ClientGame.ClientMainSystem
             return 0;
         }
 
+        /// <summary>
+        /// The sky box VBO's.
+        /// </summary>
         VBO[] skybox;
 
+        /// <summary>
+        /// The Shadow Pass shader.
+        /// </summary>
         public Shader s_shadow;
-        public Shader s_finalgodray;
-        public Shader s_finalgodray_lights;
-        public Shader s_finalgodray_toonify;
-        public Shader s_finalgodray_lights_toonify;
-        public Shader s_finalgodray_lights_motblur;
-        public Shader s_fbo;
-        public Shader s_fbov;
-        public Shader s_fbot;
-        public Shader s_fbo_refract;
-        public Shader s_fbov_refract;
-        public Shader s_shadowadder;
-        public Shader s_lightadder;
-        public Shader s_transponly;
-        public Shader s_transponlyvox;
-        public Shader s_transponlylit;
-        public Shader s_transponlyvoxlit;
-        public Shader s_transponlylitsh;
-        public Shader s_transponlyvoxlitsh;
-        public Shader s_godray;
+
+        /// <summary>
+        /// The Shadow Pass shader, for voxels.
+        /// </summary>
         public Shader s_shadowvox;
+
+        /// <summary>
+        /// The final write + godrays shader.
+        /// </summary>
+        public Shader s_finalgodray;
+
+        /// <summary>
+        /// The final write + godrays shader, with lights on.
+        /// </summary>
+        public Shader s_finalgodray_lights;
+
+        /// <summary>
+        /// The final write + godrays shader, with toonify on.
+        /// </summary>
+        public Shader s_finalgodray_toonify;
+
+        /// <summary>
+        /// The final write + godrays shader, with lights and toonify on.
+        /// </summary>
+        public Shader s_finalgodray_lights_toonify;
+
+        /// <summary>
+        /// The final write + godrays shader, with lights and motion blur on.
+        /// </summary>
+        public Shader s_finalgodray_lights_motblur;
+        
+        /// <summary>
+        /// The G-Buffer FBO shader.
+        /// </summary>
+        public Shader s_fbo;
+
+        /// <summary>
+        /// The G-Buffer FBO shader, for voxels.
+        /// </summary>
+        public Shader s_fbov;
+
+        /// <summary>
+        /// The G-Buffer FBO shader, for alltransparents (Skybox mainly).
+        /// </summary>
+        public Shader s_fbot;
+
+        /// <summary>
+        /// The G-Buffer FBO shader, for the refraction pass.
+        /// </summary>
+        public Shader s_fbo_refract;
+
+        /// <summary>
+        /// The G-Buffer FBO shader, for the refraction pass, for voxels.
+        /// </summary>
+        public Shader s_fbov_refract;
+
+        /// <summary>
+        /// The shader that adds shadowed lights to a scene.
+        /// </summary>
+        public Shader s_shadowadder;
+
+        /// <summary>
+        /// The shader that adds lights to a scene.
+        /// </summary>
+        public Shader s_lightadder;
+
+        /// <summary>
+        /// The shader used only for transparent data.
+        /// </summary>
+        public Shader s_transponly;
+
+        /// <summary>
+        /// The shader used only for transparent voxels.
+        /// </summary>
+        public Shader s_transponlyvox;
+
+        /// <summary>
+        /// The shader used only for transparent data with lighting.
+        /// </summary>
+        public Shader s_transponlylit;
+
+        /// <summary>
+        /// The shader used only for transparent voxels with lighting.
+        /// </summary>
+        public Shader s_transponlyvoxlit;
+
+        /// <summary>
+        /// The shader used only for transparent data with shadowed lighting.
+        /// </summary>
+        public Shader s_transponlylitsh;
+
+        /// <summary>
+        /// The shader used only for transparent voxels with shadowed lighting.
+        /// </summary>
+        public Shader s_transponlyvoxlitsh;
+
+        /// <summary>
+        /// The shader used for calculating godrays.
+        /// </summary>
+        public Shader s_godray;
+
+        /// <summary>
+        /// The shader used to calculate the in-game map.
+        /// </summary>
         public Shader s_mapvox;
+
+        /// <summary>
+        /// The shader used as the final step of adding transparent data to the scene.
+        /// TODO: Optimize this away.
+        /// </summary>
         public Shader s_transpadder;
+
+        /// <summary>
+        /// The shader used for forward ('fast') rendering of data.
+        /// </summary>
         public Shader s_forw;
+
+        /// <summary>
+        /// The shader used for forward ('fast') rendering of voxels.
+        /// </summary>
         public Shader s_forw_vox;
+
+        /// <summary>
+        /// The shader used for forward ('fast') rendering of transparent data.
+        /// </summary>
         public Shader s_forw_trans;
+
+        /// <summary>
+        /// The shader used for forward ('fast') rendering of transparent voxels.
+        /// </summary>
         public Shader s_forw_vox_trans;
+
+        /// <summary>
+        /// The shader used for transparent data (LinkedList Transparency version).
+        /// </summary>
         public Shader s_transponly_ll;
+
+        /// <summary>
+        /// The shader used for transparent voxels (LinkedList Transparency version).
+        /// </summary>
         public Shader s_transponlyvox_ll;
+
+        /// <summary>
+        /// The shader used for lit transparent data (LinkedList Transparency version).
+        /// </summary>
         public Shader s_transponlylit_ll;
+
+        /// <summary>
+        /// The shader used for lit transparent voxels (LinkedList Transparency version).
+        /// </summary>
         public Shader s_transponlyvoxlit_ll;
+
+        /// <summary>
+        /// The shader used for shadowed lit transparent data (LinkedList Transparency version).
+        /// </summary>
         public Shader s_transponlylitsh_ll;
+
+        /// <summary>
+        /// The shader used for shadowed lit transparent voxels (LinkedList Transparency version).
+        /// </summary>
         public Shader s_transponlyvoxlitsh_ll;
+
+        /// <summary>
+        /// The shader used to clear LL data.
+        /// </summary>
         public Shader s_ll_clearer;
+        
+        /// <summary>
+        /// The shader used to finally apply LL data.
+        /// </summary>
         public Shader s_ll_fpass;
+
+        /// <summary>
+        /// The shader used to assist in HDR calculation acceleration.
+        /// </summary>
         public Shader s_hdrpass;
+
+        /// <summary>
+        /// The shader used for grass-sprites in forward rendering mode.
+        /// </summary>
         public Shader s_forw_grass;
+
+        /// <summary>
+        /// The shader used for grass-sprites in deffered rendering mode.
+        /// </summary>
         public Shader s_fbo_grass;
+
+        /// <summary>
+        /// The shader used for particles in forward rendering mode.
+        /// </summary>
         public Shader s_forw_particles;
+
+        /// <summary>
+        /// The shader used for alltransparency rendering in forward mode (primarily the skybox).
+        /// </summary>
         public Shader s_forwt;
 
+        /// <summary>
+        /// Sorts all entities by distance to camera.
+        /// TODO: Speed analysis? Probably doesn't matter with an average of 'a few hundred' entities...
+        /// </summary>
         public void sortEntities()
         {
             TheRegion.Entities = TheRegion.Entities.OrderBy(o => (o.GetPosition().DistanceSquared(MainWorldView.RenderRelative))).ToList();
         }
 
+        /// <summary>
+        /// Reverses the order of entities.
+        /// </summary>
         public void ReverseEntitiesOrder()
         {
             TheRegion.Entities.Reverse();
         }
 
+        /// <summary>
+        /// Helper to calculate true graphics FPS.
+        /// </summary>
         public int gTicks = 0;
 
+        /// <summary>
+        /// Current true graphics FPS.
+        /// </summary>
         public int gFPS = 0;
 
+        /// <summary>
+        /// Render ticks since last shadow update.
+        /// </summary>
         int rTicks = 1000;
 
+        /// <summary>
+        /// Whether shadows should be redrawn this frame.
+        /// </summary>
         public bool shouldRedrawShadows = false;
 
+        /// <summary>
+        /// The main entry point for the render and tick cycles.
+        /// </summary>
         public void Window_RenderFrame(object sender, FrameEventArgs e)
         {
             lock (TickLock)
@@ -409,17 +668,54 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// How long a tick took this frame.
+        /// </summary>
         public double TickTime;
+        
+        /// <summary>
+        /// How long GL.Finish took this frame.
+        /// </summary>
         public double FinishTime;
+
+        /// <summary>
+        /// How long 2D rendering took this frame.
+        /// </summary>
         public double TWODTime;
+
+        /// <summary>
+        /// How long this entire frame took.
+        /// </summary>
         public double TotalTime;
+
+        /// <summary>
+        /// How long the longest recent tick took.
+        /// </summary>
         public double TickSpikeTime;
+
+        /// <summary>
+        /// How long the longest recent Gl.Finsh took.
+        /// </summary>
         public double FinishSpikeTime;
+
+        /// <summary>
+        /// How long the longest recent 2D rendering took.
+        /// </summary>
         public double TWODSpikeTime;
+
+        /// <summary>
+        /// How long the longest recent frame took.
+        /// </summary>
         public double TotalSpikeTime;
 
+        /// <summary>
+        /// The GlobalTickTimeLocal value for when the map was last updated.
+        /// </summary>
         public double mapLastRendered = 0;
 
+        /// <summary>
+        /// Renders all 2D data to screen.
+        /// </summary>
         public void Render2DGame()
         {
             try
@@ -453,6 +749,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Renders the entire game.
+        /// </summary>
         public void renderGame()
         {
             Stopwatch totalt = new Stopwatch();
@@ -530,25 +829,43 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// How long the Fog should be 'enhanced', in seconds.
+        /// </summary>
         public double FogEnhanceTime = 0;
 
+        /// <summary>
+        /// How strongly the Fog should be 'enhanced'.
+        /// </summary>
         public float FogEnhanceStrength = 0.3f;
 
+        /// <summary>
+        /// How far the night sky is away from the camera.
+        /// </summary>
         public float GetSecondSkyDistance()
         {
             return MaximumStraightBlockDistance() * 1.1f;
         }
 
+        /// <summary>
+        /// How far the day sky is away from the camera.
+        /// </summary>
         public float GetSkyDistance()
         {
             return MaximumStraightBlockDistance();
         }
 
+        /// <summary>
+        /// Gets the present 3D location of the sun.
+        /// </summary>
         public Location GetSunLocation()
         {
             return MainWorldView.CameraPos + TheSun.Direction * -(GetSkyDistance() * 0.96f);
         }
 
+        /// <summary>
+        /// Renders the entire skybox.
+        /// </summary>
         public void RenderSkybox()
         {
             float skyAlpha = (float)Math.Max(Math.Min((SunAngle.Pitch - 70.0) / (-90.0), 1.0), 0.06);
@@ -618,6 +935,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Rendering.SetMinimumLight(0);
         }
 
+        /// <summary>
+        /// Sets the system for 2D rendering.
+        /// </summary>
         public void Establish2D()
         {
             GL.Disable(EnableCap.DepthTest);
@@ -626,8 +946,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.UniformMatrix4(1, false, ref Ortho);
         }
 
+        /// <summary>
+        /// Whether the system is in "Voxel" rendering mode.
+        /// </summary>
         public bool isVox = false;
 
+        /// <summary>
+        /// Switch the system to voxel rendering mode.
+        /// </summary>
         public void SetVox()
         {
             if (isVox)
@@ -736,6 +1062,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Switch the system to entity rendering mode.
+        /// </summary>
         public void SetEnts()
         {
             if (!isVox)
@@ -844,8 +1173,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// The up/down position of the rain cylinder.
+        /// </summary>
         public double RainCylPos = 0;
 
+        /// <summary>
+        /// Renders the VR helpers (Controllers in particular).
+        /// </summary>
         public void RenderVR()
         {
             if (VR == null)
@@ -881,6 +1216,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Renders the 3D world upon instruction from the internal view render code.
+        /// </summary>
         public void Render3D(View3D view)
         {
             GL.Enable(EnableCap.CullFace);
@@ -1101,6 +1439,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Draws a curved line in 3D space.
+        /// </summary>
         void DrawCurve(Location one, Location two, Location cPoint, System.Drawing.Color color)
         {
             const int curvePoints = 10;
@@ -1116,30 +1457,63 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Calculates a Bezier point along a curve.
+        /// </summary>
         Location CalculateBezierPoint(double t, Location p0, Location p1, Location p2)
         {
             double u = 1 - t;
             return (u * u) * p0 + 2 * u * t * p1 + t * t * p2;
         }
 
+        /// <summary>
+        /// Whether textures should be rendered currently.
+        /// </summary>
         public bool RenderTextures = true;
 
+        /// <summary>
+        /// How long extra items should be rendered for.
+        /// </summary>
         public double RenderExtraItems = 0;
 
+        /// <summary>
+        /// The format for MS timestamps.
+        /// </summary>
         const string timeformat = "#.000";
 
+        /// <summary>
+        /// The format for health data.
+        /// </summary>
         const string healthformat = "0.0";
 
+        /// <summary>
+        /// The format for the ping display.
+        /// </summary>
         const string pingformat = "000";
 
+        /// <summary>
+        /// A matrix that can be used to fix the perspective automatically (Identity when unused).
+        /// </summary>
         public Matrix4 FixPersp = Matrix4.Identity;
 
+        /// <summary>
+        /// How high the HUD UI is from the bottom.
+        /// </summary>
         public int UIBottomHeight = (itemScale * 2 + bottomup) + itemScale * 2;
 
+        /// <summary>
+        /// How big an item is on-screen.
+        /// </summary>
         const int itemScale = 48;
 
+        /// <summary>
+        /// How far from the bottom to start things at.
+        /// </summary>
         const int bottomup = 32 + 32;
 
+        /// <summary>
+        /// Renders the 2D screen data, or 3D pieces of the 2D screen.
+        /// </summary>
         public void Render2D(bool sub3d)
         {
             if (sub3d)
@@ -1271,6 +1645,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Renders a compass coordinate to the screen.
+        /// </summary>
         public void RenderCompassCoord(Vector4d rel, string dir)
         {
             Vector4d camp = new Vector4d(ClientUtilities.ConvertD(PlayerEyePosition), 1.0);
@@ -1288,6 +1665,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             FontSets.Standard.DrawColoredText(dir, new Location(northOnScreen, Window.Height - (32 + 28), 0));
         }
 
+        /// <summary>
+        /// Whether the view is currently orthographic.
+        /// </summary>
         public bool IsOrtho = false;
 
         /// <summary>
@@ -1315,6 +1695,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// What orthographic matrix is currently in use for 2D views.
+        /// </summary>
         public Matrix4 Ortho;
     }
 }
