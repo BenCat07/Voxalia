@@ -567,15 +567,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     tasks[i].Wait();
                     len += vbos[i].Vecs.Count;
                 }
-                cVBO.Positions = new Vector3[len];
-                cVBO.TexCoords = new Vector3[len];
+                cVBO.Positions = new Vector4[len];
+                cVBO.TexCoords = new Vector4[len];
                 cVBO.Colors = new Vector4[len];
+                cVBO.TCInds = new float[len];
                 int pos = 0;
                 for (int i = 0; i < vbos.Count; i++)
                 {
                     vbos[i].Vecs.CopyTo(cVBO.Positions, pos);
                     vbos[i].Texs.CopyTo(cVBO.TexCoords, pos);
                     vbos[i].Cols.CopyTo(cVBO.Colors, pos);
+                    vbos[i].TCIs.CopyTo(cVBO.TCInds, pos);
                     pos += vbos[i].Vecs.Count;
                 }
             }

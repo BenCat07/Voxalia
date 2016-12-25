@@ -47,7 +47,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             LoadedShaders = new List<Shader>();
             // Pregenerate a few needed shader
             ColorMultShader = GetShader("color_mult");
-            TextCleanerShader = GetShader("text_cleaner");
+            TextCleanerShader = GetShader("text_cleaner?text");
         }
 
         public bool MCM_GOOD_GRAPHICS = true;
@@ -107,6 +107,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             try
             {
+                string oname = filename;
                 string[] datg = filename.SplitFast('?', 1);
                 string geom = datg.Length > 1 ? datg[1] : null;
                 string[] dat1 = datg[0].SplitFast('#', 1);
@@ -137,7 +138,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     GS = TheClient.Files.ReadText("shaders/" + geom + ".geom");
                 }
-                return CreateShader(VS, FS, filename, vars, GS);
+                return CreateShader(VS, FS, oname, vars, GS);
             }
             catch (Exception ex)
             {

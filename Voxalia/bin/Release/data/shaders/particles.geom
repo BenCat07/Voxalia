@@ -35,9 +35,6 @@ out struct vox_fout
 #endif
 } fi;
 
-float snoise(in vec3 v);
-float snoise2(in vec3 v);
-
 vec4 qfix(in vec4 pos, in vec3 right, in vec3 pos_norm)
 {
 #if MCM_PRETTY

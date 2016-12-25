@@ -24,39 +24,26 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         uint VBO;
         uint VBOTexCoords;
-        uint VBOIndices;
         uint VBOColors;
+        uint VBOTCInd;
+        uint VBOIndices;
         uint VAO;
 
         /// <summary>
         /// All vertices on this VBO.
         /// </summary>
-        public List<Vector3> Vecs = new List<Vector3>();
+        public List<Vector4> Vecs = new List<Vector4>();
 
-        public List<Vector3> Texs = new List<Vector3>();
+        public List<Vector4> Texs = new List<Vector4>();
         public List<Vector4> Cols = new List<Vector4>();
+        public List<float> TCIs = new List<float>();
 
-        //public void AddQuad(Vector2 min, Vector2 max, Vector2 tmin, Vector2 tmax, Vector4 color, int tex)
         public void AddQuad(float minX, float minY, float maxX, float maxY, float tminX, float tminY, float tmaxX, float tmaxY, Vector4 color, int tex)
         {
-            Texs.Add(new Vector3(tminX, tminY, tex));
-            Vecs.Add(new Vector3(minX, minY, 0));
+            Vecs.Add(new Vector4(minX, minY, maxX, maxY));
+            Texs.Add(new Vector4(tminX, tminY, tmaxX, tmaxY));
             Cols.Add(color);
-            Texs.Add(new Vector3(tmaxX, tminY, tex));
-            Vecs.Add(new Vector3(maxX, minY, 0));
-            Cols.Add(color);
-            Texs.Add(new Vector3(tmaxX, tmaxY, tex));
-            Vecs.Add(new Vector3(maxX, maxY, 0));
-            Cols.Add(color);
-            Texs.Add(new Vector3(tminX, tminY, tex));
-            Vecs.Add(new Vector3(minX, minY, 0));
-            Cols.Add(color);
-            Texs.Add(new Vector3(tmaxX, tmaxY, tex));
-            Vecs.Add(new Vector3(maxX, maxY, 0));
-            Cols.Add(color);
-            Texs.Add(new Vector3(tminX, tmaxY, tex));
-            Vecs.Add(new Vector3(minX, maxY, 0));
-            Cols.Add(color);
+            TCIs.Add(tex);
         }
 
         /// <summary>
@@ -67,6 +54,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.DeleteBuffer(VBO);
             GL.DeleteBuffer(VBOTexCoords);
             GL.DeleteBuffer(VBOColors);
+            GL.DeleteBuffer(VBOTCInd);
             GL.DeleteBuffer(VBOIndices);
             GL.DeleteVertexArray(VAO);
             hasBuffers = false;
@@ -77,6 +65,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.GenBuffers(1, out VBO);
             GL.GenBuffers(1, out VBOTexCoords);
             GL.GenBuffers(1, out VBOColors);
+            GL.GenBuffers(1, out VBOTCInd);
             GL.GenBuffers(1, out VBOIndices);
             GL.GenVertexArrays(1, out VAO);
             hasBuffers = true;
@@ -86,9 +75,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         bool hasBuffers = false;
 
-        public Vector3[] Positions = null;
-        public Vector3[] TexCoords = null;
+        public Vector4[] Positions = null;
+        public Vector4[] TexCoords = null;
         public Vector4[] Colors = null;
+        public float[] TCInds = null;
 
         /// <summary>
         /// Turns the local VBO build information into an actual internal GPU-side VBO.
@@ -104,6 +94,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Positions = Vecs.ToArray();
                 TexCoords = Texs.ToArray();
                 Colors = Cols.ToArray();
+                TCInds = TCIs.ToArray();
             }
             Length = Positions.Length;
             uint[] Indices = new uint[Length];
@@ -114,13 +105,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.BindVertexArray(0);
             // Vertex buffer
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(Positions.Length * Vector3.SizeInBytes), Positions, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(Positions.Length * Vector4.SizeInBytes), Positions, BufferUsageHint.StaticDraw);
             // TexCoord buffer
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOTexCoords);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(TexCoords.Length * Vector3.SizeInBytes), TexCoords, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(TexCoords.Length * Vector4.SizeInBytes), TexCoords, BufferUsageHint.StaticDraw);
             // Color buffer
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOColors);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(Colors.Length * Vector4.SizeInBytes), Colors, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            // TCInd buffer
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOTCInd);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(TCInds.Length * sizeof(float)), TCInds, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             // Index buffer
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOIndices);
@@ -129,12 +124,15 @@ namespace Voxalia.ClientGame.GraphicsSystems
             // VAO
             GL.BindVertexArray(VAO);
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 0, 0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOTexCoords);
-            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, 0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBOColors);
-            GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBOTCInd);
+            GL.VertexAttribPointer(3, 1, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
             GL.EnableVertexAttribArray(2);
             GL.EnableVertexAttribArray(3);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, VBOIndices);
@@ -143,9 +141,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Vecs.Clear();
             Texs.Clear();
             Cols.Clear();
+            TCIs.Clear();
             Positions = null;
             TexCoords = null;
             Colors = null;
+            TCInds = null;
         }
         
         /// <summary>
@@ -158,10 +158,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 return;
             }
             GL.BindTexture(TextureTarget.Texture2DArray, Engine.Texture3D);
-            Matrix4 mat = Matrix4.Identity;
-            GL.UniformMatrix4(2, false, ref mat);
             GL.BindVertexArray(VAO);
-            GL.DrawElements(PrimitiveType.Triangles, Length, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            GL.DrawElements(PrimitiveType.Points, Length, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
     }
 }
