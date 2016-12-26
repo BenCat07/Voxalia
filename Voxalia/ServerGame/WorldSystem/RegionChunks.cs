@@ -157,12 +157,14 @@ namespace Voxalia.ServerGame.WorldSystem
             return new Location(Math.Floor(worldPos.X), Math.Floor(worldPos.Y), Math.Floor(worldPos.Z));
         }
 
+        const double tCW = 1.0 / (double)Chunk.CHUNK_SIZE;
+
         public Vector3i ChunkLocFor(Location worldPos)
         {
             Vector3i temp;
-            temp.X = (int)Math.Floor(worldPos.X / (double)Chunk.CHUNK_SIZE);
-            temp.Y = (int)Math.Floor(worldPos.Y / (double)Chunk.CHUNK_SIZE);
-            temp.Z = (int)Math.Floor(worldPos.Z / (double)Chunk.CHUNK_SIZE);
+            temp.X = (int)Math.Floor(worldPos.X * tCW);
+            temp.Y = (int)Math.Floor(worldPos.Y * tCW);
+            temp.Z = (int)Math.Floor(worldPos.Z * tCW);
             return temp;
         }
 
