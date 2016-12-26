@@ -15,6 +15,7 @@ using System.Drawing.Imaging;
 using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using Voxalia.Shared;
 using Voxalia.Shared.Files;
 using Voxalia.Shared.Collision;
@@ -25,9 +26,33 @@ using BEPUutilities;
 
 namespace Voxalia.ServerGame.OtherSystems
 {
+    public struct FastColor
+    {
+        public byte R;
+        public byte G;
+        public byte B;
+        public byte A;
+    }
+
     public class MaterialImage
     {
-        public Color[,] Colors;
+        public int Width;
+
+        public int Height;
+
+        public FastColor[] Colors;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetAt(int x, int y, FastColor c)
+        {
+            Colors[x + y * Width] = c;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public FastColor GetAt(int x, int y)
+        {
+            return Colors[x + y * Width];
+        }
     }
 
     public class BlockImageManager
@@ -61,10 +86,11 @@ namespace Voxalia.ServerGame.OtherSystems
             {
                 RenderChunkInternal(tregion, chunkCoords, chunk);
             }
-            if (tregion.TheServer.CVars.n_rendersides.ValueB)
+            // TODO: REIMPLEMENT?
+            /*if (tregion.TheServer.CVars.n_rendersides.ValueB)
             {
                 RenderChunkInternalAngle(tregion, chunkCoords, chunk);
-            }
+            }*/
 #if TIMINGS
             sw.Stop();
             Timings_General += sw.ElapsedTicks / (double)Stopwatch.Frequency;
@@ -90,35 +116,41 @@ namespace Voxalia.ServerGame.OtherSystems
             return temp.ToArray();
         }
 
-        Color Blend(Color one, Color two)
+        FastColor Blend(FastColor one, FastColor two)
         {
-            byte a2 = (byte)(255 - one.A);
-            return Color.FromArgb((byte)Math.Min(one.A + two.A, 255),
-                (byte)(one.R * one.A / 255 + two.R * a2 / 255),
-                (byte)(one.G * one.A / 255 + two.G * a2 / 255),
-                (byte)(one.B * one.A / 255 + two.B * a2 / 255));
+            int a2 = 255 - one.A;
+            return new FastColor()
+            {
+                R = (byte)(((one.R * one.A) / 255) + ((two.R * a2) / 255)),
+                G = (byte)(((one.G * one.A) / 255) + ((two.G * a2) / 255)),
+                B = (byte)(((one.B * one.A) / 255) + ((two.B * a2) / 255)),
+                A = (byte)Math.Min(one.A + two.A, 255)
+            };
         }
 
-        Color Multiply(Color one, Color two)
+        FastColor Multiply(FastColor one, FastColor two)
         {
-            return Color.FromArgb((byte)(one.A * two.A / 255),
-                (byte)(one.R * two.R / 255),
-                (byte)(one.G * two.G / 255),
-                (byte)(one.B * two.B / 255));
+            return new FastColor()
+            {
+                R = (byte)((one.R * two.R) / 255),
+                G = (byte)((one.G * two.G) / 255),
+                B = (byte)((one.B * two.B) / 255),
+                A = (byte)((one.A * two.A) / 255)
+            };
         }
 
-        void DrawImage(MaterialImage bmp, MaterialImage bmpnew, int xmin, int ymin, Color col)
+        void DrawImage(MaterialImage bmp, MaterialImage bmpnew, int xmin, int ymin, FastColor col)
         {
             for (int x = 0; x < TexWidth; x++)
             {
                 for (int y = 0; y < TexWidth; y++)
                 {
-                    Color basepx = bmp.Colors[xmin + x, ymin + y];
-                    bmp.Colors[xmin + x, ymin + y] = Blend(Multiply(bmpnew.Colors[x, y], col), basepx);
+                    bmp.SetAt(xmin + x, ymin + y, Blend(Multiply(bmpnew.GetAt(x, y), col), bmp.GetAt(xmin + x, ymin + y)));
                 }
             }
         }
 
+        /*
         void DrawImageShiftX(MaterialImage bmp, MaterialImage bmpnew, int xmin, int ymin, Color col)
         {
             xmin += TexWidth;
@@ -253,7 +285,7 @@ namespace Voxalia.ServerGame.OtherSystems
             DataStream ds = new DataStream();
             tbmp.Save(ds, ImageFormat.Png);
             tregion.ChunkManager.WriteImageAngle((int)chunkCoords.X, (int)chunkCoords.Y, (int)chunkCoords.Z, ds.ToArray());
-        }
+        }*/
 
         void RenderChunkInternal(WorldSystem.Region tregion, Vector3i chunkCoords, Chunk chunk)
         {
@@ -261,7 +293,7 @@ namespace Voxalia.ServerGame.OtherSystems
             Stopwatch sw = new Stopwatch();
             sw.Start();
 #endif
-            MaterialImage bmp = new MaterialImage() { Colors = new Color[BmpSize, BmpSize] };
+            MaterialImage bmp = new MaterialImage() { Colors = new FastColor[BmpSize * BmpSize], Width = BmpSize, Height = BmpSize };
             for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
             {
                 for (int y = 0; y < Chunk.CHUNK_SIZE; y++)
@@ -280,7 +312,7 @@ namespace Voxalia.ServerGame.OtherSystems
                     }
                     if (!topOpaque.Material.RendersAtAll())
                     {
-                        DrawImage(bmp, MaterialImages[0], x * TexWidth, y * TexWidth, Color.Transparent);
+                        DrawImage(bmp, MaterialImages[0], x * TexWidth, y * TexWidth, new FastColor() { R = 0, G = 0, B = 0, A = 0 });
                     }
                     for (int z = topZ; z < Chunk.CHUNK_SIZE; z++)
                     {
@@ -292,10 +324,11 @@ namespace Voxalia.ServerGame.OtherSystems
                             {
                                 continue;
                             }
-                            Color zcolor = Colors.ForByte(bi.BlockPaint);
+                            Color tzcolor = Colors.ForByte(bi.BlockPaint);
+                            FastColor zcolor = new FastColor() { R = tzcolor.R, G = tzcolor.G, B = tzcolor.B, A = tzcolor.A };
                             if (zcolor.A == 0)
                             {
-                                zcolor = Color.White;
+                                zcolor = new FastColor() { R = 255, G = 255, B = 255, A = 255 };
                             }
                             DrawImage(bmp, zmatbmp, x * TexWidth, y * TexWidth, zcolor);
                         }
@@ -319,7 +352,7 @@ namespace Voxalia.ServerGame.OtherSystems
                 {
                     for (int y = 0; y < BmpSize; y++)
                     {
-                        Color tcol = bmp.Colors[x, y];
+                        FastColor tcol = bmp.GetAt(x, y);
                         ptr[(x * 4) + y * stride + 0] = tcol.B;
                         ptr[(x * 4) + y * stride + 1] = tcol.G;
                         ptr[(x * 4) + y * stride + 2] = tcol.R;
@@ -380,12 +413,16 @@ namespace Voxalia.ServerGame.OtherSystems
                     Bitmap bmp2 = new Bitmap(bmp1, new Size(TexWidth, TexWidth));
                     bmp1.Dispose();
                     MaterialImage img = new MaterialImage();
-                    img.Colors = new Color[TexWidth, TexWidth];
+                    img.Width = TexWidth;
+                    img.Height = TexWidth;
+                    img.Colors = new FastColor[TexWidth * TexWidth];
                     for (int x = 0; x < TexWidth; x++)
                     {
                         for (int y = 0; y < TexWidth; y++)
                         {
-                            img.Colors[x, y] = bmp2.GetPixel(x, y);
+                            // TODO: Effic?
+                            Color t = bmp2.GetPixel(x, y);
+                            img.SetAt(x, y, new FastColor() { R = t.R, G = t.G, B = t.B, A = t.A });
                         }
                     }
                     MaterialImages[i] = img;
