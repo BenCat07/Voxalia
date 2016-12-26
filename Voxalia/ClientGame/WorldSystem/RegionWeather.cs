@@ -91,6 +91,10 @@ namespace Voxalia.ClientGame.WorldSystem
                 }
                 return;
             }
+            if (!TheClient.MainWorldView.FBOid.IsMainTransp())
+            {
+                return;
+            }
             if (ReClouds)
             {
                 bool forceset = false;

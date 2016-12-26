@@ -121,7 +121,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             float scale = (float)End(this).X;
             if (TID == -1)
             {
-                TID = TheClient.Particles.Engine.GetTextureID(texture.Name);
+                TID = TheClient.Particles.Engine.GetTextureID(texture.Name); // TODO: make sure this gets set prior to now?
             }
             return new Tuple<Location, Vector4, Vector2>(start, rcol, new Vector2(scale, TID));
         }

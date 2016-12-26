@@ -49,10 +49,11 @@ vec4 qfix(in vec4 pos, in vec3 right, in vec3 pos_norm)
 void main()
 {
 	vec3 pos = gl_in[0].gl_Position.xyz;
-	if (dot(pos, pos) > (50.0 * 50.0)) // TODO: Configurable particles render range cap!
+	 // TODO: Configurable particles render range cap!
+	/*if (dot(pos, pos) > (50.0 * 50.0))
 	{
 		return;
-	}
+	}*/
 	vec3 up = vec3(0.0, 0.0, 1.0);
 	vec3 pos_norm = normalize(pos.xyz);
 	if (abs(pos_norm.x) < 0.01 && abs(pos_norm.y) < 0.01)

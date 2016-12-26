@@ -17,6 +17,8 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Threading.Tasks;
+using Voxalia.ClientGame.WorldSystem;
 
 namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 {
@@ -99,14 +101,21 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         bool prepped = false;
 
+        public class ParticleData
+        {
+            public Vector3[] Poses;
+            public Vector4[] Cols;
+            public Vector2[] TCs;
+        }
+
         public void Render()
         {
             if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
             {
                 List<Vector3> pos = new List<Vector3>();
                 List<Vector4> col = new List<Vector4>();
-                List<Vector2> tcs = new List<Vector2>(0);
-                // TODO: If this gets too big, try to async it? Parallel.ForEach could speed it up, in that situation! Would require a logic adjustment though.
+                List<Vector2> tcs = new List<Vector2>();
+                // TODO: If this gets too big, try to async it? Parallel.ForEach or similar could speed it up, in that situation! Would require a logic adjustment though.
                 for (int i = 0; i < ActiveEffects.Count; i++)
                 {
                     if (ActiveEffects[i].Type == ParticleEffectType.SQUARE)
@@ -127,6 +136,38 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     {
                         ActiveEffects[i].OnDestroy?.Invoke(ActiveEffects[i]);
                         ActiveEffects.RemoveAt(i--);
+                    }
+                }
+                if (TheClient.CVars.r_clouds.ValueB)
+                {
+                    int cloudID = GetTextureID("effects/clouds/cloud1"); // TODO: Cache!
+                    List<Task> tasks = new List<Task>(TheClient.TheRegion.Clouds.Count); // This could be an array.
+                    List<ParticleData> datas = new List<ParticleData>(tasks.Capacity);
+                    foreach (Cloud tcl in TheClient.TheRegion.Clouds)
+                    {
+                        Cloud cloud = tcl;
+                        ParticleData pd = new ParticleData();
+                        datas.Add(pd);
+                        tasks.Add(Task.Factory.StartNew(() =>
+                        {
+                            pd.Poses = new Vector3[cloud.Points.Count];
+                            pd.Cols = new Vector4[cloud.Points.Count];
+                            pd.TCs = new Vector2[cloud.Points.Count];
+                            for (int i = 0; i < cloud.Points.Count; i++)
+                            {
+                                pd.Poses[i] = ClientUtilities.Convert((cloud.Position + cloud.Points[i]) - TheClient.MainWorldView.CameraPos);
+                                pd.Cols[i] = Vector4.One; // TODO: Colored clouds?
+                                pd.TCs[i] = new Vector2(cloud.Sizes[i], cloudID);
+                            }
+                        }));
+                    }
+                    int count = pos.Count;
+                    for (int i = 0; i < tasks.Count; i++)
+                    {
+                        tasks[i].Wait();
+                        pos.AddRange(datas[i].Poses);
+                        col.AddRange(datas[i].Cols);
+                        tcs.AddRange(datas[i].TCs);
                     }
                 }
                 TheClient.s_forw_particles = TheClient.s_forw_particles.Bind();

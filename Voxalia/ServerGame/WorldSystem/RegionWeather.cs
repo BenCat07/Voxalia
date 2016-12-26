@@ -26,9 +26,9 @@ namespace Voxalia.ServerGame.WorldSystem
             foreach (Chunk chunk in LoadedChunks.Values)
             {
                 // TODO: Only if pure air?
-                if (chunk.WorldPosition.Z >= 3 && chunk.WorldPosition.Z <= 7) // TODO: Better estimating
+                if (chunk.WorldPosition.Z >= 2 && chunk.WorldPosition.Z <= 5) // TODO: Better estimating. Also, config?
                 {
-                    if (Utilities.UtilRandom.Next(400) > 399)
+                    if (Utilities.UtilRandom.Next(403) > 400) // TODO: Config?
                     {
                         double d1 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
                         double d2 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
