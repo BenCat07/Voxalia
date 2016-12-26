@@ -28,7 +28,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 // TODO: Only if pure air?
                 if (chunk.WorldPosition.Z >= 2 && chunk.WorldPosition.Z <= 5) // TODO: Better estimating. Also, config?
                 {
-                    if (Utilities.UtilRandom.Next(403) > 400) // TODO: Config?
+                    if (Utilities.UtilRandom.Next(400) > 399) // TODO: Config?
                     {
                         double d1 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
                         double d2 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
