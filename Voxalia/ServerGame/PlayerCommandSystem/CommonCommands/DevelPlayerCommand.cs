@@ -339,6 +339,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 {
                     entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "--> " + time.Item1 + ": " + time.Item2);
                 }
+#if TIMINGS
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "--> [Image]: " + entry.Player.TheRegion.TheServer.BlockImages.Timings_General);
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "--> [Image/A]: " + entry.Player.TheRegion.TheServer.BlockImages.Timings_A);
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "--> [Image/B]: " + entry.Player.TheRegion.TheServer.BlockImages.Timings_B);
@@ -353,6 +354,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                     entry.Player.TheRegion.TheServer.BlockImages.Timings_C = 0;
                     entry.Player.TheRegion.TheServer.BlockImages.Timings_D = 0;
                 }
+#endif
             }
             else
             {

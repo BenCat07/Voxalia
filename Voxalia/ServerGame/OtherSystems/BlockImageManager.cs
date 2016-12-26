@@ -43,11 +43,13 @@ namespace Voxalia.ServerGame.OtherSystems
 
         static readonly Color Transp = Color.FromArgb(0, 0, 0, 0);
 
+#if TIMINGS
         public double Timings_General = 0; // TODO: Per-region var?
         public double Timings_A = 0; // TODO: Per-region var?
         public double Timings_B = 0; // TODO: Per-region var?
         public double Timings_C = 0; // TODO: Per-region var?
         public double Timings_D = 0; // TODO: Per-region var?
+#endif
 
         public void RenderChunk(WorldSystem.Region tregion, Vector3i chunkCoords, Chunk chunk)
         {
@@ -255,8 +257,10 @@ namespace Voxalia.ServerGame.OtherSystems
 
         void RenderChunkInternal(WorldSystem.Region tregion, Vector3i chunkCoords, Chunk chunk)
         {
+#if TIMINGS
             Stopwatch sw = new Stopwatch();
             sw.Start();
+#endif
             MaterialImage bmp = new MaterialImage() { Colors = new Color[BmpSize, BmpSize] };
             for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
             {
@@ -298,10 +302,12 @@ namespace Voxalia.ServerGame.OtherSystems
                     }
                 }
             }
+#if TIMINGS
             sw.Stop();
             Timings_A += sw.ElapsedTicks / (double)Stopwatch.Frequency;
             sw.Reset();
             sw.Start();
+#endif
             Bitmap tbmp = new Bitmap(BmpSize2, BmpSize2);
             BitmapData bdat = tbmp.LockBits(new Rectangle(0, 0, tbmp.Width, tbmp.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
             int stride = bdat.Stride;
@@ -322,29 +328,46 @@ namespace Voxalia.ServerGame.OtherSystems
                 }
             }
             tbmp.UnlockBits(bdat);
+#if TIMINGS
             sw.Stop();
             Timings_B += sw.ElapsedTicks / (double)Stopwatch.Frequency;
             sw.Reset();
             sw.Start();
+#endif
             DataStream ds = new DataStream();
             tbmp.Save(ds, ImageFormat.Png);
             tbmp.Dispose();
+#if TIMINGS
             sw.Stop();
             Timings_C += sw.ElapsedTicks / (double)Stopwatch.Frequency;
             sw.Reset();
             sw.Start();
-            lock (OneAtATimePlease) // NOTE: We can probably make this grab off an array of locks to reduce load a little.
+#endif
+            lock (GetLocker(new Vector2i(chunkCoords.X, chunkCoords.Y)))
             {
-                KeyValuePair<int, int> maxes = tregion.ChunkManager.GetMaxes((int)chunkCoords.X, (int)chunkCoords.Y);
-                tregion.ChunkManager.SetMaxes((int)chunkCoords.X, (int)chunkCoords.Y, Math.Min(maxes.Key, (int)chunkCoords.Z), Math.Max(maxes.Value, (int)chunkCoords.Z));
+                Vector2i maxes = tregion.ChunkManager.GetMaxes((int)chunkCoords.X, (int)chunkCoords.Y);
+                tregion.ChunkManager.SetMaxes((int)chunkCoords.X, (int)chunkCoords.Y, Math.Min(maxes.X, (int)chunkCoords.Z), Math.Max(maxes.Y, (int)chunkCoords.Z));
             }
             tregion.ChunkManager.WriteImage((int)chunkCoords.X, (int)chunkCoords.Y, (int)chunkCoords.Z, ds.ToArray());
+#if TIMINGS
             sw.Stop();
             Timings_D += sw.ElapsedTicks / (double)Stopwatch.Frequency;
+#endif
         }
+
+        public Object GetLocker(Vector2i input)
+        {
+            return Lockers[Math.Abs(input.GetHashCode()) % Lockers.Length];
+        }
+
+        public Object[] Lockers = new Object[32];
 
         public void Init(Server tserver)
         {
+            for (int i = 0; i < Lockers.Length; i++)
+            {
+                Lockers[i] = new Object();
+            }
             // TODO: v0.1.0 texture config update!
             MaterialImages = new MaterialImage[MaterialHelpers.Textures.Length];
             for (int i = 0; i < MaterialImages.Length; i++)
