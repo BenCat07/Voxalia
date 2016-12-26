@@ -1,5 +1,7 @@
 #version 430 core
 
+#define MCM_GEOM_ACTIVE 0
+
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texcoords;
@@ -12,7 +14,7 @@ layout (location = 8) in vec4 BoneID2;
 
 const int MAX_BONES = 200;
 
-layout (location = 1) uniform mat4 projection = mat4(1.0);
+layout (location = 1) uniform mat4 proj_matrix = mat4(1.0);
 layout (location = 2) uniform mat4 model_matrix = mat4(1.0);
 layout (location = 3) uniform vec4 v_color = vec4(1.0);
 // ...
@@ -25,14 +27,19 @@ out struct vox_out
 	vec2 texcoord;
 	vec4 color;
 	mat3 tbn;
+#if MCM_GEOM_ACTIVE
+#else
 	vec2 scrpos;
 	float z;
+#endif
 } f;
 
 void main()
 {
 	vec4 pos1;
 	vec4 nor1;
+#if MCM_GEOM_ACTIVE
+#else
 	float rem = 1.0 - (Weights[0] + Weights[1] + Weights[2] + Weights[3] + Weights2[0] + Weights2[1] + Weights2[2] + Weights2[3]);
 	mat4 BT = mat4(1.0);
 	if (rem < 0.99)
@@ -56,6 +63,9 @@ void main()
 	}
 	pos1 *= simplebone_matrix;
 	nor1 *= simplebone_matrix;
+#endif
+	pos1 = vec4(position, 1.0);
+	nor1 = vec4(normal, 1.0);
 	f.color = color;
     if (f.color == vec4(0.0, 0.0, 0.0, 1.0))
     {
@@ -65,10 +75,14 @@ void main()
 	f.texcoord = texcoords;
 	vec4 tpos = model_matrix * vec4(pos1.xyz, 1.0);
 	f.position = tpos / tpos.w;
-	vec4 npos = projection * tpos;
+#if MCM_GEOM_ACTIVE
+	gl_Position = tpos;
+#else
+	vec4 npos = proj_matrix * tpos;
 	f.scrpos = npos.xy / npos.w * 0.5 + vec2(0.5);
 	f.z = npos.z;
 	gl_Position = npos;
+#endif
 	mat4 mv_mat_simple = model_matrix;
 	mv_mat_simple[3][0] = 0.0;
 	mv_mat_simple[3][1] = 0.0;

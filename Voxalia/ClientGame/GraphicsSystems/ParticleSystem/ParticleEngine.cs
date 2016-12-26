@@ -110,7 +110,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         public void Render()
         {
-            if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
+            if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP || TheClient.MainWorldView.FBOid.IsMainTransp())
             {
                 List<Vector3> pos = new List<Vector3>();
                 List<Vector4> col = new List<Vector4>();
@@ -124,7 +124,15 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                         if (dets != null)
                         {
                             pos.Add(ClientUtilities.Convert(dets.Item1 - TheClient.MainWorldView.CameraPos));
-                            col.Add(Vector4.Min(dets.Item2, Vector4.One)); // NOTE: Min here is only for FORWARD mode, to prevent light > 1.0
+                            if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
+                            {
+                                col.Add(Vector4.Min(dets.Item2, Vector4.One));
+                            }
+                            else
+                            {
+
+                                col.Add(dets.Item2);
+                            }
                             tcs.Add(dets.Item3);
                         }
                     }
@@ -215,23 +223,6 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 GL.BindVertexArray(0);
                 TheClient.isVox = true;
                 TheClient.SetEnts();
-            }
-            else if (TheClient.MainWorldView.FBOid.IsMainTransp())
-            {
-                // TODO: Translate this to use the above, with a new shader.
-                TheClient.Rendering.SetMinimumLight(1);
-                for (int i = 0; i < ActiveEffects.Count; i++)
-                {
-                    ActiveEffects[i].Render();
-                    if (ActiveEffects[i].TTL <= 0)
-                    {
-                        ActiveEffects[i].OnDestroy?.Invoke(ActiveEffects[i]);
-                        ActiveEffects.RemoveAt(i--);
-                    }
-                }
-                TheClient.Textures.White.Bind();
-                TheClient.Rendering.SetColor(Color4.White);
-                TheClient.Rendering.SetMinimumLight(0);
             }
         }
     }

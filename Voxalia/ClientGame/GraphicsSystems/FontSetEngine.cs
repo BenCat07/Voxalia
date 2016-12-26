@@ -103,7 +103,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             Name = _name.ToLowerFast();
             Engine = engine;
-            cVBO = new TextVBO(Engine.GLFonts);
         }
 
         public void Load(string fontname, int fontsize)
@@ -531,6 +530,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                 }
             };
+            TextVBO cVBO = new TextVBO(Engine.GLFonts);
             Engine.GLFonts.Shaders.TextCleanerShader.Bind();
             GL.UniformMatrix4(1, false, ref Client.Central.Ortho); // TODO: Pass Client reference
             Matrix4 ident = Matrix4.Identity;
@@ -621,9 +621,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             return res.ToString();
         }
-
-        TextVBO cVBO;
-
+        
         public static string EscapeFancyText(string input)
         {
             return input.Replace("^", "^^n");

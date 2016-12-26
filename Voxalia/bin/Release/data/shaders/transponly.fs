@@ -5,6 +5,8 @@
 #define MCM_LIT 0
 #define MCM_SHADOWS 0
 #define MCM_LL 0
+#define MCM_ANY 0
+#define MCM_GEOM_ACTIVE 0
 
 #define AB_SIZE 16
 #define P_SIZE 4
@@ -12,8 +14,12 @@
 // TODO: more dynamically defined?
 #define ab_shared_pool_size (8 * 1024 * 1024)
 
+#if MCM_GEOM_ACTIVE
+layout (binding = 0) uniform sampler2DArray tex;
+#else
 layout (binding = 0) uniform sampler2D tex;
 layout (binding = 1) uniform sampler2D normal_tex;
+#endif
 // TODO: Spec, refl!
 layout (binding = 3) uniform sampler2DArray shadowtex;
 #if MCM_LL
@@ -33,15 +39,30 @@ layout (location = 10) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
 layout (location = 20) uniform mat4 light_details_array[LIGHTS_MAX];
 layout (location = 30) uniform mat4 light_details2_array[LIGHTS_MAX];
 
+#if MCM_GEOM_ACTIVE
+in struct vox_fout
+#else
 in struct vox_out
+#endif
 {
 	vec4 position;
+#if MCM_GEOM_ACTIVE
+	vec3 texcoord;
+#else
 	vec2 texcoord;
+#endif
 	vec4 color;
 	mat3 tbn;
 	vec2 scrpos;
 	float z;
+#if MCM_GEOM_ACTIVE
+} fi;
+
+#define f fi
+
+#else
 } f;
+#endif
 
 #if MCM_LL
 #else
@@ -59,10 +80,13 @@ void main()
 	vec4 fcolor;
 #endif
 	vec4 tcolor = texture(tex, f.texcoord);
+#if MCM_ANY
+#else
 	if (tcolor.w * f.color.w >= 0.99)
 	{
 		discard;
 	}
+#endif
 	if (tcolor.w * f.color.w < 0.01)
 	{
 		discard;
@@ -71,7 +95,11 @@ void main()
 	fcolor = color;
 #if MCM_LIT
 	fcolor = vec4(0.0);
+#if MCM_GEOM_ACTIVE
+	vec3 norms = vec3(0.0, 0.0, 1.0);
+#else
 	vec3 norms = texture(normal_tex, f.texcoord).xyz * 2.0 - 1.0;
+#endif
 	int count = int(lights_used);
 	for (int i = 0; i < count; i++)
 	{
@@ -99,7 +127,7 @@ void main()
 	float exposure = light_details2[2][0];
 	vec3 light_color = vec3(light_details2[0][3], light_details2[2][1], light_details2[2][2]);
 	vec4 x_spos = shadow_matrix * vec4(f.position.xyz, 1.0);
-	vec3 N = normalize(-normalize(f.tbn * norms));
+	vec3 N = -normalize(f.tbn * norms);
 	vec3 light_path = light_pos - f.position.xyz;
 	float light_length = length(light_path);
 	float d = light_length / light_radius;

@@ -1734,7 +1734,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         TRANSP_SHADOWS_LL = 14,
         REFRACT = 21,
         FORWARD_TRANSP = 98,
-        FORWARD_SOLID = 99,
+        FORWARD_SOLID = 99
     }
 
     public static class FBOIDExtensions

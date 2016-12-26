@@ -202,6 +202,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY?grass");
             s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP?particles");
             s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT");
+            s_transponly_particles = Shaders.GetShader("transponly" + def + ",MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
+            s_transponlylit_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
+            s_transponlylitsh_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
+            s_transponly_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
+            s_transponlylit_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
+            s_transponlylitsh_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
             // TODO: Better place for models?
             RainCyl = Models.GetModel("raincyl");
             RainCyl.LoadSkin(Textures);
@@ -552,6 +558,36 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The shader used for alltransparency rendering in forward mode (primarily the skybox).
         /// </summary>
         public Shader s_forwt;
+
+        /// <summary>
+        /// The shader used only for transparent particles.
+        /// </summary>
+        public Shader s_transponly_particles;
+
+        /// <summary>
+        /// The shader used only for transparent particles with lighting.
+        /// </summary>
+        public Shader s_transponlylit_particles;
+
+        /// <summary>
+        /// The shader used only for transparent particles with shadowed lighting.
+        /// </summary>
+        public Shader s_transponlylitsh_particles;
+
+        /// <summary>
+        /// The shader used for transparent particles (LinkedList Transparency version).
+        /// </summary>
+        public Shader s_transponly_ll_particles;
+
+        /// <summary>
+        /// The shader used for lit transparent particles (LinkedList Transparency version).
+        /// </summary>
+        public Shader s_transponlylit_ll_particles;
+
+        /// <summary>
+        /// The shader used for shadowed lit transparent particles (LinkedList Transparency version).
+        /// </summary>
+        public Shader s_transponlylitsh_ll_particles;
 
         /// <summary>
         /// Sorts all entities by distance to camera.
@@ -1228,10 +1264,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     TheRegion.ShadowCasters[i].Render();
                 }
-                if (view.TranspShadows)
-                {
-                    TheRegion.RenderClouds();
-                }
             }
             else
             {
@@ -1250,13 +1282,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     s_forwt.Bind();
                     RenderSkybox();
                     s_forw.Bind();
-                }
-                if (view.FBOid == FBOID.TRANSP_UNLIT || view.FBOid == FBOID.TRANSP_LIT || view.FBOid == FBOID.TRANSP_SHADOWS
-                    || view.FBOid == FBOID.FORWARD_SOLID || view.FBOid == FBOID.FORWARD_TRANSP)
-                {
-                    Rendering.SetMinimumLight(1);
-                    TheRegion.RenderClouds();
-                    Rendering.SetMinimumLight(0);
                 }
                 SetEnts();
                 for (int i = 0; i < TheRegion.Entities.Count; i++)
