@@ -35,7 +35,7 @@ namespace Voxalia.ClientGame.CommandSystem
 
         // Renderer CVars
         public CVar r_fullscreen, r_width, r_height, r_vsync, r_lighting, r_renderwireframe,
-            r_fov, r_znear, r_renderdist,
+            r_fov, r_znear, r_renderdist, r_renderdist_2, r_renderdist_2h, r_renderdist_5, r_renderdist_5h,
             r_dof_strength,
             r_maxfps,
             r_lightmaxdistance,
@@ -87,6 +87,10 @@ namespace Voxalia.ClientGame.CommandSystem
             r_fov = Register("r_fov", "70", CVarFlag.Numeric, "What Field of Vision range value to use.");
             r_znear = Register("r_znear", "0.1", CVarFlag.Numeric, "How close the near plane should be to the camera.");
             r_renderdist = Register("r_renderdist", "3", CVarFlag.Numeric, "The maximum distance, in chunks, a chunk can be from you for it to render.");
+            r_renderdist_2 = Register("r_renderdist_2", "1", CVarFlag.Numeric, "Base RenderDist + this = how far a LOD2 chunk can be from you.");
+            r_renderdist_2h = Register("r_renderdist_2h", "1", CVarFlag.Numeric, "Base RenderDist + this = how far (Height-wise) a LOD2 chunk can be from you.");
+            r_renderdist_5 = Register("r_renderdist_5", "1", CVarFlag.Numeric, "Base RenderDist + this = how far a LOD5 chunk can be from you.");
+            r_renderdist_5h = Register("r_renderdist_5h", "1", CVarFlag.Numeric, "Base RenderDist + this = how far (Height-wise) a LOD5 chunk can be from you.");
             r_dof_strength = Register("r_dof_strength", "4", CVarFlag.Numeric, "How strong the Depth Of Field effect should be.");
             r_maxfps = Register("r_maxfps", "60", CVarFlag.Numeric | CVarFlag.Delayed, "What the FPS cap should be.");
             r_lightmaxdistance = Register("r_lightmaxdistance", "35", CVarFlag.Numeric, "How far away a light can be from the camera before it is disabled.");

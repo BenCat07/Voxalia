@@ -565,7 +565,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                 int tport = Utilities.StringToInt(LastPort);
                 ConnectionSocket.Connect(new IPEndPoint(address, tport));
                 ConnectionSocket.Send(FileHandler.encoding.GetBytes("VOX__\r" + Username
-                    + "\r" + key + "\r" + LastIP + "\r" + LastPort + "\n"));
+                    + "\r" + key + "\r" + LastIP + "\r" + LastPort +
+                    "\r" + TheClient.CVars.r_renderdist.ValueI + "," + TheClient.CVars.r_renderdist_2.ValueI + ","
+                    + TheClient.CVars.r_renderdist_2h.ValueI + "," + TheClient.CVars.r_renderdist_5.ValueI + ","
+                    + TheClient.CVars.r_renderdist_5h.ValueI + "\n"));
                 byte[] resp = ReceiveUntil(ConnectionSocket, 150, (byte)'\n');
                 if (FileHandler.encoding.GetString(resp) != "ACCEPT")
                 {

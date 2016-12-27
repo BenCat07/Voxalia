@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.ComponentModel;
 using System.Text;
 using System.Net;
 using System.Linq;
@@ -24,7 +25,8 @@ using System.Web;
 
 namespace Voxalia.ServerGame.NetworkSystem
 {
-    class ShortWebClient : WebClient
+    [DesignerCategory("")]
+    public class ShortWebClient : WebClient
     {
         protected override WebRequest GetWebRequest(Uri uri)
         {
@@ -44,7 +46,7 @@ namespace Voxalia.ServerGame.NetworkSystem
         {
             TheServer = tserver;
             PrimarySocket = psocket;
-            PrimarySocket.Blocking = true;// false;
+            PrimarySocket.Blocking = true; // TODO: Should this be blocking? Could freeze things from a bad client potentially!
             recd = new byte[MAX];
         }
 
@@ -312,9 +314,9 @@ namespace Voxalia.ServerGame.NetworkSystem
                         // VOXALIA connect
                         if (recd[recdsofar - 1] == '\n')
                         {
-                            string data = FileHandler.encoding.GetString(recd, 6, recdsofar - 6);
+                            string data = FileHandler.encoding.GetString(recd, 6, recdsofar - 7);
                             string[] datums = data.SplitFast('\r');
-                            if (datums.Length != 4)
+                            if (datums.Length != 5)
                             {
                                 throw new Exception("Invalid VOX__ connection details!");
                             }
@@ -322,6 +324,12 @@ namespace Voxalia.ServerGame.NetworkSystem
                             string key = datums[1];
                             string host = datums[2];
                             string port = datums[3];
+                            string rdist = datums[4];
+                            string[] rds = rdist.SplitFast(',');
+                            if (rds.Length != 5)
+                            {
+                                throw new Exception("Invalid VOX__ connection details: RenderDist!");
+                            }
                             if (!Utilities.ValidateUsername(name))
                             {
                                 throw new Exception("Invalid connection - unreasonable username!");
@@ -342,6 +350,11 @@ namespace Voxalia.ServerGame.NetworkSystem
                                         player.Host = host;
                                         player.Port = port;
                                         player.IP = PrimarySocket.RemoteEndPoint.ToString();
+                                        player.ViewRadiusInChunks = Utilities.StringToInt(rds[0]);
+                                        player.ViewRadExtra2 = Utilities.StringToInt(rds[1]);
+                                        player.ViewRadExtra2Height = Utilities.StringToInt(rds[2]);
+                                        player.ViewRadExtra5 = Utilities.StringToInt(rds[3]);
+                                        player.ViewRadExtra5Height = Utilities.StringToInt(rds[4]);
                                         TheServer.Schedule.ScheduleSyncTask(() =>
                                         {
                                             TheServer.PlayersWaiting.Add(player);
@@ -378,7 +391,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                         // VOXALIA chunk connect
                         if (recd[recdsofar - 1] == '\n')
                         {
-                            string data = FileHandler.encoding.GetString(recd, 6, recdsofar - 6);
+                            string data = FileHandler.encoding.GetString(recd, 6, recdsofar - 7);
                             string[] datums = data.SplitFast('\r');
                             if (datums.Length != 4)
                             {
@@ -407,7 +420,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                                 }
                                 if (player == null)
                                 {
-                                    throw new Exception("Can't find player for VOXc_!");
+                                    throw new Exception("Can't find player for VOXc_:" + name + ", " + host + ", " + port + ", " + key.Length);
                                 }
                                 PE = player;
                                 player.ChunkNetwork = this;
