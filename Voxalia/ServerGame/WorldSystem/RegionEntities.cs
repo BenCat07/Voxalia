@@ -105,7 +105,15 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 e.EID = TheServer.AdvanceCID();
             }
-            Entities.Add(e.EID, e);
+            try
+            {
+                Entities.Add(e.EID, e);
+            }
+            catch (Exception ex)
+            {
+                Utilities.CheckException(ex);
+                SysConsole.Output(OutputType.WARNING, "Failed to spawn entity with ID: " + e.EID + ": Duplicate EID!");
+            }
             e.IsSpawned = true;
             if (e.Ticks)
             {
