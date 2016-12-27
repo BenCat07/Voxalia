@@ -127,7 +127,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             View3D.CheckError("Load - Rendering - Shaders");
             generateMapHelpers();
             GenerateGrassHelpers();
-            View3D.CheckError("Load - Rendering - Map");
+            View3D.CheckError("Load - Rendering - Map/Grass");
             MainWorldView.ShadowingAllowed = true;
             MainWorldView.ShadowTexSize = () => CVars.r_shadowquality.ValueI;
             MainWorldView.Render3D = Render3D;
@@ -825,20 +825,25 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         box.Include(ch.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE);
                         box.Include(ch.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(Chunk.CHUNK_SIZE));
                     }
+                    box.Min -= MainWorldView.RenderRelative;
+                    box.Max -= MainWorldView.RenderRelative;
                     Matrix4 ortho = Matrix4.CreateOrthographicOffCenter((float)box.Min.X, (float)box.Max.X, (float)box.Min.Y, (float)box.Max.Y, (float)box.Min.Z, (float)box.Max.Z);
-                    //  Matrix4 oident = Matrix4.Identity;
+                    Matrix4d oident = Matrix4d.Identity;
                     s_mapvox = s_mapvox.Bind();
                     GL.UniformMatrix4(View3D.MAT_LOC_VIEW, false, ref ortho);
+                    MainWorldView.SetMatrix(View3D.MAT_LOC_OBJECT, oident);
                     GL.Viewport(0, 0, 256, 256); // TODO: Customizable!
                     GL.BindFramebuffer(FramebufferTarget.Framebuffer, map_fbo_main);
                     GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
-                    GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0.0f, 1.0f, 0.0f, 1.0f });
+                    GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0.0f, 0.2f, 0.1f, 1.0f });
                     GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1.0f });
+                    GL.ActiveTexture(TextureUnit.Texture0);
                     GL.BindTexture(TextureTarget.Texture2DArray, TBlock.TextureID);
                     foreach (Chunk chunk in TheRegion.LoadedChunks.Values)
                     {
                         chunk.Render();
                     }
+                    // TODO: Render static entities like trees too! Also, an icon for the player's own location! And perhaps that of other players/live entities, if set to render?!
                     GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                     GL.BindTexture(TextureTarget.Texture2DArray, 0);
                     GL.DrawBuffer(DrawBufferMode.Back);
@@ -1618,10 +1623,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         new Location(center + 4, Window.Height - 26, 0));
                     if (CVars.u_showmap.ValueB)
                     {
-                        Textures.White.Bind();
-                        Rendering.SetColor(Color4.Black);
-                        Rendering.RenderRectangle(Window.Width - 16 - 200, 16, Window.Width - 16, 16 + 200); // TODO: Dynamic size?
                         Rendering.SetColor(Color4.White);
+                        Textures.Black.Bind();
+                        Rendering.RenderRectangle(Window.Width - 16 - 200, 16, Window.Width - 16, 16 + 200); // TODO: Dynamic size?
                         GL.BindTexture(TextureTarget.Texture2D, map_fbo_texture);
                         Rendering.RenderRectangle(Window.Width - 16 - (200 - 2), 16 + 2, Window.Width - 16 - 2, 16 + (200 - 2));
                     }

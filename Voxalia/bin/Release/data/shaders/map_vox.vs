@@ -6,6 +6,8 @@ layout (location = 2) in vec3 texcoords;
 layout (location = 3) in vec3 tangent;
 layout (location = 4) in vec4 color;
 layout (location = 5) in vec4 tcol;
+layout (location = 6) in vec4 thv;
+layout (location = 7) in vec4 thw;
 
 vec4 color_for(in vec4 pos);
 float snoise2(in vec3 v);
@@ -15,17 +17,19 @@ const float time = 0.0;
 out struct vox_out
 {
 	vec3 texcoord;
-	vec4 tcol;
+	vec3 tcol;
 } f;
 
 layout (location = 1) uniform mat4 proj_matrix = mat4(1.0);
+layout (location = 2) uniform mat4 view_mat = mat4(1.0);
 // ...
 
 void main(void)
 {
 	f.texcoord = texcoords;
-	f.tcol = color_for(vec4(position, 1.0)); // TODO: Special handle magic colors
-	gl_Position = proj_matrix * vec4(position, 1.0);
+	vec4 fpos = view_mat * vec4(position, 1.0);
+	f.tcol = color_for(fpos).xyz; // TODO: Special handle magic colors
+	gl_Position = proj_matrix * fpos;
 }
 
 const float min_cstrobe = 3.0 / 255.0;
