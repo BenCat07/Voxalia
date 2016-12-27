@@ -350,11 +350,11 @@ namespace Voxalia.ServerGame.NetworkSystem
                                         player.Host = host;
                                         player.Port = port;
                                         player.IP = PrimarySocket.RemoteEndPoint.ToString();
-                                        player.ViewRadiusInChunks = Utilities.StringToInt(rds[0]);
-                                        player.ViewRadExtra2 = Utilities.StringToInt(rds[1]);
-                                        player.ViewRadExtra2Height = Utilities.StringToInt(rds[2]);
-                                        player.ViewRadExtra5 = Utilities.StringToInt(rds[3]);
-                                        player.ViewRadExtra5Height = Utilities.StringToInt(rds[4]);
+                                        player.ViewRadiusInChunks = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[0])));
+                                        player.ViewRadExtra2 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[1])));
+                                        player.ViewRadExtra2Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[2])));
+                                        player.ViewRadExtra5 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[3])));
+                                        player.ViewRadExtra5Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[5])));
                                         TheServer.Schedule.ScheduleSyncTask(() =>
                                         {
                                             TheServer.PlayersWaiting.Add(player);
