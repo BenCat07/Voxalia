@@ -8,7 +8,7 @@
 
 namespace VoxaliaLauncher
 {
-    partial class Form1
+    partial class LauncherForm
     {
         /// <summary>
         /// Required designer variable.

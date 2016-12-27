@@ -25,11 +25,11 @@ using Gecko;
 
 namespace VoxaliaLauncher
 {
-    public partial class Form1 : Form
+    public partial class LauncherForm : Form
     {
         public static Encoding encoding = new UTF8Encoding(false);
 
-        public Form1()
+        public LauncherForm()
         {
             // XUL Runner Acquired from XUL: https://ftp.mozilla.org/pub/xulrunner/releases/33.0b9/runtimes/
             string app_dir = Path.GetDirectoryName(Application.ExecutablePath);
