@@ -354,7 +354,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                                         player.ViewRadExtra2 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[1])));
                                         player.ViewRadExtra2Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[2])));
                                         player.ViewRadExtra5 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[3])));
-                                        player.ViewRadExtra5Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[5])));
+                                        player.ViewRadExtra5Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[4])));
                                         TheServer.Schedule.ScheduleSyncTask(() =>
                                         {
                                             TheServer.PlayersWaiting.Add(player);
