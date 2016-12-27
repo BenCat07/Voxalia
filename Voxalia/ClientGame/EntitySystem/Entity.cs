@@ -53,6 +53,11 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public Region TheRegion = null;
 
+        public virtual void RenderForMap()
+        {
+            // Do nothing by default.
+        }
+
         /// <summary>
         /// Draw the entity in the 3D world.
         /// </summary>

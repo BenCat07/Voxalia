@@ -1,13 +1,17 @@
 #version 430 core
 
+#define MCM_VOX 0
+
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec3 texcoords;
 layout (location = 3) in vec3 tangent;
 layout (location = 4) in vec4 color;
+#if MCM_VOX
 layout (location = 5) in vec4 tcol;
 layout (location = 6) in vec4 thv;
 layout (location = 7) in vec4 thw;
+#endif
 
 vec4 color_for(in vec4 pos);
 float snoise2(in vec3 v);
@@ -16,7 +20,11 @@ const float time = 0.0;
 
 out struct vox_out
 {
+#if MCM_VOX
 	vec3 texcoord;
+#else
+	vec2 texcoord;
+#endif
 	vec3 tcol;
 } f;
 
@@ -26,11 +34,18 @@ layout (location = 2) uniform mat4 view_mat = mat4(1.0);
 
 void main(void)
 {
-	f.texcoord = texcoords;
 	vec4 fpos = view_mat * vec4(position, 1.0);
+#if MCM_VOX
+	f.texcoord = texcoords;
 	f.tcol = color_for(fpos).xyz; // TODO: Special handle magic colors
+#else
+	f.texcoord = texcoords.xy;
+	f.tcol = vec3(1.0); // TODO: Colors!
+#endif
 	gl_Position = proj_matrix * fpos;
 }
+
+#if MCM_VOX
 
 const float min_cstrobe = 3.0 / 255.0;
 
@@ -66,6 +81,8 @@ vec4 color_for(in vec4 pos)
 	}
 	return tcol;
 }
+
+#endif
 
 
 ////////////////////////////// END SHADER //////////////////////////////

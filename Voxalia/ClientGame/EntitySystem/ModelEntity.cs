@@ -361,6 +361,24 @@ namespace Voxalia.ClientGame.EntitySystem
             }
         }
 
+        public override void RenderForMap()
+        {
+            if (GenBlockShadows)
+            {
+                if (!Visible || model.Meshes.Count == 0)
+                {
+                    return;
+                }
+                Matrix4d mat = GetTransformationMatrix();
+                TheClient.MainWorldView.SetMatrix(2, mat);
+                if (model.Meshes[0].vbo.Tex == null)
+                {
+                    TheClient.Textures.White.Bind();
+                }
+                model.Draw();
+            }
+        }
+
         public void RenderSimpler()
         {
             if (!Visible || model.Meshes.Count == 0)

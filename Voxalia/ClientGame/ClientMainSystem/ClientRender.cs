@@ -178,7 +178,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_transponlylitsh = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS");
             s_transponlyvoxlitsh = Shaders.GetShader("transponlyvox" + def + ",MCM_LIT,MCM_SHADOWS");
             s_godray = Shaders.GetShader("godray" + def);
-            s_mapvox = Shaders.GetShader("map_vox" + def);
+            s_map = Shaders.GetShader("map" + def);
+            s_mapvox = Shaders.GetShader("map" + def + ",MCM_VOX");
             s_transpadder = Shaders.GetShader("transpadder" + def);
             s_finalgodray = Shaders.GetShader("finalgodray" + def);
             s_finalgodray_toonify = Shaders.GetShader("finalgodray" + def + ",MCM_TOONIFY");
@@ -464,7 +465,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public Shader s_godray;
 
         /// <summary>
-        /// The shader used to calculate the in-game map.
+        /// The shader used to calculate the in-game map data.
+        /// </summary>
+        public Shader s_map;
+
+        /// <summary>
+        /// The shader used to calculate the in-game map voxels.
         /// </summary>
         public Shader s_mapvox;
 
@@ -843,7 +849,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     {
                         chunk.Render();
                     }
-                    // TODO: Render static entities like trees too! Also, an icon for the player's own location! And perhaps that of other players/live entities, if set to render?!
+                    GL.BindTexture(TextureTarget.Texture2DArray, 0);
+                    s_map = s_map.Bind();
+                    GL.UniformMatrix4(View3D.MAT_LOC_VIEW, false, ref ortho);
+                    MainWorldView.SetMatrix(View3D.MAT_LOC_OBJECT, oident);
+                    Textures.White.Bind();
+                    foreach (Entity ent in TheRegion.Entities)
+                    {
+                        ent.RenderForMap();
+                    }
                     GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                     GL.BindTexture(TextureTarget.Texture2DArray, 0);
                     GL.DrawBuffer(DrawBufferMode.Back);

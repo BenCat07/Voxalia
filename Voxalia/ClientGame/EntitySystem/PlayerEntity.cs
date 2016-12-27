@@ -954,6 +954,12 @@ namespace Voxalia.ClientGame.EntitySystem
             return GetPosition();
         }
 
+        public override void RenderForMap()
+        {
+            TheClient.Textures.Black.Bind(); // TODO: Player icon of some form.
+            TheClient.Rendering.RenderRectangle(-5, -5, 5, 5, OpenTK.Matrix4.CreateTranslation(0, 0, 1));
+        }
+
         // TODO: Merge with base.Render() as much as possible!
         public override void Render()
         {
