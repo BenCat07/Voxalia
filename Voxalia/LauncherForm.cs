@@ -96,11 +96,22 @@ namespace VoxaliaLauncher
             {
                 loggedAs.Text = "Logged out";
                 playButton.Enabled = false;
+                logoutButton.Text = "Log In";
+                usernameBox.Enabled = true;
+                passwordBox.Enabled = true;
+                tfaBox.Enabled = true;
             }
             else
             {
                 loggedAs.Text = "Logged in as: " + UserName;
                 playButton.Enabled = true;
+                logoutButton.Text = "Log Out";
+                usernameBox.Enabled = false;
+                passwordBox.Enabled = false;
+                tfaBox.Enabled = false;
+                usernameBox.Text = "";
+                passwordBox.Text = "";
+                tfaBox.Text = "";
             }
         }
 
@@ -121,7 +132,7 @@ namespace VoxaliaLauncher
                 return;
             }
             Trying = true;
-            changeLogin.Enabled = false;
+            logoutButton.Enabled = false;
             progressBar1.Enabled = true;
             progressBar1.Style = ProgressBarStyle.Marquee;
             Task.Factory.StartNew(() =>
@@ -143,7 +154,7 @@ namespace VoxaliaLauncher
                             string key = resp.Substring("ACCEPT=".Length, resp.Length - 1 - "ACCEPT=".Length);
                             Invoke(new Action(() =>
                             {
-                                changeLogin.Enabled = true;
+                                logoutButton.Enabled = true;
                                 progressBar1.Enabled = false;
                                 progressBar1.Style = ProgressBarStyle.Blocks;
                                 Trying = false;
@@ -156,7 +167,7 @@ namespace VoxaliaLauncher
                         {
                             Invoke(new Action(() =>
                             {
-                                changeLogin.Enabled = true;
+                                logoutButton.Enabled = true;
                                 progressBar1.Enabled = false;
                                 progressBar1.Style = ProgressBarStyle.Blocks;
                                 Trying = false;
@@ -169,7 +180,7 @@ namespace VoxaliaLauncher
                     {
                         Invoke(new Action(() =>
                         {
-                            changeLogin.Enabled = true;
+                            logoutButton.Enabled = true;
                             progressBar1.Enabled = false;
                             progressBar1.Style = ProgressBarStyle.Blocks;
                             Trying = false;
@@ -190,7 +201,14 @@ namespace VoxaliaLauncher
 
         private void logoutButton_Click(object sender, EventArgs e)
         {
-            Logout();
+            if (UserName == null)
+            {
+                GlobalLoginAttempt(usernameBox.Text, passwordBox.Text, tfaBox.Text);
+            }
+            else
+            {
+                Logout();
+            }
         }
 
         public void Logout()
@@ -201,6 +219,11 @@ namespace VoxaliaLauncher
             }
             UserName = null;
             FixButtons();
+        }
+
+        private void LauncherForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 
