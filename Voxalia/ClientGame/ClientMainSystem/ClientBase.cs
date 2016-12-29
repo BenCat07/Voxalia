@@ -182,7 +182,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 VR.Stop();
                 VR = null;
             }
-            Sounds.StopAll();
+            Sounds.Shutdown();
             if (RawGamePad != null)
             {
                 RawGamePad.Dispose();

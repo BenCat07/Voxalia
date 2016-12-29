@@ -80,6 +80,13 @@ namespace Voxalia.ClientGame.AudioSystem
             PlayingNow.Clear();
         }
 
+        public void Shutdown()
+        {
+            StopAll();
+            Context.Dispose();
+            Context = null;
+        }
+
         public bool Selected;
 
         SoundEffect DeafStart;
