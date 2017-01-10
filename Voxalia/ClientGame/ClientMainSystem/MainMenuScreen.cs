@@ -47,5 +47,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             MouseHandler.ReleaseMouse();
         }
+
+        public override void FullRender(double delta, int xoff, int yoff)
+        {
+            base.FullRender(delta, xoff, yoff);
+            float size = Math.Min(TheClient.Window.Width, TheClient.Window.Height) * 0.5f;
+            TheClient.RenderLoader(TheClient.Window.Width * 0.5f, TheClient.Window.Height * 0.5f, size, delta);
+        }
     }
 }

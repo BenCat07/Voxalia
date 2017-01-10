@@ -193,7 +193,7 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             }
         }
 
-        public void FullRender(double delta, int xoff, int yoff)
+        public virtual void FullRender(double delta, int xoff, int yoff)
         {
             if (Parent == null || !Parent.ToRemove.Contains(this))
             {

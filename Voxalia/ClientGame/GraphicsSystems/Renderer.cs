@@ -333,6 +333,22 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.BindVertexArray(0);
         }
 
+        /// <summary>
+        /// Renders a 2D rectangle, with centered rotation.
+        /// </summary>
+        /// <param name="xmin">The lower bounds of the the rectangle: X coordinate.</param>
+        /// <param name="ymin">The lower bounds of the the rectangle: Y coordinate.</param>
+        /// <param name="xmax">The upper bounds of the the rectangle: X coordinate.</param>
+        /// <param name="ymax">The upper bounds of the the rectangle: Y coordinate.</param>
+        public void RenderRectangleCentered(float xmin, float ymin, float xmax, float ymax, float cx, float cy, Matrix4 rot)
+        {
+            Matrix4 mat = Matrix4.CreateScale(xmax - xmin, ymax - ymin, 1) * Matrix4.CreateTranslation(-cx, -cy, 0) * rot * Matrix4.CreateTranslation(xmin + cx, ymin + cy, 0);
+            GL.UniformMatrix4(2, false, ref mat);
+            GL.BindVertexArray(Square._VAO);
+            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            GL.BindVertexArray(0);
+        }
+
         public void RenderBillboard(Location center, Location scale, Location facing, float pzr = 0f)
         {
             Location lookdir = (facing - center).Normalize();
