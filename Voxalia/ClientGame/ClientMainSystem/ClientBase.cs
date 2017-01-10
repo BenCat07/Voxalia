@@ -308,6 +308,27 @@ namespace Voxalia.ClientGame.ClientMainSystem
             EntityConstructors[NetworkEntityType.HOVER_MESSAGE] = new HoverMessageEntityConstructor();
         }
 
+        Stopwatch SWLoading = new Stopwatch();
+
+        double psectime = -1;
+        
+        public void PassLoadScreen()
+        {
+            SWLoading.Stop();
+            double sectime = SWLoading.ElapsedMilliseconds / 1000.0;
+            SWLoading.Start();
+            if (sectime - psectime > 0.02)
+            {
+                load_screen.Bind();
+                Shaders.ColorMultShader.Bind();
+                Rendering.RenderRectangle(0, 0, Window.Width, Window.Height);
+                RenderLoader(Window.Width - 100f, 100f, 100f, sectime - psectime);
+                psectime = sectime;
+                Window.SwapBuffers();
+            }
+        }
+
+        Texture load_screen;
 
         /// <summary>
         /// Called when the window is loading, only to be used by the startup process.
@@ -342,12 +363,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Rendering = new Renderer(Textures, Shaders);
             Rendering.Init();
             SysConsole.Output(OutputType.INIT, "Preparing load screen...");
-            Texture load_screen = Textures.GetTexture("ui/menus/loadscreen");
-            load_screen.Bind();
-            Shaders.ColorMultShader.Bind();
+            load_screen = Textures.GetTexture("ui/menus/loadscreen");
             Establish2D();
-            Rendering.RenderRectangle(0, 0, Window.Width, Window.Height);
-            Window.SwapBuffers();
+            SWLoading.Start();
+            PassLoadScreen();
             SysConsole.Output(OutputType.INIT, "Loading block textures...");
             TBlock = new TextureBlock();
             TBlock.Generate(this, CVars, Textures);
@@ -358,6 +377,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             FontSets = new FontSetEngine(Fonts);
             FontSets.Init(this);
             View3D.CheckError("Load - Fonts");
+            PassLoadScreen();
             SysConsole.Output(OutputType.INIT, "Loading animation engine...");
             Animations = new AnimationEngine();
             SysConsole.Output(OutputType.INIT, "Loading model engine...");
@@ -371,6 +391,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.INIT, "Loading UI engine...");
             UIConsole.InitConsole(); // TODO: make this non-static
             InitChatSystem();
+            PassLoadScreen();
             View3D.CheckError("Load - UI");
             SysConsole.Output(OutputType.INIT, "Preparing rendering engine...");
             InitRendering();
@@ -380,6 +401,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.INIT, "Preparing mouse, keyboard, and gamepad handlers...");
             KeyHandler.Init();
             GamePadHandler.Init();
+            PassLoadScreen();
             View3D.CheckError("Load - Keyboard/mouse");
             SysConsole.Output(OutputType.INIT, "Building the sound system...");
             Sounds = new SoundEngine();
@@ -387,11 +409,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
             View3D.CheckError("Load - Sound");
             SysConsole.Output(OutputType.INIT, "Building game world...");
             BuildWorld();
+            PassLoadScreen();
             View3D.CheckError("Load - World");
             SysConsole.Output(OutputType.INIT, "Preparing networking...");
             Network = new NetworkBase(this);
             RegisterDefaultEntityTypes();
             View3D.CheckError("Load - Net");
+            PassLoadScreen();
             SysConsole.Output(OutputType.INIT, "Playing background music...");
             BackgroundMusic();
             CVars.a_musicvolume.OnChanged += onMusicVolumeChanged;
@@ -399,14 +423,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             CVars.a_music.OnChanged += onMusicChanged;
             CVars.a_echovolume.OnChanged += OnEchoVolumeChanged;
             OnEchoVolumeChanged(null, null);
+            PassLoadScreen();
             SysConsole.Output(OutputType.INIT, "Setting up screens...");
             TheMainMenuScreen = new MainMenuScreen(this);
             TheGameScreen = new GameScreen(this);
             TheSingleplayerMenuScreen = new SingleplayerMenuScreen(this);
-            SysConsole.Output(OutputType.INIT, "Preparing inventory...");
-            InitInventory();
-            SysConsole.Output(OutputType.INIT, "Showing main menu...");
-            ShowMainMenu();
             SysConsole.Output(OutputType.INIT, "Trying to grab RawGamePad...");
             try
             {
@@ -416,6 +437,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 SysConsole.Output(OutputType.INIT, "Failed to grab RawGamePad: " + ex.Message);
             }
+            SysConsole.Output(OutputType.INIT, "Preparing inventory...");
+            InitInventory();
+            PassLoadScreen();
+            SysConsole.Output(OutputType.INIT, "Showing main menu...");
+            ShowMainMenu();
             View3D.CheckError("Load - Final");
             SysConsole.Output(OutputType.INIT, "Ready and looping!");
         }

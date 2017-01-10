@@ -633,6 +633,25 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public bool shouldRedrawShadows = false;
 
         /// <summary>
+        /// How many things the game is currently loading.
+        /// </summary>
+        public int Loading = 0;
+
+        /// <summary>
+        /// Draws the entire 2D environment.
+        /// </summary>
+        /// <param name="w">The width of the screen currently.</param>
+        public void Draw2DEnv(int w)
+        {
+            CScreen.FullRender(gDelta, 0, 0);
+            if (Loading > 0)
+            {
+                RenderLoader(w - 100f, 100f, 100f, gDelta);
+            }
+            UIConsole.Draw();
+        }
+
+        /// <summary>
         /// The main entry point for the render and tick cycles.
         /// </summary>
         public void Window_RenderFrame(object sender, FrameEventArgs e)
@@ -650,17 +669,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         if (CVars.r_3d_enable.ValueB || VR != null)
                         {
                             GL.Viewport(Window.Width / 2, 0, Window.Width / 2, Window.Height);
-                            CScreen.FullRender(gDelta, 0, 0);
-                            UIConsole.Draw();
+                            Draw2DEnv(Window.Width / 2);
                             GL.Viewport(0, 0, Window.Width / 2, Window.Height);
-                            CScreen.FullRender(gDelta, 0, 0);
-                            UIConsole.Draw();
+                            Draw2DEnv(Window.Width / 2);
                             GL.Viewport(0, 0, Window.Width, Window.Height);
                         }
                         else
                         {
-                            CScreen.FullRender(gDelta, 0, 0);
-                            UIConsole.Draw();
+                            Draw2DEnv(Window.Width);
                         }
                     }
                     catch (Exception ex)

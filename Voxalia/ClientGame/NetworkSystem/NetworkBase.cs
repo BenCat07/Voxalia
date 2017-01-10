@@ -152,42 +152,55 @@ namespace Voxalia.ClientGame.NetworkSystem
         {
             TheClient.Schedule.StartASyncTask(() =>
             {
-                IPAddress address = GetAddress(IP);
-                ConnectionSocket = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                ConnectionSocket.LingerState.LingerTime = 5;
-                ConnectionSocket.LingerState.Enabled = true;
-                ConnectionSocket.ReceiveTimeout = 10000;
-                ConnectionSocket.SendTimeout = 10000;
-                ConnectionSocket.ReceiveBufferSize = 5 * 1024 * 1024;
-                ConnectionSocket.SendBufferSize = 5 * 1024 * 1024;
-                int tport = Utilities.StringToInt(port);
-                ConnectionSocket.Connect(new IPEndPoint(address, tport));
-                Stopwatch stopwatch = new Stopwatch();
-                stopwatch.Start();
-                ConnectionSocket.Send(FileHandler.encoding.GetBytes("VOXp_\n"));
-                byte[] resp = ReceiveUntil(ConnectionSocket, 150, (byte)'\n');
-                stopwatch.Stop();
-                long ping = stopwatch.ElapsedMilliseconds;
-                string respString = FileHandler.encoding.GetString(resp);
-                bool success = false;
-                string message = "No server ping response.";
-                if (respString != null)
+                try
                 {
-                    string[] datums = respString.SplitFast('\r');
-                    if (datums.Length < 2 || datums[0] != "SUCCESS")
+                    Interlocked.Increment(ref TheClient.Loading);
+                    IPAddress address = GetAddress(IP);
+                    ConnectionSocket = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    ConnectionSocket.LingerState.LingerTime = 5;
+                    ConnectionSocket.LingerState.Enabled = true;
+                    ConnectionSocket.ReceiveTimeout = 10000;
+                    ConnectionSocket.SendTimeout = 10000;
+                    ConnectionSocket.ReceiveBufferSize = 5 * 1024 * 1024;
+                    ConnectionSocket.SendBufferSize = 5 * 1024 * 1024;
+                    int tport = Utilities.StringToInt(port);
+                    ConnectionSocket.Connect(new IPEndPoint(address, tport));
+                    Stopwatch stopwatch = new Stopwatch();
+                    stopwatch.Start();
+                    ConnectionSocket.Send(FileHandler.encoding.GetBytes("VOXp_\n"));
+                    byte[] resp = ReceiveUntil(ConnectionSocket, 150, (byte)'\n');
+                    stopwatch.Stop();
+                    long ping = stopwatch.ElapsedMilliseconds;
+                    string respString = FileHandler.encoding.GetString(resp);
+                    bool success = false;
+                    string message = "No server ping response.";
+                    if (respString != null)
                     {
-                        message = "Invalid server ping details!";
+                        string[] datums = respString.SplitFast('\r');
+                        if (datums.Length < 2 || datums[0] != "SUCCESS")
+                        {
+                            message = "Invalid server ping details!";
+                        }
+                        else
+                        {
+                            success = true;
+                            message = datums[1];
+                        }
                     }
-                    else
+                    TheClient.Schedule.ScheduleSyncTask(() =>
                     {
-                        success = true;
-                        message = datums[1];
-                    }
+                        callback.Invoke(new PingInfo() { Success = success, Message = message, Ping = ping });
+                    });
+                    Interlocked.Decrement(ref TheClient.Loading);
                 }
-                TheClient.Schedule.ScheduleSyncTask(() =>
+                catch (Exception ex)
                 {
-                    callback.Invoke(new PingInfo() { Success = success, Message = message, Ping = ping });
-                });
+                    TheClient.Schedule.ScheduleSyncTask(() =>
+                    {
+                        callback.Invoke(new PingInfo() { Success = false, Message = "Failed: Network exception: " + ex.ToString(), Ping = -1 });
+                    });
+                    Interlocked.Decrement(ref TheClient.Loading);
+                }
             });
         }
 
@@ -553,6 +566,7 @@ namespace Voxalia.ClientGame.NetworkSystem
         {
             try
             {
+                Interlocked.Increment(ref TheClient.Loading);
                 string key = GetWebSession();
                 IPAddress address = GetAddress(LastIP);
                 ConnectionSocket = new Socket(address.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -597,9 +611,11 @@ namespace Voxalia.ClientGame.NetworkSystem
                 SysConsole.Output(OutputType.INFO, "Connected to " + address.ToString() + " " + tport);
                 IsAlive = true;
                 LaunchTicker();
+                Interlocked.Decrement(ref TheClient.Loading);
             }
             catch (Exception ex)
             {
+                Interlocked.Decrement(ref TheClient.Loading);
                 if (ex is ThreadAbortException)
                 {
                     throw ex;

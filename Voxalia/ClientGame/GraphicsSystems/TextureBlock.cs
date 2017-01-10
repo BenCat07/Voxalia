@@ -152,6 +152,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                     texs.Add(tex);
                     IntTexs[(int)tex.Mat] = tex.Textures[0];
+                    TheClient.PassLoadScreen();
                 }//, i * LoadRate);
                 //time = i * 0.1f;
             }
@@ -178,6 +179,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         }
                     }
                     combo.Dispose();
+                    TheClient.PassLoadScreen();
                 }//, time + i * LoadRate);
             }
             GL.BindTexture(TextureTarget.Texture2DArray, 0);
