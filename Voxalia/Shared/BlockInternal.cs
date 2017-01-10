@@ -13,14 +13,15 @@ namespace Voxalia.Shared
 {
     /// <summary>
     /// Internal representation of a single block's data.
+    /// 5 bytes.
     /// Structure:
-    /// 14 bits: Material
-    /// 2 bits: block damage
-    /// 8 bits: shape ('data')
-    /// 6 bits: paint
-    /// 1 bit: blockShareTexture
-    /// 1 bit: --UNUSED--
-    /// 8 bits: local data
+    /// 14 bits: Material.
+    /// 2 bits: block damage.
+    /// 8 bits: shape ('data').
+    /// 6 bits: paint.
+    /// 1 bit: blockShareTexture.
+    /// 1 bit: --UNUSED--.
+    /// 8 bits: local data.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack=1)]
     public struct BlockInternal
@@ -37,7 +38,7 @@ namespace Voxalia.Shared
         /// <returns>The actual block internal data.</returns>
         public static BlockInternal FromItemDatum(int dat)
         {
-            return FromItemDatumU(BitConverter.ToUInt32(BitConverter.GetBytes(dat), 0)); // TODO: Less stupid conversion
+            return FromItemDatumU(BitConverter.ToUInt32(BitConverter.GetBytes(dat), 0)); // TODO: Less stupid conversion - maybe some unchecked stuff?
         }
 
         /// <summary>
@@ -118,7 +119,7 @@ namespace Voxalia.Shared
         }
 
         /// <summary>
-        /// The data represented by this block.
+        /// The data (shape) represented by this block.
         /// Currently a directly read field, may be replaced by a getter that expands the bit count by stealing from other fields.
         /// </summary>
         public byte BlockData;
@@ -193,7 +194,7 @@ namespace Voxalia.Shared
         /// </summary>
         public int GetItemDatum()
         {
-            return BitConverter.ToInt32(BitConverter.GetBytes(GetItemDatumU()), 0); // TODO: Less stupid conversion
+            return BitConverter.ToInt32(BitConverter.GetBytes(GetItemDatumU()), 0); // TODO: Less stupid conversion - maybe some unchecked stuff?
         }
 
         /// <summary>

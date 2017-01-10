@@ -19,7 +19,7 @@ namespace Voxalia.Shared.Collision
 {
     public class FullChunkShape : CollisionShape
     {
-        public const int CHUNK_SIZE = 30;
+        public const int CHUNK_SIZE = Constants.CHUNK_WIDTH;
 
         public FullChunkShape(BlockInternal[] blocks)
         {
@@ -30,7 +30,7 @@ namespace Voxalia.Shared.Collision
 
         public int BlockIndex(int x, int y, int z)
         {
-            return z * CHUNK_SIZE * CHUNK_SIZE + y * CHUNK_SIZE + x;
+            return z * (CHUNK_SIZE * CHUNK_SIZE) + y * CHUNK_SIZE + x;
         }
 
         public static Vector3i[] ReachStarts = new Vector3i[]

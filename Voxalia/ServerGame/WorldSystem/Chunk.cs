@@ -23,9 +23,9 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public class Chunk
     {
-        public const int CHUNK_SIZE = FullChunkShape.CHUNK_SIZE;
+        public const int CHUNK_SIZE = Constants.CHUNK_WIDTH;
 
-        public const int RAM_USAGE = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE * 5;
+        public const int RAM_USAGE = Constants.CHUNK_BLOCK_COUNT * Constants.BYTES_PER_BLOCK;
 
         public static List<Object> Lockers = new List<Object>();
 
@@ -57,7 +57,7 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public Chunk()
         {
-            BlocksInternal = new BlockInternal[CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE];
+            BlocksInternal = new BlockInternal[Constants.CHUNK_BLOCK_COUNT];
         }
 
         public Chunk(byte[] _lod)
