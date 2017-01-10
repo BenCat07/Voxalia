@@ -26,6 +26,8 @@ namespace Voxalia.Shared
         /// Unfortunately it is not a multiple of ten, which makes many other usages awkward.</para>
         /// <para>30 was "good enough" for the present situation, with many blocks (27,000), and neatly a multiple of ten.
         /// It is unfortunately not a divisor of 100. It is also not a particularly notable number in any way... but it works nicely.</para>
+        /// <para>40 bares no visible advantage to bump up to currently, and would be a fair bit large at 64,000 blocks.</para>
+        /// <para>50 and higher would just be way too big at 250,000 blocks.</para>
         /// </summary>
         public const int CHUNK_WIDTH = 30;
 
