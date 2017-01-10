@@ -64,6 +64,10 @@ namespace Voxalia.ServerGame.ServerMainSystem
             });
         }
 
+        /// <summary>
+        /// Construct the server object with a specific port. Call <see cref="StartUp(Action)"/> after this!
+        /// </summary>
+        /// <param name="port">The specific port.</param>
         public Server(int port)
         {
             Files.Init();
@@ -130,18 +134,27 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// </summary>
         public bool ShuttingDown = false;
 
-        Thread CurThread;
+        /// <summary>
+        /// The current thread the server is running on.
+        /// </summary>
+        public Thread CurThread;
 
+        /// <summary>
+        /// Whether the server needs a shutdown immediately (Set by the method <see cref="ShutDown(Action)"/>).
+        /// </summary>
         public bool NeedShutdown = false;
 
-        Action shutdownCallback = null;
+        /// <summary>
+        /// The action to fire when a shutdown completes (Set by the method <see cref="ShutDown(Action)"/>).
+        /// </summary>
+        public Action ShutdownCallback = null;
 
         /// <summary>
         /// Shuts down the server, saving any necessary data.
         /// </summary>
         public void ShutDown(Action callback = null)
         {
-            shutdownCallback = callback;
+            ShutdownCallback = callback;
             if (CurThread != Thread.CurrentThread)
             {
                 NeedShutdown = true; // TODO: Lock for this?
@@ -203,9 +216,9 @@ namespace Voxalia.ServerGame.ServerMainSystem
                 world.FinalShutdown();
             }
             ConsoleHandler.Close();
-            if (shutdownCallback != null)
+            if (ShutdownCallback != null)
             {
-                shutdownCallback.Invoke();
+                ShutdownCallback.Invoke();
             }
             if (CurThread == Thread.CurrentThread)
             {
@@ -213,6 +226,11 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
         }
 
+        /// <summary>
+        /// Handles a console command.
+        /// </summary>
+        /// <param name="sender">The sending object.</param>
+        /// <param name="e">The event data.</param>
         public void CommandInputHandle(object sender, ConsoleCommandEventArgs e)
         {
             Schedule.ScheduleSyncTask(() =>
@@ -221,14 +239,31 @@ namespace Voxalia.ServerGame.ServerMainSystem
             });
         }
 
+        /// <summary>
+        /// The system that managers all compiled plugins on the server.
+        /// </summary>
         public PluginManager Plugins;
 
+        /// <summary>
+        /// The main configuration data for the server, located in "data/server_config.fds".
+        /// </summary>
         public FDSSection Config;
 
+        /// <summary>
+        /// Recent messages to the console, with a limited length. Used for display console output.
+        /// </summary>
         public List<string> RecentMessages = new List<string>();
 
+        /// <summary>
+        /// Lock to protect cross-thread access to RecentMessages.
+        /// </summary>
         public Object RecentMessagesLock = new Object();
 
+        /// <summary>
+        /// Handles a message to the console, and records it to <see cref="RecentMessages"/>.
+        /// </summary>
+        /// <param name="sender">The sending objects.</param>
+        /// <param name="args">The event data.</param>
         public void OnConsoleWritten(object sender, ConsoleWrittenEventArgs args)
         {
             lock (RecentMessagesLock)
@@ -241,6 +276,13 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
         }
 
+        /// <summary>
+        /// Gets the config file for a player.
+        /// If the player is online, will return the online player's config data.
+        /// Otherwise, will return a temporary copy from file.
+        /// </summary>
+        /// <param name="username">The username of the player.</param>
+        /// <returns>The config data.</returns>
         public FDSSection GetPlayerConfig(string username)
         {
             if (username.Length == 0)
@@ -270,11 +312,16 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
         }
 
+        /// <summary>
+        /// This will be locked on whenever the server is in an active tick. Lock on this to prevent conflict with server actions.
+        /// (Consider using the <see cref="Schedule"/> system).
+        /// </summary>
         public Object TickLock = new Object();
 
         /// <summary>
-        /// Start up and run the server.
+        /// Starts up and run the server.
         /// </summary>
+        /// <param name="loaded">The action to fire when the server is loaded.</param>
         public void StartUp(Action loaded = null)
         {
             CurThread = Thread.CurrentThread;
@@ -375,7 +422,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
                         if (NeedShutdown)
                         {
                             CurThread = Thread.CurrentThread;
-                            ShutDown(shutdownCallback);
+                            ShutDown(ShutdownCallback);
                             return;
                         }
                         lock (TickLock)
@@ -402,6 +449,9 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
         }
 
+        /// <summary>
+        /// Causes all autorun scripts to be calculated immediately. Part of the default startup sequence.
+        /// </summary>
         public void AutorunScripts()
         {
             string[] files = System.IO.Directory.GetFiles(Environment.CurrentDirectory + "/data/scripts/server/", "*.cfg", System.IO.SearchOption.AllDirectories);
