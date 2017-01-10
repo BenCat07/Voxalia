@@ -17,7 +17,10 @@ namespace Voxalia.ServerGame.ServerMainSystem
     // TODO: Rename or scrap file?
     public partial class Server
     {
-        // TODO: Dictionary?
+        /// <summary>
+        /// The list of all worlds known to the server.
+        /// TODO: Dictionary?
+        /// </summary>
         public List<World> LoadedWorlds = new List<World>();
 
         /// <summary>
@@ -41,6 +44,11 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// </summary>
         public FreneticScriptEventHandler<WorldLoadPostEventArgs> OnWorldLoadPostEvent = new FreneticScriptEventHandler<WorldLoadPostEventArgs>();
 
+        /// <summary>
+        /// Loads a world to the server. If a world by that name is already loaded, will simply return that world.
+        /// </summary>
+        /// <param name="name">The name of the world.</param>
+        /// <returns>A world object.</returns>
         public World LoadWorld(string name)
         {
             string nl = name.ToLowerFast();
@@ -73,10 +81,22 @@ namespace Voxalia.ServerGame.ServerMainSystem
             return world;
         }
         
-        public long cID = 1; // TODO: Save/load value!
+        /// <summary>
+        /// The current entity ID value.
+        /// Should generally not be read directly.
+        /// Instead, use <see cref="AdvanceCID"/>!
+        /// </summary>
+        public long cID = 1;
 
+        /// <summary>
+        /// Locker to protect cross-thread access to the <see cref="cID"/> field.
+        /// </summary>
         public Object CIDLock = new Object();
 
+        /// <summary>
+        /// Advances the <see cref="cID"/> and returns its value prior to advancement.
+        /// </summary>
+        /// <returns>The previous cID value.</returns>
         public long AdvanceCID()
         {
             lock (CIDLock)
@@ -85,10 +105,22 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
         }
 
-        long CloudID = 1;
+        /// <summary>
+        /// The current cloud ID.
+        /// Should generally not be read directly.
+        /// Instead, use <see cref="AdvanceCloudID"/>!
+        /// </summary>
+        public long CloudID = 1;
 
+        /// <summary>
+        /// Locker to protect cross-thread access to the <see cref="CloudID"/> field.
+        /// </summary>
         Object CloudIDLock = new Object();
 
+        /// <summary>
+        /// Advances the <see cref="CloudID"/> and returns its value prior to advancement.
+        /// </summary>
+        /// <returns>The previous CloudID value.</returns>
         public long AdvanceCloudID()
         {
             lock (CloudIDLock)
@@ -97,6 +129,11 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
         }
 
+        /// <summary>
+        /// Gets an entity that matches a specific EID value. Uses an efficient per-world lookup table. Can be slowed down by having too many worlds.
+        /// </summary>
+        /// <param name="eid">The entity ID.</param>
+        /// <returns>The entity, or null.</returns>
         public Entity GetEntity(long eid)
         {
             foreach (World world in LoadedWorlds)
@@ -110,6 +147,11 @@ namespace Voxalia.ServerGame.ServerMainSystem
             return null;
         }
 
+        /// <summary>
+        /// Gets a world by a specific name if it is loaded.
+        /// </summary>
+        /// <param name="name">The name of the world.</param>
+        /// <returns>The world, or null.</returns>
         public World GetWorld(string name)
         {
             name = name.ToLowerFast();
@@ -125,6 +167,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         }
     }
 
+    // TODO: Move to an event helper area.
     public class WorldLoadEventArgs : EventArgs
     {
         public bool Cancelled = false;
@@ -132,6 +175,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         public World TheWorld = null;
     }
 
+    // TODO: Move to an event helper area.
     public class WorldLoadPreEventArgs : EventArgs
     {
         public bool Cancelled = false;
@@ -139,6 +183,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         public string WorldName = null;
     }
 
+    // TODO: Move to an event helper area.
     public class WorldLoadPostEventArgs : EventArgs
     {
         public World TheWorld = null;
