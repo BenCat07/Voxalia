@@ -29,20 +29,45 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// </summary>
         public List<PlayerEntity> Players = new List<PlayerEntity>();
 
+        /// <summary>
+        /// All players waiting to be spawned on the server.
+        /// </summary>
         public List<PlayerEntity> PlayersWaiting = new List<PlayerEntity>();
 
+        /// <summary>
+        /// The <see cref="OncePerSecondActions"/> timer.
+        /// </summary>
         public double opsat = 0;
+        
+        /// <summary>
+        /// The RegEx string to match a URL, see <see cref="urlregex"/>.
+        /// </summary>
+        public const string URL_REGEX = "(?<!([^\\s]))(https?:\\/\\/[^\\s]+)";
 
-        string SaveStr = null;
+        /// <summary>
+        /// The Regex object to match a URL, see  <see cref="URL_REGEX"/>.
+        /// TODO: Replace usage of this with a non-regex method.
+        /// </summary>
+        public Regex urlregex = new Regex(URL_REGEX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        // TODO: Non-regex?
-        private const string URL_REGEX = "(?<!([^\\s]))(https?:\\/\\/[^\\s]+)";
-        Regex urlregex = new Regex(URL_REGEX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        /// <summary>
+        /// Translates all URLs in a chat message from raw URLs to valid textstyle URL identifiers.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
         public string TranslateURLs(string input)
         {
             return urlregex.Replace(input, "^[url=$2|$2]");
         }
 
+        /// <summary>
+        /// Sends a chat message to all players.
+        /// Does not apply any sender formatting.
+        /// Applies URL translation help per server config.
+        /// Applies line splitting via '\n'.
+        /// </summary>
+        /// <param name="message">The chat message.</param>
+        /// <param name="bcolor">The base color, if any (for console usage).</param>
         public void ChatMessage(string message, string bcolor = null)
         {
             if (message.Contains("\n"))
@@ -57,7 +82,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
             {
                 message = message.Replace("://", ":^n//");
             }
-            if (CVars.t_translateurls.ValueB) // TODO: && sender has permission (or is the console)
+            if (CVars.t_translateurls.ValueB) // TODO: && sender has permission (or is the console)?
             {
                 message = TranslateURLs(message);
             }
@@ -68,6 +93,12 @@ namespace Voxalia.ServerGame.ServerMainSystem
             SysConsole.Output(OutputType.INFO, "[Chat] " + message, bcolor);
         }
 
+        /// <summary>
+        /// Sends a broadcast to all players.
+        /// Does not modify message in any way.
+        /// </summary>
+        /// <param name="message">The message to broadcast.</param>
+        /// <param name="bcolor">The base color, if any (for console usage).</param>
         public void Broadcast(string message, string bcolor = null)
         {
             for (int i = 0; i < Players.Count; i++)
@@ -77,6 +108,10 @@ namespace Voxalia.ServerGame.ServerMainSystem
             SysConsole.Output(OutputType.INFO, "[Broadcast] " + message, bcolor);
         }
 
+        /// <summary>
+        /// Sends a packet to all online players.
+        /// </summary>
+        /// <param name="packet">The packet to send.</param>
         public void SendToAll(AbstractPacketOut packet)
         {
             for (int i = 0; i < Players.Count; i++)
@@ -85,9 +120,25 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
         }
 
+        /// <summary>
+        /// The current "ticks per second" value.
+        /// </summary>
         public int TPS = 0;
-        int tpsc = 0;
 
+        /// <summary>
+        /// The counter for the current second's ticks.
+        /// </summary>
+        int tpsc = 0;
+        
+        /// <summary>
+        /// Lock for saving standard server files.
+        /// </summary>
+        public Object SaveFileLock = new Object();
+
+        /// <summary>
+        /// Runs any actions that are necessary to be ran exactly once per second.
+        /// Includes any data saving.
+        /// </summary>
         public void OncePerSecondActions()
         {
             long cid;
@@ -100,7 +151,17 @@ namespace Voxalia.ServerGame.ServerMainSystem
                 prev_eid = cid;
                 Schedule.StartASyncTask(() =>
                 {
-                    Files.WriteText("server_eid.txt", cid.ToString());
+                    try
+                    {
+                        lock (SaveFileLock)
+                        {
+                            Files.WriteText("server_eid.txt", cid.ToString());
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SysConsole.Output(OutputType.ERROR, "Saving the current EID: " + ex.ToString());
+                    }
                 });
             }
             TPS = tpsc;
@@ -126,12 +187,22 @@ namespace Voxalia.ServerGame.ServerMainSystem
                         cvarsave.Append("set \"" + CVars.system.CVarList[i].Name + "\" \"" + val + "\";\n");
                     }
                 }
-                SaveStr = cvarsave.ToString();
-                Thread thread = new Thread(new ThreadStart(SaveCFG));
-                thread.Start();
+                string SaveStr = cvarsave.ToString();
+                Schedule.StartASyncTask(() =>
+                {
+                    try
+                    {
+                        lock (SaveFileLock)
+                        {
+                            Files.WriteText("serverdefaultsettings.cfg", SaveStr);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SysConsole.Output(OutputType.ERROR, "Saving settings: " + ex.ToString());
+                    }
+                });
             }
-         //   SysConsole.Output(OutputType.INFO, "Tick: " + (TickTimeC / TickTimes) + ", Schedule: " + (ScheduleTimeC / ScheduleTimes)
-         //       + ", Physics: " + (PhysicsTimeC / PhysicsTimes) + ", Entity: " + (EntityTimeC / EntityTimes) + " Ticked: " + TickTimes);
             TickTimes = 0;
             TickTimeC = 0;
             ScheduleTimes = 0;
@@ -141,35 +212,55 @@ namespace Voxalia.ServerGame.ServerMainSystem
             EntityTimes = 0;
             EntityTimeC = 0;
         }
-
-        public void SaveCFG()
-        {
-            try
-            {
-                Files.WriteText("serverdefaultsettings.cfg", SaveStr);
-            }
-            catch (Exception ex)
-            {
-                SysConsole.Output(OutputType.ERROR, "Saving settings: " + ex.ToString());
-            }
-        }
-
-        //double pts;
-
+        
+        /// <summary>
+        /// The current server delta timing.
+        /// </summary>
         public double Delta;
 
+        /// <summary>
+        /// Current tick time.
+        /// </summary>
         public double TickTimeC;
+
+        /// <summary>
+        /// How many times <see cref="TickTimeC"/> has been added to.
+        /// </summary>
         public double TickTimes;
 
+        /// <summary>
+        /// Current schedule time.
+        /// </summary>
         public double ScheduleTimeC;
+
+        /// <summary>
+        /// How many times <see cref="ScheduleTimeC"/> has been added to.
+        /// </summary>
         public double ScheduleTimes;
 
+        /// <summary>
+        /// Current physics time.
+        /// </summary>
         public double PhysicsTimeC;
+
+        /// <summary>
+        /// How many times <see cref="PhysicsTimeC"/> has been added to.
+        /// </summary>
         public double PhysicsTimes;
 
+        /// <summary>
+        /// Current entity calculation time.
+        /// </summary>
         public double EntityTimeC;
+
+        /// <summary>
+        /// How many times <see cref="EntityTimeC"/> has been added to.
+        /// </summary>
         public double EntityTimes;
 
+        /// <summary>
+        /// The previous EID value of the last second, to determine if the EID file should be updated.
+        /// </summary>
         long prev_eid = 0;
 
         /// <summary>

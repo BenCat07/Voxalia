@@ -197,6 +197,17 @@ namespace Voxalia.ServerGame.ServerMainSystem
             LoadedWorlds.Clear();
             SysConsole.Output(OutputType.INFO, "[Shutdown] Clearing plugins...");
             Plugins.UnloadPlugins();
+            SysConsole.Output(OutputType.INFO, "[Shutdown] Saving final data...");
+            long cid;
+            lock (CIDLock)
+            {
+                cid = cID;
+            }
+            lock (SaveFileLock)
+            {
+                Files.WriteText("server_eid.txt", cid.ToString());
+            }
+            // TODO: CVar save?
             SysConsole.Output(OutputType.INFO, "[Shutdown] Closing server...");
             ShutDownQuickly();
         }
