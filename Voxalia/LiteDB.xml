@@ -91,7 +91,7 @@
         </member>
         <member name="M:LiteDB.LiteCollection`1.Find(LiteDB.Query,System.Int32,System.Int32)">
             <summary>
-            Find documents inside a collection using Query object. Must have indexes in query expression
+            Find documents inside a collection using Query object.
             </summary>
         </member>
         <member name="M:LiteDB.LiteCollection`1.Find(System.Linq.Expressions.Expression{System.Func{`0,System.Boolean}},System.Int32,System.Int32)">
@@ -145,6 +145,12 @@
             <param name="property">Property linq expression</param>
             <param name="unique">Create a unique values index?</param>
         </member>
+        <member name="M:LiteDB.LiteCollection`1.IndexFactory(System.String)">
+            <summary>
+            Internal ensure index for auto-create index when needed
+            It's override LiteEngine define index because in LiteDatabase we have index definition in BsonMapper
+            </summary>
+        </member>
         <member name="M:LiteDB.LiteCollection`1.GetIndexes">
             <summary>
             Returns all indexes information
@@ -153,11 +159,6 @@
         <member name="M:LiteDB.LiteCollection`1.DropIndex(System.String)">
             <summary>
             Drop index and release slot for another index
-            </summary>
-        </member>
-        <member name="M:LiteDB.LiteCollection`1.EnsureIndex(LiteDB.IndexNotFoundException)">
-            <summary>
-            Create index based on a IndexNotFound exception
             </summary>
         </member>
         <member name="M:LiteDB.LiteCollection`1.Insert(`0)">
@@ -344,11 +345,6 @@
             Single process only
             </summary>
         </member>
-        <member name="P:LiteDB.StreamDiskService.IsJournalEnabled">
-            <summary>
-            No journal implemented
-            </summary>
-        </member>
         <member name="M:LiteDB.StreamDiskService.WriteJournal(System.Collections.Generic.ICollection{System.Byte[]})">
             <summary>
             No journal implemented
@@ -364,7 +360,7 @@
             No journal implemented
             </summary>
         </member>
-        <member name="M:LiteDB.StreamDiskService.Lock(LiteDB.LockState)">
+        <member name="M:LiteDB.StreamDiskService.Lock(LiteDB.LockState,System.TimeSpan)">
             <summary>
             No lock implemented
             </summary>
@@ -439,6 +435,11 @@
         <member name="P:LiteDB.LiteEngine.Timeout">
             <summary>
             Gets time waiting write lock operation before throw LiteException timeout
+            </summary>
+        </member>
+        <member name="P:LiteDB.LiteEngine.Locker">
+            <summary>
+            Instance of locker control
             </summary>
         </member>
         <member name="M:LiteDB.LiteEngine.#ctor(System.String,System.Boolean)">
@@ -631,11 +632,6 @@
             Returns file length
             </summary>
         </member>
-        <member name="P:LiteDB.FileDiskService.IsJournalEnabled">
-            <summary>
-            Returns if journal is enabled
-            </summary>
-        </member>
         <member name="M:LiteDB.FileDiskService.WriteJournal(System.Collections.Generic.ICollection{System.Byte[]})">
             <summary>
             Write original bytes page in a journal file (in sequence) - if journal not exists, create.
@@ -656,7 +652,7 @@
             Indicate disk can be access by multiples processes or not
             </summary>
         </member>
-        <member name="M:LiteDB.FileDiskService.Lock(LiteDB.LockState)">
+        <member name="M:LiteDB.FileDiskService.Lock(LiteDB.LockState,System.TimeSpan)">
             <summary>
             Implement datafile lock/unlock
             </summary>
@@ -696,11 +692,6 @@
             Indicate that disk/instance are data access exclusive (no other process can access)
             </summary>
         </member>
-        <member name="P:LiteDB.IDiskService.IsJournalEnabled">
-            <summary>
-            Indicate if journal are enabled/implemented
-            </summary>
-        </member>
         <member name="M:LiteDB.IDiskService.ReadJournal">
             <summary>
             Read journal file returning IEnumerable of pages
@@ -716,7 +707,7 @@
             Clear journal file
             </summary>
         </member>
-        <member name="M:LiteDB.IDiskService.Lock(LiteDB.LockState)">
+        <member name="M:LiteDB.IDiskService.Lock(LiteDB.LockState,System.TimeSpan)">
             <summary>
             Lock datafile returning lock position
             </summary>
@@ -1022,6 +1013,11 @@
             Queries can be executed in 2 ways: Index Seek (fast), Index Scan (good)
             </summary>
         </member>
+        <member name="M:LiteDB.Query.IndexFactory(System.Action{System.String,System.String})">
+            <summary>
+            Set, only if not defined yet, a new factory to create index if nedded
+            </summary>
+        </member>
         <member name="F:LiteDB.Query.Ascending">
             <summary>
             Indicate when a query must execute in ascending order
@@ -1169,36 +1165,61 @@
         </member>
         <member name="T:LiteDB.LockService">
             <summary>
-            Implement a locker service locking datafile to shared/reserved and exclusive mode
-            Implement both Thread lock and Process lock
+            Implement a locker service locking datafile to shared/reserved and exclusive access mode
+            Implement both thread lock and process lock
             Shared -> Reserved -> Exclusive => !Reserved => !Shared
             Reserved -> Exclusive => !Reserved
             [Thread Safe]
             </summary>
         </member>
-        <member name="M:LiteDB.LockService.Shared(System.Action)">
+        <member name="P:LiteDB.LockService.State">
             <summary>
-            Try enter in shared lock (read) - Call action if request a new lock
+            Get current datafile lock state
             </summary>
         </member>
-        <member name="M:LiteDB.LockService.Reserved(System.Action)">
+        <member name="M:LiteDB.LockService.Shared">
             <summary>
-            Try enter in reserved mode (read - single reserved)
+            Enter in Shared lock mode.
+            </summary>
+        </member>
+        <member name="M:LiteDB.LockService.Reserved">
+            <summary>
+            Enter in Reserved lock mode.
             </summary>
         </member>
         <member name="M:LiteDB.LockService.Exclusive">
             <summary>
+            Enter in Exclusive lock mode
+            </summary>
+        </member>
+        <member name="M:LiteDB.LockService.LockShared">
+            <summary>
+            Try enter in shared lock (read) - Call action if request a new lock
+            </summary>
+        </member>
+        <member name="M:LiteDB.LockService.LockReserved">
+            <summary>
+            Try enter in reserved mode (read - single reserved)
+            </summary>
+        </member>
+        <member name="M:LiteDB.LockService.LockExclusive">
+            <summary>
             Try enter in exclusive mode (single write)
             </summary>
         </member>
-        <member name="M:LiteDB.LockService.Read">
+        <member name="M:LiteDB.LockService.ThreadRead">
             <summary>
             Start new shared read lock control using timeout
             </summary>
         </member>
-        <member name="M:LiteDB.LockService.Write">
+        <member name="M:LiteDB.LockService.ThreadWrite">
             <summary>
             Start new exclusive write lock control using timeout
+            </summary>
+        </member>
+        <member name="M:LiteDB.LockService.AvoidDirtyRead">
+            <summary>
+            Test if cache still valid (if datafile was changed by another process reset cache)
             </summary>
         </member>
         <member name="F:LiteDB.CacheService._clean">
@@ -1459,11 +1480,6 @@
         <member name="M:LiteDB.TransactionService.Rollback">
             <summary>
             Clear cache, discard journal file
-            </summary>
-        </member>
-        <member name="M:LiteDB.TransactionService.AvoidDirtyRead">
-            <summary>
-            Test if cache still valid (if datafile was changed by another process reset cache)
             </summary>
         </member>
         <member name="M:LiteDB.TransactionService.Recovery">
@@ -2264,11 +2280,6 @@
         <member name="T:LiteDB.FileOptions">
             <summary>
             Datafile open options (for FileDiskService)
-            </summary>
-        </member>
-        <member name="T:LiteDB.IndexNotFoundException">
-            <summary>
-            A specific exception when a query didn't found an index
             </summary>
         </member>
         <member name="T:LiteDB.AesEncryption">
