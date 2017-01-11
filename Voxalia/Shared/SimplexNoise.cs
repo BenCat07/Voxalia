@@ -10,6 +10,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
 {
     // mcmonkey - NOTE TO READERS: This class was found elsewhere. Can't locate a link to it.
     // mcmonkey - Original header is below, though I removed some unicode from the name to avoid file errors.
+
     // mcmonkey - ORIGINAL HEADER BEGIN
 
     // SimplexNoise for C#

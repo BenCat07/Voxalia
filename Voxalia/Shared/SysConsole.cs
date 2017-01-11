@@ -18,7 +18,7 @@ namespace Voxalia.Shared
 {
     public class SysConsole
     {
-        volatile static List<KeyValuePair<string, string>> Waiting = new List<KeyValuePair<string, string>>();
+        static List<KeyValuePair<string, string>> Waiting = new List<KeyValuePair<string, string>>();
 
         static Object ConsoleLock;
 

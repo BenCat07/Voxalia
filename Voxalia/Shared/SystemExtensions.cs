@@ -13,8 +13,17 @@ using System.Text;
 
 namespace Voxalia.Shared
 {
+    /// <summary>
+    /// Helpers for various system classes.
+    /// </summary>
     public static class SystemExtensions
     {
+        /// <summary>
+        /// Gets the part of a string before a specified portion.
+        /// </summary>
+        /// <param name="input">The original string.</param>
+        /// <param name="match">The end marker.</param>
+        /// <returns>The prior portion.</returns>
         public static string Before(this string input, string match)
         {
             int ind = input.IndexOf(match);
@@ -26,6 +35,13 @@ namespace Voxalia.Shared
             return input.Substring(0, ind);
         }
 
+        /// <summary>
+        /// Gets the parts of a string before and after a specified portion.
+        /// </summary>
+        /// <param name="input">The original string.</param>
+        /// <param name="match">The end marker.</param>
+        /// <param name="after">The output of the latter portion.</param>
+        /// <returns>The prior portion.</returns>
         public static string BeforeAndAfter(this string input, string match, out string after)
         {
             int ind = input.IndexOf(match);
@@ -38,6 +54,12 @@ namespace Voxalia.Shared
             return input.Substring(0, ind);
         }
 
+        /// <summary>
+        /// Gets the part of a string after a specified portion.
+        /// </summary>
+        /// <param name="input">The original string.</param>
+        /// <param name="match">The end marker.</param>
+        /// <returns>The latter portion.</returns>
         public static string After(this string input, string match)
         {
             int ind = input.IndexOf(match);
@@ -48,6 +70,11 @@ namespace Voxalia.Shared
             return input.Substring(ind + match.Length);
         }
 
+        /// <summary>
+        /// Gets a Gaussian random value from a Random object.
+        /// </summary>
+        /// <param name="input">The random object.</param>
+        /// <returns>The Gaussian value.</returns>
         public static double NextGaussian(this Random input)
         {
             double u1 = input.NextDouble();

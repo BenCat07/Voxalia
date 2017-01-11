@@ -10,6 +10,9 @@ using System;
 
 namespace Voxalia.Shared
 {
+    /// <summary>
+    /// Flags for the 'your status' packet.
+    /// </summary>
     [Flags]
     public enum YourStatusFlags : byte
     {
@@ -24,6 +27,9 @@ namespace Voxalia.Shared
         ONETWENTYEIGHT = 128
     }
 
+    /// <summary>
+    /// Available Block Damage types.
+    /// </summary>
     public enum BlockDamage : byte
     {
         NONE = 0,
@@ -32,6 +38,9 @@ namespace Voxalia.Shared
         FULL = 3
     }
 
+    /// <summary>
+    /// Types of network bandwidth consumption.
+    /// </summary>
     public enum NetUsageType : byte
     {
         EFFECTS = 0,
@@ -44,18 +53,28 @@ namespace Voxalia.Shared
         COUNT = 7
     }
 
+    /// <summary>
+    /// For the OperationStatus packet.
+    /// TODO: Delete this, and associated packets?
+    /// </summary>
     public enum StatusOperation : byte
     {
         NONE = 0,
         CHUNK_LOAD = 1
     }
 
+    /// <summary>
+    /// BlockGroupEntity solidness tracing mode.
+    /// </summary>
     public enum BGETraceMode : byte
     {
         CONVEX = 0,
         PERFECT = 1
     }
 
+    /// <summary>
+    /// Entity flags.
+    /// </summary>
     public enum EntityFlag : byte
     {
         FLYING = 0,
@@ -64,6 +83,9 @@ namespace Voxalia.Shared
         HELO_TILT_MOD = 3
     }
 
+    /// <summary>
+    /// Types of sounds that can be played generically (as opposed to by filename).
+    /// </summary>
     public enum DefaultSound : byte
     {
         STEP = 0,
@@ -71,6 +93,9 @@ namespace Voxalia.Shared
         BREAK = 2
     }
 
+    /// <summary>
+    /// Network types for particle effect transmission.
+    /// </summary>
     public enum ParticleEffectNetType : byte
     {
         EXPLOSION = 0,
@@ -79,21 +104,29 @@ namespace Voxalia.Shared
         PAINT_BOMB = 3
     }
 
+    /// <summary>
+    /// Model entity collision modes.
+    /// </summary>
     public enum ModelCollisionMode : byte
     {
         PRECISE = 1,
         AABB = 2,
         SPHERE = 3,
         CONVEXHULL = 4
-        // TODO: ConvexHull!
     }
 
+    /// <summary>
+    /// Client status packets.
+    /// </summary>
     public enum ClientStatus : byte
     {
         TYPING = 0,
         AFK = 1
     }
 
+    /// <summary>
+    /// Types of rendered beams.
+    /// </summary>
     public enum BeamType : byte
     {
         STRAIGHT = 0,
@@ -101,6 +134,9 @@ namespace Voxalia.Shared
         MULTICURVE = 2
     }
     
+    /// <summary>
+    /// Keys that can be pressed.
+    /// </summary>
     public enum KeysPacketData : ushort
     {
         UPWARD = 1,
@@ -114,6 +150,9 @@ namespace Voxalia.Shared
         ITEMDOWN = 256
     }
     
+    /// <summary>
+    /// Directions which a chunk can be reached through.
+    /// </summary>
     public enum ChunkReachability : byte
     {
         ZP_ZM = 0,
@@ -134,6 +173,9 @@ namespace Voxalia.Shared
         COUNT = 15
     }
 
+    /// <summary>
+    /// Packets that go from the client to the server.
+    /// </summary>
     public enum ClientToServerPacket : byte
     {
         PING = 0,
@@ -145,6 +187,9 @@ namespace Voxalia.Shared
         PLEASE_REDEFINE = 6
     }
 
+    /// <summary>
+    /// Packets that go from the server to the client.
+    /// </summary>
     public enum ServerToClientPacket : byte
     {
         PING = 0,
