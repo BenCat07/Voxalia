@@ -8,8 +8,15 @@
 
 namespace Voxalia.ServerGame.WorldSystem
 {
+    /// <summary>
+    /// Abstractly represents a biome from an unspecified generator.
+    /// </summary>
     public abstract class Biome
     {
+        /// <summary>
+        /// Gets the name of the biome.
+        /// </summary>
+        /// <returns>The name of the biome.</returns>
         public abstract string GetName();
     }
 }
