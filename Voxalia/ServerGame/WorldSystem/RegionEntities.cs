@@ -34,8 +34,14 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public partial class Region
     {
+        /// <summary>
+        /// All physics joins in this region.
+        /// </summary>
         public List<InternalBaseJoint> Joints = new List<InternalBaseJoint>();
 
+        /// <summary>
+        /// All players in this region.
+        /// </summary>
         public List<PlayerEntity> Players = new List<PlayerEntity>();
 
         /// <summary>
@@ -50,10 +56,20 @@ namespace Voxalia.ServerGame.WorldSystem
 
         // TODO: Potentially a list of entities separated by what chunk they're in, for faster location lookup?
 
+        /// <summary>
+        /// All entities that need despawning, for use by ticking methods.
+        /// </summary>
         public List<Entity> DespawnQuick = new List<Entity>();
 
+        /// <summary>
+        /// The current joint ID.
+        /// </summary>
         long jID = 0;
 
+        /// <summary>
+        /// Adds a new joint to the region.
+        /// </summary>
+        /// <param name="joint">The joint to add.</param>
         public void AddJoint(InternalBaseJoint joint)
         {
             Joints.Add(joint);
@@ -70,6 +86,10 @@ namespace Voxalia.ServerGame.WorldSystem
             SendToAll(new AddJointPacketOut(joint));
         }
 
+        /// <summary>
+        /// Destroys a joint, removing it from the region.
+        /// </summary>
+        /// <param name="joint">The join to remove.</param>
         public void DestroyJoint(InternalBaseJoint joint)
         {
             Joints.Remove(joint);
@@ -95,6 +115,10 @@ namespace Voxalia.ServerGame.WorldSystem
             SendToAll(new DestroyJointPacketOut(joint));
         }
 
+        /// <summary>
+        /// Spawns an entity into the world.
+        /// </summary>
+        /// <param name="e">The entity to spawn.</param>
         public void SpawnEntity(Entity e)
         {
             if (e.IsSpawned)
@@ -147,6 +171,10 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Removes an entity from the world.
+        /// </summary>
+        /// <param name="e">The entity to remove.</param>
         public void DespawnEntity(Entity e)
         {
             if (!e.IsSpawned)
@@ -191,6 +219,11 @@ namespace Voxalia.ServerGame.WorldSystem
             Entities.Remove(e.EID);
         }
 
+        /// <summary>
+        /// Returns whether any player can see a specific location.
+        /// </summary>
+        /// <param name="pos">The location.</param>
+        /// <returns>Whether it is visible.</returns>
         public bool IsVisible(Location pos)
         {
             Vector3i cpos = ChunkLocFor(pos);
@@ -204,6 +237,11 @@ namespace Voxalia.ServerGame.WorldSystem
             return false;
         }
 
+        /// <summary>
+        /// Sends a packet to all players that can see a location.
+        /// </summary>
+        /// <param name="pos">The position.</param>
+        /// <param name="packet">The packet to send.</param>
         public void SendToVisible(Location pos, AbstractPacketOut packet)
         {
             Vector3i cpos = ChunkLocFor(pos);
@@ -216,6 +254,12 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Gets all players in a radius from a location.
+        /// </summary>
+        /// <param name="pos">The position.</param>
+        /// <param name="rad">The radius.</param>
+        /// <returns>All players in radius.</returns>
         public List<PlayerEntity> GetPlayersInRadius(Location pos, double rad)
         {
             List<PlayerEntity> pes = new List<PlayerEntity>();
@@ -229,6 +273,12 @@ namespace Voxalia.ServerGame.WorldSystem
             return pes;
         }
 
+        /// <summary>
+        /// Gets all entities in a radius from a location.
+        /// </summary>
+        /// <param name="pos">The position.</param>
+        /// <param name="rad">The radius.</param>
+        /// <returns>All entities in radius.</returns>
         public List<Entity> GetEntitiesInRadius(Location pos, double rad)
         {
             List<Entity> es = new List<Entity>();
@@ -245,6 +295,12 @@ namespace Voxalia.ServerGame.WorldSystem
             return es;
         }
 
+        /// <summary>
+        /// Converts an item to its entity equivalent.
+        /// TODO: Registry / helpers / something / anything!
+        /// </summary>
+        /// <param name="item">The item to convert.</param>
+        /// <returns>An entity.</returns>
         public PhysicsEntity ItemToEntity(ItemStack item)
         {
             if (item.Info is BlockItem)
@@ -274,8 +330,16 @@ namespace Voxalia.ServerGame.WorldSystem
             return new ItemEntity(item, this);
         }
 
+        /// <summary>
+        /// A map of all objects used to construct entities based on save data.
+        /// </summary>
         public Dictionary<EntityType, EntityConstructor> EntityConstructors = new Dictionary<EntityType, EntityConstructor>();
 
+        /// <summary>
+        /// Gets the constructor for a specific entity type.
+        /// </summary>
+        /// <param name="etype">The entity type.</param>
+        /// <returns>The constructor, or null.</returns>
         public EntityConstructor ConstructorFor(EntityType etype)
         {
             EntityConstructor ec;
@@ -285,12 +349,23 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             return null;
         }
-
+        
+        /// <summary>
+        /// A physics collision filter that ignores all entities (but not worldsolid objects).
+        /// </summary>
+        /// <param name="entry">A broad phase entry.</param>
+        /// <returns>Whether it is not an entity.</returns>
         public bool IgnoreEntities(BroadPhaseEntry entry)
         {
             return !(entry is EntityCollidable);
         }
         
+        /// <summary>
+        /// Spawns a tree into the world.
+        /// </summary>
+        /// <param name="tree">The tree type to spawn.</param>
+        /// <param name="opos">The base position for it.</param>
+        /// <param name="chunk">Specify null to spawn in the world, or a chunk to await loading for.</param>
         public void SpawnTree(string tree, Location opos, Chunk chunk)
         {
             // TODO: Efficiency!
