@@ -251,7 +251,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         }
 
         /// <summary>
-        /// The system that managers all compiled plugins on the server.
+        /// The system that manages all compiled plugins on the server.
         /// </summary>
         public PluginManager Plugins;
 

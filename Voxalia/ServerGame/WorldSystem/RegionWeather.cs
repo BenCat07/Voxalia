@@ -19,8 +19,15 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public partial class Region
     {
+        /// <summary>
+        /// The current vector force of wind (as it affects clouds and other objects).
+        /// </summary>
         public Location Wind = new Location(0.3, 0, 0);
 
+        /// <summary>
+        /// Immediately updates all clouds known to the server.
+        /// Called by the standard server tick loop.
+        /// </summary>
         public void TickClouds()
         {
             foreach (Chunk chunk in LoadedChunks.Values)
@@ -94,6 +101,11 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Adds a randomly generated bit to a cloud, with a minimum starting size.
+        /// </summary>
+        /// <param name="cloud">The cloud.</param>
+        /// <param name="start">The minimum starting size.</param>
         public void AddToCloud(Cloud cloud, double start)
         {
             double modif = Math.Sqrt(cloud.Points.Count) * 1.5;
@@ -106,6 +118,10 @@ namespace Voxalia.ServerGame.WorldSystem
             cloud.EndSizes.Add((double)d4);
         }
 
+        /// <summary>
+        /// Removes a cloud from the server and any clients that can see it.
+        /// </summary>
+        /// <param name="cloud">The cloud to remove.</param>
         public void DeleteCloud(Cloud cloud)
         {
             foreach (PlayerEntity player in Players)
@@ -118,6 +134,10 @@ namespace Voxalia.ServerGame.WorldSystem
             Clouds.Remove(cloud);
         }
 
+        /// <summary>
+        /// Removes all clouds that are inside a specific chunk (in particular for when that chunk is unloaded).
+        /// </summary>
+        /// <param name="chunk">The chunk.</param>
         public void RemoveCloudsFrom(Chunk chunk)
         {
             for (int i = Clouds.Count - 1; i >= 0; i--)
@@ -129,6 +149,10 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Adds clouds to a new chunk based on random noise, and present cloud configuration.
+        /// </summary>
+        /// <param name="chunk">The chunk to add clouds to.</param>
         public void AddCloudsToNewChunk(Chunk chunk)
         {
             if (chunk.WorldPosition.Z >= 3 && chunk.WorldPosition.Z <= 7 && Utilities.UtilRandom.Next(100) > 90)
@@ -146,12 +170,19 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Spawns a new cloud into the world.
+        /// </summary>
+        /// <param name="cloud">The cloud to spawn.</param>
         public void SpawnCloud(Cloud cloud)
         {
             cloud.CID = TheServer.AdvanceCloudID();
             Clouds.Add(cloud);
         }
 
+        /// <summary>
+        /// All clouds presently loaded on the server.
+        /// </summary>
         public List<Cloud> Clouds = new List<Cloud>();
     }
 }
