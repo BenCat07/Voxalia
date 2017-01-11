@@ -21,26 +21,54 @@ using FreneticScript;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
+    /// <summary>
+    /// Represents a world under a server.
+    /// A world holds one or more regions (usually one under present implementation).
+    /// </summary>
     public class World
     {
+        /// <summary>
+        /// The world configuration file.
+        /// </summary>
         public FDSSection Config;
 
+        /// <summary>
+        /// The name of this world.
+        /// </summary>
         public string Name;
 
         /// <summary>
         /// Represents the only region currently contained by a world.
         /// May in the future by changed to a dictionary of separate worldly regions.
+        /// At which point, this object will identify the "main" region only, IE the centermost.
         /// </summary>
         public Region MainRegion = null;
 
+        /// <summary>
+        /// The server object holding this world.
+        /// </summary>
         public Server TheServer;
 
+        /// <summary>
+        /// The present execution thread, which the world is running on.
+        /// </summary>
         public Thread Execution = null;
 
+        /// <summary>
+        /// The default seed value, for if a world has an error generating one (Generally won't be actually used).
+        /// Considered a 'safe' seed value, if one is needed.
+        /// </summary>
         public const int DefaultSeed = 100;
 
+        /// <summary>
+        /// The default spawn point of a world, as a location string.
+        /// </summary>
         public const string DefaultSpawnPoint = "0,0,50";
 
+        /// <summary>
+        /// The maximum allowed value of a seed.
+        /// TODO: Change this value?
+        /// </summary>
         const int SeedMax = ushort.MaxValue;
 
         /// <summary>
@@ -48,6 +76,10 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public double GlobalTickTime = 0;
 
+        /// <summary>
+        /// Loads the world configuration onto this world object.
+        /// Is called as part of the startup sequence for a world.
+        /// </summary>
         public void LoadConfig()
         {
             string folder = "saves/" + Name;
@@ -80,8 +112,15 @@ namespace Voxalia.ServerGame.WorldSystem
             Seed5 = (seedGen.Next(SeedMax) - SeedMax / 2);
         }
 
+        /// <summary>
+        /// Whether the config has been edited and needs to be resaved.
+        /// TODO: Use this more?
+        /// </summary>
         public bool CFGEdited;
 
+        /// <summary>
+        /// The spawnpoint location, in the <see cref="MainRegion"/>.
+        /// </summary>
         public Location SpawnPoint;
 
         /// <summary>
@@ -115,10 +154,20 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public int Seed5;
 
+        /// <summary>
+        /// The scheduling system for this world.
+        /// </summary>
         public Scheduler Schedule = new Scheduler();
 
+        /// <summary>
+        /// Whether this world should be flat and empty. (IE, use flat generator).
+        /// TODO: Better generator controls.
+        /// </summary>
         public bool Flat = false;
 
+        /// <summary>
+        /// Starts up a world onto its own thread.
+        /// </summary>
         public void Start()
         {
             if (Execution != null)
@@ -129,6 +178,9 @@ namespace Voxalia.ServerGame.WorldSystem
             Execution.Start();
         }
 
+        /// <summary>
+        /// Loads the main region.
+        /// </summary>
         public void LoadRegion()
         {
             if (MainRegion != null)
@@ -142,10 +194,21 @@ namespace Voxalia.ServerGame.WorldSystem
             MainRegion = rg;
         }
 
+        /// <summary>
+        /// Used to calculate the <see cref="Delta"/> value.
+        /// </summary>
         private Stopwatch DeltaCounter;
 
+        /// <summary>
+        /// Used as part of accurate tick timing.
+        /// </summary>
         private double TotalDelta;
 
+        /// <summary>
+        /// Generates an estimate of how much delta time has passed since the theoretical execution time identified by <see cref="GlobalTickTime"/>.
+        /// Uses stopwatch magic, and should only be used sparingly!
+        /// </summary>
+        /// <returns>An estimated value.</returns>
         public double EstimateSpareDelta()
         {
             DeltaCounter.Stop();
@@ -154,8 +217,16 @@ namespace Voxalia.ServerGame.WorldSystem
             return d + TotalDelta;
         }
 
+        /// <summary>
+        /// What delta amount the world is currently trying to calculate at.
+        /// Based on server the "g_fps" CVar presently.
+        /// Inverse of this is present target FPS.
+        /// </summary>
         public double TargetDelta;
         
+        /// <summary>
+        /// The internal main running code.
+        /// </summary>
         private void MainThread()
         {
             LoadConfig();
@@ -190,7 +261,7 @@ namespace Voxalia.ServerGame.WorldSystem
                         TheServer.CVars.g_fps.Set("30");
                         TARGETFPS = 30;
                     }
-                    TargetDelta = (1d / TARGETFPS);
+                    TargetDelta = (1.0d / TARGETFPS);
                     // How much delta has been built up
                     TotalDelta += CurrentDelta;
                     double tdelt = TargetDelta;
@@ -231,10 +302,23 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Lock this object to prevent collision with the world tick.
+        /// </summary>
         public Object TickLock = new Object();
 
+        /// <summary>
+        /// The callback action to be fired upon full unload of the world.
+        /// </summary>
         Action UnloadCallback = null;
 
+        /// <summary>
+        /// Causes the world to unloaded in full form as soon as possible.
+        /// Allows inputting a callback to be fired when the unload completes.
+        /// Might not necessarily be immediate.
+        /// Will terminate the world thread.
+        /// </summary>
+        /// <param name="wrapUp">The action to fire when the unload completes.</param>
         public void UnloadFully(Action wrapUp)
         {
             if (wrapUp != null)
@@ -246,25 +330,44 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
+            CFGEdited = true;
+            OncePerSecondActions();
             // TODO: Lock safely!
             MainRegion.UnloadFully();
             MainRegion = null;
             UnloadCallback?.Invoke();
+            // TODO: Should we really just be aborting the current thread?
             Execution.Abort();
             Execution = null;
         }
 
+        /// <summary>
+        /// Whether the world is marked for shutdown as soon as possible.
+        /// </summary>
         bool NeedShutdown = false;
         
+        /// <summary>
+        /// Final step of the world shutdown sequence.
+        /// Is not automatically called by <see cref="UnloadFully(Action)"/>!
+        /// </summary>
         public void FinalShutdown()
         {
             MainRegion.FinalShutdown();
         }
 
+        /// <summary>
+        /// The world configuration is saved around this lock object.
+        /// </summary>
         Object SaveWorldCFGLock = new Object();
 
+        /// <summary>
+        /// The last known entity ID. Used to track whether the current EID has changed.
+        /// </summary>
         long previous_eid = 0;
 
+        /// <summary>
+        /// Called once per second to manage any non-priority world operations, such as saving data.
+        /// </summary>
         public void OncePerSecondActions()
         {
             long cid;
@@ -282,6 +385,7 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             if (CFGEdited)
             {
+                Config.Set("general.time", GlobalTickTime); // TODO: update this value and save occasionally, even if the config is unedited - in case of bad shutdown!
                 string cfg = Config.SaveToString();
                 Schedule.StartASyncTask(() =>
                 {
@@ -294,10 +398,22 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Used to track the <see cref="OncePerSecondActions"/> time.
+        /// </summary>
         double ops = 0;
 
+        /// <summary>
+        /// The current delta timing for the world tick.
+        /// Represents the amount of time passed since the last tick.
+        /// </summary>
         public double Delta = 0;
 
+        /// <summary>
+        /// Ticks the world and all regions.
+        /// Called automatically by the standard run thread.
+        /// </summary>
+        /// <param name="delta">How much time has passed since the last tick.</param>
         public void Tick(double delta)
         {
             Delta = delta;

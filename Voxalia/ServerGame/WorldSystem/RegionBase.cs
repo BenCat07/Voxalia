@@ -36,7 +36,7 @@ namespace Voxalia.ServerGame.WorldSystem
     /// <summary>
     /// Represents a single region of a world (the standard world has only one region under present implementation).
     /// Contains all data pertaining to entities and block data inside its area.
-    /// Note that this is held under a server object, and requires the server object be valid.
+    /// Note that this is held under a world object, and requires the world object be valid.
     /// </summary>
     public partial class Region
     {
