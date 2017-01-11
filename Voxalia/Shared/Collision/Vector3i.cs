@@ -31,6 +31,7 @@ namespace Voxalia.Shared.Collision
 
         public override int GetHashCode()
         {
+            // TODO: Better hash method!
             return X + Y + Z;
         }
 

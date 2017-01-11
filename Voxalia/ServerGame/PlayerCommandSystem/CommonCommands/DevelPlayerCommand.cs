@@ -211,7 +211,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
-                    List<Location> locs = entry.Player.TheRegion.FindPath(entry.Player.GetPosition(), entry.Player.GetPosition() + new Location(dist, 0, 0), dist * 2, 1.5f, true);
+                    List<Location> locs = entry.Player.TheRegion.FindPath(entry.Player.GetPosition(), entry.Player.GetPosition() + new Location(dist, 0, 0), dist * 2, 1.5f);
                     sw.Stop();
                     entry.Player.TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
                     {
@@ -241,7 +241,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
-                    List<Location> locs = entry.Player.TheRegion.FindPath(entry.Player.GetPosition(), goal, 75, 1.5f, true);
+                    List<Location> locs = entry.Player.TheRegion.FindPath(entry.Player.GetPosition(), goal, 75, 1.5f);
                     sw.Stop();
                     entry.Player.TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
                     {

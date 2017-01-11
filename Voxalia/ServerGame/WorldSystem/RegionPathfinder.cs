@@ -18,10 +18,20 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public partial class Region
     {
-        // Thanks to fullwall for the reference sources this was built off
-        public List<Location> FindPath(Location startloc, Location endloc, double maxRadius, double goaldist, bool isAsync = false)
+        /// <summary>
+        /// Finds a path from the start to the end, if one exists.
+        /// Current implementation is A-Star (A*).
+        /// Thanks to fullwall for the reference sources this was built from.
+        /// Questionably safe for Async usage.
+        /// </summary>
+        /// <param name="startloc">The starting location.</param>
+        /// <param name="endloc">The ending location.</param>
+        /// <param name="maxRadius">The maximum radius to search through.</param>
+        /// <param name="goaldist">The maximum distance from the goal allowed.</param>
+        /// <returns>The shortest path, as a list of blocks to travel through.</returns>
+        public List<Location> FindPath(Location startloc, Location endloc, double maxRadius, double goaldist)
         {
-            // TODO: Async safety!
+            // TODO: Improve async safety!
             startloc = startloc.GetBlockLocation() + new Location(0.5, 0.5, 1.0);
             endloc = endloc.GetBlockLocation() + new Location(0.5, 0.5, 1.0);
             double mrsq = maxRadius * maxRadius;
@@ -84,6 +94,11 @@ namespace Voxalia.ServerGame.WorldSystem
             return null;
         }
 
+        /// <summary>
+        /// Reconstructs the path from a single node.
+        /// </summary>
+        /// <param name="node">The end node.</param>
+        /// <returns>The full path.</returns>
         List<Location> Reconstruct(PathFindNode node)
         {
             List<Location> locs = new List<Location>();
@@ -97,26 +112,49 @@ namespace Voxalia.ServerGame.WorldSystem
         }
     }
 
+    /// <summary>
+    /// Represents a node in a path.
+    /// </summary>
     public class PathFindNode: FastPriorityQueueNode, IComparable<PathFindNode>, IEquatable<PathFindNode>, IComparer<PathFindNode>, IEqualityComparer<PathFindNode>
     {
+        /// <summary>
+        /// The actual block location this node represents.
+        /// </summary>
         public Location Internal;
         
+        /// <summary>
+        /// The F value for this node. (See: Any A* explanation!)
+        /// </summary>
         public double F;
 
+        /// <summary>
+        /// The G value for this node. (See: Any A* explanation!)
+        /// </summary>
         public double G;
 
+        /// <summary>
+        /// The parent node for this node.
+        /// </summary>
         public PathFindNode Parent;
-
+        
+        /// <summary>
+        /// The default set of valid neighbors for a block.
+        /// </summary>
         public static Location[] Neighbors = new Location[] { Location.UnitX, Location.UnitY, Location.UnitZ, -Location.UnitX, -Location.UnitY, -Location.UnitZ };
 
         /// <summary>
-        /// Goes through a square root, yikes!
+        /// Calculates the distance to a second node.
         /// </summary>
         public double Distance(PathFindNode other)
         {
             return Internal.Distance(other.Internal);
         }
 
+        /// <summary>
+        /// Compares this node to another.
+        /// </summary>
+        /// <param name="other">The other.</param>
+        /// <returns>-1, 1, or 0.</returns>
         public int CompareTo(PathFindNode other)
         {
             if (other.F > F)
@@ -130,6 +168,11 @@ namespace Voxalia.ServerGame.WorldSystem
             return 0;
         }
 
+        /// <summary>
+        /// Checks if this node is at the same location as another.
+        /// </summary>
+        /// <param name="other">The other.</param>
+        /// <returns>Whether they are the same.</returns>
         public bool Equals(PathFindNode other)
         {
             if (other == null)
@@ -139,6 +182,11 @@ namespace Voxalia.ServerGame.WorldSystem
             return other.Internal == this.Internal;
         }
 
+        /// <summary>
+        /// Checks if this node is at the same location as another.
+        /// </summary>
+        /// <param name="obj">The other.</param>
+        /// <returns>Whether they are the same.</returns>
         public override bool Equals(object obj)
         {
             if (!(obj is PathFindNode))
@@ -148,6 +196,12 @@ namespace Voxalia.ServerGame.WorldSystem
             return Equals((PathFindNode)obj);
         }
 
+        /// <summary>
+        /// Checks if two nodes are equal.
+        /// </summary>
+        /// <param name="self">The first node.</param>
+        /// <param name="other">The second node.</param>
+        /// <returns>Whether they are equal.</returns>
         public static bool operator ==(PathFindNode self, PathFindNode other)
         {
             if (ReferenceEquals(self, null) && ReferenceEquals(other, null))
@@ -161,6 +215,12 @@ namespace Voxalia.ServerGame.WorldSystem
             return self.Equals(other);
         }
 
+        /// <summary>
+        /// Checks if two nodes are not equal.
+        /// </summary>
+        /// <param name="self">The first node.</param>
+        /// <param name="other">The second node.</param>
+        /// <returns>Whether they are not equal.</returns>
         public static bool operator !=(PathFindNode self, PathFindNode other)
         {
             if (ReferenceEquals(self, null) && ReferenceEquals(other, null))
@@ -174,21 +234,42 @@ namespace Voxalia.ServerGame.WorldSystem
             return !self.Equals(other);
         }
 
+        /// <summary>
+        /// Gets a reasonable hash code for a node, based on its location.
+        /// </summary>
+        /// <returns>The hash code.</returns>
         public override int GetHashCode()
         {
             return Internal.GetHashCode();
         }
 
+        /// <summary>
+        /// Compares two nodes.
+        /// </summary>
+        /// <param name="x">The first.</param>
+        /// <param name="y">The second.</param>
+        /// <returns>-1, 1, or 0.</returns>
         public int Compare(PathFindNode x, PathFindNode y)
         {
             return x.CompareTo(y);
         }
 
+        /// <summary>
+        /// Checks if two nodes are equal.
+        /// </summary>
+        /// <param name="x">The first.</param>
+        /// <param name="y">The second.</param>
+        /// <returns>Whether they are equal.</returns>
         public bool Equals(PathFindNode x, PathFindNode y)
         {
             return x == y;
         }
 
+        /// <summary>
+        /// Gets a reasonable hash code for a node, based on its location.
+        /// </summary>
+        /// <param name="obj">The node.</param>
+        /// <returns>The hash code.</returns>
         public int GetHashCode(PathFindNode obj)
         {
             return obj.GetHashCode();
