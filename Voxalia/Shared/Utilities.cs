@@ -16,6 +16,9 @@ using System.Security.Cryptography;
 
 namespace Voxalia.Shared
 {
+    /// <summary>
+    /// Helpful utilities for general usage.
+    /// </summary>
     public class Utilities
     {
         /// <summary>
@@ -24,7 +27,7 @@ namespace Voxalia.Shared
         public static Encoding encoding = new UTF8Encoding(false);
 
         /// <summary>
-        /// A static random object for all non-deterministic objects to use.
+        /// A thread-static random object for all non-deterministic objects to use.
         /// </summary>
         public static MTRandom UtilRandom
         {
@@ -38,73 +41,148 @@ namespace Voxalia.Shared
             }
         }
 
+        /// <summary>
+        /// A thread-static random provider.
+        /// </summary>
         [ThreadStatic]
         private static MTRandom intRandom;
 
+        /// <summary>
+        /// An SHA-512 hashing helper.
+        /// </summary>
         public static SHA512Managed sha512 = new SHA512Managed();
 
+        /// <summary>
+        /// Password static salt part 1.
+        /// </summary>
         public const string salt1 = "aB123!";
 
+        /// <summary>
+        /// Password static salt part 2.
+        /// </summary>
         public const string salt2 = "--=123Tt=--";
 
+        /// <summary>
+        /// Password static salt part 3.
+        /// </summary>
         public const string salt3 = "^&()xyZ";
 
+        /// <summary>
+        /// Quickly gets a Base-64 string of a hashed password input.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <param name="password">The password.</param>
+        /// <returns>A hash code.</returns>
         public static string HashQuick(string username, string password)
         {
             // TODO: Dynamic hash text maybe?
             return Convert.ToBase64String(sha512.ComputeHash(encoding.GetBytes(salt1 + username + salt2 + password + salt3)));
         }
         
+        /// <summary>
+        /// Converts a byte array to a ushort.
+        /// </summary>
+        /// <param name="bytes">The byte array.</param>
+        /// <returns>The actual value of it.</returns>
         public static ushort BytesToUshort(byte[] bytes)
         {
             return BitConverter.ToUInt16(bytes, 0);
         }
 
+        /// <summary>
+        /// Converts a byte array to a float.
+        /// </summary>
+        /// <param name="bytes">The byte array.</param>
+        /// <returns>The actual value of it.</returns>
         public static float BytesToFloat(byte[] bytes)
         {
             return BitConverter.ToSingle(bytes, 0);
         }
 
+        /// <summary>
+        /// Converts a byte array to a double.
+        /// </summary>
+        /// <param name="bytes">The byte array.</param>
+        /// <returns>The actual value of it.</returns>
         public static double BytesToDouble(byte[] bytes)
         {
             return BitConverter.ToDouble(bytes, 0);
         }
 
+        /// <summary>
+        /// Converts a ushort to a byte array.
+        /// </summary>
+        /// <param name="ush">The actual value of it.</param>
+        /// <returns>The byte array.</returns>
         public static byte[] UshortToBytes(ushort ush)
         {
             return BitConverter.GetBytes(ush);
         }
 
+        /// <summary>
+        /// Converts a float to a byte array.
+        /// </summary>
+        /// <param name="flt">The actual value of it.</param>
+        /// <returns>The byte array.</returns>
         public static byte[] FloatToBytes(float flt)
         {
             return BitConverter.GetBytes(flt);
         }
 
+        /// <summary>
+        /// Converts a double to a byte array.
+        /// </summary>
+        /// <param name="flt">The actual value of it.</param>
+        /// <returns>The byte array.</returns>
         public static byte[] DoubleToBytes(double flt)
         {
             return BitConverter.GetBytes(flt);
         }
 
+        /// <summary>
+        /// Converts a byte array to an int.
+        /// </summary>
+        /// <param name="bytes">The byte array.</param>
+        /// <returns>The actual value of it.</returns>
         public static int BytesToInt(byte[] bytes)
         {
             return BitConverter.ToInt32(bytes, 0);
         }
 
+        /// <summary>
+        /// Converts a byte array to a long.
+        /// </summary>
+        /// <param name="bytes">The byte array.</param>
+        /// <returns>The actual value of it.</returns>
         public static long BytesToLong(byte[] bytes)
         {
             return BitConverter.ToInt64(bytes, 0);
         }
 
+        /// <summary>
+        /// Converts an int to a byte array.
+        /// </summary>
+        /// <param name="intty">The actual value of it.</param>
+        /// <returns>The byte array.</returns>
         public static byte[] IntToBytes(int intty)
         {
             return BitConverter.GetBytes(intty);
         }
 
+        /// <summary>
+        /// Converts a long to a byte array.
+        /// </summary>
+        /// <param name="intty">The actual value of it.</param>
+        /// <returns>The byte array.</returns>
         public static byte[] LongToBytes(long intty)
         {
             return BitConverter.GetBytes(intty);
         }
 
+        /// <summary>
+        /// Checks an exception for rethrow necessity.
+        /// </summary>
+        /// <param name="ex">The exception to check.</param>
         public static void CheckException(Exception ex)
         {
             if (ex is ThreadAbortException)
@@ -113,7 +191,14 @@ namespace Voxalia.Shared
             }
         }
 
-        // TODO: Reduce need for BytesPartial in packets via adding an index to BytesTo<Type>!
+        /// <summary>
+        /// Grabs a sub section of a byte array.
+        /// TODO: Reduce need for BytesPartial in packets via adding an index to BytesTo[Type]!
+        /// </summary>
+        /// <param name="full">The original byte array.</param>
+        /// <param name="start">The start index.</param>
+        /// <param name="length">The length.</param>
+        /// <returns>The subset.</returns>
         public static byte[] BytesPartial(byte[] full, int start, int length)
         {
             byte[] data = new byte[length];
@@ -121,6 +206,13 @@ namespace Voxalia.Shared
             return data;
         }
 
+        /// <summary>
+        /// Steps a value towards a goal by a specified amount, automatically moving the correct direction (positive or negative) and preventing going past the goal.
+        /// </summary>
+        /// <param name="start">The initial value.</param>
+        /// <param name="target">The goal value.</param>
+        /// <param name="amount">The amount to step by.</param>
+        /// <returns>The result.</returns>
         public static double StepTowards(double start, double target, double amount)
         {
             if (start < target - amount)
@@ -137,6 +229,13 @@ namespace Voxalia.Shared
             }
         }
 
+        /// <summary>
+        /// Returns whether a number is close to another number, within a specified range.
+        /// </summary>
+        /// <param name="one">The first number.</param>
+        /// <param name="target">The second number.</param>
+        /// <param name="amount">The range.</param>
+        /// <returns>Whether it's close.</returns>
         public static bool IsCloseTo(double one, double target, double amount)
         {
             return one > target ? one - amount < target : one + amount > target;
@@ -159,12 +258,7 @@ namespace Voxalia.Shared
                 return 0f;
             }
         }
-
-        public static Location StringToLocation(string input)
-        {
-            return Location.FromString(input);
-        }
-
+        
         /// <summary>
         /// Converts a string to a double. Returns 0 if the string is not a valid double.
         /// </summary>
@@ -371,7 +465,10 @@ namespace Voxalia.Shared
                     );
         }
 
-        public static double PI180 = Math.PI / 180;
+        /// <summary>
+        /// Represents the constant PI / 180.
+        /// </summary>
+        public const double PI180 = Math.PI / 180.0;
 
         /// <summary>
         /// Returns a one-length vector of the Yaw/Pitch angle input.
@@ -430,6 +527,11 @@ namespace Voxalia.Shared
             return new Location(bX * cosyaw - vec.Y * sinyaw, bX * sinyaw + vec.Y * cosyaw, bZ);
         }
 
+        /// <summary>
+        /// Converts a string to a quaternion.
+        /// </summary>
+        /// <param name="input">The string.</param>
+        /// <returns>The quaternion, or the identity quaternion.</returns>
         public static Quaternion StringToQuat(string input)
         {
             string[] data = input.Replace('(', ' ').Replace(')', ' ').Replace(" ", "").SplitFast(',');
@@ -440,11 +542,21 @@ namespace Voxalia.Shared
             return new Quaternion(StringToFloat(data[0]), StringToFloat(data[1]), StringToFloat(data[2]), StringToFloat(data[3]));
         }
 
+        /// <summary>
+        /// Converts a quaternion to a string.
+        /// </summary>
+        /// <param name="quat">The quaternion.</param>
+        /// <returns>The string.</returns>
         public static string QuatToString(Quaternion quat)
         {
             return "(" + quat.X + ", " + quat.Y + ", " + quat.Z + ", " + quat.W + ")";
         }
 
+        /// <summary>
+        /// Converts a quaternion to a byte array.
+        /// </summary>
+        /// <param name="quat">The quaternion.</param>
+        /// <returns>The byte array.</returns>
         public static byte[] QuaternionToBytes(Quaternion quat)
         {
             byte[] dat = new byte[4 + 4 + 4 + 4];
@@ -455,6 +567,12 @@ namespace Voxalia.Shared
             return dat;
         }
 
+        /// <summary>
+        /// Converts a byte array to a quaternion.
+        /// </summary>
+        /// <param name="dat">The byte array.</param>
+        /// <param name="offset">The offset in the array.</param>
+        /// <returns>The quaternion.</returns>
         public static Quaternion BytesToQuaternion(byte[] dat, int offset)
         {
             return new Quaternion(BytesToFloat(BytesPartial(dat, offset, 4)), BytesToFloat(BytesPartial(dat, offset + 4, 4)),
@@ -462,6 +580,13 @@ namespace Voxalia.Shared
 
         }
 
+        /// <summary>
+        /// Creates a Matrix that "looks at" a target from a location, left-hand notation.
+        /// </summary>
+        /// <param name="start">The starting coordinate.</param>
+        /// <param name="end">The end target.</param>
+        /// <param name="up">The normalized up vector.</param>
+        /// <returns>A matrix.</returns>
         public static Matrix LookAtLH(Location start, Location end, Location up)
         {
             Location zAxis = (end - start).Normalize();
@@ -472,6 +597,11 @@ namespace Voxalia.Shared
                 (double)-xAxis.Dot(start), (double)-yAxis.Dot(start), (double)-zAxis.Dot(start), 1);
         }
 
+        /// <summary>
+        /// Converts a matrix to Euler angles.
+        /// </summary>
+        /// <param name="WorldTransform">The matrix.</param>
+        /// <returns>The Euler angles.</returns>
         public static Location MatrixToAngles(Matrix WorldTransform)
         {
             Location rot;
@@ -481,12 +611,17 @@ namespace Voxalia.Shared
             return rot;
         }
 
+        /// <summary>
+        /// Converts Euler angles to a matrix.
+        /// </summary>
+        /// <param name="rot">The Euler angles.</param>
+        /// <returns>The matrix.</returns>
         public static Matrix AnglesToMatrix(Location rot)
         {
             // TODO: better method?
-            return Matrix.CreateFromAxisAngle(new BEPUutilities.Vector3(1, 0, 0), (double)(rot.X * Utilities.PI180))
-                    * Matrix.CreateFromAxisAngle(new BEPUutilities.Vector3(0, 1, 0), (double)(rot.Y * Utilities.PI180))
-                    * Matrix.CreateFromAxisAngle(new BEPUutilities.Vector3(0, 0, 1), (double)(rot.Z * Utilities.PI180));
+            return Matrix.CreateFromAxisAngle(new Vector3(1, 0, 0), (double)(rot.X * Utilities.PI180))
+                    * Matrix.CreateFromAxisAngle(new Vector3(0, 1, 0), (double)(rot.Y * Utilities.PI180))
+                    * Matrix.CreateFromAxisAngle(new Vector3(0, 0, 1), (double)(rot.Z * Utilities.PI180));
         }
 
         /// <summary>
@@ -584,7 +719,8 @@ namespace Voxalia.Shared
         /// <summary>
         /// Calculates a Halton Sequence result.
         /// </summary>
-        /// <param name="basen">Should be prime.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="basen">The base number, should be prime.</param>
         static double HaltonSequence(int index, int basen)
         {
             if (basen <= 1)
@@ -603,8 +739,14 @@ namespace Voxalia.Shared
             return res;
         }
 
+        /// <summary>
+        /// Formats a long with "123,456" style notation.
+        /// </summary>
+        /// <param name="input">The number.</param>
+        /// <returns>The formatted string.</returns>
         public static string FormatNumber(long input)
         {
+            // TODO: Better method here.
             string basinp = input.ToString();
             string creation = "";
             int c = 0;
@@ -623,19 +765,39 @@ namespace Voxalia.Shared
             return creation;
         }
         
+        /// <summary>
+        /// Projects a vector onto another.
+        /// </summary>
+        /// <param name="a">The first vector.</param>
+        /// <param name="b">The second vector.</param>
+        /// <returns>The projected vector.</returns>
         public static Vector3 Project(Vector3 a, Vector3 b)
         {
             return b * (Vector3.Dot(a, b) / b.LengthSquared());
         }
     }
 
+    /// <summary>
+    /// Holds a volatile integer.
+    /// TODO: Delete?
+    /// </summary>
     public class IntHolder
     {
+        /// <summary>
+        /// The value.
+        /// </summary>
         public volatile int Value = 0;
     }
 
+    /// <summary>
+    /// Holds any data in a class object.
+    /// </summary>
+    /// <typeparam name="T">The type of data to holder.</typeparam>
     public class DataHolder<T>
     {
+        /// <summary>
+        /// The held data.
+        /// </summary>
         public T Data;
     }
 }
