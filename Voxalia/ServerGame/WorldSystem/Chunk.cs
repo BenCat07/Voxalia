@@ -21,14 +21,29 @@ using System.Runtime.CompilerServices;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
+    /// <summary>
+    /// Represents a single chunk.
+    /// </summary>
     public class Chunk
     {
+        /// <summary>
+        /// A local copy of <see cref="Constants.CHUNK_WIDTH"/>.
+        /// </summary>
         public const int CHUNK_SIZE = Constants.CHUNK_WIDTH;
 
+        /// <summary>
+        /// A constant approximation of how much RAM the chunk should use from block data.
+        /// </summary>
         public const int RAM_USAGE = Constants.CHUNK_BLOCK_COUNT * Constants.BYTES_PER_BLOCK;
 
+        /// <summary>
+        /// A set of locker objects for chunks to use. (See <see cref="GetLocker"/>.)
+        /// </summary>
         public static List<Object> Lockers = new List<Object>();
 
+        /// <summary>
+        /// Preparese the chunk static data.
+        /// </summary>
         static Chunk()
         {
             Lockers = new List<Object>(21);
@@ -38,50 +53,78 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Gets the global static locker associated with a chunk and chunks with a matching hash.
+        /// </summary>
+        /// <returns>A locker object.</returns>
         public Object GetLocker()
         {
             return Lockers[Math.Abs(WorldPosition.GetHashCode()) % 20];
         }
 
+        /// <summary>
+        /// The Level-Of-Detail copy of a chunk.
+        /// </summary>
         public byte[] LOD = null;
 
+        /// <summary>
+        /// Whether the <see cref="LOD"/> data is purely air.
+        /// </summary>
         public bool LOD_Is_Air = false;
 
+        /// <summary>
+        /// Flags on the chunk.
+        /// </summary>
         public ChunkFlags Flags = ChunkFlags.NONE;
         
+        /// <summary>
+        /// The region that holds this chunk.
+        /// </summary>
         public Region OwningRegion = null;
 
+        /// <summary>
+        /// The chunk position in the region that this chunk is at. (Multiply by <see cref="CHUNK_SIZE"/> to find its 3D space coordinate).
+        /// </summary>
         public Vector3i WorldPosition;
 
-        public volatile ASyncScheduleItem LoadSchedule = null;
+        /// <summary>
+        /// The async schedule item that this chunk is using to load itself.
+        /// </summary>
+        public ASyncScheduleItem LoadSchedule = null;
 
+        /// <summary>
+        /// Constructs the chunk with its basic data (an empty block set).
+        /// </summary>
         public Chunk()
         {
             BlocksInternal = new BlockInternal[Constants.CHUNK_BLOCK_COUNT];
         }
 
-        public Chunk(byte[] _lod)
-        {
-            LOD = _lod;
-            LOD_Is_Air = true;
-            for (int i = 0; i < _lod.Length; i++)
-            {
-                if (_lod[i] != 0)
-                {
-                    LOD_Is_Air = false;
-                    break;
-                }
-            }
-        }
-
+        /// <summary>
+        /// Returns whether the location is inside the chunk.
+        /// </summary>
+        /// <param name="loc">The location.</param>
+        /// <returns>Whether it is contained.</returns>
         public bool Contains(Location loc)
         {
+            // TODO: Doubles?
             return loc.X >= WorldPosition.X * CHUNK_SIZE && loc.Y >= WorldPosition.Y * CHUNK_SIZE && loc.Z >= WorldPosition.Z * CHUNK_SIZE
                 && loc.X < WorldPosition.X * CHUNK_SIZE + CHUNK_SIZE && loc.Y < WorldPosition.Y * CHUNK_SIZE + CHUNK_SIZE && loc.Z < WorldPosition.Z * CHUNK_SIZE + CHUNK_SIZE;
         }
 
+        /// <summary>
+        /// All blocks currently in this chunk.
+        /// </summary>
         public BlockInternal[] BlocksInternal;
 
+        /// <summary>
+        /// Calculates the best (most opaque) block material for a lowered Level-Of-Detail version of the chunk.
+        /// </summary>
+        /// <param name="x">X coordinate of the block.</param>
+        /// <param name="y">Y coordinate of the block.</param>
+        /// <param name="z">Z coordinate of the block.</param>
+        /// <param name="lod">The level of detail.</param>
+        /// <returns>The best block material.</returns>
         public Material LODBlock(int x, int y, int z, int lod)
         {
             int xs = x * lod;
@@ -104,30 +147,56 @@ namespace Voxalia.ServerGame.WorldSystem
         }
 
         /// <summary>
-        /// Asyncable (math only).
+        /// Calculates the index of a block for given coordinates.
         /// </summary>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        /// <param name="z">The Z coordinate.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int BlockIndex(int x, int y, int z)
         {
             return z * (CHUNK_SIZE * CHUNK_SIZE) + y * CHUNK_SIZE + x;
         }
 
+        /// <summary>
+        /// Sets the block at given coordinates to a specified block data set.
+        /// </summary>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        /// <param name="z">The Z coordinate.</param>
+        /// <param name="det">The block details.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetBlockAt(int x, int y, int z, BlockInternal mat)
+        public void SetBlockAt(int x, int y, int z, BlockInternal det)
         {
-            BlocksInternal[BlockIndex(x, y, z)] = mat;
+            BlocksInternal[BlockIndex(x, y, z)] = det;
         }
 
+        /// <summary>
+        /// Gets the block data set at given coordinates.
+        /// </summary>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        /// <param name="z">The Z coordinate.</param>
+        /// <returns>The block details.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BlockInternal GetBlockAt(int x, int y, int z)
         {
             return BlocksInternal[BlockIndex(x, y, z)];
         }
 
+        /// <summary>
+        /// The time this chunk was last edited. -1 if the chunk has been saved since its last edit.
+        /// </summary>
         public double LastEdited = -1;
 
+        /// <summary>
+        /// The physics model of this chunk.
+        /// </summary>
         public FullChunkObject FCO = null;
 
+        /// <summary>
+        /// Causes the chunk to detect access paths.
+        /// </summary>
         public void ChunkDetect()
         {
             if (!Flags.HasFlag(ChunkFlags.NEEDS_DETECT))
@@ -138,7 +207,7 @@ namespace Voxalia.ServerGame.WorldSystem
         }
         
         /// <summary>
-        /// Sync only.
+        /// Adds the chunk to the owning region.
         /// </summary>
         public void AddToWorld()
         {
@@ -166,9 +235,11 @@ namespace Voxalia.ServerGame.WorldSystem
             OwningRegion.AddCloudsToNewChunk(this);
             ChunkDetect();
         }
-
-        public ASyncScheduleItem chunkAccessDetection = null;
-
+        
+        /// <summary>
+        /// Gets the save data for a chunks blocks.
+        /// </summary>
+        /// <returns>The save data.</returns>
         public byte[] GetChunkSaveData()
         {
             byte[] bytes = new byte[BlocksInternal.Length * 5];
@@ -182,6 +253,10 @@ namespace Voxalia.ServerGame.WorldSystem
             return bytes;
         }
 
+        /// <summary>
+        /// Gets the entity save data for a chunk.
+        /// </summary>
+        /// <returns>The save data.</returns>
         public BsonDocument GetEntitySaveData()
         {
             BsonDocument full = new BsonDocument();
@@ -205,6 +280,9 @@ namespace Voxalia.ServerGame.WorldSystem
             return full;
         }
 
+        /// <summary>
+        /// Removes all entities that the chunk contains.
+        /// </summary>
         void clearentities()
         {
             // TODO: Efficiency
@@ -218,8 +296,9 @@ namespace Voxalia.ServerGame.WorldSystem
         }
 
         /// <summary>
-        /// Sync only.
+        /// Safely unload the chunk.
         /// </summary>
+        /// <param name="callback">Callback for when it's fully saved and unloaded.</param>
         public void UnloadSafely(Action callback = null)
         {
             SaveAsNeeded(callback);
@@ -232,11 +311,15 @@ namespace Voxalia.ServerGame.WorldSystem
             OwningRegion.RemoveCloudsFrom(this);
         }
 
+        /// <summary>
+        /// The timer to track when this chunk needs to be unloaded.
+        /// </summary>
         public double UnloadTimer = 0;
 
         /// <summary>
-        /// Sync only.
+        /// Save the chunk if necessary.
         /// </summary>
+        /// <param name="callback">The callback for when the save completes.</param>
         public void SaveAsNeeded(Action callback = null)
         {
             if (FCO == null)
@@ -266,8 +349,9 @@ namespace Voxalia.ServerGame.WorldSystem
         }
         
         /// <summary>
-        /// Sync only.
+        /// SySaves the chunk to file.
         /// </summary>
+        /// <param name="callback">The callback for when the save completes.</param>
         public void SaveToFile(Action callback = null)
         {
             if (FCO == null)
@@ -292,8 +376,14 @@ namespace Voxalia.ServerGame.WorldSystem
             });
         }
 
+        /// <summary>
+        /// An array of booleans indicating which directs a chunk can be reached through.
+        /// </summary>
         public bool[] Reachability = new bool[(int)ChunkReachability.COUNT] { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true };
 
+        /// <summary>
+        /// Causes the chunk to detect all access routes.
+        /// </summary>
         public void DetectChunkAccess()
         {
             for (int i = 0; i < (int)ChunkReachability.COUNT; i++)
@@ -304,6 +394,12 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Gets the LOD data for a chunk.
+        /// </summary>
+        /// <param name="lod">The level of detail.</param>
+        /// <param name="canReturnNull">Whether null is acceptable if the chunk is purely air.</param>
+        /// <returns>The usable byte array data.</returns>
         public byte[] LODBytes(int lod, bool canReturnNull = false)
         {
             if (LOD != null && lod == 5)
@@ -341,6 +437,10 @@ namespace Voxalia.ServerGame.WorldSystem
             return data_orig;
         }
         
+        /// <summary>
+        /// Internally saves chunk blocks to file.
+        /// </summary>
+        /// <param name="blks">The block data.</param>
         void SaveToFileI(byte[] blks)
         {
             try
@@ -371,6 +471,10 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Internally saves chunk entities to file.
+        /// </summary>
+        /// <param name="ents">The entity data.</param>
         void SaveToFileE(BsonDocument ents)
         {
             try
@@ -392,10 +496,21 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Any entities this chunk needs to spawn upon being added to the world.
+        /// </summary>
         public List<Entity> entsToSpawn = new List<Entity>();
 
+        /// <summary>
+        /// Any fix paths this chunk needs to run upon being added to the world.
+        /// </summary>
         public List<SyncScheduleItem> fixesToRun = new List<SyncScheduleItem>();
         
+        /// <summary>
+        /// Loads the chunk from save data.
+        /// </summary>
+        /// <param name="det">The block data.</param>
+        /// <param name="ents">The entity data.</param>
         public void LoadFromSaveData(ChunkDetails det, ChunkDetails ents)
         {
             if (det.Version != 2 || ents.Version != 2)

@@ -13,12 +13,27 @@ using System.Text;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
+    /// <summary>
+    /// The flags on a chunk.
+    /// </summary>
     [Flags]
     public enum ChunkFlags: int
     {
+        /// <summary>
+        /// No flags apply.
+        /// </summary>
         NONE = 0,
+        /// <summary>
+        /// The chunk has custom data and needs population.
+        /// </summary>
         ISCUSTOM = 1,
+        /// <summary>
+        /// The chunk is still populating.
+        /// </summary>
         POPULATING = 2,
+        /// <summary>
+        /// The chunk needs a detection pass called on it.
+        /// </summary>
         NEEDS_DETECT = 4
     }
 }
