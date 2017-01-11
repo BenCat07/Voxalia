@@ -32,6 +32,10 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public partial class Region
     {
+        /// <summary>
+        /// Adds a chunk object to the physics environment.
+        /// </summary>
+        /// <param name="mesh">The physics model.</param>
         public void AddChunk(FullChunkObject mesh)
         {
             if (mesh == null)
@@ -41,6 +45,10 @@ namespace Voxalia.ServerGame.WorldSystem
             PhysicsWorld.Add(mesh);
         }
 
+        /// <summary>
+        /// Quietly removes a chnuk from the physics world.
+        /// </summary>
+        /// <param name="mesh">The physics model.</param>
         public void RemoveChunkQuiet(FullChunkObject mesh)
         {
             if (mesh == null)
@@ -54,8 +62,18 @@ namespace Voxalia.ServerGame.WorldSystem
             PhysicsWorld.Remove(mesh);
         }
 
-        public Dictionary<Vector3i, Chunk> LoadedChunks = new Dictionary<Vector3i, Chunk>(1000);
+        /// <summary>
+        /// All currently loaded chunks.
+        /// </summary>
+        public Dictionary<Vector3i, Chunk> LoadedChunks = new Dictionary<Vector3i, Chunk>(5000);
 
+        /// <summary>
+        /// Determines whether a character is allowed to break a material at a location.
+        /// </summary>
+        /// <param name="ent">The character.</param>
+        /// <param name="block">The block.</param>
+        /// <param name="mat">The material.</param>
+        /// <returns>Whether it is allowed.</returns>
         public bool IsAllowedToBreak(CharacterEntity ent, Location block, Material mat)
         {
             if (block.Z > TheServer.CVars.g_maxheight.ValueI || block.Z < TheServer.CVars.g_minheight.ValueI)
@@ -65,6 +83,13 @@ namespace Voxalia.ServerGame.WorldSystem
             return mat != Material.AIR;
         }
 
+        /// <summary>
+        /// Determines whether a character is allowed to place a material at a location.
+        /// </summary>
+        /// <param name="ent">The character.</param>
+        /// <param name="block">The block.</param>
+        /// <param name="mat">The material.</param>
+        /// <returns>Whether it is allowed.</returns>
         public bool IsAllowedToPlaceIn(CharacterEntity ent, Location block, Material mat)
         {
             if (block.Z > TheServer.CVars.g_maxheight.ValueI || block.Z < TheServer.CVars.g_minheight.ValueI)
@@ -74,6 +99,11 @@ namespace Voxalia.ServerGame.WorldSystem
             return mat == Material.AIR;
         }
         
+        /// <summary>
+        /// Gets the material at a location.
+        /// </summary>
+        /// <param name="pos">The location.</param>
+        /// <returns>The material.</returns>
         public Material GetBlockMaterial(Location pos)
         {
             Chunk ch = LoadChunk(ChunkLocFor(pos));
@@ -83,6 +113,11 @@ namespace Voxalia.ServerGame.WorldSystem
             return (Material)ch.GetBlockAt(x, y, z).BlockMaterial;
         }
 
+        /// <summary>
+        /// Gets the full block details at a location.
+        /// </summary>
+        /// <param name="pos">The location.</param>
+        /// <returns>The block details.</returns>
         public BlockInternal GetBlockInternal(Location pos)
         {
             Chunk ch = LoadChunk(ChunkLocFor(pos));
@@ -92,13 +127,31 @@ namespace Voxalia.ServerGame.WorldSystem
             return ch.GetBlockAt(x, y, z);
         }
 
-        public void SetBlockMaterial(Location pos, BlockInternal bi, bool broadcast = true, bool regen = true, bool override_protection = false)
+        /// <summary>
+        /// Sets a block's full details at a location.
+        /// </summary>
+        /// <param name="pos">The location.</param>
+        /// <param name="bi">The block object.</param>
+        /// <param name="broadcast">Whether to broadcast the edit to players.</param>
+        /// <param name="override_protection">Whether to override a 'protected' flag on a block.</param>
+        public void SetBlockMaterial(Location pos, BlockInternal bi, bool broadcast = true, bool override_protection = false)
         {
-            SetBlockMaterial(pos, bi.Material, bi.BlockData, bi._BlockPaintInternal, bi.BlockLocalData, bi.Damage, broadcast, regen, override_protection);
+            SetBlockMaterial(pos, bi.Material, bi.BlockData, bi._BlockPaintInternal, bi.BlockLocalData, bi.Damage, broadcast, override_protection);
         }
 
+        /// <summary>
+        /// Sets a block's material or full details at a location.
+        /// </summary>
+        /// <param name="pos">The location.</param>
+        /// <param name="mat">The material.</param>
+        /// <param name="dat">The block data.</param>
+        /// <param name="paint">The block paint.</param>
+        /// <param name="locdat">The block local data.</param>
+        /// <param name="damage">The block damage.</param>
+        /// <param name="broadcast">Whether to broadcast the edit to players.</param>
+        /// <param name="override_protection">Whether to override a 'protected' flag on a block.</param>
         public void SetBlockMaterial(Location pos, Material mat, byte dat = 0, byte paint = 0, byte locdat = (byte)BlockFlags.EDITED, BlockDamage damage = BlockDamage.NONE,
-            bool broadcast = true, bool regen = true, bool override_protection = false)
+            bool broadcast = true, bool override_protection = false)
         {
             Chunk ch = LoadChunk(ChunkLocFor(pos));
             int x = (int)Math.Floor(pos.X) - (int)ch.WorldPosition.X * Chunk.CHUNK_SIZE;
@@ -121,8 +174,11 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
         
-        public Location[] FellLocs = new Location[] { new Location(0, 0, 1), new Location(1, 0, 0), new Location(0, 1, 0), new Location(-1, 0, 0), new Location(0, -1, 0) };
-
+        /// <summary>
+        /// Breaks a block naturally.
+        /// </summary>
+        /// <param name="pos">The block location to break.</param>
+        /// <param name="regentrans">Whether to transmit the change to players.</param>
         public void BreakNaturally(Location pos, bool regentrans = true)
         {
             pos = pos.GetBlockLocation();
@@ -152,13 +208,16 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
-        public Location GetBlockLocation(Location worldPos)
-        {
-            return new Location(Math.Floor(worldPos.X), Math.Floor(worldPos.Y), Math.Floor(worldPos.Z));
-        }
+        /// <summary>
+        /// The value of 1.0 / CHUNK_WIDTH. A constant.
+        /// </summary>
+        const double tCW = 1.0 / (double)Constants.CHUNK_WIDTH;
 
-        const double tCW = 1.0 / (double)Chunk.CHUNK_SIZE;
-
+        /// <summary>
+        /// Returns the chunk location for a world position.
+        /// </summary>
+        /// <param name="worldPos">The world position.</param>
+        /// <returns>The chunk location.</returns>
         public Vector3i ChunkLocFor(Location worldPos)
         {
             Vector3i temp;
@@ -168,6 +227,12 @@ namespace Voxalia.ServerGame.WorldSystem
             return temp;
         }
 
+        /// <summary>
+        /// Loads a chunk but will not populate it.
+        /// May return a still-loading chunk!
+        /// </summary>
+        /// <param name="cpos">The chunk location.</param>
+        /// <returns>The chunk object.</returns>
         public Chunk LoadChunkNoPopulate(Vector3i cpos)
         {
             Chunk chunk;
@@ -190,19 +255,12 @@ namespace Voxalia.ServerGame.WorldSystem
             return chunk;
         }
 
-        public Chunk LoadChunkLOD(Vector3i cpos)
-        {
-            byte[] lod = ChunkManager.GetLODChunkDetails(cpos.X, cpos.Y, cpos.Z);
-            if (lod != null)
-            {
-                return new Chunk(lod) { WorldPosition = cpos };
-            }
-            else
-            {
-                return null;
-            }
-        }
-
+        /// <summary>
+        /// Loads a chunk immediately.
+        /// Will generate a chunk freshly if needed.
+        /// </summary>
+        /// <param name="cpos">The chunk position.</param>
+        /// <returns>The valid chunk object.</returns>
         public Chunk LoadChunk(Vector3i cpos)
         {
             Chunk chunk;
@@ -245,6 +303,11 @@ namespace Voxalia.ServerGame.WorldSystem
             return chunk;
         }
 
+        /// <summary>
+        /// Populates a chunk in the background.
+        /// </summary>
+        /// <param name="chunk">The chunk.</param>
+        /// <param name="callback">What to run when its populated.</param>
         void HandleChunkBGOne(Chunk chunk, Action<Chunk> callback)
         {
             if (chunk.Flags.HasFlag(ChunkFlags.ISCUSTOM))
@@ -278,7 +341,12 @@ namespace Voxalia.ServerGame.WorldSystem
             chunk.UnloadTimer = 0;
             callback.Invoke(chunk);
         }
-        
+
+        /// <summary>
+        /// Loads a chunk in the background.
+        /// </summary>
+        /// <param name="cpos">The chunk location.</param>
+        /// <param name="callback">What to run when its populated.</param>
         public void LoadChunk_Background(Vector3i cpos, Action<Chunk> callback = null)
         {
             Chunk chunk;
@@ -329,8 +397,12 @@ namespace Voxalia.ServerGame.WorldSystem
                 });
             });
         }
-
-
+        
+        /// <summary>
+        /// Gets a chunk if it exists and is valid. Otherwise, returns null.
+        /// </summary>
+        /// <param name="cpos">The chunk location.</param>
+        /// <returns>The chunk, or null.</returns>
         public Chunk GetChunk(Vector3i cpos)
         {
             Chunk chunk;
@@ -345,6 +417,11 @@ namespace Voxalia.ServerGame.WorldSystem
             return null;
         }
 
+        /// <summary>
+        /// Gets the block details at a location, without loading any chunks.
+        /// </summary>
+        /// <param name="pos">The block location.</param>
+        /// <returns>The block details, or air if not known.</returns>
         public BlockInternal GetBlockInternal_NoLoad(Location pos)
         {
             Chunk ch = GetChunk(ChunkLocFor(pos));
@@ -358,9 +435,23 @@ namespace Voxalia.ServerGame.WorldSystem
             return ch.GetBlockAt(x, y, z);
         }
 
+        /// <summary>
+        /// The current world generator.
+        /// </summary>
         public BlockPopulator Generator = new SimpleGeneratorCore();
+
+        /// <summary>
+        /// The current biome generator.
+        /// </summary>
         public BiomeGenerator BiomeGen = new SimpleBiomeGenerator();
 
+        /// <summary>
+        /// Immediately populates a chunk.
+        /// </summary>
+        /// <param name="chunk">The chunk to populate.</param>
+        /// <param name="allowFile">Whether loading from file is allowed.</param>
+        /// <param name="fileOnly">Whether we can ONLY load from file.</param>
+        /// <returns>Whether it successfully populated the chunk.</returns>
         public bool PopulateChunk(Chunk chunk, bool allowFile, bool fileOnly = false)
         {
             try
@@ -435,10 +526,18 @@ namespace Voxalia.ServerGame.WorldSystem
             return true;
         }
 
+        /// <summary>
+        /// Gets all block locations in a radius of a location.
+        /// </summary>
+        /// <param name="pos">The location.</param>
+        /// <param name="rad">The radius.</param>
+        /// <returns>All locations in range.</returns>
         public List<Location> GetBlocksInRadius(Location pos, double rad)
         {
+            // TODO: Is this really the best way to do this?
             int min = (int)Math.Floor(-rad);
             int max = (int)Math.Ceiling(rad);
+            double radsq = rad * rad;
             List<Location> posset = new List<Location>();
             for (int x = min; x < max; x++)
             {
@@ -447,7 +546,7 @@ namespace Voxalia.ServerGame.WorldSystem
                     for (int z = min; z < max; z++)
                     {
                         Location post = new Location(pos.X + x, pos.Y + y, pos.Z + z);
-                        if ((post - pos).LengthSquared() <= rad * rad)
+                        if ((post - pos).LengthSquared() <= radsq)
                         {
                             posset.Add(post);
                         }
@@ -457,6 +556,12 @@ namespace Voxalia.ServerGame.WorldSystem
             return posset;
         }
 
+        /// <summary>
+        /// Returns whether any part of a bounding box is in water.
+        /// </summary>
+        /// <param name="min">The minimum coordinates of the box.</param>
+        /// <param name="max">The maximum coordinates of the box.</param>
+        /// <returns>Whether it is in water.</returns>
         public bool InWater(Location min, Location max)
         {
             // TODO: Efficiency!
