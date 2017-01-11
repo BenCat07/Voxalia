@@ -32,6 +32,10 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public partial class Region
     {
+        /// <summary>
+        /// Runs physics around a block.
+        /// </summary>
+        /// <param name="start">The location of the block.</param>
         public void SurroundRunPhysics(Location start)
         {
             start = start.GetBlockLocation();
@@ -48,6 +52,14 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Sets a block and triggers physics around it.
+        /// </summary>
+        /// <param name="block">The block location.</param>
+        /// <param name="mat">The material to set to.</param>
+        /// <param name="dat">The shape to set to.</param>
+        /// <param name="paint">The paint to set to.</param>
+        /// <param name="damage">Te damage to set to.</param>
         public void PhysicsSetBlock(Location block, Material mat, byte dat = 0, byte paint = 0, BlockDamage damage = BlockDamage.NONE)
         {
             SetBlockMaterial(block, mat, dat, paint, (byte)(BlockFlags.EDITED | BlockFlags.NEEDS_RECALC), damage);
@@ -64,8 +76,10 @@ namespace Voxalia.ServerGame.WorldSystem
         }
 
         /// <summary>
-        /// This is for a specific set of cases, and is not recommended for general usage.
+        /// Sets a note that a block needs or does not need recalculation.
         /// </summary>
+        /// <param name="block">The block location.</param>
+        /// <param name="rec">Whether it needs a recalculation.</param>
         public BlockInternal SetNeedsRecalc(Location block, bool rec)
         {
             Chunk ch = LoadChunk(ChunkLocFor(block));
@@ -92,6 +106,10 @@ namespace Voxalia.ServerGame.WorldSystem
             return ch.BlocksInternal[ind];
         }
 
+        /// <summary>
+        /// Runs a blocks physics update... when available!
+        /// </summary>
+        /// <param name="block">The block location.</param>
         private void PhysBlockAnnounce(Location block)
         {
             // The below code: Basically, if the block already has the needs_recalc flag,
@@ -124,12 +142,21 @@ namespace Voxalia.ServerGame.WorldSystem
             TheWorld.Schedule.ScheduleSyncTask(a.Data, 0.25);
         }
 
+        /// <summary>
+        /// Runs block physics immediately.
+        /// </summary>
+        /// <param name="block">The block.</param>
         private void RunBlockPhysics(Location block)
         {
             BlockInternal c = SetNeedsRecalc(block, false);
             LiquidPhysics(block, c);
         }
 
+        /// <summary>
+        /// Runs liquid physics for a block.
+        /// </summary>
+        /// <param name="block">The block.</param>
+        /// <param name="c">The block data.</param>
         private void LiquidPhysics(Location block, BlockInternal c)
         {
             Material cmat = c.Material;
@@ -195,6 +222,16 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Attempts to spread a liquid sideways.
+        /// </summary>
+        /// <param name="block">The block.</param>
+        /// <param name="cDat">The shape of the block.</param>
+        /// <param name="cmat">The material of the block.</param>
+        /// <param name="cpaint">The paint of the block.</param>
+        /// <param name="spreadAs">What material to spread as.</param>
+        /// <param name="two">The location to spread into.</param>
+        /// <returns>How much spreading happened.</returns>
         public byte TryLiquidSpreadSide(Location block, byte cDat, Material cmat, byte cpaint, Material spreadAs, Location two)
         {
             BlockInternal tc = GetBlockInternal(two);
