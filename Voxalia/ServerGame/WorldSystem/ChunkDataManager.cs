@@ -26,6 +26,10 @@ namespace Voxalia.ServerGame.WorldSystem
 
         LiteCollection<BsonDocument> DBChunks;
 
+        LiteCollection<BsonDocument> DBTops;
+
+        LiteCollection<BsonDocument> DBMins;
+
         LiteDatabase LODsDatabase;
 
         LiteCollection<BsonDocument> DBLODs;
@@ -50,6 +54,8 @@ namespace Voxalia.ServerGame.WorldSystem
             dir = TheRegion.TheServer.Files.BaseDirectory + dir;
             Database = new LiteDatabase("filename=" + dir + "chunks.ldb");
             DBChunks = Database.GetCollection<BsonDocument>("chunks");
+            DBTops = Database.GetCollection<BsonDocument>("tops");
+            DBMins = Database.GetCollection<BsonDocument>("mins");
             LODsDatabase = new LiteDatabase("filename=" + dir + "lod_chunks.ldb");
             DBLODs = LODsDatabase.GetCollection<BsonDocument>("lodchunks");
             EntsDatabase = new LiteDatabase("filename=" + dir + "ents.ldb");
@@ -241,5 +247,60 @@ namespace Voxalia.ServerGame.WorldSystem
             BsonValue id = GetIDFor(details.X, details.Y, details.Z);
             DBChunks.Delete(id);
         }
+
+        public void WriteTops(int x, int y, byte[] tops)
+        {
+            BsonValue id = GetIDFor(x, y, 0);
+            BsonDocument newdoc = new BsonDocument();
+            Dictionary<string, BsonValue> tbs = newdoc.RawValue;
+            tbs["_id"] = id;
+            tbs["tops"] = new BsonValue(FileHandler.Compress(tops));
+            DBTops.Upsert(newdoc);
+        }
+
+        public byte[] GetTops(int x, int y)
+        {
+            BsonDocument doc;
+            doc = DBTops.FindById(GetIDFor(x, y, 0));
+            if (doc == null)
+            {
+                return null;
+            }
+            return FileHandler.Uncompress(doc["tops"].AsBinary);
+        }
+
+        /// <summary>
+        /// TODO: potentially clear this occasionally?
+        /// </summary>
+        public ConcurrentDictionary<Vector2i, int> Mins = new ConcurrentDictionary<Vector2i, int>();
+        
+        public int GetMins(int x, int y)
+        {
+            Vector2i input = new Vector2i(x, y);
+            int output;
+            if (Mins.TryGetValue(input, out output))
+            {
+                return output;
+            }
+            BsonDocument doc;
+            doc = DBMins.FindById(GetIDFor(x, y, 0));
+            if (doc == null)
+            {
+                return 0;
+            }
+            return doc["min"].AsInt32;
+        }
+
+        public void SetMins(int x, int y, int min)
+        {
+            BsonValue id = GetIDFor(x, y, 0);
+            BsonDocument newdoc = new BsonDocument();
+            Dictionary<string, BsonValue> tbs = newdoc.RawValue;
+            tbs["_id"] = id;
+            tbs["min"] = new BsonValue(min);
+            Mins[new Vector2i(x, y)] = min;
+            DBMins.Upsert(newdoc);
+        }
+
     }
 }

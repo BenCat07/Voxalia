@@ -233,8 +233,16 @@ namespace Voxalia.ServerGame.WorldSystem
             FCO.CollisionRules.Group = CollisionUtil.WorldSolid;
             OwningRegion.AddChunk(FCO);
             OwningRegion.AddCloudsToNewChunk(this);
+            OwningRegion.NoticeChunkForUpperArea(WorldPosition);
             ChunkDetect();
+            if (IsNew)
+            {
+                OwningRegion.PushNewChunkDetailsToUpperArea(this);
+            }
+            IsNew = false;
         }
+
+        public bool IsNew = false;
         
         /// <summary>
         /// Gets the save data for a chunks blocks.
@@ -308,6 +316,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 OwningRegion.RemoveChunkQuiet(FCO);
                 FCO = null;
             }
+            OwningRegion.ForgetChunkForUpperArea(WorldPosition);
             OwningRegion.RemoveCloudsFrom(this);
         }
 

@@ -30,6 +30,7 @@ using Voxalia.ServerGame.ItemSystem;
 using Voxalia.ServerGame.ItemSystem.CommonItems;
 using FreneticScript;
 using FreneticDataSyntax;
+using Voxalia.ServerGame.OtherSystems;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -178,6 +179,14 @@ namespace Voxalia.ServerGame.WorldSystem
             foreach (Vector3i loc in DelMe)
             {
                 LoadedChunks.Remove(loc);
+            }
+            foreach (KeyValuePair<Vector2i, BlockUpperArea> bua in UpperAreas)
+            {
+                if (bua.Value.Edited)
+                {
+                    ChunkManager.WriteTops(bua.Key.X, bua.Key.Y, bua.Value.ToBytes());
+                    bua.Value.Edited = false;
+                }
             }
         }
 

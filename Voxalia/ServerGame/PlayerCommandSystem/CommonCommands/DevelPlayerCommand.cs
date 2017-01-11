@@ -150,6 +150,8 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 double temp = entry.Player.TheRegion.BiomeGen.GetTemperature(entry.Player.TheRegion.TheWorld.Seed2, entry.Player.TheRegion.TheWorld.Seed3, (double)posBlock.X, (double)posBlock.Y);
                 double down = entry.Player.TheRegion.BiomeGen.GetDownfallRate(entry.Player.TheRegion.TheWorld.Seed3, entry.Player.TheRegion.TheWorld.Seed4, (double)posBlock.X, (double)posBlock.Y);
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Height: " + h + ", temperature: " + temp + ", downfallrate: " + down + ", biome yield: " + biome.GetName());
+                BlockUpperArea.TopBlock top = entry.Player.TheRegion.GetHighestBlock(posBlock);
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Material: " + top.BasicMat + ", height: " + top.Height);
             }
             else if (arg0 == "structureSelect" && entry.InputArguments.Count > 1)
             {

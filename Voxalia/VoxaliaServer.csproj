@@ -257,6 +257,7 @@
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\YourStatusPacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\WebPage.cs" />
     <Compile Include="ServerGame\OtherSystems\BlockImageManager.cs" />
+    <Compile Include="ServerGame\OtherSystems\BlockUpperArea.cs" />
     <Compile Include="ServerGame\OtherSystems\GameLocation.cs" />
     <Compile Include="ServerGame\OtherSystems\GameMode.cs" />
     <Compile Include="ServerGame\OtherSystems\ModelEngine.cs" />

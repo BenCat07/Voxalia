@@ -27,6 +27,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.ItemSystem;
 using Voxalia.ServerGame.ItemSystem.CommonItems;
+using Voxalia.ServerGame.OtherSystems;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -62,6 +63,142 @@ namespace Voxalia.ServerGame.WorldSystem
             PhysicsWorld.Remove(mesh);
         }
 
+        public Dictionary<Vector2i, BlockUpperArea> UpperAreas = new Dictionary<Vector2i, BlockUpperArea>();
+
+        public BlockUpperArea.TopBlock GetHighestBlock(Location pos)
+        {
+            Vector3i wpos = ChunkLocFor(pos);
+            Vector2i two = new Vector2i(wpos.X, wpos.Y);
+            int rx = (int)(pos.X - wpos.X * Constants.CHUNK_WIDTH);
+            int ry = (int)(pos.Y - wpos.Y * Constants.CHUNK_WIDTH);
+            BlockUpperArea bua;
+            if (UpperAreas.TryGetValue(two, out bua))
+            {
+                return bua.Blocks[bua.BlockIndex(rx, ry)];
+            }
+            return default(BlockUpperArea.TopBlock);
+        }
+
+        public void TryPushOne(Location pos, Material mat)
+        {
+            pos = pos.GetBlockLocation();
+            Vector3i wpos = ChunkLocFor(pos);
+            Vector2i two = new Vector2i(wpos.X, wpos.Y);
+            int rx = (int)(pos.X - wpos.X * Constants.CHUNK_WIDTH);
+            int ry = (int)(pos.Y - wpos.Y * Constants.CHUNK_WIDTH);
+            BlockUpperArea bua;
+            if (UpperAreas.TryGetValue(two, out bua))
+            {
+                if (mat.IsOpaque())
+                {
+                    bua.TryPush(rx, ry, (int)pos.Z, mat);
+                }
+                else
+                {
+                    int min = ChunkManager.GetMins(two.X, two.Y);
+                    for (int i = wpos.Z; i >= min; i--)
+                    {
+                        Chunk chk = LoadChunkNoPopulate(new Vector3i(wpos.X, wpos.Y, i));
+                        if (chk == null)
+                        {
+                            continue;
+                        }
+                        bool pass = false;
+                        while (!pass)
+                        {
+                            lock (chk.GetLocker())
+                            {
+                                pass = chk.LoadSchedule == null;
+                            }
+                            if (pass)
+                            {
+                                Thread.Sleep(1); // TODO: Handle loading a still-populating chunk more cleanly.
+                            }
+                        }
+                        for (int z = Constants.CHUNK_WIDTH - 1; z >= 0; z--)
+                        {
+                            BlockInternal bi = chk.GetBlockAt(rx, ry, z);
+                            if (bi.IsOpaque())
+                            {
+                                int ind = bua.BlockIndex(rx, ry);
+                                bua.Blocks[ind].BasicMat = bi.Material;
+                                bua.Blocks[ind].Height = Constants.CHUNK_WIDTH * chk.WorldPosition.Z + z;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public void NoticeChunkForUpperArea(Vector3i pos)
+        {
+            Vector2i two = new Vector2i(pos.X, pos.Y);
+            BlockUpperArea bua;
+            if (!UpperAreas.TryGetValue(two, out bua))
+            {
+                byte[] b = ChunkManager.GetTops(two.X, two.Y);
+                bua = new BlockUpperArea();
+                if (b != null)
+                {
+                    bua.FromBytes(b);
+                }
+                UpperAreas[two] = bua;
+            }
+            bua.ChunksUsing.Add(pos.Z);
+            int min = ChunkManager.GetMins(two.X, two.Y);
+            if (min > pos.Z)
+            {
+                ChunkManager.SetMins(two.X, two.Y, pos.Z);
+            }
+        }
+
+        public void ForgetChunkForUpperArea(Vector3i pos)
+        {
+            Vector2i two = new Vector2i(pos.X, pos.Y);
+            BlockUpperArea bua;
+            if (UpperAreas.TryGetValue(two, out bua))
+            {
+                bua.ChunksUsing.Remove(pos.Z);
+                if (bua.Edited)
+                {
+                    ChunkManager.WriteTops(two.X, two.Y, bua.ToBytes());
+                    bua.Edited = false;
+                }
+                if (bua.ChunksUsing.Count == 0)
+                {
+                    UpperAreas.Remove(two);
+                }
+            }
+        }
+
+        public void PushNewChunkDetailsToUpperArea(Chunk chk)
+        {
+            Vector2i two = new Vector2i(chk.WorldPosition.X, chk.WorldPosition.Y);
+            BlockUpperArea bua;
+            if (UpperAreas.TryGetValue(two, out bua))
+            {
+                for (int x = 0; x < Constants.CHUNK_WIDTH; x++)
+                {
+                    for (int y = 0; y < Constants.CHUNK_WIDTH; y++)
+                    {
+                        int ind = bua.BlockIndex(x, y);
+                        if (bua.Blocks[ind].BasicMat == Material.AIR || bua.Blocks[ind].Height < (chk.WorldPosition.Z + 1) * Constants.CHUNK_WIDTH)
+                        {
+                            for (int z = Constants.CHUNK_WIDTH - 1; z >= 0; z--)
+                            {
+                                BlockInternal bi = chk.GetBlockAt(x, y, z);
+                                if (bi.IsOpaque())
+                                {
+                                    bua.TryPush(x, y, z + chk.WorldPosition.Z * Constants.CHUNK_WIDTH, bi.Material);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         /// <summary>
         /// All currently loaded chunks.
         /// </summary>
@@ -165,7 +302,8 @@ namespace Voxalia.ServerGame.WorldSystem
             ch.SetBlockAt(x, y, z, bi);
             ch.LastEdited = GlobalTickTime;
             ch.Flags |= ChunkFlags.NEEDS_DETECT;
-            ch.ChunkDetect();
+            ch.ChunkDetect(); // TODO: Make this optional?
+            TryPushOne(pos, mat);
             // TODO: See if this makes any new chunks visible!
             if (broadcast)
             {
@@ -273,7 +411,10 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         pass = chunk.LoadSchedule == null;
                     }
-                    Thread.Sleep(1); // TODO: Handle loading a still-populating chunk more cleanly.
+                    if (pass)
+                    {
+                        Thread.Sleep(1); // TODO: Handle loading a still-populating chunk more cleanly.
+                    }
                 }
                 if (chunk.Flags.HasFlag(ChunkFlags.ISCUSTOM))
                 {
@@ -363,7 +504,10 @@ namespace Voxalia.ServerGame.WorldSystem
                             {
                                 pass = chunk.LoadSchedule == null;
                             }
-                            Thread.Sleep(1); // TODO: Handle loading a loading chunk more cleanly.
+                            if (pass)
+                            {
+                                Thread.Sleep(1); // TODO: Handle loading a loading chunk more cleanly.
+                            }
                         }
                         TheWorld.Schedule.ScheduleSyncTask(() =>
                         {
@@ -516,6 +660,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 chunk.LastEdited = GlobalTickTime;
                 chunk.Flags &= ~(ChunkFlags.POPULATING | ChunkFlags.ISCUSTOM);
                 chunk.Flags |= ChunkFlags.NEEDS_DETECT;
+                chunk.IsNew = true;
             }
             catch (Exception ex)
             {
