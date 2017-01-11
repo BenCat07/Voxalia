@@ -33,14 +33,38 @@ using FreneticDataSyntax;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
+    /// <summary>
+    /// Represents a single region of a world (the standard world has only one region under present implementation).
+    /// Contains all data pertaining to entities and block data inside its area.
+    /// Note that this is held under a server object, and requires the server object be valid.
+    /// </summary>
     public partial class Region
     {
         /// <summary>
-        /// How much time has elapsed since the last tick started.
+        /// How much time has elapsed since the last tick started on the world.
+        /// (This is a getter - it just reads the value off the world object!)
+        /// TODO: Delete this?
         /// </summary>
-        public double Delta;
+        public double Delta
+        {
+            get
+            {
+                return TheWorld.Delta;
+            }
+        }
 
-        public double GlobalTickTime = 0;
+        /// <summary>
+        /// How much time has passed since the world first loaded.
+        /// (This is a getter - it just reads the value off the world object!)
+        /// TODO: Delete this?
+        /// </summary>
+        public double GlobalTickTime
+        {
+            get
+            {
+                return TheWorld.GlobalTickTime;
+            }
+        }
 
         public ChunkDataManager ChunkManager;
 
@@ -157,10 +181,8 @@ namespace Voxalia.ServerGame.WorldSystem
 
         double opsat;
 
-        public void Tick(double delta)
+        public void Tick()
         {
-            Delta = delta;
-            GlobalTickTime += Delta;
             if (Delta <= 0)
             {
                 return;
@@ -181,7 +203,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 PhysicsWorld.TimeStepSettings.TimeStepDuration = TheWorld.TargetDelta;
             }
-            PhysicsWorld.Update(delta);
+            PhysicsWorld.Update(Delta);
             sw.Stop();
             TheServer.PhysicsTimeC += sw.Elapsed.TotalMilliseconds;
             TheServer.PhysicsTimes++;

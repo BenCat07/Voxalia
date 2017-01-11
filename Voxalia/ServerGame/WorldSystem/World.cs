@@ -43,6 +43,11 @@ namespace Voxalia.ServerGame.WorldSystem
 
         const int SeedMax = ushort.MaxValue;
 
+        /// <summary>
+        /// How much time has passed since the world first loaded.
+        /// </summary>
+        public double GlobalTickTime = 0;
+
         public void LoadConfig()
         {
             string folder = "saves/" + Name;
@@ -62,6 +67,8 @@ namespace Voxalia.ServerGame.WorldSystem
             Config.Default("general.seed", Utilities.UtilRandom.Next(SeedMax) - SeedMax / 2);
             Config.Default("general.spawnpoint", new Location(0, 0, 50).ToString());
             Config.Default("general.flat", "false");
+            Config.Default("general.time", 0);
+            GlobalTickTime = Config.GetLong("general.time", 0).Value;
             CFGEdited = true;
             Seed = Config.GetInt("general.seed", DefaultSeed).Value;
             SpawnPoint = Location.FromString(Config.GetString("general.spawnpoint", DefaultSpawnPoint));
@@ -76,15 +83,36 @@ namespace Voxalia.ServerGame.WorldSystem
         public bool CFGEdited;
 
         public Location SpawnPoint;
-        
+
+        /// <summary>
+        /// The present basic world seed.
+        /// TODO: Long?
+        /// There is also the generated <see cref="Seed2"/>, <see cref="Seed3"/>, <see cref="Seed4"/>, and <see cref="Seed5"/>.
+        /// </summary>
         public int Seed;
 
+        /// <summary>
+        /// The present second world seed.
+        /// See <see cref="Seed"/>.
+        /// </summary>
         public int Seed2;
 
+        /// <summary>
+        /// The present third world seed.
+        /// See <see cref="Seed"/>.
+        /// </summary>
         public int Seed3;
 
+        /// <summary>
+        /// The present fourth world seed.
+        /// See <see cref="Seed"/>.
+        /// </summary>
         public int Seed4;
 
+        /// <summary>
+        /// The present fifth world seed.
+        /// See <see cref="Seed"/>.
+        /// </summary>
         public int Seed5;
 
         public Scheduler Schedule = new Scheduler();
@@ -268,8 +296,12 @@ namespace Voxalia.ServerGame.WorldSystem
 
         double ops = 0;
 
+        public double Delta = 0;
+
         public void Tick(double delta)
         {
+            Delta = delta;
+            GlobalTickTime += delta;
             ops += delta;
             if (ops > 1)
             {
@@ -277,7 +309,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 OncePerSecondActions();
             }
             Schedule.RunAllSyncTasks(delta);
-            MainRegion.Tick(delta);
+            MainRegion.Tick();
         }
     }
 }
