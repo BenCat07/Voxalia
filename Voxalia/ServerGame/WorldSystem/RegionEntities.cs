@@ -218,7 +218,6 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public List<PlayerEntity> GetPlayersInRadius(Location pos, double rad)
         {
-            CheckThreadValidity();
             List<PlayerEntity> pes = new List<PlayerEntity>();
             foreach (PlayerEntity pe in Players)
             {

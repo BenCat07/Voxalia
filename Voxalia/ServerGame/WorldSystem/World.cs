@@ -190,7 +190,7 @@ namespace Voxalia.ServerGame.WorldSystem
             Region rg = new Region();
             rg.TheServer = TheServer;
             rg.TheWorld = this;
-            rg.BuildWorld();
+            rg.BuildRegion();
             MainRegion = rg;
         }
 
@@ -345,10 +345,12 @@ namespace Voxalia.ServerGame.WorldSystem
         /// Whether the world is marked for shutdown as soon as possible.
         /// </summary>
         bool NeedShutdown = false;
-        
+
         /// <summary>
         /// Final step of the world shutdown sequence.
         /// Is not automatically called by <see cref="UnloadFully(Action)"/>!
+        /// MUST be called for a full safe and complete shutdown.
+        /// Malfunctions may occur if this is lost!
         /// </summary>
         public void FinalShutdown()
         {

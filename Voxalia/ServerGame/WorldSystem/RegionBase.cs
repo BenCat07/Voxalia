@@ -66,8 +66,17 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Manager for chunk save file data.
+        /// </summary>
         public ChunkDataManager ChunkManager;
 
+        /// <summary>
+        /// Sends a packet to all players that can see a chunk location.
+        /// Note that this still uses the standard network path, not the chunk network path.
+        /// </summary>
+        /// <param name="packet">The packet to send.</param>
+        /// <param name="cpos">The chunk location.</param>
         public void ChunkSendToAll(AbstractPacketOut packet, Vector3i cpos)
         {
             for (int i = 0; i < Players.Count; i++)
@@ -79,6 +88,10 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Sends a packet to all players.
+        /// </summary>
+        /// <param name="packet">The packet to send.</param>
         public void SendToAll(AbstractPacketOut packet)
         {
             for (int i = 0; i < Players.Count; i++)
@@ -87,6 +100,10 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Broadcasts a message to all online players.
+        /// </summary>
+        /// <param name="message">The message to send.</param>
         public void Broadcast(string message)
         {
             SysConsole.Output(OutputType.INFO, "[Broadcast] " + message);
@@ -95,31 +112,18 @@ namespace Voxalia.ServerGame.WorldSystem
                 Players[i].SendMessage(TextChannel.BROADCAST, message);
             }
         }
-
-        public int MaxViewRadiusInChunks = 4;
-
-        Thread MainThread;
-
-        int MainThreadID;
-
-        public void CheckThreadValidity()
+        
+        /// <summary>
+        /// Sets up data for the region to work with, including the physics environment and the chunk data management.
+        /// </summary>
+        public void BuildRegion()
         {
-            if (Thread.CurrentThread.ManagedThreadId != MainThreadID)
-            {
-                throw new Exception("Called a critical method on the wrong thread!");
-            }
-        }
-
-        public void BuildWorld()
-        {
-            MainThread = Thread.CurrentThread;
-            MainThreadID = MainThread.ManagedThreadId;
             ParallelLooper pl = new ParallelLooper();
             for (int i = 0; i < Environment.ProcessorCount; i++)
             {
                 pl.AddThread();
             }
-            CollisionDetectionSettings.AllowedPenetration = 0.01f;
+            CollisionDetectionSettings.AllowedPenetration = 0.01f; // TODO: This is a global setting - handle it elsewhere, or make it non-global?
             PhysicsWorld = new Space(pl);
             PhysicsWorld.TimeStepSettings.MaximumTimeStepsPerFrame = 10;
             PhysicsWorld.ForceUpdater.Gravity = new Vector3(0, 0, -9.8f * 3f / 2f);
@@ -136,11 +140,11 @@ namespace Voxalia.ServerGame.WorldSystem
             EntityConstructors.Add(EntityType.HOVER_MESSAGE, new HoverMessageEntityConstructor());
             ChunkManager = new ChunkDataManager();
             ChunkManager.Init(this);
-            //LoadRegion(new Location(-MaxViewRadiusInChunks * 30), new Location(MaxViewRadiusInChunks * 30), true);
-            //TheServer.Schedule.RunAllSyncTasks(0.016); // TODO: Separate per-region scheduler // Also don't freeze the entire server/region just because we're waiting on chunks >.>
-            //SysConsole.Output(OutputType.INIT, "Finished building chunks! Now have " + LoadedChunks.Count + " chunks!");
         }
         
+        /// <summary>
+        /// Handles all actions that need to be executed only once per second, such as chunk saving to file or cloud movement ticking.
+        /// </summary>
         void OncePerSecondActions()
         {
             TickClouds();
@@ -177,10 +181,20 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// The maximum time a chunk can be far away from players before it's unloaded.
+        /// TODO: Configurable?
+        /// </summary>
         public double UnloadLimit = 10;
 
+        /// <summary>
+        /// The timer for <see cref="OncePerSecondActions"/>.
+        /// </summary>
         double opsat;
 
+        /// <summary>
+        /// Ticks the entire region.
+        /// </summary>
         public void Tick()
         {
             if (Delta <= 0)
@@ -248,8 +262,14 @@ namespace Voxalia.ServerGame.WorldSystem
             TheServer.EntityTimes++;
         }
         
+        /// <summary>
+        /// The server object holding this region.
+        /// </summary>
         public Server TheServer = null;
 
+        /// <summary>
+        /// The world object holding this region.
+        /// </summary>
         public World TheWorld = null;
         
         /// <summary>
@@ -301,11 +321,24 @@ namespace Voxalia.ServerGame.WorldSystem
             FinalShutdown();
         }
 
+        /// <summary>
+        /// Finalizes the shutdown of a region.
+        /// MUST be called for a full safe and complete shutdown.
+        /// Malfunctions may occur if this is lost!
+        /// </summary>
         public void FinalShutdown()
         {
             ChunkManager.Shutdown();
         }
 
+        /// <summary>
+        /// Plays a sound at a location for all players in range to hear.
+        /// TODO: Move elsewhere?
+        /// </summary>
+        /// <param name="sound">The sound file to play.</param>
+        /// <param name="pos">The position of the sound to be played.</param>
+        /// <param name="vol">The volume of the sound.</param>
+        /// <param name="pitch">The pitch multiplier of the sound.</param>
         public void PlaySound(string sound, Location pos, double vol, double pitch)
         {
             bool nan = pos.IsNaN();
@@ -320,6 +353,13 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Explodes a paint bomb at a given location, repainting all in-radius blocks.
+        /// TODO: Move elsewhere?
+        /// </summary>
+        /// <param name="pos">The position to detonate at.</param>
+        /// <param name="bcol">The color byte.</param>
+        /// <param name="rad">The radius.</param>
         public void PaintBomb(Location pos, byte bcol, double rad = 5f)
         {
             foreach (Location loc in GetBlocksInRadius(pos, 5))
@@ -337,14 +377,32 @@ namespace Voxalia.ServerGame.WorldSystem
             // TODO: Sound effect?
         }
 
+        /// <summary>
+        /// Causes an explosion of damage at a given location.
+        /// TODO: Move elsewhere?
+        /// </summary>
+        /// <param name="pos">The position to detonate at.</param>
+        /// <param name="rad">The radius.</param>
+        /// <param name="effect">Whether to play an effect.</param>
+        /// <param name="breakblock">Whether to break blocks.</param>
+        /// <param name="applyforce">Whether to apply entity forces.</param>
+        /// <param name="doDamage">Whether to do entity damage.</param>
         public void Explode(Location pos, double rad = 5f, bool effect = true, bool breakblock = true, bool applyforce = true, bool doDamage = true)
         {
             if (doDamage)
             {
-                // TODO: DO DAMAGE!
+                foreach (Entity e in GetEntitiesInRadius(pos, rad * 5)) // TODO: Physent-specific search method?
+                {
+                    // TODO: Generic entity 'Damage' method?
+                    if (e is LivingEntity)
+                    {
+                        Location offs = e.GetPosition() - pos;
+                        double dpower = (double)((rad * 5) - offs.Length()); // TODO: Efficiency?
+                        (e as LivingEntity).Damage(dpower);
+                    }
+                }
             }
             double expDamage = 5 * rad;
-            CheckThreadValidity();
             if (breakblock)
             {
                 int min = (int)Math.Floor(-rad);
@@ -384,7 +442,7 @@ namespace Voxalia.ServerGame.WorldSystem
                         Location offs = e.GetPosition() - pos;
                         double dpower = (double)((rad * 5) - offs.Length()); // TODO: Efficiency?
                         Location force = new Location(1, 1, 3) * dpower;
-                        ((PhysicsEntity)e).ApplyForce(force);
+                        (e as PhysicsEntity).ApplyForce(force);
                     }
                 }
             }
