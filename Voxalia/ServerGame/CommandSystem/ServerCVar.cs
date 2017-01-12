@@ -24,16 +24,24 @@ namespace Voxalia.ServerGame.CommandSystem
         /// </summary>
         public CVarSystem system;
 
-        // System CVars
+        /// <summary>
+        /// System CVars
+        /// </summary>
         public CVar s_filepath, s_debug;
 
-        // Game CVars
+        /// <summary>
+        /// Game CVars
+        /// </summary>
         public CVar g_fps, g_maxheight, g_minheight, g_maxdist, g_renderblocks, g_maxrenderdist;
 
-        // Network CVars
+        /// <summary>
+        /// Network CVars
+        /// </summary>
         public CVar n_verifyip, n_rendersides, n_chunkspertick, n_online;
 
-        // Text CVars
+        /// <summary>
+        /// Text CVars
+        /// </summary>
         public CVar t_translateurls, t_blockurls, t_blockcolors;
 
         /// <summary>

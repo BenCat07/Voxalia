@@ -73,6 +73,7 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 // TODO: Set world!
             }
+            // TODO: Server-side default gamemode!
             if (!Enum.TryParse(config.GetString("gamemode", "SURVIVOR"), out Mode))
             {
                 SysConsole.Output(OutputType.WARNING, "Invalid gamemode for " + Name + ", reverting to SURVIVOR!");
