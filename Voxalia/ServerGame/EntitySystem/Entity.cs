@@ -44,8 +44,16 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public bool NetworkMe = true; // TODO: Readonly? Toggler method?
 
+        /// <summary>
+        /// Return the type of entity this is (as the network thinks of it).
+        /// </summary>
+        /// <returns>The networked entity type.</returns>
         public abstract NetworkEntityType GetNetType();
 
+        /// <summary>
+        /// Return a byte set that can be used to identify the entity.
+        /// </summary>
+        /// <returns>The byte set.</returns>
         public abstract byte[] GetNetData();
 
         /// <summary>

@@ -30,48 +30,97 @@ using FreneticDataSyntax;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
+    /// <summary>
+    /// Represents a player-typed entity in the world.
+    /// </summary>
     public class PlayerEntity: HumanoidEntity
     {
+        /// <summary>
+        /// The player's current session key that they used to connect.
+        /// Only useful during the login sequence.
+        /// </summary>
         public string SessionKey = null;
 
+        /// <summary>
+        /// Implements <see cref="Entity.GetNetType"/>.
+        /// </summary>
+        /// <returns>The net type.</returns>
         public override NetworkEntityType GetNetType()
         {
             return NetworkEntityType.CHARACTER;
         }
 
+        /// <summary>
+        /// Implements <see cref="Entity.GetNetData"/>.
+        /// </summary>
+        /// <returns>The net data.</returns>
         public override byte[] GetNetData()
         {
             return GetCharacterNetData();
         }
 
+        /// <summary>
+        /// The <see cref="GameMode"/> this player is in currently.
+        /// </summary>
         public GameMode Mode = GameMode.SURVIVOR;
 
+        /// <summary>
+        /// Whether this is the first join of the player (defaults to true until pre-existing data is loaded).
+        /// </summary>
         public bool IsFirstJoin = true;
 
+        /// <summary>
+        /// Trackers for how much network bandwidth this player has used in total.
+        /// </summary>
         public long[] UsagesTotal = new long[(int)NetUsageType.COUNT];
 
+        /// <summary>
+        /// How long this player has been spawned for in total.
+        /// </summary>
         public double SpawnedTime = 0;
 
+        /// <summary>
+        /// Whether this player is enabled for movement security tracking.
+        /// </summary>
         public bool SecureMovement = true;
 
+        /// <summary>
+        /// The permissions data on this player.
+        /// </summary>
         public FDSSection Permissions = new FDSSection();
 
+        /// <summary>
+        /// Sends a language-file based message to the player.
+        /// </summary>
+        /// <param name="channel">The text channel to send to.</param>
+        /// <param name="message">The message data to send.</param>
         public void SendLanguageData(TextChannel channel, params string[] message)
         {
             Network.SendLanguageData(channel, message);
         }
 
+        /// <summary>
+        /// Sends a plaintext message to the player.
+        /// </summary>
+        /// <param name="channel">The text channel to send to.</param>
+        /// <param name="message">The message data to send.</param>
         public void SendMessage(TextChannel channel, string message)
         {
             Network.SendMessage(channel, message);
         }
         
+        /// <summary>
+        /// Loads the player's data from a saves file.
+        /// </summary>
+        /// <param name="config">The saves file.</param>
         public void LoadFromSaves(FDSSection config)
         {
             string world = config.GetString("world", null);
             if (world != null) // TODO: && worldIsValidAndLoaded
             {
                 // TODO: Set world!
+                SetVelocity(Location.FromString(config.GetString("velocity", "0,0,0")));
+                SetPosition(Location.FromString(config.GetString("position", TheRegion.TheWorld.SpawnPoint.ToString())));
             }
             // TODO: Server-side default gamemode!
             if (!Enum.TryParse(config.GetString("gamemode", "SURVIVOR"), out Mode))
@@ -88,8 +137,6 @@ namespace Voxalia.ServerGame.EntitySystem
                     Fly();
                 }, 0.1);
             }
-            SetVelocity(Location.FromString(config.GetString("velocity", "0,0,0")));
-            SetPosition(Location.FromString(config.GetString("position", TheRegion.TheWorld.SpawnPoint.ToString())));
             SecureMovement = config.GetString("secure_movement", "true").ToLowerFast() == "true"; // TODO: ReadBoolean?
             if (config.HasKey("permissions"))
             {
@@ -104,7 +151,11 @@ namespace Voxalia.ServerGame.EntitySystem
             SpawnedTime = TheRegion.GlobalTickTime;
         }
 
-        public void SaveToYAML(FDSSection config)
+        /// <summary>
+        /// Saves the player's data to a saves file.
+        /// </summary>
+        /// <param name="config">The save file to dump into.</param>
+        public void SaveToConfig(FDSSection config)
         {
             config.Set("gamemode", Mode.ToString());
             config.Set("maxhealth", GetMaxHealth());
@@ -128,11 +179,21 @@ namespace Voxalia.ServerGame.EntitySystem
             // TODO: Inventory!
         }
 
+        /// <summary>
+        /// The internal code to check if the player has a highly specifically permission node.
+        /// </summary>
+        /// <param name="node">The node path.</param>
+        /// <returns>Whether the permission is marked.</returns>
         public bool HasSpecificPermissionNodeInternal(string node)
         {
             return Permissions.GetString(node, "false").ToLowerFast() == "true";
         }
 
+        /// <summary>
+        /// The internal code to check if the player has a permission.
+        /// </summary>
+        /// <param name="path">The details of the node path.</param>
+        /// <returns>Whether the permission is marked.</returns>
         public bool HasPermissionInternal(params string[] path)
         {
             string constructed = "";
@@ -147,24 +208,43 @@ namespace Voxalia.ServerGame.EntitySystem
             return HasSpecificPermissionNodeInternal(constructed.Substring(0, constructed.Length - 1));
         }
 
+        /// <summary>
+        /// Returns whether the player has a permission.
+        /// </summary>
+        /// <param name="permission">The permission.</param>
+        /// <returns>Whether the permission is granted to the player.</returns>
         public bool HasPermission(string permission)
         {
             return HasPermissionInternal(permission.ToLowerFast().SplitFast('.'));
         }
 
+        /// <summary>
+        /// Implements <see cref="Entity.GetEntityType"/>.
+        /// </summary>
+        /// <returns>The entity type.</returns>
         public override EntityType GetEntityType()
         {
             return EntityType.PLAYER;
         }
         
+        /// <summary>
+        /// Implements <see cref="Entity.GetSaveData"/>.
+        /// </summary>
+        /// <returns>The save data.</returns>
         public override BsonDocument GetSaveData()
         {
             // Does not save through entity system!
             return null;
         }
 
+        /// <summary>
+        /// Returns the correct animation to hold any given item.
+        /// </summary>
+        /// <param name="item">The item to be held.</param>
+        /// <returns>The animation to play.</returns>
         public string AnimToHold(ItemStack item)
         {
+            // TODO: less arbitrary method. Item-side information?
             if (item.Name == "rifle_gun")
             {
                 return "torso_armed_rifle";
@@ -208,10 +288,19 @@ namespace Voxalia.ServerGame.EntitySystem
         /// </summary>
         public string IP;
 
+        /// <summary>
+        /// The last byte received in a ping.
+        /// </summary>
         public byte LastPingByte = 0;
 
+        /// <summary>
+        /// The last byte received in a chunk-network ping.
+        /// </summary>
         public byte LastCPingByte = 0;
 
+        /// <summary>
+        /// Whether the player has already been kicked.
+        /// </summary>
         bool pkick = false;
         
         /// <summary>
@@ -219,27 +308,64 @@ namespace Voxalia.ServerGame.EntitySystem
         /// </summary>
         public int ViewRadiusInChunks = 3;
 
+        /// <summary>
+        /// How much to add to <see cref="ViewRadiusInChunks"/> in LOD:2 chunk data, horizontally.
+        /// </summary>
         public int ViewRadExtra2 = 1;
 
+        /// <summary>
+        /// How much to add to <see cref="ViewRadiusInChunks"/> in LOD:2 chunk data, vertically.
+        /// </summary>
         public int ViewRadExtra2Height = 1;
 
+        /// <summary>
+        /// How much to add to <see cref="ViewRadiusInChunks"/> in LOD:5 chunk data, horizontally.
+        /// </summary>
         public int ViewRadExtra5 = 1;
 
+        /// <summary>
+        /// How much to add to <see cref="ViewRadiusInChunks"/> in LOD:5 chunk data, vertically.
+        /// </summary>
         public int ViewRadExtra5Height = 1;
         
+        /// <summary>
+        /// The lowest LOD the player is allowed to see.
+        /// </summary>
         public int BestLOD = 1;
 
+        /// <summary>
+        /// The entity grabbed by the manipulator item.
+        /// </summary>
         public PhysicsEntity Manipulator_Grabbed = null;
 
+        /// <summary>
+        /// The beam joint for the manipulator item.
+        /// </summary>
         public ConnectorBeam Manipulator_Beam = null;
 
+        /// <summary>
+        /// The distance the manipulator item is operating at.
+        /// </summary>
         public double Manipulator_Distance = 10;
 
+        /// <summary>
+        /// The attempted direction change for the manipulator item.
+        /// </summary>
         public Location AttemptedDirectionChange = Location.Zero;
 
+        /// <summary>
+        /// What position the player is loading data relative to.
+        /// </summary>
         public Location LoadRelPos;
+
+        /// <summary>
+        /// What direction the player is loading data relative to.
+        /// </summary>
         public Location LoadRelDir;
 
+        /// <summary>
+        /// The player's configuration file as of last save.
+        /// </summary>
         public FDSSection PlayerConfig = null;
         
         /// <summary>
@@ -274,18 +400,27 @@ namespace Voxalia.ServerGame.EntitySystem
             }
             string nl = Name.ToLower();
             string fn = "server_player_saves/" + nl[0].ToString() + "/" + nl + ".plr";
-            SaveToYAML(PlayerConfig);
+            SaveToConfig(PlayerConfig);
             TheServer.Files.WriteText(fn, PlayerConfig.SaveToString());
         }
 
         /// <summary>
         /// The default mass of the player.
         /// </summary>
-        public double tmass = 70;
+        public const double tmass = 70;
 
-        // TODO: Dictionary<breadcrumb id: int, List<Location>> ?
+        /// <summary>
+        /// A list of breadcrumbs the player is currently tracking.
+        /// TODO: Dictionary[breadcrumb id: int, List[Location]] ?
+        /// </summary>
         public List<Location> Breadcrumbs = new List<Location>();
 
+        /// <summary>
+        /// Constructs the player entity.
+        /// </summary>
+        /// <param name="tregion">The region the player is in.</param>
+        /// <param name="conn">The network connection for the player.</param>
+        /// <param name="name">The name of the player.</param>
         public PlayerEntity(WorldSystem.Region tregion, Connection conn, string name)
             : base(tregion)
         {
@@ -302,6 +437,9 @@ namespace Voxalia.ServerGame.EntitySystem
             Items = new PlayerInventory(this);
         }
 
+        /// <summary>
+        /// Sets up the player once it's ready to load into the world.
+        /// </summary>
         public void InitPlayer()
         {
             // TODO: Convert all these to item files!
@@ -359,10 +497,13 @@ namespace Voxalia.ServerGame.EntitySystem
             if (PlayerConfig == null)
             {
                 PlayerConfig = new FDSSection();
-                SaveToYAML(PlayerConfig);
+                SaveToConfig(PlayerConfig);
             }
         }
 
+        /// <summary>
+        /// Implements <see cref="CharacterEntity.Solidify"/>.
+        /// </summary>
         public override void Solidify()
         {
             Flags |= YourStatusFlags.NON_SOLID;
@@ -370,6 +511,9 @@ namespace Voxalia.ServerGame.EntitySystem
             base.Solidify();
         }
 
+        /// <summary>
+        /// Implements <see cref="CharacterEntity.Desolidify"/>.
+        /// </summary>
         public override void Desolidify()
         {
             Flags &= ~YourStatusFlags.NON_SOLID;
@@ -377,8 +521,14 @@ namespace Voxalia.ServerGame.EntitySystem
             base.Desolidify();
         }
 
+        /// <summary>
+        /// Sets the player's current animation.
+        /// </summary>
+        /// <param name="anim">The animation.</param>
+        /// <param name="mode">Which mode it should apply to.</param>
         public void SetAnimation(string anim, byte mode)
         {
+            // TODO: Mode -> enum!
             if (mode == 0)
             {
                 if (hAnim != null && hAnim.Name == anim)
@@ -406,6 +556,11 @@ namespace Voxalia.ServerGame.EntitySystem
             TheRegion.SendToAll(new AnimationPacketOut(this, anim, mode));
         }
         
+        /// <summary>
+        /// A physics filter for ignoring this specific player.
+        /// </summary>
+        /// <param name="entry">The entry.</param>
+        /// <returns>Whether the entry should be collided with.</returns>
         public bool IgnoreThis(BroadPhaseEntry entry) // TODO: PhysicsEntity?
         {
             if (entry is EntityCollidable && ((EntityCollidable)entry).Entity.Tag == this)
@@ -415,6 +570,11 @@ namespace Voxalia.ServerGame.EntitySystem
             return TheRegion.Collision.ShouldCollide(entry);
         }
 
+        /// <summary>
+        /// A physics filter for ignoring any in-region player.
+        /// </summary>
+        /// <param name="entry">The entry.</param>
+        /// <returns>Whether the entry should be collided with.</returns>
         public bool IgnorePlayers(BroadPhaseEntry entry)
         {
             if (entry.CollisionRules.Group == CollisionUtil.Player)
@@ -424,6 +584,9 @@ namespace Voxalia.ServerGame.EntitySystem
             return TheRegion.Collision.ShouldCollide(entry);
         }
 
+        /// <summary>
+        /// Implements <see cref="CharacterEntity.Fly"/>.
+        /// </summary>
         public override void Fly()
         {
             if (IsFlying)
@@ -435,6 +598,9 @@ namespace Voxalia.ServerGame.EntitySystem
             TheRegion.SendToAll(new FlagEntityPacketOut(this, EntityFlag.MASS, 0));
         }
 
+        /// <summary>
+        /// Implements <see cref="CharacterEntity.Unfly"/>.
+        /// </summary>
         public override void Unfly()
         {
             if (!IsFlying)
@@ -446,19 +612,15 @@ namespace Voxalia.ServerGame.EntitySystem
             TheRegion.SendToAll(new FlagEntityPacketOut(this, EntityFlag.MASS, PreFlyMass));
         }
 
+        /// <summary>
+        /// Sets whether the player is marked as typing.
+        /// </summary>
+        /// <param name="isTyping">Whether typing is on.</param>
         public void SetTypingStatus(bool isTyping)
         {
             IsTyping = isTyping;
-            // TODO: Generic find-all-players-that-can-see-me method
-            Vector3i ch = TheRegion.ChunkLocFor(GetPosition());
             SetStatusPacketOut pack = new SetStatusPacketOut(this, ClientStatus.TYPING, (byte)(IsTyping ? 1 : 0));
-            foreach (PlayerEntity player in TheRegion.Players)
-            {
-                if (player.CanSeeChunk(ch))
-                {
-                    player.Network.SendPacket(pack);
-                }
-            }
+            TheRegion.SendToVisible(GetPosition(), pack);
         }
 
         public void GainAwarenesOf(Entity ent)
@@ -466,11 +628,24 @@ namespace Voxalia.ServerGame.EntitySystem
             throw new NotImplementedException(); // TODO: Handle awareness-gain of entities: Set EG Status packets, etc.
         }
 
+        /// <summary>
+        /// Whether the player is currently marked as typing.
+        /// </summary>
         public bool IsTyping = false;
 
+        /// <summary>
+        /// Whether the player is currently marked as AFK.
+        /// </summary>
         public bool IsAFK = false;
+
+        /// <summary>
+        /// How many seconds have passed since the player lsat did something.
+        /// </summary>
         public int TimeAFK = 0;
 
+        /// <summary>
+        /// Marks the player as AFK.
+        /// </summary>
         public void MarkAFK()
         {
             IsAFK = true;
@@ -478,6 +653,9 @@ namespace Voxalia.ServerGame.EntitySystem
             // TODO: SetStatus to all visible!
         }
 
+        /// <summary>
+        /// Marks the player as no longer AFK.
+        /// </summary>
         public void UnmarkAFK()
         {
             IsAFK = false;
@@ -486,7 +664,7 @@ namespace Voxalia.ServerGame.EntitySystem
         }
 
         /// <summary>
-        /// Called to indicate that the player is actively doing something (IE, not AFK!)
+        /// Called to indicate that the player is actively doing something (IE, not AFK!).
         /// </summary>
         public void NoteDidAction()
         {
@@ -497,6 +675,9 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
+        /// <summary>
+        /// Runs once per second to manage slow trackers.
+        /// </summary>
         public void OncePerSecondTick()
         {
             TimeAFK++;
@@ -506,15 +687,27 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
+        /// <summary>
+        /// The player's current world selection (for items such as block copiers).
+        /// </summary>
         public AABB Selection;
 
+        /// <summary>
+        /// Sends a packet to the player marking their selection.
+        /// </summary>
         public void NetworkSelection()
         {
             Network.SendPacket(new HighlightPacketOut(Selection));
         }
 
+        /// <summary>
+        /// <see cref="OncePerSecondTick"/> timer.
+        /// </summary>
         double opstt = 0;
 
+        /// <summary>
+        /// Implements <see cref="Entity.Tick"/>
+        /// </summary>
         public override void Tick()
         {
             if (!IsSpawned)
@@ -590,27 +783,6 @@ namespace Voxalia.ServerGame.EntitySystem
             ChunkMarchAndSend();
             if (cpos != pChunkLoc)
             {
-                /*
-                // TODO: Better system -> async?
-                TrySet(pos, 1, 1, 0, 1, false);
-                TrySet(pos, ViewRadiusInChunks / 2, ViewRadiusInChunks / 2, 0, 1, false);
-                TrySet(pos, ViewRadiusInChunks, ViewRadiusInChunks, 0, 1, false);
-                TrySet(pos, ViewRadiusInChunks + 1, ViewRadiusInChunks, 15, 2, true);
-                TrySet(pos, ViewRadiusInChunks + ViewRadExtra2, ViewRadiusInChunks + ViewRadExtra2Height, 30, 2, true);
-                TrySet(pos, ViewRadiusInChunks + ViewRadExtra5, ViewRadiusInChunks + ViewRadExtra5Height, 60, 5, true);
-                */
-                /*
-                if (!loadedInitially)
-                {
-                    loadedInitially = true;
-                    ChunkNetwork.SendPacket(new TeleportPacketOut(GetPosition()));
-                    ChunkNetwork.SendPacket(new OperationStatusPacketOut(StatusOperation.CHUNK_LOAD, 1));
-                }
-                else
-                {
-                    ChunkNetwork.SendPacket(new OperationStatusPacketOut(StatusOperation.CHUNK_LOAD, 2));
-                }
-                */
                 foreach (ChunkAwarenessInfo ch in ChunksAwareOf.Values)
                 {
                     if (!ShouldLoadChunk(ch.ChunkPos))
@@ -688,11 +860,20 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
+        /// <summary>
+        /// Valid chunkmarch movement dirs.
+        /// </summary>
         static Vector3i[] MoveDirs = new Vector3i[] { new Vector3i(-1, 0, 0), new Vector3i(1, 0, 0),
             new Vector3i(0, -1, 0), new Vector3i(0, 1, 0), new Vector3i(0, 0, -1), new Vector3i(0, 0, 1) };
 
+        /// <summary>
+        /// Maximum field-of-view for a player.
+        /// </summary>
         const double Max_FOV = 100f;
         
+        /// <summary>
+        /// Runs through the chunks near the player and sends them in a reasonable order.
+        /// </summary>
         void ChunkMarchAndSend()
         {
             // TODO: is this the most efficient it can be?
@@ -936,6 +1117,11 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
+        /// <summary>
+        /// Clamps the player's position to within the distance limits.
+        /// </summary>
+        /// <param name="pos">The position.</param>
+        /// <returns>The clamped position.</returns>
         public Location posClamp(Location pos)
         {
             double maxdist = Math.Abs(TheServer.CVars.g_maxdist.ValueD);
@@ -945,6 +1131,14 @@ namespace Voxalia.ServerGame.EntitySystem
             return pos;
         }
 
+        /// <summary>
+        /// Clamps a number to be between a min and max.
+        /// TODO: Utilities file?
+        /// </summary>
+        /// <param name="num">The base number.</param>
+        /// <param name="min">The minimum value.s</param>
+        /// <param name="max">The maximum value.</param>
+        /// <returns>The clamped value.</returns>
         public double Clamp(double num, double min, double max)
         {
             if (num < min)
@@ -961,10 +1155,21 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
+        /// <summary>
+        /// Chunks that need removing.
+        /// </summary>
         List<Vector3i> removes = new List<Vector3i>();
 
+        /// <summary>
+        /// Position of the player for the current second.
+        /// </summary>
         public Location losPos = Location.NaN;
 
+        /// <summary>
+        /// Whether the player's presence alone is sufficient reason for a chunk to remain loaded.
+        /// </summary>
+        /// <param name="cpos">The chunk position.</param>
+        /// <returns>Whether to keep it loaded.</returns>
         public bool ShouldLoadChunk(Vector3i cpos)
         {
             Vector3i wpos = TheRegion.ChunkLocFor(LoadRelPos);
@@ -977,6 +1182,11 @@ namespace Voxalia.ServerGame.EntitySystem
             return true;
         }
 
+        /// <summary>
+        /// Whether the player should load a chunk, as of last frame.
+        /// </summary>
+        /// <param name="cpos">The chunk position.</param>
+        /// <returns>Whether to keep it loaded.</returns>
         public bool ShouldLoadChunkPreviously(Vector3i cpos)
         {
             if (lPos.IsNaN())
@@ -993,6 +1203,11 @@ namespace Voxalia.ServerGame.EntitySystem
             return true;
         }
 
+        /// <summary>
+        /// Whether the player should load a chunk, as of last frame.
+        /// </summary>
+        /// <param name="cpos">The chunk position.</param>
+        /// <returns>Whether to keep it loaded.</returns>
         public bool ShouldSeeLODChunkOneSecondAgo(Vector3i cpos)
         {
             Vector3i wpos = TheRegion.ChunkLocFor(losPos);
@@ -1005,6 +1220,11 @@ namespace Voxalia.ServerGame.EntitySystem
             return true;
         }
 
+        /// <summary>
+        /// Whether the player should reasonably see a full-detail chunk one second ago.
+        /// </summary>
+        /// <param name="cpos">The chunk position.</param>
+        /// <returns>Whether it was seen.</returns>
         public bool ShouldSeeChunkOneSecondAgo(Vector3i cpos)
         {
             if (losPos.IsNaN())
@@ -1107,10 +1327,23 @@ namespace Voxalia.ServerGame.EntitySystem
             return ShouldLoadChunkPreviously(TheRegion.ChunkLocFor(pos));
         }
 
+        /// <summary>
+        /// How far away a player's breadcrumbs should be seen.
+        /// </summary>
         public int BreadcrumbRadius = 6;
 
+        /// <summary>
+        /// The chunk the player was in last frame.
+        /// </summary>
         Vector3i pChunkLoc = new Vector3i(-100000, -100000, -100000);
         
+        /// <summary>
+        /// Attempts to send a chunk if necessary.
+        /// </summary>
+        /// <param name="cworldPos">The chunk position.</param>
+        /// <param name="posMult">The LOD.</param>
+        /// <param name="chi">The chunk itself if an object for it is available.</param>
+        /// <returns>Whether the chunk was sent.</returns>
         public bool TryChunk(Vector3i cworldPos, int posMult, Chunk chi = null) // TODO: Efficiency?
         {
             if (pkick)
@@ -1143,8 +1376,16 @@ namespace Voxalia.ServerGame.EntitySystem
             return false;
         }
 
+        /// <summary>
+        /// All chunks the player is presently aware of.
+        /// </summary>
         public Dictionary<Vector3i, ChunkAwarenessInfo> ChunksAwareOf = new Dictionary<Vector3i, ChunkAwarenessInfo>();
 
+        /// <summary>
+        /// Whether the player can see a specific chunk.
+        /// </summary>
+        /// <param name="cpos">The chunk location.</param>
+        /// <returns>Whether it is seen.</returns>
         public bool CanSeeChunk(Vector3i cpos)
         {
             return ChunksAwareOf.ContainsKey(cpos);
@@ -1156,6 +1397,9 @@ namespace Voxalia.ServerGame.EntitySystem
         /// </summary>
         public HashSet<long> Known = new HashSet<long>();
 
+        /// <summary>
+        /// Implements <see cref="PhysicsEntity.EndTick"/>.
+        /// </summary>
         public override void EndTick()
         {
             if (UpdateLoadPos)
@@ -1170,6 +1414,12 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
+        /// <summary>
+        /// Causes the player to forget a chunk.
+        /// </summary>
+        /// <param name="ch">The chunk.</param>
+        /// <param name="cpos">The chunk position.</param>
+        /// <returns>Whether it was ever seen in the first place.</returns>
         public bool ForgetChunk(Chunk ch, Vector3i cpos)
         {
             if (ChunksAwareOf.Remove(cpos))
@@ -1193,14 +1443,26 @@ namespace Voxalia.ServerGame.EntitySystem
             return false;
         }
 
+        /// <summary>
+        /// Whether the player can reach a specific location based on world distance limits.
+        /// </summary>
+        /// <param name="pos">The location.</param>
+        /// <returns>Whether it can be reached.</returns>
         public bool CanReach(Location pos)
         {
             double maxdist = Math.Abs(TheServer.CVars.g_maxdist.ValueD);
             return Math.Abs(pos.X) < maxdist && Math.Abs(pos.Y) < maxdist && Math.Abs(pos.Z) < maxdist;
         }
 
+        /// <summary>
+        /// Updates the player's loading position.
+        /// </summary>
         public bool UpdateLoadPos = true;
 
+        /// <summary>
+        /// Implements <see cref="Entity.SetPosition(Location)"/>.
+        /// </summary>
+        /// <param name="pos">The position.</param>
         public override void SetPosition(Location pos)
         {
             Location l = posClamp(pos);
@@ -1212,58 +1474,107 @@ namespace Voxalia.ServerGame.EntitySystem
             base.SetPosition(l);
         }
 
+        /// <summary>
+        /// Teleports the player immediately to a specific location.
+        /// </summary>
+        /// <param name="pos">The location.</param>
         public void Teleport(Location pos)
         {
             SetPosition(pos);
             Network.SendPacket(new TeleportPacketOut(GetPosition()));
         }
 
+        /// <summary>
+        /// Returns a String description of the player.
+        /// </summary>
+        /// <returns>Player name.</returns>
         public override string ToString()
         {
             return Name;
         }
 
+        /// <summary>
+        /// Updates the player's status for the client to see.
+        /// </summary>
         public void SendStatus()
         {
             Network.SendPacket(new YourStatusPacketOut(GetHealth(), GetMaxHealth(), Flags));
         }
 
+        /// <summary>
+        /// Implements <see cref="LivingEntity.SetHealth(double)"/>.
+        /// </summary>
+        /// <param name="health">The health value.</param>
         public override void SetHealth(double health)
         {
             base.SetHealth(health);
             SendStatus();
         }
 
+        /// <summary>
+        /// Implements <see cref="LivingEntity.SetMaxHealth(double)"/>.
+        /// </summary>
+        /// <param name="maxhealth">The maximum health value.</param>
         public override void SetMaxHealth(double maxhealth)
         {
             base.SetMaxHealth(maxhealth);
             SendStatus();
         }
 
+        /// <summary>
+        /// Implements <see cref="LivingEntity.Die"/>.
+        /// </summary>
         public override void Die()
         {
             SetHealth(MaxHealth);
             Teleport(TheRegion.TheWorld.SpawnPoint);
         }
 
+        /// <summary>
+        /// The Block Group Entity being used to represent a paste.
+        /// </summary>
         public BlockGroupEntity Pasting = null;
 
+        /// <summary>
+        /// How far away the paster is operating at.
+        /// </summary>
         public double PastingDist = 5;
 
+        /// <summary>
+        /// The wings a player is currently wearing, as a plane entity they are seemingly inside.
+        /// </summary>
         public PlaneEntity Wings = null;
     }
 
+    /// <summary>
+    /// Represents chunk awareness information.
+    /// </summary>
     public class ChunkAwarenessInfo
     {
+        /// <summary>
+        /// The chunk location.
+        /// </summary>
         public Vector3i ChunkPos;
 
+        /// <summary>
+        /// The chunk level of detail.
+        /// </summary>
         public int LOD;
 
+        /// <summary>
+        /// A reasonable hashcode.
+        /// </summary>
+        /// <returns>A hashcode.</returns>
         public override int GetHashCode()
         {
             return ChunkPos.GetHashCode();
         }
 
+        /// <summary>
+        /// Gets whether this chunk equals another.
+        /// </summary>
+        /// <param name="obj">The other.</param>
+        /// <returns>Whether they are equal.</returns>
         public override bool Equals(object obj)
         {
             if (obj == null)
@@ -1273,11 +1584,23 @@ namespace Voxalia.ServerGame.EntitySystem
             return ChunkPos.Equals(((ChunkAwarenessInfo)obj).ChunkPos);
         }
 
+        /// <summary>
+        /// Gets whether two chunks are equal.
+        /// </summary>
+        /// <param name="cai">The first chunk.</param>
+        /// <param name="cai2">The second chunk.</param>
+        /// <returns>Whether they are equal.</returns>
         public static bool operator ==(ChunkAwarenessInfo cai, ChunkAwarenessInfo cai2)
         {
             return cai.Equals(cai2);
         }
 
+        /// <summary>
+        /// Gets whether two chunks are not equal.
+        /// </summary>
+        /// <param name="cai">The first chunk.</param>
+        /// <param name="cai2">The second chunk.</param>
+        /// <returns>Whether they are not equal.</returns>
         public static bool operator !=(ChunkAwarenessInfo cai, ChunkAwarenessInfo cai2)
         {
             return !cai.Equals(cai2);
