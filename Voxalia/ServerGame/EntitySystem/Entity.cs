@@ -23,8 +23,16 @@ namespace Voxalia.ServerGame.EntitySystem
     /// </summary>
     public abstract class Entity
     {
+        /// <summary>
+        /// The region that holds this entity.
+        /// </summary>
         public Region TheRegion;
 
+        /// <summary>
+        /// Constructs the entity object.
+        /// </summary>
+        /// <param name="tregion">The region it will be in.</param>
+        /// <param name="tickme">Whether it ticks at all ever.</param>
         public Entity(Region tregion, bool tickme)
         {
             TheRegion = tregion;
@@ -32,16 +40,29 @@ namespace Voxalia.ServerGame.EntitySystem
             Ticks = tickme;
         }
 
+        /// <summary>
+        /// Gets an estimation of how much RAM an entity object uses.
+        /// </summary>
+        /// <returns>The estimated value.</returns>
         public virtual long GetRAMUsage()
         {
             return 8 + 8 + (Seats == null ? 8 : Seats.Count * 8) + 8;
         }
 
+        /// <summary>
+        /// Returns an estimation of the actual radius scale of the entity.
+        /// Default implementation returns a 1, implementations should give better estimates.
+        /// </summary>
+        /// <returns>The estimated value.</returns>
         public virtual double GetScaleEstimate()
         {
             return 1;
         }
 
+        /// <summary>
+        /// Can be set false to prevent networking of this entity.
+        /// Should only be set prior to spawn-in.
+        /// </summary>
         public bool NetworkMe = true; // TODO: Readonly? Toggler method?
 
         /// <summary>
@@ -91,8 +112,15 @@ namespace Voxalia.ServerGame.EntitySystem
         /// </summary>
         public Server TheServer = null;
 
+        /// <summary>
+        /// All joints on this entity.
+        /// </summary>
         public List<InternalBaseJoint> Joints = new List<InternalBaseJoint>();
 
+        /// <summary>
+        /// Gets a packet that properly spawns this entity.
+        /// </summary>
+        /// <returns>An entity spawn packet for this entity.</returns>
         public AbstractPacketOut GetSpawnPacket()
         {
             return new SpawnEntityPacketOut(this);
@@ -106,24 +134,60 @@ namespace Voxalia.ServerGame.EntitySystem
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Implementations of this method will return the exact world position of this entity.
+        /// </summary>
+        /// <returns>The world position.</returns>
         public abstract Location GetPosition();
 
+        /// <summary>
+        /// Implementations of this method will set the exact world position of this entity.
+        /// </summary>
+        /// <param name="pos">The world position.</param>
         public abstract void SetPosition(Location pos);
 
+        /// <summary>
+        /// Implementations of this method will return the exact orientation of this entity.
+        /// </summary>
+        /// <returns>The orientation.</returns>
         public abstract BEPUutilities.Quaternion GetOrientation();
 
+        /// <summary>
+        /// Implementations of this method will set the exact orientation of this entity.
+        /// </summary>
+        /// <param name="quat">The orientation.</param>
         public abstract void SetOrientation(BEPUutilities.Quaternion quat);
 
+        /// <summary>
+        /// Whether this entity should be marked as visible for clients.
+        /// </summary>
         public bool Visible = true;
 
+        /// <summary>
+        /// Implementations of this method will return the exact server-side type of this entity.
+        /// </summary>
+        /// <returns>The type.</returns>
         public abstract EntityType GetEntityType();
 
+        /// <summary>
+        /// Implementations of this method will return the exact server-side save data of this entity, if any is available.
+        /// </summary>
+        /// <returns>The save data, or null.</returns>
         public abstract BsonDocument GetSaveData();
 
+        /// <summary>
+        /// Tells the entity it needs to be active.
+        /// </summary>
         public abstract void PotentialActivate();
 
+        /// <summary>
+        /// The entity is removed from the owning region, or will be momentarily.
+        /// </summary>
         public bool Removed = false;
 
+        /// <summary>
+        /// Removes the entity from the owning region.
+        /// </summary>
         public void RemoveMe()
         {
             if (Removed)
@@ -134,14 +198,27 @@ namespace Voxalia.ServerGame.EntitySystem
             TheRegion.DespawnQuick.Add(this);
         }
 
+        /// <summary>
+        /// Returns a rough description of the entity.
+        /// </summary>
+        /// <returns>The rough description.</returns>
         public override string ToString()
         {
             return "{Entity of type " + GetEntityType() + "/" + GetNetType() + " at " + GetPosition() + " with ID " + EID + "}";
         }
     }
 
+    /// <summary>
+    /// Represents the method to construct an entity.
+    /// </summary>
     public abstract class EntityConstructor
     {
+        /// <summary>
+        /// Creates the entity.
+        /// </summary>
+        /// <param name="tregion">The region it will be in.</param>
+        /// <param name="input">The data to load from.</param>
+        /// <returns>The entity.</returns>
         public abstract Entity Create(Region tregion, BsonDocument input);
     }
 }
