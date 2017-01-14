@@ -685,6 +685,10 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 MarkAFK();
             }
+            if (GetPosition().Z < TheServer.CVars.g_minheight.ValueD)
+            {
+                Damage(1); // TODO: Configurable damage amount!
+            }
         }
 
         /// <summary>
