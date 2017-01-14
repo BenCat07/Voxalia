@@ -152,7 +152,7 @@ namespace VoxaliaBrowser
             e.Handled = true;
         }
 
-        Timer timey = new Timer();
+        System.Windows.Forms.Timer timey = new System.Windows.Forms.Timer();
 
         bool ready = false;
 
