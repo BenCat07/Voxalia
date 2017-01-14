@@ -6,16 +6,14 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
-/*
- * Gotten from https://github.com/mono/csvorbis - all credit to its author(s)
- */
 using System;
 using System.IO;
 using System.Diagnostics;
 using System.Text;
-
 using csogg;
 using csvorbis;
+
+// Gotten from https://github.com/mono/csvorbis - all credit to its author(s)
 
 namespace OggDecoder
 {

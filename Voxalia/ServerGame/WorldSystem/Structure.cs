@@ -58,9 +58,9 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
-        // TODO: Optimize tracing!
         public Structure(Region tregion, Location startOfTrace, int maxrad)
         {
+            // TODO: Optimize tracing!
             startOfTrace = startOfTrace.GetBlockLocation();
             Queue<Location> locs = new Queue<Location>();
             HashSet<Location> found = new HashSet<Location>();

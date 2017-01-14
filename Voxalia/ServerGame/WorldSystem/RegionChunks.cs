@@ -110,7 +110,7 @@ namespace Voxalia.ServerGame.WorldSystem
                             {
                                 pass = chk.LoadSchedule == null;
                             }
-                            if (pass)
+                            if (!pass)
                             {
                                 Thread.Sleep(1); // TODO: Handle loading a still-populating chunk more cleanly.
                             }
@@ -411,7 +411,7 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         pass = chunk.LoadSchedule == null;
                     }
-                    if (pass)
+                    if (!pass)
                     {
                         Thread.Sleep(1); // TODO: Handle loading a still-populating chunk more cleanly.
                     }
@@ -504,7 +504,7 @@ namespace Voxalia.ServerGame.WorldSystem
                             {
                                 pass = chunk.LoadSchedule == null;
                             }
-                            if (pass)
+                            if (!pass)
                             {
                                 Thread.Sleep(1); // TODO: Handle loading a loading chunk more cleanly.
                             }
