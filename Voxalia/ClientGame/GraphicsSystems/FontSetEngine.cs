@@ -557,7 +557,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         float ty = Y;
                         string tcc = tcol;
                         tasks.Add(Task.Factory.StartNew(() => render(tcc + line, ty, tvbo)));
-                        tcol += GrabAllColors(lines[i]);
+                        tcol += GrabAllColors(line);
                     }
                     Y += font_default.Height;
                 }
@@ -597,27 +597,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     res.Append("^" + input[i + 1]);
                 }
-                else if (input[i] == '^' && input[i + 1] == '[')
-                {
-                    int c = 1;
-                    while (i < cap)
-                    {
-                        res.Append(input[i]);
-                        if (input[i] == '[')
-                        {
-                            c++;
-                        }
-                        else if (input[i] == ']')
-                        {
-                            c--;
-                            if (c == 0)
-                            {
-                                break;
-                            }
-                        }
-                        i++;
-                    }
-                }
+                // TODO: Strip away [ ... ] text colors!
             }
             return res.ToString();
         }
