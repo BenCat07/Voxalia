@@ -164,15 +164,18 @@ vec4 color_for(in vec4 pos, in vec4 colt)
 //							 https://github.com/ashima/webgl-noise
 // 
 
-vec3 mod289(in vec3 x) {
+vec3 mod289(in vec3 x)
+{
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 mod289(in vec4 x) {
+vec4 mod289(in vec4 x)
+{
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 permute(in vec4 x) {
+vec4 permute(in vec4 x)
+{
 		 return mod289(((x * 34.0) + 1.0) * x);
 }
 
@@ -182,7 +185,7 @@ vec4 taylorInvSqrt(vec4 r)
 }
 
 float snoise(in vec3 v)
-{ 
+{
 	const vec2	C = vec2(1.0/6.0, 1.0/3.0);
 	const vec4	D = vec4(0.0, 0.5, 1.0, 2.0);
 
@@ -198,7 +201,7 @@ float snoise(in vec3 v)
 	vec3 x2 = x0 - i2 + C.yyy;
 	vec3 x3 = x0 - D.yyy;
 
-	i = mod289(i); 
+	i = mod289(i);
 	vec4 p = permute(permute(permute(i.z + vec4(0.0, i1.z, i2.z, 1.0)) + i.y + vec4(0.0, i1.y, i2.y, 1.0)) + i.x + vec4(0.0, i1.x, i2.x, 1.0));
 
 	float n_ = 0.142857142857;
@@ -241,5 +244,5 @@ float snoise(in vec3 v)
 
 float snoise2(in vec3 v) // MONKEY: snoise2 (Entire function)
 {
-	return (snoise(v) + 1.0) * 0.5;
+	return (snoise(abs(v)) + 1.0) * 0.5;
 }

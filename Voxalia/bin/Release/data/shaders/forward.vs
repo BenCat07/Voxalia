@@ -84,13 +84,14 @@ void main()
 #if MCM_VOX
 	vec4 vpos = vec4(position, 1.0);
 	fi.texcoord = texcoords;
-	fi.tcol = color_for(vpos, tcol);
 	fi.thv = thv;
 	fi.thw = thw;
 	vec4 normo = mv_mat_simple * vec4(normal, 1.0);
 	fi.norm = normo.xyz;
-    fi.color = color_for(mv_matrix * vpos, color * v_color);
-	gl_Position = proj_matrix * mv_matrix * vpos;
+	vec4 vpos_mv = mv_matrix * vpos;
+    fi.color = color_for(vpos_mv, color * v_color);
+	fi.tcol = color_for(vpos_mv, tcol);
+	gl_Position = proj_matrix * vpos_mv;
 #else // MCM_VOX
 #if MCM_GEOM_ACTIVE
 	f.texcoord = texcoords.xy;
@@ -192,15 +193,18 @@ vec4 color_for(in vec4 pos, in vec4 colt)
 //							 https://github.com/ashima/webgl-noise
 // 
 
-vec3 mod289(in vec3 x) {
+vec3 mod289(in vec3 x)
+{
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 mod289(in vec4 x) {
+vec4 mod289(in vec4 x)
+{
 	return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
 
-vec4 permute(in vec4 x) {
+vec4 permute(in vec4 x)
+{
 		 return mod289(((x * 34.0) + 1.0) * x);
 }
 
@@ -210,7 +214,7 @@ vec4 taylorInvSqrt(vec4 r)
 }
 
 float snoise(in vec3 v)
-{ 
+{
 	const vec2	C = vec2(1.0/6.0, 1.0/3.0);
 	const vec4	D = vec4(0.0, 0.5, 1.0, 2.0);
 
@@ -269,5 +273,5 @@ float snoise(in vec3 v)
 
 float snoise2(in vec3 v) // MONKEY: snoise2 (Entire function)
 {
-	return (snoise(v) + 1.0) * 0.5;
+	return (snoise(abs(v)) + 1.0) * 0.5;
 }
