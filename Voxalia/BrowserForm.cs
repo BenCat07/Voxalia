@@ -22,6 +22,8 @@ using System.Net;
 using System.Web;
 using Gecko;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Globalization;
 
 namespace VoxaliaBrowser
 {
@@ -101,6 +103,9 @@ namespace VoxaliaBrowser
 
         public Form1(string page, bool term)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
             ShowInTaskbar = false;
             Terminates = term;
             // XUL Runner Acquired from XUL: https://ftp.mozilla.org/pub/xulrunner/releases/33.0b9/runtimes/

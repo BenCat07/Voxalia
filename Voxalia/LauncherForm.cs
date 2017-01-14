@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Web;
 using System.Threading;
+using System.Globalization;
 using Gecko;
 
 namespace VoxaliaLauncher
@@ -31,6 +32,9 @@ namespace VoxaliaLauncher
 
         public LauncherForm()
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
             // XUL Runner Acquired from XUL: https://ftp.mozilla.org/pub/xulrunner/releases/33.0b9/runtimes/
             string app_dir = Path.GetDirectoryName(Application.ExecutablePath);
             Xpcom.Initialize(Path.Combine(app_dir, "xulrunner"));
