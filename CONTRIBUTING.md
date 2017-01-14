@@ -23,12 +23,18 @@ For pull requests:
 
 - For the most part, format under standard Visual Studio rules.
 	- Spaces, not tabs.
-	- `void MyMethod(int input)`
-	- `{`
-	- `    DoSomething(input);`
-	- `}`
 - Don't use `var`, use explicit types always.
 - Don't delete the `using System;` line from the top.
+- Prefer to make things public whenever that is safe to do.
+- Sample below:
+
+```
+public void MyMethod(int input)
+{
+    int myInt = input + 1;
+    DoSomething(myInt);
+}
+```
 
 ## Mini-license pre-warning
 
