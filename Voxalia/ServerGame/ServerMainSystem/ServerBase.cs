@@ -173,7 +173,6 @@ namespace Voxalia.ServerGame.ServerMainSystem
             foreach (World world in LoadedWorlds)
             {
                 t++;
-                // TODO: Thread-safer shutdown sequence!
                 SysConsole.Output(OutputType.INFO, "[Shutdown] Unloading world: " + world.Name);
                 world.UnloadFully(() =>
                 {
@@ -192,6 +191,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
                         break;
                     }
                 }
+                // TODO: Max timeout?
                 Thread.Sleep(50);
             }
             LoadedWorlds.Clear();

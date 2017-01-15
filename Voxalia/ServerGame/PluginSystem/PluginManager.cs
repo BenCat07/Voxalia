@@ -108,12 +108,13 @@ namespace Voxalia.ServerGame.PluginSystem
             {
                 try
                 {
+                    SysConsole.Output(OutputType.INFO, "Unloading plugin: " + Plugins[i].Name);
                     Plugins[i].Unload();
                 }
                 catch (Exception ex)
                 {
                     Utilities.CheckException(ex);
-                    SysConsole.Output("Unloading plugin '" + Plugins[i].Name + "'", ex);
+                    SysConsole.Output("Unloading plugin: '" + Plugins[i].Name + "'", ex);
                 }
             }
             Plugins.Clear();
