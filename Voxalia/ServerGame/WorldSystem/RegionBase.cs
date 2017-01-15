@@ -327,7 +327,6 @@ namespace Voxalia.ServerGame.WorldSystem
                 TheWorld.Schedule.RunAllSyncTasks(0.016);
             }
             OncePerSecondActions();
-            FinalShutdown();
         }
 
         /// <summary>

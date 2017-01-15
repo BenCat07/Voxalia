@@ -330,9 +330,19 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
-            CFGEdited = true;
-            OncePerSecondActions();
-            // TODO: Lock safely!
+            Config.Set("general.time", GlobalTickTime); // TODO: update this value and save occasionally, even if the config is unedited - in case of bad shutdown!
+            string cfg = Config.SaveToString();
+            // TODO: Journaling save.
+            lock (SaveWorldCFGLock)
+            {
+                TheServer.Files.WriteText("saves/" + Name + "/world.fds", cfg);
+            }
+            long cid;
+            lock (TheServer.CIDLock)
+            {
+                cid = TheServer.cID;
+            }
+            TheServer.Files.WriteText("saves/" + Name + "/eid.txt", cid.ToString());
             MainRegion.UnloadFully();
             MainRegion = null;
             UnloadCallback?.Invoke();
