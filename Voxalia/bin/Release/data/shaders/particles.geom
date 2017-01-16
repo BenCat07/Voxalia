@@ -9,6 +9,7 @@
 #version 430 core
 
 #define MCM_PRETTY 0
+#define MCM_FADE_DEPTH 0
 
 layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
@@ -42,6 +43,9 @@ out struct vox_fout
 	vec3 norm;
 	vec3 texcoord;
 	vec4 color;
+#endif
+#if MCM_FADE_DEPTH
+	float size;
 #endif
 } fi;
 
@@ -77,6 +81,9 @@ void main()
 	float tid = f[0].texcoord.y;
 	vec3 right = cross(up, pos_norm);
 	fi.color = f[0].color;
+#if MCM_FADE_DEPTH
+	fi.size = 1.0 / scale;
+#endif
 	// First Vertex
 	gl_Position = proj_matrix * qfix(vec4(pos - (right) * scale, 1.0), right, pos_norm);
 	fi.texcoord = vec3(0.0, 1.0, tid);

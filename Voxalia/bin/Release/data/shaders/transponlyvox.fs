@@ -47,7 +47,7 @@ const int LIGHTS_MAX = 10; // How many lights we can ever have.
 layout (location = 4) uniform float desaturationAmount = 1.0;
 layout (location = 5) uniform float minimum_light;
 layout (location = 8) uniform vec2 u_screensize = vec2(1024, 1024);
-layout (location = 9) uniform float lights_used = 0.0;
+layout (location = 9) uniform mat4 lights_used_helper;
 layout (location = 10) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
 layout (location = 20) uniform mat4 light_details_array[LIGHTS_MAX];
 layout (location = 30) uniform mat4 light_details2_array[LIGHTS_MAX];
@@ -111,7 +111,7 @@ void main()
 #if MCM_LIT
 	fcolor = vec4(0.0);
 	vec3 norms = texture(normal_tex, f.texcoord).xyz * 2.0 - 1.0;
-	int count = int(lights_used);
+	int count = int(lights_used_helper[0][0]);
 	for (int i = 0; i < count; i++)
 	{
 	mat4 light_details = light_details_array[i];

@@ -66,7 +66,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         int fbo_godray_texture;
         int fbo_godray_texture2;
 
-        RenderSurface4Part RS4P;
+        public RenderSurface4Part RS4P;
 
         public double ShadowTime;
         public double FBOTime;
@@ -1628,6 +1628,36 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     if (TheClient.CVars.r_transpll.ValueB)
                     {
+                        TheClient.s_transponlylitsh_ll_particles = TheClient.s_transponlylitsh_ll_particles.Bind();
+                    }
+                    else
+                    {
+                        TheClient.s_transponlylitsh_particles = TheClient.s_transponlylitsh_particles.Bind();
+                    }
+                }
+                else
+                {
+                    if (TheClient.CVars.r_transpll.ValueB)
+                    {
+                        TheClient.s_transponlylit_ll_particles = TheClient.s_transponlylit_ll_particles.Bind();
+                    }
+                    else
+                    {
+                        TheClient.s_transponlylit_particles = TheClient.s_transponlylit_particles.Bind();
+                    }
+                }
+                Matrix4 mat_lhelp = new Matrix4(c, TheClient.CVars.r_znear.ValueF, TheClient.ZFar(), Width, Height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                GL.UniformMatrix4(2, false, ref IdentityMatrix);
+                GL.Uniform1(7, (float)TheClient.GlobalTickTimeLocal);
+                GL.Uniform2(8, new Vector2(Width, Height));
+                GL.UniformMatrix4(9, false, ref mat_lhelp);
+                GL.UniformMatrix4(10, LIGHTS_MAX, false, s_mats);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, l_dats1);
+                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats2);
+                if (TheClient.CVars.r_transpshadows.ValueB && TheClient.CVars.r_shadows.ValueB)
+                {
+                    if (TheClient.CVars.r_transpll.ValueB)
+                    {
                         TheClient.s_transponlyvoxlitsh_ll = TheClient.s_transponlyvoxlitsh_ll.Bind();
                     }
                     else
@@ -1649,7 +1679,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(2, false, ref IdentityMatrix);
                 GL.Uniform1(7, (float)TheClient.GlobalTickTimeLocal);
                 GL.Uniform2(8, new Vector2(Width, Height));
-                GL.Uniform1(9, (float)c);
+                GL.UniformMatrix4(9, false, ref mat_lhelp);
                 GL.UniformMatrix4(10, LIGHTS_MAX, false, s_mats);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, l_dats1);
                 GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats2);
@@ -1677,7 +1707,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 }
                 GL.UniformMatrix4(2, false, ref IdentityMatrix);
                 GL.Uniform2(8, new Vector2(Width, Height));
-                GL.Uniform1(9, (float)c);
+                GL.UniformMatrix4(9, false, ref mat_lhelp);
                 GL.UniformMatrix4(10, LIGHTS_MAX, false, s_mats);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, l_dats1);
                 GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats2);

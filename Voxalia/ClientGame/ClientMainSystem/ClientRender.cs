@@ -209,12 +209,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY?grass");
             s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP?particles");
             s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT");
-            s_transponly_particles = Shaders.GetShader("transponly" + def + ",MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
-            s_transponlylit_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
-            s_transponlylitsh_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
-            s_transponly_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
-            s_transponlylit_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
-            s_transponlylitsh_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY?particles");
+            s_transponly_particles = Shaders.GetShader("transponly" + def + ",MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
+            s_transponlylit_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
+            s_transponlylitsh_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
+            s_transponly_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
+            s_transponlylit_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
+            s_transponlylitsh_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
             // TODO: Better place for models?
             RainCyl = Models.GetModel("raincyl");
             RainCyl.LoadSkin(Textures);

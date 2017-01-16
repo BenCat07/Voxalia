@@ -178,7 +178,38 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                         tcs.AddRange(datas[i].TCs);
                     }
                 }
-                TheClient.s_forw_particles = TheClient.s_forw_particles.Bind();
+                if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
+                {
+                    TheClient.s_forw_particles = TheClient.s_forw_particles.Bind();
+                }
+                else
+                {
+                    // TODO: From FBOid
+                    if (TheClient.CVars.r_transpshadows.ValueB && TheClient.CVars.r_shadows.ValueB)
+                    {
+                        if (TheClient.CVars.r_transpll.ValueB)
+                        {
+                            TheClient.s_transponlylitsh_ll_particles = TheClient.s_transponlylitsh_ll_particles.Bind();
+                        }
+                        else
+                        {
+                            TheClient.s_transponlylitsh_particles = TheClient.s_transponlylitsh_particles.Bind();
+                        }
+                    }
+                    else
+                    {
+                        if (TheClient.CVars.r_transpll.ValueB)
+                        {
+                            TheClient.s_transponlylit_ll_particles = TheClient.s_transponlylit_ll_particles.Bind();
+                        }
+                        else
+                        {
+                            TheClient.s_transponlylit_particles = TheClient.s_transponlylit_particles.Bind();
+                        }
+                    }
+                    GL.ActiveTexture(TextureUnit.Texture1);
+                    GL.BindTexture(TextureTarget.Texture2D, TheClient.MainWorldView.RS4P.DepthTexture);
+                }
                 GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
                 Matrix4 ident = Matrix4.Identity;
                 GL.UniformMatrix4(2, false, ref ident);
@@ -186,6 +217,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 GL.Uniform4(12, new Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
                 GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
                 GL.Uniform1(14, TheClient.ZFar());
+                GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, TextureID);
                 Vector3[] posset = pos.ToArray();
                 Vector4[] colorset = col.ToArray();
@@ -223,6 +255,10 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 GL.BindVertexArray(0);
                 TheClient.isVox = true;
                 TheClient.SetEnts();
+                GL.ActiveTexture(TextureUnit.Texture1);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.ActiveTexture(TextureUnit.Texture0);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
             }
         }
     }

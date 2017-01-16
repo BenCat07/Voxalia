@@ -15,6 +15,7 @@
 #define MCM_LL 0
 #define MCM_ANY 0
 #define MCM_GEOM_ACTIVE 0
+#define MCM_FADE_DEPTH 0
 
 #define AB_SIZE 16
 #define P_SIZE 4
@@ -24,11 +25,14 @@
 
 #if MCM_GEOM_ACTIVE
 layout (binding = 0) uniform sampler2DArray tex;
+#if MCM_FADE_DEPTH
+layout (binding = 1) uniform sampler2D depth_tex;
+#endif
 #else
 layout (binding = 0) uniform sampler2D tex;
 layout (binding = 1) uniform sampler2D normal_tex;
 #endif
-// TODO: Spec, refl!
+// TODO: Spec, refl!?
 layout (binding = 3) uniform sampler2DArray shadowtex;
 #if MCM_LL
 layout(size1x32, binding = 4) coherent uniform uimage2DArray ui_page;
@@ -42,7 +46,7 @@ const int LIGHTS_MAX = 10; // How many lights we can ever have.
 layout (location = 4) uniform float desaturationAmount = 1.0;
 layout (location = 5) uniform float minimum_light;
 layout (location = 8) uniform vec2 u_screensize = vec2(1024, 1024);
-layout (location = 9) uniform float lights_used = 0.0;
+layout (location = 9) uniform mat4 lights_used_helper;
 layout (location = 10) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
 layout (location = 20) uniform mat4 light_details_array[LIGHTS_MAX];
 layout (location = 30) uniform mat4 light_details2_array[LIGHTS_MAX];
@@ -63,6 +67,9 @@ in struct vox_out
 	mat3 tbn;
 	vec2 scrpos;
 	float z;
+#if MCM_FADE_DEPTH
+	float size;
+#endif
 #if MCM_GEOM_ACTIVE
 } fi;
 
@@ -80,6 +87,11 @@ out vec4 fcolor;
 vec3 desaturate(vec3 c)
 {
 	return mix(c, vec3(0.95, 0.77, 0.55) * dot(c, vec3(1.0)), desaturationAmount);
+}
+
+float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a linear distance (still from 0.0 to 1.0).
+{
+	return (2.0 * lights_used_helper[0][1]) / (lights_used_helper[0][2] + lights_used_helper[0][1] - rinput * (lights_used_helper[0][2] - lights_used_helper[0][1]));
 }
 
 void main()
@@ -108,7 +120,7 @@ void main()
 #else
 	vec3 norms = texture(normal_tex, f.texcoord).xyz * 2.0 - 1.0;
 #endif
-	int count = int(lights_used);
+	int count = int(lights_used_helper[0][0]);
 	for (int i = 0; i < count; i++)
 	{
 	mat4 light_details = light_details_array[i];
@@ -221,9 +233,15 @@ void main()
 	}
 #endif // lit
 #if MCM_GOOD_GRAPHICS
-	fcolor = vec4(desaturate(fcolor.xyz), fcolor.w);
+	fcolor.xyz = desaturate(fcolor.xyz);
 #endif
 	fcolor = vec4(fcolor.xyz, tcolor.w * f.color.w);
+#if MCM_FADE_DEPTH
+	float dist = linearizeDepth(gl_FragCoord.z);
+	vec2 fc_xy = gl_FragCoord.xy / vec2(lights_used_helper[0][3], lights_used_helper[1][0]);
+	float depthval = linearizeDepth(texture(depth_tex, fc_xy).x);
+	fcolor.w *= min(max((depthval - dist) * fi.size * 0.5 * (lights_used_helper[0][2] - lights_used_helper[0][1]), 0.0), 1.0);
+#endif
 #if MCM_LL
 	uint page = 0;
 	uint frag = 0;
