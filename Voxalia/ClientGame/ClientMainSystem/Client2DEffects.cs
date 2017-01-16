@@ -74,7 +74,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 fcol = new Vector4(0.1f, 1.0f, 0.1f, 1.0f);
             }
-            int spokes = (int)(size * 0.5f * LI1_SPOKE_REL);
             float sz = Math.Abs(size * 0.5f);
             double rot = LI2_START_MOD * LI_Time;
             rot %= (Math.PI * 0.5);

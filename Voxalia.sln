@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxaliaServerExe", "Voxalia
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxaliaLauncher", "Voxalia\VoxaliaLauncher.csproj", "{57BFCD1D-03E3-48E6-ACEF-70A46B1E8C1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBB}") = "VoxaliaBrowser", "Voxalia\VoxaliaBrowser.csproj", "{57BFCD1D-03E3-48E6-ACEF-70A46B1E8C1B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxaliaBrowser", "Voxalia\VoxaliaBrowser.csproj", "{57BFCD1D-03E3-48E6-ACEF-70A46B1E8C1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
