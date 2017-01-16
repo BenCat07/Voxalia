@@ -64,7 +64,22 @@ namespace Voxalia.ServerGame.WorldSystem
             DBImages = ImageDatabase.GetCollection<BsonDocument>("images");
             DBMaxes = ImageDatabase.GetCollection<BsonDocument>("maxes");
             DBImages2 = ImageDatabase.GetCollection<BsonDocument>("images_angle");
+            for (int i = 0; i < 30; i++)
+            {
+                Lockers_Chunk[i] = new Object();
+                Lockers_Ents[i] = new Object();
+                Lockers_Tops[i] = new Object();
+                Lockers_Others[i] = new Object();
+            }
         }
+
+        public Object[] Lockers_Chunk = new Object[30];
+
+        public Object[] Lockers_Ents = new Object[30];
+
+        public Object[] Lockers_Tops = new Object[30];
+
+        public Object[] Lockers_Others = new Object[30];
 
         /// <summary>
         /// TODO: potentially clear this occasionally?
@@ -97,7 +112,11 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["min"] = new BsonValue(min);
             tbs["max"] = new BsonValue(max);
             Maxes[new Vector2i(x, y)] = new Vector2i(min, max);
-            DBMaxes.Upsert(newdoc);
+            lock (Lockers_Others[Math.Abs(x + y) % 30])
+            {
+                DBMaxes.Delete(id);
+                DBMaxes.Insert(newdoc);
+            }
         }
 
         public byte[] GetImageAngle(int x, int y, int z)
@@ -129,7 +148,11 @@ namespace Voxalia.ServerGame.WorldSystem
             Dictionary<string, BsonValue> tbs = newdoc.RawValue;
             tbs["_id"] = id;
             tbs["image"] = new BsonValue(data);
-            DBImages2.Upsert(newdoc);
+            lock (Lockers_Others[Math.Abs(x + y) % 30])
+            {
+                DBImages2.Delete(id);
+                DBImages2.Insert(newdoc);
+            }
         }
 
         public void WriteImage(int x, int y, int z, byte[] data)
@@ -139,7 +162,11 @@ namespace Voxalia.ServerGame.WorldSystem
             Dictionary<string, BsonValue> tbs = newdoc.RawValue;
             tbs["_id"] = id;
             tbs["image"] = new BsonValue(data);
-            DBImages.Upsert(newdoc);
+            lock (Lockers_Others[Math.Abs(x + y) % 30])
+            {
+                DBImages.Delete(id);
+                DBImages.Insert(newdoc);
+            }
         }
 
         public void Shutdown()
@@ -177,9 +204,11 @@ namespace Voxalia.ServerGame.WorldSystem
             Dictionary<string, BsonValue> tbs = newdoc.RawValue;
             tbs["_id"] = id;
             tbs["blocks"] = new BsonValue(FileHandler.Compress(LOD));
-            DBLODs.Delete(id);
-            DBLODs.Insert(newdoc);
-            DBLODs.Upsert(newdoc);
+            lock (Lockers_Others[Math.Abs(x + y) % 30])
+            {
+                DBLODs.Delete(id);
+                DBLODs.Insert(newdoc);
+            }
         }
 
         public ChunkDetails GetChunkEntities(int x, int y, int z)
@@ -207,7 +236,11 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["_id"] = id;
             tbs["version"] = new BsonValue(details.Version);
             tbs["entities"] = new BsonValue(/*FileHandler.GZip(*/details.Blocks/*)*/);
-            DBEnts.Upsert(newdoc);
+            lock (Lockers_Ents[Math.Abs(details.X + details.Y) % 30])
+            {
+                DBEnts.Delete(id);
+                DBEnts.Insert(newdoc);
+            }
         }
 
         public ChunkDetails GetChunkDetails(int x, int y, int z)
@@ -239,7 +272,11 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["flags"] = new BsonValue((int)details.Flags);
             tbs["blocks"] = new BsonValue(FileHandler.Compress(details.Blocks));
             tbs["reach"] = new BsonValue(details.Reachables);
-            DBChunks.Upsert(newdoc);
+            lock (Lockers_Chunk[Math.Abs(details.X + details.Y) % 30])
+            {
+                DBChunks.Delete(id);
+                DBChunks.Insert(newdoc);
+            }
         }
 
         public void ClearChunkDetails(Vector3i details)
@@ -255,7 +292,11 @@ namespace Voxalia.ServerGame.WorldSystem
             Dictionary<string, BsonValue> tbs = newdoc.RawValue;
             tbs["_id"] = id;
             tbs["tops"] = new BsonValue(FileHandler.Compress(tops));
-            DBTops.Upsert(newdoc);
+            lock (Lockers_Tops[Math.Abs(x + y) % 30])
+            {
+                DBTops.Delete(id);
+                DBTops.Insert(newdoc);
+            }
         }
 
         public byte[] GetTops(int x, int y)
@@ -299,7 +340,11 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["_id"] = id;
             tbs["min"] = new BsonValue(min);
             Mins[new Vector2i(x, y)] = min;
-            DBMins.Upsert(newdoc);
+            lock (Lockers_Tops[Math.Abs(x + y) % 30])
+            {
+                DBMins.Delete(id);
+                DBMins.Insert(newdoc);
+            }
         }
 
     }

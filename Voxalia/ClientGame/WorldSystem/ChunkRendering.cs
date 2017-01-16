@@ -597,7 +597,7 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(WorldPosition.ToLocation() * CHUNK_SIZE));
                 OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
-                _VBO.Render(OwningRegion.TheClient.RenderTextures);
+                _VBO.Render(false);
             }
         }
 
