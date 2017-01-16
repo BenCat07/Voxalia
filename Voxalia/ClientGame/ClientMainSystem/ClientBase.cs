@@ -152,6 +152,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Window.Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(KeyHandler.Mouse_ButtonUp);
             Window.Resize += Window_Resize;
             Window.Closed += Window_Closed;
+            Window.ReduceCPUWaste = true;
             onVsyncChanged(CVars.r_vsync, null);
             if (CVars.r_maxfps.ValueD < 1.0)
             {
