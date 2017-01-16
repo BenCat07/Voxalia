@@ -585,6 +585,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             cVBO.Render();
             Engine.GLFonts.Shaders.ColorMultShader.Bind();
             r_depth--;
+            cVBO.Destroy();
         }
 
         public string GrabAllColors(string input)
