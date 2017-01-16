@@ -68,14 +68,20 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             toret.Add(new Tuple<string, long>("BlockTextures", blocktexturec));
             long chunkc = 0;
+            long chunkc_transp = 0;
             foreach (Chunk chunk in TheRegion.LoadedChunks.Values)
             {
-                if (chunk._VBO != null)
+                if (chunk._VBOSolid != null)
                 {
-                    chunkc += chunk._VBO.GetVRAMUsage();
+                    chunkc += chunk._VBOSolid.GetVRAMUsage();
+                }
+                if (chunk._VBOTransp != null)
+                {
+                    chunkc += chunk._VBOTransp.GetVRAMUsage();
                 }
             }
-            toret.Add(new Tuple<string, long>("chunks", chunkc));
+            toret.Add(new Tuple<string, long>("Chunks", chunkc));
+            toret.Add(new Tuple<string, long>("Chunks_Transparent", chunkc_transp));
             // TODO: Maybe also View3D render helper usage?
             return toret;
         }
@@ -1407,7 +1413,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.LineWidth(5);
                 foreach (Chunk chunk in TheRegion.LoadedChunks.Values)
                 {
-                    if (chunk._VBO == null && !chunk.IsAir)
+                    if ((chunk._VBOSolid == null || !chunk._VBOSolid.generated) && (chunk._VBOTransp == null || !chunk._VBOTransp.generated) && !chunk.IsAir)
                     {
                         Rendering.RenderLineBox(chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE, (chunk.WorldPosition.ToLocation() + Location.One) * Chunk.CHUNK_SIZE);
                     }
@@ -1542,6 +1548,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         const string timeformat = "#.000";
 
         /// <summary>
+        /// The format for the second FPS counter.
+        /// </summary>
+        const string timeformat_fps2 = "00.0";
+
+        /// <summary>
         /// The format for health data.
         /// </summary>
         const string healthformat = "0.0";
@@ -1595,7 +1606,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 if (!sub3d && CVars.u_debug.ValueB)
                 {
-                    FontSets.Standard.DrawColoredText(FontSets.Standard.SplitAppropriately("^!^e^7gFPS(calc): " + (1f / gDelta) + ", gFPS(actual): " + gFPS
+                    FontSets.Standard.DrawColoredText(FontSets.Standard.SplitAppropriately("^!^e^7gFPS(calc): " + (1f / gDelta).ToString(timeformat_fps2) + ", gFPS(actual): " + gFPS
                         + "\nHeld Item: " + GetItemForSlot(QuickBarPos).ToString()
                         + "\nTimes -> Physics: " + TheRegion.PhysTime.ToString(timeformat) + ", Shadows: " + MainWorldView.ShadowTime.ToString(timeformat)
                         + ", FBO: " + MainWorldView.FBOTime.ToString(timeformat) + ", Lights: " + MainWorldView.LightsTime.ToString(timeformat) + ", 2D: " + TWODTime.ToString(timeformat)

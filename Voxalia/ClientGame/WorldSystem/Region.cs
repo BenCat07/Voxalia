@@ -354,15 +354,16 @@ namespace Voxalia.ClientGame.WorldSystem
                     chunk.OwningRegion = this;
                     chunk.adding = ch.adding;
                     chunk.rendering = ch.rendering;
-                    chunk._VBO = null;
+                    chunk._VBOSolid = null;
+                    chunk._VBOTransp = null;
                     chunk.WorldPosition = pos;
-                    ch.SucceededBy = chunk;
                     chunk.OnRendered = () =>
                     {
                         LoadedChunks.Remove(pos);
                         ch.Destroy();
                         LoadedChunks.Add(pos, chunk);
                     };
+                    ch.SucceededBy = chunk;
                 }
             }
             else

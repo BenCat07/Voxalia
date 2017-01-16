@@ -3,6 +3,7 @@ Name=Heavy_Gas
 Sound=Metal
 Solidity=GAS
 Opaque=false
+AnyOpaque=false
 FogColor=0.25,0.25,0.25
 Hardness=5
 BreakTime=0.2

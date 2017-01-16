@@ -110,14 +110,32 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         }
                         entry.Info(queue, "Plants: " + ch.Plant_C + ", generated as ID: " + ch.Plant_VAO);
                         int c = 0;
+                        long verts = 0;
+                        long verts_transp = 0;
+                        int total = 0;
+                        int total_rendered = 0;
+                        int total_rendered_transp = 0;
                         foreach (Chunk chunk in TheClient.TheRegion.LoadedChunks.Values)
                         {
-                            if (chunk._VBO != null && ch._VBO != null && chunk._VBO._VAO == ch._VBO._VAO)
+                            total++;
+                            if (chunk._VBOSolid != null && ch._VBOSolid != null && chunk._VBOSolid._VAO == ch._VBOSolid._VAO)
                             {
                                 c++;
                             }
+                            if (chunk._VBOSolid != null && chunk._VBOSolid.generated)
+                            {
+                                verts += chunk._VBOSolid.vC;
+                                total_rendered++;
+                            }
+                            if (chunk._VBOTransp != null && chunk._VBOTransp.generated)
+                            {
+                                verts_transp += chunk._VBOTransp.vC;
+                                total_rendered_transp++;
+                            }
                         }
-                        entry.Info(queue, "Chunk rendering as " + (ch._VBO == null ? "{NULL}" : ch._VBO._VAO.ToString()) + ", which is seen in " + c + " chunks!");
+                        entry.Info(queue, "Chunk rendering as " + (ch._VBOSolid == null ? "{NULL}" : ch._VBOSolid._VAO.ToString()) + ", which is seen in " + c + " chunks!");
+                        entry.Info(queue, "Chunks: " + total + ", rendering " + verts + " solid verts and " + verts_transp +
+                            " transparent verts, with " + total_rendered + " solid-existent chunks, and " + total_rendered_transp + " transparent-existent chunks!");
                         break;
                     }
                 case "blockInfo":

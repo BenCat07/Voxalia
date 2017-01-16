@@ -69,9 +69,9 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             return BlocksInternal[BlockIndex(x / PosMultiplier, y / PosMultiplier, z / PosMultiplier)];
         }
-        
+
         public FullChunkObject FCO = null;
-        
+
         public ASyncScheduleItem adding = null;
 
         public void AddToWorld()
@@ -97,12 +97,20 @@ namespace Voxalia.ClientGame.WorldSystem
                 OwningRegion.RemoveChunkQuiet(FCO);
                 IsAdded = false;
             }
-            if (_VBO != null)
+            DestroyVBO(_VBOSolid);
+            DestroyVBO(_VBOTransp);
+            _VBOSolid = null;
+            _VBOTransp = null;
+            DestroyPlants();
+        }
+
+        void DestroyVBO(VBO tV)
+        {
+            if (tV != null)
             {
-                VBO tV = _VBO;
                 lock (OwningRegion.TheClient.vbos)
                 {
-                    if (tV.generated && OwningRegion.TheClient.vbos.Count < 120)
+                    if (tV.generated && OwningRegion.TheClient.vbos.Count < MAX_VBOS_REMEMBERED)
                     {
                         OwningRegion.TheClient.vbos.Push(tV);
                     }
@@ -111,9 +119,7 @@ namespace Voxalia.ClientGame.WorldSystem
                         tV.Destroy();
                     }
                 }
-                _VBO = null;
             }
-            DestroyPlants();
         }
 
         public void DestroyPlants()

@@ -2,6 +2,7 @@ Name=Water
 Sound=LIQUID
 Solidity=LIQUID
 Opaque=false
+AnyOpaque=false
 FogColor=0,0.5,1
 FogAlpha=0.5
 Hardness=5

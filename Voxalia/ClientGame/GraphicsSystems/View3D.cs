@@ -1743,5 +1743,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             return id == FBOID.TRANSP_LIT || id == FBOID.TRANSP_LIT_LL || id == FBOID.TRANSP_LL || id == FBOID.TRANSP_SHADOWS || id == FBOID.TRANSP_SHADOWS_LL || id == FBOID.TRANSP_UNLIT;
         }
+
+        public static bool IsSolid(this FBOID id)
+        {
+            return id == FBOID.SHADOWS || id == FBOID.FORWARD_SOLID || id == FBOID.REFRACT || id == FBOID.MAIN;
+        }
     }
 }

@@ -1,6 +1,7 @@
 Name=Fire
 Solidity=NONSOLID
 Opaque=false
+AnyOpaque=false
 RendersAtAll=false
 FogAlpha=0
 BreakTime=Infinity

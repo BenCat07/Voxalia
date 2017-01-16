@@ -37,4 +37,5 @@ server_eid.txt
 LicenseInjector.exe
 logs/
 xulrunner/
+*.snk
 

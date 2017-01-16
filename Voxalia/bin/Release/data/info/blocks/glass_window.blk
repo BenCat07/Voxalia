@@ -4,5 +4,6 @@ Sound=GLASS
 Hardness=5
 BreakTime=1
 Opaque=false
+AnyOpaque=false
 LightDamage=0.05
 TextureBasic=blocks/transparent/glass_window

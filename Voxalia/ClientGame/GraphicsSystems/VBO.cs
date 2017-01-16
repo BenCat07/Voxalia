@@ -60,7 +60,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public long GetVRAMUsage()
         {
-            return LastVRAM;
+            if (generated)
+            {
+                return LastVRAM;
+            }
+            return 0;
         }
 
         public void CleanLists()
@@ -86,7 +90,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             THWs2 = null;
         }
 
-        int vC;
+        public int vC;
 
         public void AddSide(Location normal, TextureCoordinates tc, bool offs = false, float texf = 0)
         {

@@ -148,6 +148,9 @@ namespace Voxalia.Shared
                         case "canrenderagainstself":
                             inf.CanRenderAgainstSelf = opt[1].ToLowerFast() == "true";
                             break;
+                        case "anyopaque":
+                            inf.AnyOpaque = opt[1].ToLowerFast() == "true";
+                            break;
                         case "spawntype":
                             inf.SpawnType = (MaterialSpawnType)Enum.Parse(typeof(MaterialSpawnType), opt[1].ToUpperInvariant());
                             break;
@@ -299,6 +302,11 @@ namespace Voxalia.Shared
         public static bool IsOpaque(this Material mat)
         {
             return ALL_MATS[(int)mat].Opaque;
+        }
+
+        public static bool HasAnyOpaque(this Material mat)
+        {
+            return ALL_MATS[(int)mat].AnyOpaque;
         }
 
         public static bool RendersAtAll(this Material mat)
@@ -572,6 +580,7 @@ namespace Voxalia.Shared
         
         /// <summary>
         /// Whether this material is fully opaque.
+        /// TODO: Calculate from texture?
         /// </summary>
         public bool Opaque = true;
 
@@ -679,6 +688,12 @@ namespace Voxalia.Shared
         /// What plant texture to render as.
         /// </summary>
         public string Plant = null;
+
+        /// <summary>
+        /// Whether this material has ANY opaque pixels AT ALL!
+        /// TODO: Calculate from texture?
+        /// </summary>
+        public bool AnyOpaque = true;
     }
 
     public enum MaterialSpawnType : byte
