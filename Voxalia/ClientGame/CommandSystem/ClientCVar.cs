@@ -92,7 +92,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_renderdist_5 = Register("r_renderdist_5", "1", CVarFlag.Numeric, "Base RenderDist + this = how far a LOD5 chunk can be from you.");
             r_renderdist_5h = Register("r_renderdist_5h", "1", CVarFlag.Numeric, "Base RenderDist + this = how far (Height-wise) a LOD5 chunk can be from you.");
             r_dof_strength = Register("r_dof_strength", "4", CVarFlag.Numeric, "How strong the Depth Of Field effect should be.");
-            r_maxfps = Register("r_maxfps", "60", CVarFlag.Numeric | CVarFlag.Delayed, "What the FPS cap should be.");
+            r_maxfps = Register("r_maxfps", "600", CVarFlag.Numeric | CVarFlag.Delayed, "What the FPS cap should be.");
             r_lightmaxdistance = Register("r_lightmaxdistance", "35", CVarFlag.Numeric, "How far away a light can be from the camera before it is disabled.");
             r_shadowquality = Register("r_shadowquality", "1024", CVarFlag.Numeric, "What texture size to use for shadow maps.");
             r_shadowblur = Register("r_shadowblur", "0.25", CVarFlag.Numeric, "What factor to use for shadow blurring. Smaller = blurrier.");
