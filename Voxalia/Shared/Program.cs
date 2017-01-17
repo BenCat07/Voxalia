@@ -19,7 +19,7 @@ namespace Voxalia.Shared
     {
         public const string GameName = "Voxalia";
 
-        public const string GameVersion = "0.1.0";
+        public const string GameVersion = "0.1.1";
 
         public const string GlobalServerAddress = "https://frenetic.xyz/";
         
