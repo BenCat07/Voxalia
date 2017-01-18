@@ -2,4 +2,5 @@ language: csharp
 solution: Voxalia.sln
 script:
   - xbuild "/p:Configuration=Release(Linux)" Voxalia.sln
+  - chmod +x ./tests_linux.sh
   - ./tests_linux.sh
