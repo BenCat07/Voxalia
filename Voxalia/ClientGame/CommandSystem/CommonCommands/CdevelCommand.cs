@@ -21,6 +21,7 @@ using Voxalia.ClientGame.AudioSystem;
 using FreneticScript.TagHandlers.Objects;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.GraphicsSystems;
+using Voxalia.ClientGame.OtherSystems;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {
@@ -191,6 +192,22 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                     {
                         double time = NumberTag.TryFor(entry.GetArgumentObject(queue, 1)).Internal;
                         TheClient.Sounds.Deafen(time);
+                        break;
+                    }
+                case "topInfo":
+                    {
+                        Location pos = TheClient.Player.GetPosition().GetBlockLocation();
+                        Vector3i chunkLoc = TheClient.TheRegion.ChunkLocFor(pos);
+                        Vector2i buaPos = new Vector2i(chunkLoc.X, chunkLoc.Y);
+                        BlockUpperArea bua;
+                        if (!TheClient.TheRegion.UpperAreas.TryGetValue(buaPos, out bua))
+                        {
+                            entry.Info(queue, "Failed to grab Top data: Out of map?");
+                        }
+                        else
+                        {
+                            entry.Info(queue, pos + ": " + bua.Blocks[bua.BlockIndex((int)pos.X - chunkLoc.X * Chunk.CHUNK_SIZE, (int)pos.Y - chunkLoc.Y * Chunk.CHUNK_SIZE)]);
+                        }
                         break;
                     }
                 default:

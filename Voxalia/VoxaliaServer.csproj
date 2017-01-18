@@ -237,6 +237,7 @@
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\SpawnItemPacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\SunAnglePacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\TeleportPacketOut.cs" />
+    <Compile Include="ServerGame\NetworkSystem\PacketsOut\TopsPacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\YourEIDPacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\YourPositionPacketOut.cs" />
     <Compile Include="ServerGame\ItemSystem\ItemStack.cs" />

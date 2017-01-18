@@ -56,6 +56,8 @@ namespace Voxalia.ClientGame.WorldSystem
         
         public AABB[] Highlights = new AABB[0];
 
+        public Dictionary<Vector2i, BlockUpperArea> UpperAreas = new Dictionary<Vector2i, BlockUpperArea>();
+
         /// <summary>
         /// Builds the physics world.
         /// </summary>

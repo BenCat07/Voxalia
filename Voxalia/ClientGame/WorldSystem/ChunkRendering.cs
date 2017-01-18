@@ -164,16 +164,21 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             bool plants = PosMultiplier == 1 && OwningRegion.TheClient.CVars.r_plants.ValueB;
             bool shaped = OwningRegion.TheClient.CVars.r_noblockshapes.ValueB;
+            BlockUpperArea bua;
+            if (!OwningRegion.UpperAreas.TryGetValue(new Vector2i(WorldPosition.X, WorldPosition.Y), out bua))
+            {
+                bua = null;
+            }
             Action a = () =>
             {
                 CancelTokenSource = new CancellationTokenSource();
                 CancelToken = CancelTokenSource.Token;
-                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, false);
+                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, false, bua);
                 if (CancelToken.IsCancellationRequested)
                 {
                     return;
                 }
-                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, true);
+                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, true, bua);
                 if (CancelToken.IsCancellationRequested)
                 {
                     return;
@@ -236,8 +241,7 @@ namespace Voxalia.ClientGame.WorldSystem
         }
         
         void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym,
-            Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym
-            , List<Chunk> potentials, bool plants, bool shaped, bool transp)
+            Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym, List<Chunk> potentials, bool plants, bool shaped, bool transp, BlockUpperArea bua)
         {
             try
             {
@@ -248,6 +252,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 List<Vector4> colorses = new List<Vector4>();
                 List<Vector2> tcses = new List<Vector2>();
                 Vector3d wp = ClientUtilities.ConvertD(WorldPosition.ToLocation()) * CHUNK_SIZE;
+                Vector3i wpi = WorldPosition * CHUNK_SIZE;
                 bool isProbablyAir = true;
                 for (int x = 0; x < CSize; x++)
                 {
@@ -373,6 +378,11 @@ namespace Voxalia.ClientGame.WorldSystem
                                     else
                                     {
                                         reldat = zp.BlockLocalData;
+                                    }
+                                    // TODO: better darkness system!
+                                    if (reldat > 200 && bua != null && bua.Darken(x, y, wpi.Z + z))
+                                    {
+                                        reldat = 100;
                                     }
                                     Location lcol = OwningRegion.GetLightAmountForSkyValue(ClientUtilities.Convert(vt) + WorldPosition.ToLocation() * CHUNK_SIZE, ClientUtilities.Convert(nt), potentials, reldat / 255f);
                                     rh.Cols.Add(new Vector4((float)lcol.X, (float)lcol.Y, (float)lcol.Z, 1));
@@ -610,11 +620,11 @@ namespace Voxalia.ClientGame.WorldSystem
     {
         const int CSize = Chunk.CHUNK_SIZE;
 
+        // TODO: Should this be so big? What value should they be at?!
         const int StartVal = (CSize * CSize * CSize) / 10;
 
         public ChunkRenderHelper()
         {
-            // TODO: Should these be so big? What value should they be at?!
             Vertices = new List<Vector3>(StartVal);
             TCoords = new List<Vector3>(StartVal);
             Norms = new List<Vector3>(StartVal);

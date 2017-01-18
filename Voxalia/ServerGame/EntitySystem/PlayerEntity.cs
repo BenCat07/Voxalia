@@ -1358,12 +1358,18 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 double dist = (cworldPos.ToLocation() * Chunk.CHUNK_SIZE - LoadRelPos).LengthSquared();
                 bool async = chi == null && dist > (Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE * 2 * 2);
+                Vector2i topcoord = new Vector2i(cworldPos.X, cworldPos.Y);
+                bool sendTop = TopsAwareof.Add(topcoord);
                 if (async)
                 {
                     TheRegion.LoadChunk_Background(cworldPos, (chn) =>
                     {
                         if (!pkick && chn != null)
                         {
+                            if (sendTop)
+                            {
+                                SendTops(topcoord);
+                            }
                             ChunkNetwork.SendPacket(new ChunkInfoPacketOut(chn, posMult));
                         }
                     });
@@ -1371,6 +1377,10 @@ namespace Voxalia.ServerGame.EntitySystem
                 else
                 {
                     Chunk chk = chi != null ? chi : TheRegion.LoadChunk(cworldPos);
+                    if (sendTop)
+                    {
+                        SendTops(topcoord);
+                    }
                     ChunkNetwork.SendPacket(new ChunkInfoPacketOut(chk, posMult));
                 }
                 ChunksAwareOf.Remove(cworldPos);
@@ -1380,10 +1390,23 @@ namespace Voxalia.ServerGame.EntitySystem
             return false;
         }
 
+        public void SendTops(Vector2i tops)
+        {
+            BlockUpperArea bua;
+            if (!TheRegion.UpperAreas.TryGetValue(tops, out bua))
+            {
+                TopsAwareof.Remove(tops);
+                return;
+            }
+            Network.SendPacket(new TopsPacketOut(tops, bua));
+        }
+
         /// <summary>
         /// All chunks the player is presently aware of.
         /// </summary>
         public Dictionary<Vector3i, ChunkAwarenessInfo> ChunksAwareOf = new Dictionary<Vector3i, ChunkAwarenessInfo>();
+
+        public HashSet<Vector2i> TopsAwareof = new HashSet<Vector2i>();
 
         /// <summary>
         /// Whether the player can see a specific chunk.

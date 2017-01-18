@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Voxalia.Shared;
 using System.Runtime.CompilerServices;
 using Voxalia.Shared.Collision;
+using Voxalia.Shared.Files;
 
 namespace Voxalia.ServerGame.OtherSystems
 {
@@ -63,6 +64,16 @@ namespace Voxalia.ServerGame.OtherSystems
                 Blocks[i].BasicMat = (Material)Utilities.BytesToUshort(Utilities.BytesPartial(b, i * 2, 2));
                 Blocks[i].Height = Utilities.BytesToInt(Utilities.BytesPartial(b, (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * 2 + i * 4, 4));
             }
+        }
+
+        public byte[] ToNetBytes()
+        {
+            byte[] toret = new byte[(Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * 4];
+            for (int i = 0; i < Blocks.Length; i++)
+            {
+                Utilities.IntToBytes(Blocks[i].Height).CopyTo(toret, i * 4);
+            }
+            return FileHandler.Compress(toret);
         }
     }
 }

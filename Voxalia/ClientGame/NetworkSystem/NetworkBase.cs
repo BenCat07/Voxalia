@@ -293,6 +293,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                         packet = new CharacterUpdatePacketIn();
                         usage = NetUsageType.PLAYERS;
                         break;
+                    case ServerToClientPacket.TOPS:
+                        packet = new TopsPacketIn();
+                        usage = NetUsageType.CHUNKS;
+                        break;
                     case ServerToClientPacket.DESPAWN_ENTITY:
                         packet = new DespawnEntityPacketIn();
                         usage = NetUsageType.ENTITIES;

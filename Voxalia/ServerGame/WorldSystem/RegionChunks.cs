@@ -145,11 +145,6 @@ namespace Voxalia.ServerGame.WorldSystem
                 UpperAreas[two] = bua;
             }
             bua.ChunksUsing.Add(pos.Z);
-            int min = ChunkManager.GetMins(two.X, two.Y);
-            if (min > pos.Z)
-            {
-                ChunkManager.SetMins(two.X, two.Y, pos.Z);
-            }
         }
 
         public void ForgetChunkForUpperArea(Vector3i pos)
@@ -196,6 +191,11 @@ namespace Voxalia.ServerGame.WorldSystem
                         }
                     }
                 }
+            }
+            int min = ChunkManager.GetMins(two.X, two.Y);
+            if (min > chk.WorldPosition.Z)
+            {
+                ChunkManager.SetMins(two.X, two.Y, chk.WorldPosition.Z);
             }
         }
         

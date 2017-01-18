@@ -226,6 +226,7 @@
     <Compile Include="ClientGame\NetworkSystem\PacketsIn\AddToCloudPacketIn.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsIn\AnimationPacketIn.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsIn\BlockEditPacketIn.cs" />
+    <Compile Include="ClientGame\NetworkSystem\PacketsIn\TopsPacketIn.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsIn\ChunkForgetPacketIn.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsIn\ChunkInfoPacketIn.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsIn\CVarSetPacketIn.cs" />
@@ -267,6 +268,7 @@
     <Compile Include="ClientGame\NetworkSystem\PacketsOut\PingPacketOut.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsOut\PleaseRedefinePacketOut.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsOut\SetStatusPacketOut.cs" />
+    <Compile Include="ClientGame\OtherSystems\BlockUpperArea.cs" />
     <Compile Include="ClientGame\OtherSystems\BrowserView.cs" />
     <Compile Include="ClientGame\OtherSystems\ChatMessage.cs" />
     <Compile Include="ClientGame\OtherSystems\ClientUtilities.cs" />

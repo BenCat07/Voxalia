@@ -198,7 +198,7 @@ namespace Voxalia.Shared
         PHYSICS_ENTITY_UPDATE = 3,
         MESSAGE = 4,
         CHARACTER_UPDATE = 5,
-        // ...
+        TOPS = 6,
         DESPAWN_ENTITY = 7,
         NET_STRING = 8,
         SPAWN_ITEM = 9,
