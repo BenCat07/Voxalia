@@ -15,16 +15,34 @@ using Voxalia.Shared.Collision;
 
 namespace Voxalia.Shared
 {
+    /// <summary>
+    /// Main game program initializer.
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// The name of the game.
+        /// </summary>
         public const string GameName = "Voxalia";
 
+        /// <summary>
+        /// The version of the game.
+        /// </summary>
         public const string GameVersion = "0.1.1";
 
+        /// <summary>
+        /// The description of the game version.
+        /// </summary>
         public const string GameVersionDescription = "Pre-Alpha";
 
+        /// <summary>
+        /// The web address for the primary global server that handles logging in.
+        /// </summary>
         public const string GlobalServerAddress = "https://frenetic.xyz/";
         
+        /// <summary>
+        /// Initializes the entire game.
+        /// </summary>
         public static void Init()
         {
             FileHandler files = new FileHandler();
