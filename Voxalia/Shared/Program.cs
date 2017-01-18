@@ -12,6 +12,8 @@ using System.Linq;
 using System.Text;
 using Voxalia.Shared.Files;
 using Voxalia.Shared.Collision;
+using System.Threading;
+using System.Globalization;
 
 namespace Voxalia.Shared
 {
@@ -39,6 +41,16 @@ namespace Voxalia.Shared
         /// The web address for the primary global server that handles logging in.
         /// </summary>
         public const string GlobalServerAddress = "https://frenetic.xyz/";
+
+        /// <summary>
+        /// This method should be called FIRST!
+        /// </summary>
+        public static void PreInit()
+        {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+        }
         
         /// <summary>
         /// Initializes the entire game.

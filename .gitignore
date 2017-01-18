@@ -38,4 +38,6 @@ LicenseInjector.exe
 logs/
 xulrunner/
 *.snk
-
+packages/
+VoxaliaTests/bin/Release/
+TestResults.xml
