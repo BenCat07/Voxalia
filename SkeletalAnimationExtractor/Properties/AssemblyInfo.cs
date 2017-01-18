@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SkeletalAnimationExtractor")]
-[assembly: AssemblyCopyright("Copyright © FreneticXYZ 2015-2016")]
+[assembly: AssemblyCopyright("Copyright © FreneticXYZ 2015-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FreneticXYZ")]
 [assembly: AssemblyProduct("Voxalia")]
-[assembly: AssemblyCopyright("Copyright © FreneticXYZ 2016")]
+[assembly: AssemblyCopyright("Copyright © FreneticXYZ 2016-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

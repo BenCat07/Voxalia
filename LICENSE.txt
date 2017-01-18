@@ -2,7 +2,7 @@ The Frenetic License (FreneticLicense)
 
 Based upon the MIT license, though heavily modified.
 
-Copyright (C) 2016 FreneticXYZ
+Copyright (C) 2016-2017 FreneticXYZ
 
 WARNING: This license is not yet fully reviewed and complete!
 AS SUCH: we do not recommend using it!

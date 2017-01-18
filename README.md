@@ -81,10 +81,10 @@ Also used libraries:
 
 (This portion is not a legal notice, only the "long version" is!)
 
-- The license is complete and shouldn't be relied on or considered final.
-- Anyone can do what they want with the code, excluding:
+- The license is not complete and shouldn't be relied on or considered final.
+- Anyone can do what they want with the code, excluding anything that violates the following conditions:
 	- We own this software and we can sell this software. You do not own the software, nor can you sell it!
-	- You can also not change the license at all, ever.
+	- You also cannot change the license at all, ever (for any sufficient portion of code as to be clearly recognizable as being part of this project).
 	- We can do what we want with this code, and the license for it.
 	- If you copy out the code or any big piece of it, you MUST include a copy of the license!
 	- There are things in here under their own licenses, both those licenses and the main license apply to those pieces if they are acquired from within here.
@@ -96,7 +96,7 @@ The Frenetic License (FreneticLicense)
 
 Based upon the MIT license, though heavily modified.
 
-Copyright (C) 2016 FreneticXYZ
+Copyright (C) 2016-2017 FreneticXYZ
 
 WARNING: This license is not yet fully reviewed and complete!
 AS SUCH: we do not recommend using it!
@@ -117,7 +117,7 @@ to do so, subject to the following conditions:
 A: The Software, or any substantial portion of the Software
 shall not be sold, sub-licensed, or relicensed by any person or party other
 than that which is named by the copyright notice above (the "Software Owner"),
-as denoted by the "Copyright (C) yyyy" prefix.
+as denoted by the "Copyright (C) (year)" prefix.
 The software may additionally be sold or sub-licensed (but not relicensed)
 by any person or party permitted to do so by the Software Owner,
 as granted at the Software Owner's discretion. Further, the Software Owner
@@ -167,7 +167,7 @@ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ----
