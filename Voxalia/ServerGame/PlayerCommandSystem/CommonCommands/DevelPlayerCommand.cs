@@ -209,7 +209,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             else if (arg0 == "timePathfind" && entry.InputArguments.Count > 1)
             {
                 double dist = Utilities.StringToDouble(entry.InputArguments[1]);
-                entry.Player.TheServer.Schedule.StartASyncTask(() =>
+                entry.Player.TheServer.Schedule.StartAsyncTask(() =>
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
@@ -239,7 +239,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 {
                     goal = eye + forw * 50;
                 }
-                entry.Player.TheServer.Schedule.StartASyncTask(() =>
+                entry.Player.TheServer.Schedule.StartAsyncTask(() =>
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();

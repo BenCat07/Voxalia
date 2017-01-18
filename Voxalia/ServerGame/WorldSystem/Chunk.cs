@@ -342,7 +342,7 @@ namespace Voxalia.ServerGame.WorldSystem
             if (LastEdited == -1)
             {
                 BsonDocument ents = GetEntitySaveData();
-                OwningRegion.TheServer.Schedule.StartASyncTask(() =>
+                OwningRegion.TheServer.Schedule.StartAsyncTask(() =>
                 {
                     SaveToFileE(ents);
                     if (callback != null)
@@ -374,7 +374,7 @@ namespace Voxalia.ServerGame.WorldSystem
             LastEdited = -1;
             BsonDocument ents = GetEntitySaveData();
             byte[] blks = GetChunkSaveData();
-            OwningRegion.TheServer.Schedule.StartASyncTask(() =>
+            OwningRegion.TheServer.Schedule.StartAsyncTask(() =>
             {
                 SaveToFileI(blks);
                 SaveToFileE(ents);

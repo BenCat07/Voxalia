@@ -393,7 +393,7 @@ namespace Voxalia.ClientGame.AudioSystem
                 SoundEffect tsfx = new SoundEffect();
                 tsfx.Name = name;
                 tsfx.Internal = -1;
-                TheClient.Schedule.StartASyncTask(() =>
+                TheClient.Schedule.StartAsyncTask(() =>
                 {
                     SoundEffect ts = LoadVorbisSound(TheClient.Files.ReadToStream(newname), name);
                     lock (tsfx)

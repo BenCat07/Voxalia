@@ -495,7 +495,7 @@ namespace Voxalia.ClientGame.WorldSystem
                         break;
                     }
                 }
-                TheClient.Schedule.StartASyncTask(() =>
+                TheClient.Schedule.StartAsyncTask(() =>
                 {
                     LightForChunks(ch, above);
                 });
@@ -515,7 +515,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 Chunk below = GetChunk(ch.WorldPosition + new Vector3i(0, 0, -1));
                 if (below != null)
                 {
-                    TheClient.Schedule.StartASyncTask(() =>
+                    TheClient.Schedule.StartAsyncTask(() =>
                     {
                         LightForChunks(below, ch);
                     });

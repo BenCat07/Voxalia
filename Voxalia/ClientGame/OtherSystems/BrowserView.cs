@@ -47,7 +47,7 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public void ReadPage(string page, Action callback = null)
         {
-            Scheduled = TheClient.Schedule.StartASyncTask(() =>
+            Scheduled = TheClient.Schedule.StartAsyncTask(() =>
             {
                 Process p = null;
                 if (!Terminates)

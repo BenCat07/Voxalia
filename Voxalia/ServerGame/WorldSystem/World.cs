@@ -390,7 +390,7 @@ namespace Voxalia.ServerGame.WorldSystem
             if (cid != previous_eid)
             {
                 previous_eid = cid;
-                Schedule.StartASyncTask(() =>
+                Schedule.StartAsyncTask(() =>
                 {
                     TheServer.Files.WriteText("saves/" + Name + "/eid.txt", cid.ToString());
                 });
@@ -399,7 +399,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 Config.Set("general.time", GlobalTickTime); // TODO: update this value and save occasionally, even if the config is unedited - in case of bad shutdown!
                 string cfg = Config.SaveToString();
-                Schedule.StartASyncTask(() =>
+                Schedule.StartAsyncTask(() =>
                 {
                     // TODO: Journaling save.
                     lock (SaveWorldCFGLock)

@@ -195,7 +195,7 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             else
             {
-                rendering = OwningRegion.TheClient.Schedule.StartASyncTask(a);
+                rendering = OwningRegion.TheClient.Schedule.StartAsyncTask(a);
             }
         }
 

@@ -454,7 +454,7 @@ namespace Voxalia.ServerGame.WorldSystem
             if (chunk.Flags.HasFlag(ChunkFlags.ISCUSTOM))
             {
                 chunk.Flags &= ~ChunkFlags.ISCUSTOM;
-                chunk.LoadSchedule = TheWorld.Schedule.StartASyncTask(() =>
+                chunk.LoadSchedule = TheWorld.Schedule.StartAsyncTask(() =>
                 {
                     chunk.UnloadTimer = 0;
                     PopulateChunk(chunk, false, false);
@@ -495,7 +495,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 if (chunk.LoadSchedule != null)
                 {
-                    TheWorld.Schedule.StartASyncTask(() =>
+                    TheWorld.Schedule.StartAsyncTask(() =>
                     {
                         bool pass = false;
                         while (!pass)
@@ -525,7 +525,7 @@ namespace Voxalia.ServerGame.WorldSystem
             chunk.WorldPosition = cpos;
             LoadedChunks.Add(cpos, chunk);
             chunk.UnloadTimer = 0;
-            chunk.LoadSchedule = TheWorld.Schedule.StartASyncTask(() =>
+            chunk.LoadSchedule = TheWorld.Schedule.StartAsyncTask(() =>
             {
                 chunk.UnloadTimer = 0;
                 PopulateChunk(chunk, true, false);

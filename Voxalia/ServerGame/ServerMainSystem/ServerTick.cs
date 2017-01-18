@@ -149,7 +149,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
             if (cid != prev_eid)
             {
                 prev_eid = cid;
-                Schedule.StartASyncTask(() =>
+                Schedule.StartAsyncTask(() =>
                 {
                     try
                     {
@@ -188,7 +188,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
                     }
                 }
                 string SaveStr = cvarsave.ToString();
-                Schedule.StartASyncTask(() =>
+                Schedule.StartAsyncTask(() =>
                 {
                     try
                     {

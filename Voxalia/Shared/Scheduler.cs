@@ -59,7 +59,7 @@ namespace Voxalia.Shared
             }
         }
 
-        public ASyncScheduleItem StartASyncTask(Action a)
+        public ASyncScheduleItem StartAsyncTask(Action a)
         {
             ASyncScheduleItem asyncer = new ASyncScheduleItem();
             asyncer.MyAction = a;

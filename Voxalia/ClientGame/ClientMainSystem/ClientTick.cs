@@ -189,7 +189,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             if (edited)
             {
-                Schedule.StartASyncTask(SaveCFG);
+                Schedule.StartAsyncTask(SaveCFG);
             }
             ops_spike++;
             if (ops_spike >= 5)

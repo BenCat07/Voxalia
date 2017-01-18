@@ -38,7 +38,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                     {
                         TheClient.TheRegion.PreppingNow.Add(new Vector3i(x, y, z));
                     }
-                    TheClient.Schedule.StartASyncTask(() =>
+                    TheClient.Schedule.StartAsyncTask(() =>
                     {
                         try
                         {
@@ -97,7 +97,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 chk.PROCESSED = false;
                 lock (TheClient.TheRegion.PreppingNow)
                 {
-                    TheClient.Schedule.StartASyncTask(() =>
+                    TheClient.Schedule.StartAsyncTask(() =>
                     {
                         try
                         {

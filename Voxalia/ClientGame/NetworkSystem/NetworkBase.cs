@@ -143,12 +143,12 @@ namespace Voxalia.ClientGame.NetworkSystem
             TheClient.Resetregion();
             LastIP = IP;
             LastPort = port;
-            TheClient.Schedule.StartASyncTask(ConnectInternal);
+            TheClient.Schedule.StartAsyncTask(ConnectInternal);
         }
         
         public void Ping(string IP, string port, Action<PingInfo> callback)
         {
-            TheClient.Schedule.StartASyncTask(() =>
+            TheClient.Schedule.StartAsyncTask(() =>
             {
                 try
                 {
@@ -463,7 +463,7 @@ namespace Voxalia.ClientGame.NetworkSystem
 
         public void LaunchTicker()
         {
-            TheClient.Schedule.StartASyncTask(() =>
+            TheClient.Schedule.StartAsyncTask(() =>
             {
                 while (true)
                 {

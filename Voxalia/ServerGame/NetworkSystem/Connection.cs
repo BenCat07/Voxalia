@@ -335,7 +335,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                                 throw new Exception("Invalid connection - unreasonable username!");
                             }
                             trying = true;
-                            TheServer.Schedule.StartASyncTask(() =>
+                            TheServer.Schedule.StartAsyncTask(() =>
                             {
                                 try
                                 {
