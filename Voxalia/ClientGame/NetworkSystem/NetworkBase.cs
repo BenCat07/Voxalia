@@ -143,9 +143,7 @@ namespace Voxalia.ClientGame.NetworkSystem
             TheClient.Resetregion();
             LastIP = IP;
             LastPort = port;
-            ConnectionThread = new Thread(new ThreadStart(ConnectInternal));
-            ConnectionThread.Name = Program.GameVersion + "_v" + Program.GameVersion + "_NetworkConnectionThread";
-            ConnectionThread.Start();
+            TheClient.Schedule.StartASyncTask(ConnectInternal);
         }
         
         public void Ping(string IP, string port, Action<PingInfo> callback)

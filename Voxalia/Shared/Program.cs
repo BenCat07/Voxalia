@@ -21,6 +21,8 @@ namespace Voxalia.Shared
 
         public const string GameVersion = "0.1.1";
 
+        public const string GameVersionDescription = "Pre-Alpha";
+
         public const string GlobalServerAddress = "https://frenetic.xyz/";
         
         public static void Init()
