@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/FreneticXYZ/Voxalia.svg?branch=master)](https://travis-ci.org/FreneticXYZ/Voxalia)
+
 Voxalia
 -------
 
