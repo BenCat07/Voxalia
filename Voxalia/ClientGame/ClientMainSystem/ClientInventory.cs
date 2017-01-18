@@ -70,7 +70,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SkyLight tlight = new SkyLight(new Location(0, 0, 10), 64, Location.One, new Location(0, -1, -1).Normalize(), 64, false);
             MainItemView.Lights.Add(tlight);
             MainItemView.GenerateFBO();
-            MainItemView.Generate(this, Window.Width, Window.Height);
+            MainItemView.Generate(this, Window.Width, Window.Height); // TODO: Change Width/Height here - to actual viewed size?
         }
 
         public void InitInventory()

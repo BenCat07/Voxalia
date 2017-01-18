@@ -236,6 +236,9 @@ namespace Voxalia.Shared
         LOSE_CONTROL_OF_VEHICLE = 41
     }
 
+    /// <summary>
+    /// Entity types, as identified by the network system.
+    /// </summary>
     public enum NetworkEntityType : byte
     {
         NONE = 0,
@@ -251,6 +254,9 @@ namespace Voxalia.Shared
         HOVER_MESSAGE = 10
     }
 
+    /// <summary>
+    /// Client-side text channels.
+    /// </summary>
     public enum TextChannel : byte
     {
         UNSPECIFIED = 0,

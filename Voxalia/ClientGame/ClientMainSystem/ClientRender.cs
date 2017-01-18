@@ -666,7 +666,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 gDelta = e.Time;
                 gTicks++;
-                if (Window.Visible && Window.WindowState != WindowState.Minimized)
+                if (Window.Visible && Window.WindowState != WindowState.Minimized && Window.Width > 10 && Window.Height > 10)
                 {
                     try
                     {
