@@ -61,12 +61,12 @@
 ### What ports do I need to forward to run a server?
 
 - By default, Voxalia singleplayer and server open up on port 28010. You can edit this in your launch command options (first argument is always the port).
-- Note that port forwarding is partially autoamted by the internals and it generally isn't required that you manually forward ports.
+- Note that port forwarding is partially automated by the internals and it generally isn't required that you manually forward ports.
 
 ### How does Voxalia compare to similar games?
 
 - We've got better graphics than most (optionally, there's also a less pretty 'fast' render mode).
-- We use better/more-modern tech than most (OpenGL 4.3 for example, or C# as the primary language).
+- We use better/more-modern tech than most (OpenGL 4.3 for example, and C# as the primary language).
 - We have more complex/fun survival situations than most:
 	- You not only can build bases, you can fully interact with the terrain and build a base even where there was ground before (Similar to Minecraft).
 	- You can do really cool and fancy things, like place automated powered turrets (Similar to ARK).
@@ -101,8 +101,42 @@
 
 ### What is FreneticXYZ?
 
-- Our company! It's not yet registered but will be soon!
+- Our company! We've not finished registering it yet, but we will complete that process soon!
 
 ### No, what is FreneticXYZ *really*?
 
 - A drunken misunderstanding of government guidelines.
+
+### Why does the readme have all those badges on it?
+
+- Why don't you?
+
+### What do the little marks next to every commit on GitHub mean?
+
+- Those are the status of the test builds. If it's not a green check mark, something went wrong!
+
+### Can I open an issue or pull request?
+
+- Yes! Just be sure to read the issue template ( https://github.com/FreneticXYZ/Voxalia/blob/master/ISSUE_TEMPLATE ) and the contributing doc ( https://github.com/FreneticXYZ/Voxalia/blob/master/CONTRIBUTING.md )!
+
+### Can I resell the game or any large portion of it?
+
+- No! That's not cool!
+
+### Can I redistribute the files for the game?
+
+- Only the code and binaries resultant directly from the code (*.exe, *.dll, *.xml, *.pdb). Art assets (available separately) are licensed separately.
+
+### I want to know more about how the game is licensed!
+
+- Check out the full terms of the license at https://github.com/FreneticXYZ/Voxalia/blob/master/LICENSE.txt
+
+### I want to sue you or otherwise engage you in court!
+
+- Please don't. As stated in the license, we are not liable for anything done with the project. This is just a game, and while we hope nobody does anything bad with it, we simply don't have the technology to prevent it entirely!
+- If you have a problem with anything we do or think we can help a problem you have, please do CONTACT US as the first step: https://frenetic.xyz/contact - we're open and friendly, don't worry!
+
+### There's something dangerous or mislicensed or majorly problematic in this repo!
+
+- Oh no! Please CONTACT US IMMEDIATELY at https://frenetic.xyz/contact
+- If you find a potentially important issue and need motivation to bother reporting it, feel free to ask for a bounty payment. We're happy to award one to the first finder, with an amount relative to the scale of the issue!
