@@ -889,6 +889,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Material headMat = TheRegion.GetBlockMaterial(VR == null ? MainWorldView.CameraPos : Player.GetBasicEyePos());
                 MainWorldView.FogCol = headMat.GetFogColor();
                 float fg = (float)headMat.GetFogAlpha();
+                if (CVars.r_fog.ValueB && fg < 1.0f)
+                {
+                    fg = 0.9f;
+                    MainWorldView.FogCol = SkyColor;
+                }
                 MainWorldView.FogAlpha = (FogEnhanceTime > 0.01) ? Math.Max(fg, (FogEnhanceTime < 1.0 ? (FogEnhanceStrength - ((1.0f - (float)FogEnhanceTime) * FogEnhanceStrength)) : FogEnhanceStrength)) : fg;
                 MainWorldView.SunLoc = GetSunLocation();
                 MainWorldView.Render();

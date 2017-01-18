@@ -188,7 +188,7 @@ void main()
 	float jump = tex_size * depth_jump;
 	float depth = 0.0;
 	float depth_count = 0.0;
-	// TODO: Make me more efficient
+	// TODO: Make this more efficient
 	for (float x = -oneoverdj * 2; x < oneoverdj * 2 + 1; x++)
 	{
 		for (float y = -oneoverdj * 2; y < oneoverdj * 2 + 1; y++)
@@ -232,12 +232,16 @@ void main()
 #endif // else-shadows
 	}
 #endif // lit
+	float dist = linearizeDepth(gl_FragCoord.z);
 #if MCM_GOOD_GRAPHICS
 	fcolor.xyz = desaturate(fcolor.xyz);
 #endif
+	vec4 fogCol = lights_used_helper[3];
+	float fogMod = dist * exp(fogCol.w) * fogCol.w;
+	float fmz = min(fogMod, 1.0);
+	fcolor.xyz = fcolor.xyz * (1.0 - fmz) + fogCol.xyz * fmz + vec3(fogMod - fmz);
 	fcolor = vec4(fcolor.xyz, tcolor.w * f.color.w);
 #if MCM_FADE_DEPTH
-	float dist = linearizeDepth(gl_FragCoord.z);
 	vec2 fc_xy = gl_FragCoord.xy / vec2(lights_used_helper[0][3], lights_used_helper[1][0]);
 	float depthval = linearizeDepth(texture(depth_tex, fc_xy).x);
 	fcolor.w *= min(max((depthval - dist) * fi.size * 0.5 * (lights_used_helper[0][2] - lights_used_helper[0][1]), 0.0), 1.0);

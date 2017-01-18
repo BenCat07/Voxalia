@@ -576,7 +576,7 @@ namespace Voxalia.Shared
         /// <summary>
         /// The movement speed modifier for things (particularly characters) moving along the surface of this material.
         /// </summary>
-        public double SpeedMod = 1f;
+        public double SpeedMod = 1.0;
         
         /// <summary>
         /// Whether this material is fully opaque.
@@ -597,7 +597,7 @@ namespace Voxalia.Shared
         /// <summary>
         /// The friction modifier for objects on the surface of this material.
         /// </summary>
-        public double FrictionMod = 1f;
+        public double FrictionMod = 1.0;
 
         /// <summary>
         /// What color fog to display when the camera is inside this material.
@@ -607,23 +607,23 @@ namespace Voxalia.Shared
         /// <summary>
         /// The opacity value of fog when the camera is inside this material.
         /// </summary>
-        public double FogAlpha = 1;
+        public double FogAlpha = 1.0;
 
         /// <summary>
         /// How hard the material is (this affects EG how badly it is damaged by explosions).
         /// </summary>
-        public double Hardness = 10;
+        public double Hardness = 10.0;
 
         /// <summary>
         /// How long it takes, in seconds, for this material to break by default. Different breakers affect how fast this breaks.
         /// The exact value is how fast a hand will break it.
         /// </summary>
-        public double BreakTime = 1f;
+        public double BreakTime = 1.0;
 
         /// <summary>
         /// How strongly this material blocks out light.
         /// </summary>
-        public double LightDamage = 1f;
+        public double LightDamage = 1.0;
 
         /// <summary>
         /// What sound type this material plays when struck.
@@ -678,7 +678,7 @@ namespace Voxalia.Shared
         /// <summary>
         /// How far this block should emit light.
         /// </summary>
-        public double LightEmitRange = 0;
+        public double LightEmitRange = 0.0;
         
         public Material BigSpreadsAs = Material.AIR;
 

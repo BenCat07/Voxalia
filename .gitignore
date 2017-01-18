@@ -40,4 +40,4 @@ xulrunner/
 *.snk
 packages/
 VoxaliaTests/bin/Release/
-TestResults.xml
+TestResult.xml

@@ -59,6 +59,14 @@ float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a
 	return (2.0 * znear) / (zfar + znear - rinput * (zfar - znear));
 }
 
+void applyFog()
+{
+	float dist = linearizeDepth(gl_FragCoord.z);
+	float fogMod = dist * exp(fogCol.w) * fogCol.w;
+	float fmz = min(fogMod, 1.0);
+	color.xyz = min(color.xyz * (1.0 - fmz) + fogCol.xyz * fmz + vec3(fogMod - fmz), vec3(1.0));
+}
+
 void main()
 {
 	vec4 col = texture(s, fi.texcoord);
@@ -85,8 +93,10 @@ void main()
 #else
 	// TODO: Maybe read the normal texture too, to increase "prettiness"? (Optionally, probably!)
 	color.xyz *= min(max(dot(-fi.norm, sunlightDir) * maximum_light, max(0.2, minimum_light)), 1.0);
+	applyFog();
 #endif
-	float dist = linearizeDepth(gl_FragCoord.z);
-	float fogMod = dist * exp(fogCol.w) * fogCol.w;
-	color.xyz = color.xyz * (1.0 - fogMod) + fogCol.xyz * fogMod;
+	if (fogCol.w > 1.0)
+	{
+		applyFog();
+	}
 }

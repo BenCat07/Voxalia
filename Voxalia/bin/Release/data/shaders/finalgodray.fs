@@ -191,11 +191,15 @@ void main() // The central entry point of the shader. Handles everything!
 #endif
 	// Fancy effects are only available to quality graphics cards. Cut out quick if one's not available.
 #if MCM_GOOD_GRAPHICS
-	//vec4 renderhint = texture(renderhinttex, f_texcoord);
+	vec3 renderhint = texture(renderhinttex, f_texcoord).xyz;
 	vec3 renderhint2 = texture(renderhint2tex, f_texcoord).xyz;
 	float dist = linearizeDepth(texture(depthtex, f_texcoord).r); // This is useful for both fog and reflection, so grab it here.
-	float fogMod = dist * exp(fogCol.w) * fogCol.w;
-	light_color.xyz = light_color.xyz * (1.0 - fogMod) + fogCol.xyz * fogMod;
+	if (renderhint.z < 1.0 || fogCol.w > 1.0)
+	{
+		float fogMod = dist * exp(fogCol.w) * fogCol.w;
+		float fmz = min(fogMod, 1.0);
+		light_color.xyz = light_color.xyz * (1.0 - fmz) + fogCol.xyz * fmz + vec3(fogMod - fmz);
+	}
 	if (dot(renderhint2, renderhint2) > 0.99) // Apply refraction if set. This is set by having a strong renderhint2 value that has a length-squared of at least 1.0!
 	{
 		vec3 viewDir = texture(positiontex, f_texcoord).xyz - eye_position;

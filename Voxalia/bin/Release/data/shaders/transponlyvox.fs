@@ -62,6 +62,11 @@ vec3 desaturate(vec3 c)
 	return mix(c, vec3(0.95, 0.77, 0.55) * dot(c, vec3(1.0)), desaturationAmount);
 }
 
+float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a linear distance (still from 0.0 to 1.0).
+{
+	return (2.0 * lights_used_helper[0][1]) / (lights_used_helper[0][2] + lights_used_helper[0][1] - rinput * (lights_used_helper[0][2] - lights_used_helper[0][1]));
+}
+
 void main()
 {
 #if MCM_LL
@@ -218,6 +223,11 @@ void main()
 #if MCM_GOOD_GRAPHICS
     fcolor = vec4(desaturate(fcolor.xyz), 1.0); // TODO: Make available to all, not just good graphics only! Or a separate CVar!
 #endif
+	vec4 fogCol = lights_used_helper[3];
+	float dist = linearizeDepth(gl_FragCoord.z);
+	float fogMod = dist * exp(fogCol.w) * fogCol.w;
+	float fmz = min(fogMod, 1.0);
+	fcolor.xyz = fcolor.xyz * (1.0 - fmz) + fogCol.xyz * fmz + vec3(fogMod - fmz);
 	fcolor = vec4(fcolor.xyz, min(tcolor.w * f.color.w * opacity_mod + opac_min, 1.0));
 #if MCM_LL
 	uint page = 0;

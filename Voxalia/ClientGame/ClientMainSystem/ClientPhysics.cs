@@ -160,6 +160,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
         Location PlanetDir;
 
         /// <summary>
+        /// Aproximate default sky color.
+        /// </summary>
+        public static readonly Location SkyApproxColDefault = new Location(0.1, 0.4, 0.5);
+
+        /// <summary>
+        /// The current approximate color of the sky.
+        /// </summary>
+        public Location SkyColor = SkyApproxColDefault;
+
+        /// <summary>
         /// Ticks the region, including all primary calculations and lighting updates.
         /// </summary>
         public void TickWorld(double delta)
@@ -211,6 +221,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     MainWorldView.ambient = BaseAmbient * ((1f - rel) * 0.5f + 0.5f);
                     sl_min = 0.2f - (1f - rel) * (0.2f - 0.05f);
                     sl_max = 0.8f - (1f - rel) * (0.8f - 0.15f);
+                    SkyColor = SkyApproxColDefault * rel;
                 }
                 else if (SunAngle.Pitch >= 10)
                 {
@@ -220,6 +231,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     MainWorldView.ambient = BaseAmbient * 0.5f;
                     sl_min = 0.05f;
                     sl_max = 0.15f;
+                    SkyColor = Location.Zero;
                 }
                 else
                 {
@@ -229,6 +241,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     MainWorldView.ambient = BaseAmbient;
                     TheSun.InternalLights[0].color = ClientUtilities.Convert(SunLightDef);
                     TheSunClouds.InternalLights[0].color = ClientUtilities.Convert(CloudSunLightDef);
+                    SkyColor = SkyApproxColDefault;
                 }
                 rTicks = 0;
                 shouldRedrawShadows = true;

@@ -53,7 +53,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public Location FogCol = new Location(0.7);
 
-        public float FogAlpha = 1.0f;
+        public float FogAlpha = 0.0f;
         
         public Location SunLoc = Location.NaN;
 
@@ -1646,7 +1646,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         TheClient.s_transponlylit_particles = TheClient.s_transponlylit_particles.Bind();
                     }
                 }
-                Matrix4 mat_lhelp = new Matrix4(c, TheClient.CVars.r_znear.ValueF, TheClient.ZFar(), Width, Height, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+                Matrix4 mat_lhelp = new Matrix4(c, TheClient.CVars.r_znear.ValueF, TheClient.ZFar(), Width, Height, 0, 0, 0, 0, 0, 0, 0, (float)FogCol.X, (float)FogCol.Y, (float)FogCol.Z, FogAlpha);
                 GL.UniformMatrix4(2, false, ref IdentityMatrix);
                 GL.Uniform1(7, (float)TheClient.GlobalTickTimeLocal);
                 GL.Uniform2(8, new Vector2(Width, Height));
