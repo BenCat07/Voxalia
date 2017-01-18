@@ -1,0 +1,22 @@
+version: 0.1.1.{build}
+max_jobs: 1
+image: Visual Studio 2015
+init:
+  - git config --global core.autocrlf true
+matrix:
+  fast_finish: true
+assembly_info:
+  patch: true
+  file: AssemblyInfo.cs
+  assembly_version: "{version}"
+  assembly_file_version: "{version}"
+platform: x64
+configuration: Release
+build:
+  project: Voxalia.sln
+test_script:
+  - tests_windows.bat
+artifacts:
+  - path: Voxalia\bin\Release\
+    name: myapp
+deploy: off
