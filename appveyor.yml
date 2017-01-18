@@ -13,7 +13,7 @@ assembly_info:
 platform: x64
 configuration: Release
 before_build:
-  - nuget restore
+  - nuget restore Voxalia.sln
 build:
   project: Voxalia.sln
 test_script:
