@@ -14,12 +14,16 @@ Also used libraries:
 - FreneticDataSyntax (used for FreneticScript data handling and some files in Voxalia's save structure)
 - lz4net (general data compression)
 
-## Builds Status Reports
+## Builds Status Reports and Badges
 
 | Build Service | Status |
-| ------------- |--------|
+| ------------- | ------ |
 | Travis CI | [![Travis-CI Build Status](https://travis-ci.org/FreneticXYZ/Voxalia.svg?branch=master)](https://travis-ci.org/FreneticXYZ/Voxalia) |
 | AppVeyor | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/inbj8vbo0fx4a8io/branch/master?svg=true)](https://ci.appveyor.com/project/mcmonkey4eva/voxalia/branch/master) |
+| Release Downloads | [![Release Downloads](https://img.shields.io/github/downloads/FreneticXYZ/Voxalia/total.svg)](https://github.com/FreneticXYZ/Voxalia/releases) |
+| Website ([Frenetic.XYZ](https://frenetic.xyz)) | [![Website](https://img.shields.io/website-up-down-green-red/https/frenetic.xyz.svg)](https://frenetic.xyz) |
+| Issues Open | [![Issues_Open](https://img.shields.io/github/issues/FreneticXYZ/Voxalia.svg)](https://github.com/FreneticXYZ/Voxalia/issues) |
+| License | [![License](https://img.shields.io/badge/license-Frenetic-blue.svg)](https://github.com/FreneticXYZ/Voxalia/blob/master/LICENSE.txt) |
 
 ## Windows Install Notes
 
