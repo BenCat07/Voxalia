@@ -20,5 +20,5 @@ test_script:
   - tests_windows.bat
 artifacts:
   - path: Voxalia\bin\Release\
-    name: myapp
+    name: Voxalia-{version}
 deploy: off

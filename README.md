@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/FreneticXYZ/Voxalia.svg?branch=master)](https://travis-ci.org/FreneticXYZ/Voxalia)
-
 Voxalia
 -------
 
@@ -15,6 +13,13 @@ Also used libraries:
 - LiteDB (save file compression)
 - FreneticDataSyntax (used for FreneticScript data handling and some files in Voxalia's save structure)
 - lz4net (general data compression)
+
+## Builds Status Reports
+
+| Build Service | Status |
+| ------------- |--------|
+| Travis CI | [![Travis-CI Build Status](https://travis-ci.org/FreneticXYZ/Voxalia.svg?branch=master)](https://travis-ci.org/FreneticXYZ/Voxalia) |
+| AppVeyor | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/inbj8vbo0fx4a8io/branch/master?svg=true)](https://ci.appveyor.com/project/mcmonkey4eva/voxalia/branch/master) |
 
 ## Windows Install Notes
 
