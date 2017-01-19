@@ -35,6 +35,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Items.GiveItem(new ItemStack("bullet", "rifle_ammo", TheServer, 1000, "items/weapons/ammo/rifle_round_ico", "Assault Rifle Ammo", "Very rapid!", System.Drawing.Color.White, "items/weapons/ammo/rifle_round", false, 0));
             Items.cItem = 1;
             Items.Items[0].Info.PrepItem(this, Items.Items[0]);
+            ShouldShine = true;
         }
 
         public override NetworkEntityType GetNetType()
@@ -68,7 +69,7 @@ namespace Voxalia.ServerGame.EntitySystem
             NextBoing -= TheRegion.Delta;
             if (NextBoing <= 0)
             {
-                NextBoing = Utilities.UtilRandom.NextDouble() * 2;
+                NextBoing = Utilities.UtilRandom.NextDouble() * 2 + 0.5;
                 XMove = (double)Utilities.UtilRandom.NextDouble() * 2f - 1f;
                 YMove = (double)Utilities.UtilRandom.NextDouble() * 2f - 1f;
                 Upward = Utilities.UtilRandom.Next(100) > 75;
@@ -87,7 +88,7 @@ namespace Voxalia.ServerGame.EntitySystem
                     Items.Items[0].Info.Click(this, Items.Items[0]);
                     Items.Items[0].Info.ReleaseClick(this, Items.Items[0]);
                 }
-                NextAttack = Utilities.UtilRandom.NextDouble();
+                NextAttack = Utilities.UtilRandom.NextDouble() * 2 + 0.5;
             }
         }
 

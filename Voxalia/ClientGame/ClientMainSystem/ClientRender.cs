@@ -137,6 +137,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             MainWorldView.ShadowingAllowed = true;
             MainWorldView.ShadowTexSize = () => CVars.r_shadowquality.ValueI;
             MainWorldView.Render3D = Render3D;
+            MainWorldView.FinalRender = FinalRender;
             MainWorldView.PostFirstRender = ReverseEntitiesOrder;
             MainWorldView.LLActive = CVars.r_transpll.ValueB; // TODO: CVar edit call back
             View3D.CheckError("Load - Rendering - Settings");
@@ -1244,6 +1245,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 s_forw_trans = s_forw_trans.Bind();
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
+            else if (MainWorldView.FBOid == FBOID.FORWARD_FINAL)
+            {
+                s_forwt = s_forwt.Bind(); // TODO: Vox equiv?
+                GL.BindTexture(TextureTarget.Texture2DArray, 0);
+            }
+            else if (MainWorldView.FBOid == FBOID.MAIN_FINAL)
+            {
+                s_fbot = s_fbot.Bind(); // TODO: Vox equiv?
+                GL.BindTexture(TextureTarget.Texture2DArray, 0);
+            }
             else if (MainWorldView.FBOid == FBOID.SHADOWS)
             {
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
@@ -1299,8 +1310,21 @@ namespace Voxalia.ClientGame.ClientMainSystem
         }
 
         /// <summary>
+        /// Final extra pass at rendering.
+        /// </summary>
+        /// <param name="view">The view to render.</param>
+        public void FinalRender(View3D view)
+        {
+            foreach (Entity e in TheRegion.FinalRenderers)
+            {
+                e.FinalRender();
+            }
+        }
+
+        /// <summary>
         /// Renders the 3D world upon instruction from the internal view render code.
         /// </summary>
+        /// <param name="view">The view to render.</param>
         public void Render3D(View3D view)
         {
             GL.Enable(EnableCap.CullFace);

@@ -33,28 +33,71 @@ namespace Voxalia.ClientGame.EntitySystem
         {
         }
 
+        public bool ShouldShine;
+
         // TODO: Proper tracked motion?
 
         public override void SpawnBody()
         {
             base.SpawnBody();
             model.LoadSkin(TheClient.Textures);
+            if (ShouldShine)
+            {
+                EnableShine();
+            }
+        }
+
+        public override void DestroyBody()
+        {
+            if (ShouldShine)
+            {
+                DisableShine();
+            }
         }
 
         public Matrix4d PreRot = Matrix4d.Identity;
+
+        public void EnableShine(bool check = true)
+        {
+            if (!check || !TheRegion.FinalRenderers.Contains(this))
+            {
+                TheRegion.FinalRenderers.Add(this);
+            }
+            ShouldShine = true;
+        }
+
+        public void DisableShine()
+        {
+            TheRegion.FinalRenderers.Remove(this);
+            ShouldShine = false;
+        }
+
+        public Vector4 ShineColor = new Vector4(1.0f, 0.5f, 0.0f, 1.0f);
+
+        public override void FinalRender()
+        {
+            TheClient.Rendering.EnableShine(false);
+            TheClient.Rendering.SetColor(new Vector4(ShineColor.X, ShineColor.Y, ShineColor.Z, ShineColor.W * 0.5f));
+            ActualModelRender();
+            TheClient.Rendering.DisableShine();
+        }
+
+        public void ActualModelRender()
+        {
+            Matrix4d mat = PreRot * Matrix4d.CreateRotationZ((Direction.Yaw * Utilities.PI180)) * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition()));
+            TheClient.MainWorldView.SetMatrix(2, mat);
+            model.CustomAnimationAdjustments = new Dictionary<string, Matrix4>(SavedAdjustmentsOTK);
+            model.Draw(aHTime, hAnim, aTTime, tAnim, aLTime, lAnim);
+            // TODO: Render held item!
+        }
 
         public override void Render()
         {
             TheClient.SetEnts();
             TheClient.Rendering.SetColor(TheClient.Rendering.AdaptColor(ClientUtilities.Convert(GetPosition()), color));
             TheClient.Rendering.SetMinimumLight(0.0f);
-            // TODO: Prevent model flipping (Possibly related to animation?)
-            Matrix4d mat = PreRot * Matrix4d.CreateRotationZ((Direction.Yaw * Utilities.PI180)) * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition()));
-            TheClient.MainWorldView.SetMatrix(2, mat);
-            model.CustomAnimationAdjustments = new Dictionary<string, Matrix4>(SavedAdjustmentsOTK);
-            model.Draw(aHTime, hAnim, aTTime, tAnim, aLTime, lAnim);
+            ActualModelRender();
             TheClient.Rendering.SetColor(Color4.White);
-            // TODO: Render held item!
             if (IsTyping)
             {
                 TheClient.Textures.GetTexture("ui/game/typing").Bind(); // TODO: store!
@@ -99,7 +142,8 @@ namespace Voxalia.ClientGame.EntitySystem
             ent.color = System.Drawing.Color.FromArgb(dr.ReadInt());
             byte dtx = dr.ReadByte();
             ent.Visible = (dtx & 1) == 1;
-            int solidity = (dtx & (2 | 4 | 8));
+            ent.ShouldShine = (dtx & 32) == 32;
+            int solidity = (dtx & (2 | 4 | 8 | 16));
             if (solidity == 2)
             {
                 ent.CGroup = CollisionUtil.Solid;

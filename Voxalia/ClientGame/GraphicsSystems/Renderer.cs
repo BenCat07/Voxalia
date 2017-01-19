@@ -316,6 +316,21 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.Uniform1(5, min);
             }
         }
+
+        public void EnableShine(bool defaultColor = true)
+        {
+            if (defaultColor)
+            {
+                SetColor(new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+            }
+            GL.Disable(EnableCap.DepthTest);
+        }
+
+        public void DisableShine()
+        {
+            SetColor(Vector4.One);
+            GL.Enable(EnableCap.DepthTest);
+        }
         
         /// <summary>
         /// Renders a 2D rectangle.

@@ -71,6 +71,8 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public double SprintOrWalk = 0f;
 
+        public bool ShouldShine = false;
+
         public byte[] GetCharacterNetData()
         {
             DataStream ds = new DataStream();
@@ -105,6 +107,7 @@ namespace Voxalia.ServerGame.EntitySystem
             dr.WriteFloat((float)mod_zrot);
             dr.WriteFloat((float)mod_scale);
             dr.WriteInt(mod_color.ToArgb());
+            // TODO: Enumeration!
             byte dtx = 0;
             if (Visible)
             {
@@ -137,6 +140,10 @@ namespace Voxalia.ServerGame.EntitySystem
             else if (CGroup == CollisionUtil.Character)
             {
                 dtx |= 16;
+            }
+            if (ShouldShine)
+            {
+                dtx |= 32;
             }
             dr.Write(dtx);
             dr.WriteInt(TheServer.Networking.Strings.IndexForString(model));

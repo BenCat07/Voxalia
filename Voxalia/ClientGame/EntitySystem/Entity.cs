@@ -63,6 +63,14 @@ namespace Voxalia.ClientGame.EntitySystem
         /// </summary>
         public abstract void Render();
 
+        /// <summary>
+        /// Draw the entity's final pass, if one applies.
+        /// </summary>
+        public virtual void FinalRender()
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Visible = false;
 
         public abstract BEPUutilities.Quaternion GetOrientation();
