@@ -13,12 +13,16 @@
 #define MCM_GEOM_ACTIVE 0
 #define MCM_NO_ALPHA_CAP 0
 #define MCM_BRIGHT 0
+#define MCM_INVERSE_FADE 0
 
 #if MCM_VOX
 layout (binding = 0) uniform sampler2DArray s;
 #else
 #if MCM_GEOM_ACTIVE
 layout (binding = 0) uniform sampler2DArray s;
+#if MCM_INVERSE_FADE
+layout (binding = 4) uniform sampler2D depth;
+#endif
 #else
 layout (binding = 0) uniform sampler2D s;
 #endif
@@ -42,8 +46,13 @@ in struct vox_fout
 #endif
 #endif
 	vec4 color;
+#if MCM_INVERSE_FADE
+	float size;
+#endif
 } fi;
 
+// ...
+layout (location = 4) uniform vec4 screen_size = vec4(1024, 1024, 0.1, 1000.0);
 layout (location = 5) uniform float minimum_light = 0.2;
 // ...
 layout (location = 10) uniform vec3 sunlightDir = vec3(0.0, 0.0, -1.0);
@@ -99,4 +108,10 @@ void main()
 	{
 		applyFog();
 	}
+#if MCM_INVERSE_FADE
+	float dist = linearizeDepth(gl_FragCoord.z);
+	vec2 fc_xy = gl_FragCoord.xy / screen_size.xy;
+	float depthval = linearizeDepth(texture(depth, fc_xy).x);
+	color.w *= min(max(max((depthval - dist) * fi.size * 0.5 * (screen_size.z - screen_size.w), 0.01), 0.0), 1.0);
+#endif
 }

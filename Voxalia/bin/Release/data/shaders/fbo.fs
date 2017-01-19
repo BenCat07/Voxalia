@@ -11,12 +11,16 @@
 #define MCM_TRANSP_ALLOWED 0
 #define MCM_REFRACT 0
 #define MCM_GEOM_ACTIVE 0
+#define MCM_INVERSE_FADE 0
 
 #if MCM_GEOM_ACTIVE
 layout (binding = 0) uniform sampler2DArray s;
 layout (binding = 1) uniform sampler2DArray normal_tex;
 layout (binding = 2) uniform sampler2DArray spec;
 layout (binding = 3) uniform sampler2DArray refl;
+#if MCM_INVERSE_FADE
+layout (binding = 4) uniform sampler2D depth;
+#endif
 #else
 layout (binding = 0) uniform sampler2D s;
 layout (binding = 1) uniform sampler2D normal_tex;
@@ -25,6 +29,7 @@ layout (binding = 3) uniform sampler2D refl;
 #endif
 
 // ...
+layout (location = 4) uniform vec4 screen_size = vec4(1024, 1024, 0.1, 1000.0);
 layout (location = 5) uniform float minimum_light = 0.0;
 // ...
 layout (location = 9) uniform float refract_eta = 0.0;
@@ -39,6 +44,9 @@ in struct vox_fout
 #endif
 	vec4 color;
 	mat3 tbn;
+#if MCM_INVERSE_FADE
+	float size;
+#endif
 } fi;
 
 layout (location = 0) out vec4 color;
@@ -46,6 +54,11 @@ layout (location = 1) out vec4 position;
 layout (location = 2) out vec4 normal;
 layout (location = 3) out vec4 renderhint;
 layout (location = 4) out vec4 renderhint2;
+
+float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a linear distance (still from 0.0 to 1.0).
+{
+	return (2.0 * screen_size.z) / (screen_size.w + screen_size.z - rinput * (screen_size.w - screen_size.z));
+}
 
 void main()
 {
@@ -85,4 +98,10 @@ void main()
 	normal = vec4(normalize(fi.tbn * norms), 1.0);
 	renderhint = vec4(specular_strength, 0.0 /* TODO: ??? */, minimum_light, 1.0);
 	renderhint2 = vec4(0.0, reflection_amt, 0.0, 1.0);
+#if MCM_INVERSE_FADE
+	float dist = linearizeDepth(gl_FragCoord.z);
+	vec2 fc_xy = gl_FragCoord.xy / screen_size.xy;
+	float depthval = linearizeDepth(texture(depth, fc_xy).x);
+	color.w *= min(max((dist - depthval) * fi.size * 0.5 * (screen_size.z - screen_size.w), 0.0), 1.0);
+#endif
 }

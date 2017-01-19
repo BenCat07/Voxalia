@@ -22,6 +22,7 @@ using FreneticScript.TagHandlers.Objects;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.OtherSystems;
+using OpenTK;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {
@@ -208,6 +209,12 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         {
                             entry.Info(queue, pos + ": " + bua.Blocks[bua.BlockIndex((int)pos.X - chunkLoc.X * Chunk.CHUNK_SIZE, (int)pos.Y - chunkLoc.Y * Chunk.CHUNK_SIZE)]);
                         }
+                        break;
+                    }
+                case "testDecal":
+                    {
+                        Location pos = TheClient.Player.GetPosition() + new Location(0, 0, BEPUphysics.Settings.CollisionDetectionSettings.AllowedPenetration);
+                        TheClient.AddDecal(pos, new Location(0, 0, 1), Vector4.One, 1f, "white", 15);
                         break;
                     }
                 default:

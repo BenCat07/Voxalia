@@ -133,10 +133,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
             View3D.CheckError("Load - Rendering - Shaders");
             generateMapHelpers();
             GenerateGrassHelpers();
+            PrepDecals();
             View3D.CheckError("Load - Rendering - Map/Grass");
             MainWorldView.ShadowingAllowed = true;
             MainWorldView.ShadowTexSize = () => CVars.r_shadowquality.ValueI;
             MainWorldView.Render3D = Render3D;
+            MainWorldView.DecalRender = RenderDecal;
             MainWorldView.PostFirstRender = ReverseEntitiesOrder;
             MainWorldView.LLActive = CVars.r_transpll.ValueB; // TODO: CVar edit call back
             View3D.CheckError("Load - Rendering - Settings");
@@ -208,6 +210,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE?grass");
             s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY?grass");
             s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP?particles");
+            s_fbodecal = Shaders.GetShader("fbo" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE,MCM_PRETTY?decal");
+            s_forwdecal = Shaders.GetShader("forward" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE?decal");
             s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT");
             s_transponly_particles = Shaders.GetShader("transponly" + def + ",MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
             s_transponlylit_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
@@ -557,7 +561,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public Shader s_forw_grass;
 
         /// <summary>
-        /// The shader used for grass-sprites in deffered rendering mode.
+        /// The shader used for grass-sprites in deferred rendering mode.
         /// </summary>
         public Shader s_fbo_grass;
 
@@ -567,7 +571,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public Shader s_forw_particles;
 
         /// <summary>
-        /// The shader used for alltransparency rendering in forward mode (primarily the skybox).
+        /// The shader used for decal rendering in deferred rendering mode.
+        /// </summary>
+        public Shader s_fbodecal;
+        
+        /// <summary>
+        /// The shader used for decal rendering in forward mode.
+        /// </summary>
+        public Shader s_forwdecal;
+
+        /// <summary>
+        /// The shader used for all-transparency rendering in forward mode (primarily the skybox).
         /// </summary>
         public Shader s_forwt;
 
@@ -1244,14 +1258,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 s_forw_trans = s_forw_trans.Bind();
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
-            else if (MainWorldView.FBOid == FBOID.FORWARD_FINAL)
+            else if (MainWorldView.FBOid == FBOID.FORWARD_EXTRAS)
             {
-                s_forwt = s_forwt.Bind(); // TODO: Vox equiv?
+                s_forwdecal = s_forwdecal.Bind();
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
-            else if (MainWorldView.FBOid == FBOID.MAIN_FINAL)
+            else if (MainWorldView.FBOid == FBOID.MAIN_EXTRAS)
             {
-                s_fbot = s_fbot.Bind(); // TODO: Vox equiv?
+                s_fbodecal = s_fbodecal.Bind();
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
             else if (MainWorldView.FBOid == FBOID.SHADOWS)
@@ -1307,7 +1321,132 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 tmod.Draw();
             }
         }
-        
+
+        public int Dec_VAO = -1;
+        public int Dec_VBO_Pos = -1;
+        public int Dec_VBO_Nrm = -1;
+        public int Dec_VBO_Ind = -1;
+        public int Dec_VBO_Col = -1;
+        public int Dec_VBO_Tcs = -1;
+        public int DecTextureID = -1;
+
+        public const int DecTextureWidth = 64; // TODO: Configurable!
+        public const int DecTextureCount = 128; // TODO: Configurable!
+
+        public double[] DecalLastTexUse = new double[DecTextureCount];
+
+        public Dictionary<string, int> DecalTextureLocations = new Dictionary<string, int>();
+
+        public void PrepDecals()
+        {
+            Dec_VAO = GL.GenVertexArray();
+            Dec_VBO_Pos = GL.GenBuffer();
+            Dec_VBO_Nrm = GL.GenBuffer();
+            Dec_VBO_Ind = GL.GenBuffer();
+            Dec_VBO_Col = GL.GenBuffer();
+            Dec_VBO_Tcs = GL.GenBuffer();
+            DecTextureID = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2DArray, DecTextureID);
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 1, SizedInternalFormat.Rgba8, DecTextureWidth, DecTextureWidth, DecTextureCount);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+        }
+
+        public int DecalGetTextureID(string f)
+        {
+            int temp;
+            if (DecalTextureLocations.TryGetValue(f, out temp))
+            {
+                return temp;
+            }
+            for (int i = 0; i < DecTextureCount; i++)
+            {
+                if (DecalLastTexUse[i] == 0)
+                {
+                    DecalLastTexUse[i] = GlobalTickTimeLocal;
+                    DecalTextureLocations[f] = i;
+                    GL.BindTexture(TextureTarget.Texture2DArray, DecTextureID);
+                    Textures.LoadTextureIntoArray(f, i, DecTextureWidth);
+                    return i;
+                }
+            }
+            // TODO: Delete any unused entry findable in favor of this new one.
+            return 0;
+        }
+
+        public List<Tuple<Location, Vector3, Vector4, Vector2, double>> Decals = new List<Tuple<Location, Vector3, Vector4, Vector2, double>>();
+
+        public void AddDecal(Location pos, Location ang, Vector4 color, float scale, string texture, double time)
+        {
+            Decals.Add(new Tuple<Location, Vector3, Vector4, Vector2, double>(pos, ClientUtilities.Convert(ang), color, new Vector2(scale, DecalGetTextureID(texture)), time));
+        }
+
+        public bool DecalPrepped = false;
+
+        /// <summary>
+        /// Renders the 3D world's decals upon instruction from the internal view render code.
+        /// </summary>
+        /// <param name="view">The view to render.</param>
+        public void RenderDecal(View3D view)
+        {
+            GL.PolygonOffset(-1, -2);
+            GL.Disable(EnableCap.CullFace);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2DArray, DecTextureID);
+            GL.Enable(EnableCap.PolygonOffsetFill);
+            Vector3[] pos = new Vector3[Decals.Count];
+            Vector3[] nrm = new Vector3[Decals.Count];
+            Vector4[] col = new Vector4[Decals.Count];
+            Vector2[] tcs = new Vector2[Decals.Count];
+            uint[] ind = new uint[Decals.Count];
+            for (int i = 0; i < Decals.Count; i++)
+            {
+                pos[i] = ClientUtilities.Convert(Decals[i].Item1 - view.RenderRelative);
+                nrm[i] = Decals[i].Item2;
+                col[i] = Decals[i].Item3;
+                tcs[i] = Decals[i].Item4;
+                ind[i] = (uint)i;
+            }
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Pos);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(pos.Length * OpenTK.Vector3.SizeInBytes), pos, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Nrm);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(nrm.Length * OpenTK.Vector3.SizeInBytes), nrm, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Tcs);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tcs.Length * OpenTK.Vector2.SizeInBytes), tcs, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Col);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(col.Length * OpenTK.Vector4.SizeInBytes), col, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, Dec_VBO_Ind);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ind.Length * sizeof(uint)), ind, BufferUsageHint.StaticDraw);
+            GL.BindVertexArray(Dec_VAO);
+            if (!DecalPrepped)
+            {
+                GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Pos);
+                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+                GL.EnableVertexAttribArray(0);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Nrm);
+                GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
+                GL.EnableVertexAttribArray(1);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Tcs);
+                GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, 0);
+                GL.EnableVertexAttribArray(2);
+                GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Col);
+                GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
+                GL.EnableVertexAttribArray(4);
+                GL.BindBuffer(BufferTarget.ElementArrayBuffer, Dec_VBO_Ind);
+                DecalPrepped = true;
+            }
+            Matrix4 ident = Matrix4.Identity;
+            GL.UniformMatrix4(2, false, ref ident);
+            GL.DrawElements(PrimitiveType.Points, Decals.Count, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            GL.BindVertexArray(0);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.Enable(EnableCap.CullFace);
+            GL.PolygonOffset(0, 0);
+            GL.Disable(EnableCap.PolygonOffsetFill);
+        }
+
         /// <summary>
         /// Renders the 3D world upon instruction from the internal view render code.
         /// </summary>

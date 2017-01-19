@@ -28,6 +28,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// Set this to whatever method call renders all 3D objects in this view.
         /// </summary>
         public Action<View3D> Render3D = null;
+
+        /// <summary>
+        /// Set this to whatever method call renders all 3D decals in this view.
+        /// </summary>
+        public Action<View3D> DecalRender = null;
         
         public Action PostFirstRender = null;
 
@@ -611,10 +616,20 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public void RenderPass_FAST()
         {
+            RS4P.Bind();
             RenderingShadows = false;
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_SOLID;
             Vector3 maxLit = TheClient.TheRegion.GetSunAdjust().Xyz;
+            TheClient.s_forwdecal.Bind();
+            GL.UniformMatrix4(1, false, ref PrimaryMatrix);
+            GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform4(4, new Vector4(Width, Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+            GL.Uniform1(14, TheClient.ZFar());
+            TheClient.Rendering.SetColor(Color4.White);
             TheClient.s_forwt.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
@@ -647,6 +662,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 Viewport(Width / 2, 0, Width / 2, Height);
                 Render3D(this);
+                FBOid = FBOID.FORWARD_EXTRAS;
+                TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
+                DecalRender?.Invoke(this);
+                FBOid = FBOID.FORWARD_SOLID;
                 CFrust = cf2;
                 Viewport(0, 0, Width / 2, Height);
                 CameraPos = cameraBasePos - cameraAdjust;
@@ -655,6 +674,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 TheClient.s_forw = TheClient.s_forw.Bind();
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
                 Render3D(this);
+                FBOid = FBOID.FORWARD_EXTRAS;
+                TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
+                DecalRender?.Invoke(this);
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
@@ -663,6 +685,39 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 Render3D(this);
             }
+            RS4P.Unbind();
+            BindFramebuffer(FramebufferTarget.Framebuffer, CurrentFBO);
+            DrawBuffer(CurrentFBO == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0);
+            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, RS4P.fbo);
+            GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Width, Height, ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
+            TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
+            GL.ActiveTexture(TextureUnit.Texture4);
+            GL.BindTexture(TextureTarget.Texture2D, RS4P.DepthTexture);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            FBOid = FBOID.FORWARD_EXTRAS;
+            if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
+            {
+                Viewport(Width / 2, 0, Width / 2, Height);
+                DecalRender?.Invoke(this);
+                CFrust = cf2;
+                Viewport(0, 0, Width / 2, Height);
+                CameraPos = cameraBasePos - cameraAdjust;
+                GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
+                DecalRender?.Invoke(this);
+                Viewport(0, 0, Width, Height);
+                CameraPos = cameraBasePos + cameraAdjust;
+                CFrust = camFrust;
+            }
+            else
+            {
+                FBOid = FBOID.FORWARD_EXTRAS;
+                TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
+                DecalRender?.Invoke(this);
+            }
+            GL.ActiveTexture(TextureUnit.Texture4);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_TRANSP;
             TheClient.s_forw_vox_trans.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
@@ -1755,7 +1810,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
     {
         NONE = 0,
         MAIN = 1,
-        MAIN_FINAL = 2,
+        MAIN_EXTRAS = 2,
         TRANSP_UNLIT = 3,
         SHADOWS = 4,
         TRANSP_LIT = 7,
@@ -1764,7 +1819,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         TRANSP_LIT_LL = 13,
         TRANSP_SHADOWS_LL = 14,
         REFRACT = 21,
-        FORWARD_FINAL = 97,
+        FORWARD_EXTRAS = 97,
         FORWARD_TRANSP = 98,
         FORWARD_SOLID = 99,
     }

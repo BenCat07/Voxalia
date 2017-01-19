@@ -130,7 +130,6 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                             }
                             else
                             {
-
                                 col.Add(dets.Item2);
                             }
                             tcs.Add(dets.Item3);
