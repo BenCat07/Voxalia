@@ -51,9 +51,7 @@ namespace Voxalia.ClientGame.WorldSystem
         public List<Entity> Tickers = new List<Entity>();
 
         public List<Entity> ShadowCasters = new List<Entity>();
-
-        public List<Entity> FinalRenderers = new List<Entity>();
-
+        
         public PhysicsEntity[] GenShadowCasters = new PhysicsEntity[0];
         
         public AABB[] Highlights = new AABB[0];

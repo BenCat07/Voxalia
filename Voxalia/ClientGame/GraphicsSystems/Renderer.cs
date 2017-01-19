@@ -324,12 +324,16 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 SetColor(new Vector4(1.0f, 0.0f, 0.0f, 1.0f));
             }
             GL.Disable(EnableCap.DepthTest);
+            GL.DepthMask(false);
+            GL.Uniform1(8, 1.0f);
         }
 
         public void DisableShine()
         {
             SetColor(Vector4.One);
             GL.Enable(EnableCap.DepthTest);
+            GL.DepthMask(true);
+            GL.Uniform1(8, 0.0f);
         }
         
         /// <summary>

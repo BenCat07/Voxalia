@@ -41,47 +41,12 @@ namespace Voxalia.ClientGame.EntitySystem
         {
             base.SpawnBody();
             model.LoadSkin(TheClient.Textures);
-            if (ShouldShine)
-            {
-                EnableShine();
-            }
         }
-
-        public override void DestroyBody()
-        {
-            if (ShouldShine)
-            {
-                DisableShine();
-            }
-        }
-
+        
         public Matrix4d PreRot = Matrix4d.Identity;
-
-        public void EnableShine(bool check = true)
-        {
-            if (!check || !TheRegion.FinalRenderers.Contains(this))
-            {
-                TheRegion.FinalRenderers.Add(this);
-            }
-            ShouldShine = true;
-        }
-
-        public void DisableShine()
-        {
-            TheRegion.FinalRenderers.Remove(this);
-            ShouldShine = false;
-        }
-
+        
         public Vector4 ShineColor = new Vector4(1.0f, 0.5f, 0.0f, 1.0f);
-
-        public override void FinalRender()
-        {
-            TheClient.Rendering.EnableShine(false);
-            TheClient.Rendering.SetColor(new Vector4(ShineColor.X, ShineColor.Y, ShineColor.Z, ShineColor.W * 0.5f));
-            ActualModelRender();
-            TheClient.Rendering.DisableShine();
-        }
-
+        
         public void ActualModelRender()
         {
             Matrix4d mat = PreRot * Matrix4d.CreateRotationZ((Direction.Yaw * Utilities.PI180)) * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition()));
@@ -97,6 +62,13 @@ namespace Voxalia.ClientGame.EntitySystem
             TheClient.Rendering.SetColor(TheClient.Rendering.AdaptColor(ClientUtilities.Convert(GetPosition()), color));
             TheClient.Rendering.SetMinimumLight(0.0f);
             ActualModelRender();
+            if (ShouldShine)
+            {
+                TheClient.Rendering.EnableShine(false);
+                TheClient.Rendering.SetColor(new Vector4(ShineColor.X, ShineColor.Y, ShineColor.Z, ShineColor.W * 0.25f));
+                ActualModelRender();
+                TheClient.Rendering.DisableShine();
+            }
             TheClient.Rendering.SetColor(Color4.White);
             if (IsTyping)
             {

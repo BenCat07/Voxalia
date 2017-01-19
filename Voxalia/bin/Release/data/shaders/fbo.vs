@@ -52,6 +52,7 @@ layout (location = 2) uniform mat4 mv_matrix = mat4(1.0);
 layout (location = 3) uniform vec4 v_color = vec4(1.0);
 // ...
 layout (location = 6) uniform float time;
+layout (location = 8) uniform float force_depth = 0.0;
 // ...
 #if MCM_GEOM_ACTIVE
 #else
@@ -98,6 +99,11 @@ void main()
 	fi.position /= fi.position.w;
     fi.color = color_for(fi.position, color * v_color);
 	gl_Position = proj_matrix * mv_matrix * vec4(pos1.xyz, 1.0);
+	if (force_depth != 0.0)
+	{
+		gl_Position /= gl_Position.w;
+		gl_Position.z = 0.99 + gl_Position.z * 0.01;
+	}
 	mat4 mv_mat_simple = mv_matrix;
 	mv_mat_simple[3][0] = 0.0;
 	mv_mat_simple[3][1] = 0.0;

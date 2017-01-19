@@ -28,9 +28,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// Set this to whatever method call renders all 3D objects in this view.
         /// </summary>
         public Action<View3D> Render3D = null;
-
-        public Action<View3D> FinalRender = null;
-
+        
         public Action PostFirstRender = null;
 
         public bool ShadowsOnly = false;
@@ -691,10 +689,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 Viewport(Width / 2, 0, Width / 2, Height);
                 Render3D(this);
-                FBOid = FBOID.FORWARD_FINAL;
-                TheClient.s_forwt.Bind();
-                FinalRender?.Invoke(this);
-                FBOid = FBOID.FORWARD_TRANSP;
                 CFrust = cf2;
                 Viewport(0, 0, Width / 2, Height);
                 CameraPos = cameraBasePos - cameraAdjust;
@@ -703,9 +697,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 TheClient.s_forw_trans = TheClient.s_forw_trans.Bind();
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
                 Render3D(this);
-                FBOid = FBOID.FORWARD_FINAL;
-                TheClient.s_forwt.Bind();
-                FinalRender?.Invoke(this);
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
@@ -713,9 +704,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             else
             {
                 Render3D(this);
-                FBOid = FBOID.FORWARD_FINAL;
-                TheClient.s_forwt.Bind();
-                FinalRender?.Invoke(this);
             }
             GL.DepthMask(true);
             BindFramebuffer(FramebufferTarget.Framebuffer, 0);
@@ -1330,11 +1318,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Viewport(Width / 2, 0, Width / 2, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 RenderTransp(ref lightc);
-                FBOID id = FBOid;
-                FBOid = FBOID.MAIN_FINAL;
-                TheClient.s_fbo.Bind();
-                FinalRender?.Invoke(this);
-                FBOid = id;
                 CFrust = cf2;
                 Viewport(0, 0, Width / 2, Height);
                 CFrust = cf2;
@@ -1420,9 +1403,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
                 CameraPos = cameraBasePos - cameraAdjust;
                 RenderTransp(ref lightc, cf2);
-                FBOid = FBOID.MAIN_FINAL;
-                TheClient.s_fbot.Bind();
-                FinalRender?.Invoke(this);
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
@@ -1430,9 +1410,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             else
             {
                 RenderTransp(ref lightc);
-                FBOid = FBOID.MAIN_FINAL;
-                TheClient.s_fbot.Bind();
-                FinalRender?.Invoke(this);
             }
             if (lightc == 0)
             {
