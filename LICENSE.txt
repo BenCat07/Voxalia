@@ -11,6 +11,8 @@ if a future version of this license exists within reasonable
 access, it is assumed to supersede this license, even for this
 older copy of the Software (as defined below) containing this
 early notice.
+IF NO FUTURE VERSION IS AVAILABLE: The code can be assumed as ARR
+("All Rights Reserved")!
 
 Permission is hereby granted, free of charge, to any and all persons
 or parties obtaining a copy of this software (IE code and any associated
