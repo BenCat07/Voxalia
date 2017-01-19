@@ -47,6 +47,20 @@ namespace VoxaliaLauncher
             geckoWebBrowser1.DomDoubleClick += GeckoWebBrowser1_DomDoubleClick;
             geckoWebBrowser1.DomKeyPress += GeckoWebBrowser1_DomKeyPress;
             geckoWebBrowser1.DomKeyDown += GeckoWebBrowser1_DomKeyDown;
+            Resize += LauncherForm_Resize;
+            LauncherForm_Resize(null, null);
+        }
+
+        private void LauncherForm_Resize(object sender, EventArgs e)
+        {
+            if (Width < 1163)
+            {
+                Width = 1163;
+            }
+            if (Height < 700)
+            {
+                Height = 700;
+            }
         }
 
         private void GeckoWebBrowser1_DomKeyDown(object sender, DomKeyEventArgs e)

@@ -52,7 +52,7 @@ namespace VoxaliaLauncher
             // loggedAs
             // 
             this.loggedAs.AutoSize = true;
-            this.loggedAs.Location = new System.Drawing.Point(9, 42);
+            this.loggedAs.Location = new System.Drawing.Point(12, 36);
             this.loggedAs.Name = "loggedAs";
             this.loggedAs.Size = new System.Drawing.Size(61, 13);
             this.loggedAs.TabIndex = 0;
@@ -60,7 +60,7 @@ namespace VoxaliaLauncher
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(9, 11);
+            this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(58, 16);
             this.label1.TabIndex = 2;
@@ -68,23 +68,23 @@ namespace VoxaliaLauncher
             // 
             // usernameBox
             // 
-            this.usernameBox.Location = new System.Drawing.Point(80, 8);
+            this.usernameBox.Location = new System.Drawing.Point(76, 6);
             this.usernameBox.Name = "usernameBox";
-            this.usernameBox.Size = new System.Drawing.Size(124, 20);
+            this.usernameBox.Size = new System.Drawing.Size(195, 20);
             this.usernameBox.TabIndex = 3;
             // 
             // passwordBox
             // 
-            this.passwordBox.Location = new System.Drawing.Point(272, 8);
+            this.passwordBox.Location = new System.Drawing.Point(339, 6);
             this.passwordBox.Name = "passwordBox";
-            this.passwordBox.Size = new System.Drawing.Size(161, 20);
+            this.passwordBox.Size = new System.Drawing.Size(292, 20);
             this.passwordBox.TabIndex = 4;
             this.passwordBox.UseSystemPasswordChar = true;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(210, 11);
+            this.label2.Location = new System.Drawing.Point(277, 9);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(56, 13);
             this.label2.TabIndex = 5;
@@ -94,7 +94,7 @@ namespace VoxaliaLauncher
             // 
             this.playButton.Enabled = false;
             this.playButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playButton.Location = new System.Drawing.Point(629, 8);
+            this.playButton.Location = new System.Drawing.Point(835, 8);
             this.playButton.Name = "playButton";
             this.playButton.Size = new System.Drawing.Size(300, 54);
             this.playButton.TabIndex = 6;
@@ -104,7 +104,7 @@ namespace VoxaliaLauncher
             // 
             // logoutButton
             // 
-            this.logoutButton.Location = new System.Drawing.Point(272, 34);
+            this.logoutButton.Location = new System.Drawing.Point(470, 32);
             this.logoutButton.Name = "logoutButton";
             this.logoutButton.Size = new System.Drawing.Size(161, 23);
             this.logoutButton.TabIndex = 7;
@@ -115,15 +115,15 @@ namespace VoxaliaLauncher
             // progressBar1
             // 
             this.progressBar1.Enabled = false;
-            this.progressBar1.Location = new System.Drawing.Point(442, 36);
+            this.progressBar1.Location = new System.Drawing.Point(640, 36);
             this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(161, 19);
+            this.progressBar1.Size = new System.Drawing.Size(189, 19);
             this.progressBar1.TabIndex = 8;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(439, 11);
+            this.label3.Location = new System.Drawing.Point(637, 15);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(75, 13);
             this.label3.TabIndex = 10;
@@ -131,9 +131,9 @@ namespace VoxaliaLauncher
             // 
             // tfaBox
             // 
-            this.tfaBox.Location = new System.Drawing.Point(520, 8);
+            this.tfaBox.Location = new System.Drawing.Point(718, 12);
             this.tfaBox.Name = "tfaBox";
-            this.tfaBox.Size = new System.Drawing.Size(83, 20);
+            this.tfaBox.Size = new System.Drawing.Size(111, 20);
             this.tfaBox.TabIndex = 11;
             // 
             // geckoWebBrowser1
@@ -144,7 +144,7 @@ namespace VoxaliaLauncher
             this.geckoWebBrowser1.Location = new System.Drawing.Point(12, 68);
             this.geckoWebBrowser1.Name = "geckoWebBrowser1";
             this.geckoWebBrowser1.NoDefaultContextMenu = true;
-            this.geckoWebBrowser1.Size = new System.Drawing.Size(917, 525);
+            this.geckoWebBrowser1.Size = new System.Drawing.Size(1123, 525);
             this.geckoWebBrowser1.TabIndex = 12;
             this.geckoWebBrowser1.UseHttpActivityObserver = false;
             // 
@@ -152,7 +152,7 @@ namespace VoxaliaLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(941, 598);
+            this.ClientSize = new System.Drawing.Size(1147, 598);
             this.Controls.Add(this.geckoWebBrowser1);
             this.Controls.Add(this.tfaBox);
             this.Controls.Add(this.label3);
@@ -164,7 +164,6 @@ namespace VoxaliaLauncher
             this.Controls.Add(this.usernameBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.loggedAs);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "LauncherForm";
             this.Text = "Voxalia Launcher";
