@@ -180,6 +180,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
                 {
                     TheClient.s_forw_particles = TheClient.s_forw_particles.Bind();
+                    GL.Uniform4(4, new Vector4(TheClient.MainWorldView.Width, TheClient.MainWorldView.Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
                 }
                 else
                 {

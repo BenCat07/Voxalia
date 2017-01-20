@@ -209,7 +209,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_hdrpass = Shaders.GetShader("hdrpass" + def);
             s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE?grass");
             s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY?grass");
-            s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP?particles");
+            s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH?particles");
             s_fbodecal = Shaders.GetShader("fbo" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE,MCM_PRETTY?decal");
             s_forwdecal = Shaders.GetShader("forward" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE?decal");
             s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT");
@@ -1513,10 +1513,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     Rendering.SetMinimumLight(1f);
                 }
-                GL.ActiveTexture(TextureUnit.Texture1);
-                Textures.NormalDef.Bind();
-                GL.ActiveTexture(TextureUnit.Texture0);
-                Particles.Engine.Render();
             }
             SetEnts();
             isVox = false;
@@ -1526,6 +1522,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             TheRegion.RenderPlants();
             if (!view.ShadowsOnly)
             {
+                GL.ActiveTexture(TextureUnit.Texture1);
+                Textures.NormalDef.Bind();
+                GL.ActiveTexture(TextureUnit.Texture0);
+                Particles.Engine.Render();
                 GL.ActiveTexture(TextureUnit.Texture1);
                 Textures.NormalDef.Bind();
                 GL.ActiveTexture(TextureUnit.Texture0);

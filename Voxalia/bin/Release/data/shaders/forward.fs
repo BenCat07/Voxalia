@@ -14,19 +14,18 @@
 #define MCM_NO_ALPHA_CAP 0
 #define MCM_BRIGHT 0
 #define MCM_INVERSE_FADE 0
+#define MCM_FADE_DEPTH 0
 
 #if MCM_VOX
 layout (binding = 0) uniform sampler2DArray s;
 #else
 #if MCM_GEOM_ACTIVE
 layout (binding = 0) uniform sampler2DArray s;
-#if MCM_INVERSE_FADE
-layout (binding = 4) uniform sampler2D depth;
-#endif
 #else
 layout (binding = 0) uniform sampler2D s;
 #endif
 #endif
+layout (binding = 4) uniform sampler2D depth;
 
 // ...
 
@@ -47,6 +46,9 @@ in struct vox_fout
 #endif
 	vec4 color;
 #if MCM_INVERSE_FADE
+	float size;
+#endif
+#if MCM_FADE_DEPTH
 	float size;
 #endif
 } fi;
@@ -117,5 +119,11 @@ void main()
 	{
 		discard;
 	}
+#endif
+#if MCM_FADE_DEPTH
+	float dist = linearizeDepth(gl_FragCoord.z);
+	vec2 fc_xy = gl_FragCoord.xy / screen_size.xy;
+	float depthval = linearizeDepth(texture(depth, fc_xy).x);
+	color.w *= min(max((depthval - dist) * fi.size * 0.5 * (screen_size.w - screen_size.z), 0.0), 1.0);
 #endif
 }

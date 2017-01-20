@@ -746,8 +746,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
                 DecalRender?.Invoke(this);
             }
-            GL.ActiveTexture(TextureUnit.Texture4);
-            GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_TRANSP;
             TheClient.s_forw_vox_trans.Bind();
@@ -790,6 +788,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 Render3D(this);
             }
+            GL.ActiveTexture(TextureUnit.Texture4);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.ActiveTexture(TextureUnit.Texture0);
             GL.DepthMask(true);
             BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             DrawBuffer(DrawBufferMode.Back);
