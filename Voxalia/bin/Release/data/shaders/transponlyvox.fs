@@ -228,7 +228,7 @@ void main()
 	float fogMod = dist * exp(fogCol.w) * fogCol.w;
 	float fmz = min(fogMod, 1.0);
 	fcolor.xyz = fcolor.xyz * (1.0 - fmz) + fogCol.xyz * fmz + vec3(fogMod - fmz);
-	fcolor = vec4(fcolor.xyz, min(tcolor.w * f.color.w * opacity_mod + opac_min, 1.0));
+	fcolor = vec4(fcolor.xyz, min(tcolor.w * f.color.w * max(opacity_mod + opac_min, 0.9), 1.0));
 #if MCM_LL
 	uint page = 0;
 	uint frag = 0;

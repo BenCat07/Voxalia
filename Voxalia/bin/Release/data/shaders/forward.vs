@@ -66,7 +66,6 @@ layout (location = 2) uniform mat4 mv_matrix = mat4(1.0);
 layout (location = 3) uniform vec4 v_color = vec4(1.0);
 // ...
 layout (location = 6) uniform float time;
-layout (location = 8) uniform float force_depth = 0.0;
 // ...
 #if MCM_VOX
 #else
@@ -132,13 +131,6 @@ void main()
 	fi.norm = fnorm.xyz / fnorm.w;
     fi.color = color_for(mv_matrix * vec4(pos1.xyz, 1.0), color * v_color);
 	gl_Position = proj_matrix * mv_matrix * vec4(pos1.xyz, 1.0);
-#if MCM_INVERSE_FADE
-	if (force_depth != 0.0)
-	{
-		gl_Position /= gl_Position.w;
-		gl_Position.z = 0.99 + gl_Position.z * 0.01;
-	}
-#endif // MCM_INVERSE_FADE
 #endif // else - MCM_GEOM_ACTIVE
 #endif // else - MCM_VOX
 }

@@ -12,6 +12,7 @@
 #define MCM_REFRACT 0
 #define MCM_GEOM_ACTIVE 0
 #define MCM_INVERSE_FADE 0
+#define MCM_NO_ALPHA_CAP 0
 
 #if MCM_GEOM_ACTIVE
 layout (binding = 0) uniform sampler2DArray s;
@@ -79,16 +80,19 @@ void main()
 		discard;
 	}
 #endif
-#if !MCM_TRANSP_ALLOWED
-	if (col.w * fi.color.w < 0.99)
-	{
-		discard;
-	}
+#if MCM_NO_ALPHA_CAP
 #else
+#if MCM_TRANSP_ALLOWED
 	if (col.w * fi.color.w < 0.01)
 	{
 		discard;
 	}
+#else
+	if (col.w * fi.color.w < 0.99)
+	{
+		discard;
+	}
+#endif
 #endif
 	float specular_strength = texture(spec, fi.texcoord).r;
 	float reflection_amt = texture(refl, fi.texcoord).r;
@@ -102,6 +106,10 @@ void main()
 	float dist = linearizeDepth(gl_FragCoord.z);
 	vec2 fc_xy = gl_FragCoord.xy / screen_size.xy;
 	float depthval = linearizeDepth(texture(depth, fc_xy).x);
-	color.w *= min(max((dist - depthval) * fi.size * 0.5 * (screen_size.z - screen_size.w), 0.0), 1.0);
+	float mod = min(max(0.001 / max(depthval - dist, 0.001), 0.0), 1.0);
+	if (mod < 0.8)
+	{
+		discard;
+	}
 #endif
 }

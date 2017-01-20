@@ -1352,6 +1352,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.BindTexture(TextureTarget.Texture2DArray, 0);
         }
 
         public int DecalGetTextureID(string f)
@@ -1369,6 +1370,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     DecalTextureLocations[f] = i;
                     GL.BindTexture(TextureTarget.Texture2DArray, DecTextureID);
                     Textures.LoadTextureIntoArray(f, i, DecTextureWidth);
+                    GL.BindTexture(TextureTarget.Texture2DArray, 0);
                     return i;
                 }
             }
@@ -1443,7 +1445,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.BindVertexArray(0);
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.Enable(EnableCap.CullFace);
-            GL.PolygonOffset(0, 0);
+            //GL.PolygonOffset(0, 0);
             //GL.Disable(EnableCap.PolygonOffsetFill);
         }
 

@@ -104,6 +104,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Client.Central.MainWorldView.Viewport(0, 0, Width, Height);
             GL.DrawBuffers(6, new DrawBuffersEnum[] { DrawBuffersEnum.ColorAttachment0, DrawBuffersEnum.ColorAttachment1,
                 DrawBuffersEnum.ColorAttachment2, DrawBuffersEnum.ColorAttachment3, DrawBuffersEnum.ColorAttachment4, DrawBuffersEnum.ColorAttachment5 });
+            //GL.BlendFunc(3, BlendingFactorSrc.One, BlendingFactorDest.Zero);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.Enable(EnableCap.Texture2D);
+        }
+
+        public void Clear()
+        {
             GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0f, 0f, 0f, 0f });
             GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
             GL.ClearBuffer(ClearBuffer.Color, 1, new float[] { 0f, 0f, 0f, 0f });
@@ -111,9 +118,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.ClearBuffer(ClearBuffer.Color, 3, new float[] { 0f, 0f, 0f, 0f });
             GL.ClearBuffer(ClearBuffer.Color, 4, new float[] { 0f, 0f, 0f, 0f });
             GL.ClearBuffer(ClearBuffer.Color, 5, new float[] { 0f, 0f, 0f, 0f });
-            //GL.BlendFunc(3, BlendingFactorSrc.One, BlendingFactorDest.Zero);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.Enable(EnableCap.Texture2D);
         }
 
         public void Unbind()

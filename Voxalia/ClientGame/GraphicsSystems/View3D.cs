@@ -166,7 +166,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         }
 
         const int HDR_SPREAD = 4;
-
+        
         public void GenerateLightHelpers()
         {
             if (RS4P != null)
@@ -185,6 +185,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.DeleteFramebuffers(LIGHTS_MAX, fbo_shadow);
                 GL.DeleteTextures(LIGHTS_MAX, fbo_shadow_depth);
                 GL.DeleteTexture(fbo_shadow_tex);
+                GL.DeleteFramebuffer(fbo_decal);
+                GL.DeleteTexture(fbo_decal_tex);
+                GL.DeleteTexture(fbo_decal_depth);
             }
             CheckError("Load - View3D - Light - Deletes");
             RS4P = new RenderSurface4Part(Width, Height, TheClient.Rendering);
@@ -246,12 +249,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             CheckError("Load - View3D - Light - Shadows");
-            for (int i = 0; i < LIGHTS_MAX; i++)
+            for (int i = 0; i < LIGHTS_MAX + 1; i++)
             {
                 fbo_shadow[i] = GL.GenFramebuffer();
                 fbo_shadow_depth[i] = GL.GenTexture();
                 GL.BindTexture(TextureTarget.Texture2D, fbo_shadow_depth[i]);
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32, sq, sq, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32, sq,sq, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
                 GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
@@ -265,11 +268,37 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             CheckError("Load - View3D - Light - Final");
+            fbo_decal = GL.GenFramebuffer();
+            fbo_decal_tex = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, fbo_decal_tex);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, Width, Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            fbo_decal_depth = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, fbo_decal_depth);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32, Width, Height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            BindFramebuffer(FramebufferTarget.Framebuffer, fbo_decal);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, fbo_decal_depth, 0);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, fbo_decal_tex, 0);
+            BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            CheckError("Load - View3D - Decal");
         }
 
-        int[] fbo_shadow = new int[LIGHTS_MAX];
+        int fbo_decal = -1;
+        int fbo_decal_depth = -1;
+        int fbo_decal_tex = -1;
+
+        int[] fbo_shadow = new int[LIGHTS_MAX + 1];
         int fbo_shadow_tex = -1;
-        int[] fbo_shadow_depth = new int[LIGHTS_MAX];
+        int[] fbo_shadow_depth = new int[LIGHTS_MAX + 1];
 
         int hdrfbo;
         int hdrtex;
@@ -617,6 +646,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public void RenderPass_FAST()
         {
             RS4P.Bind();
+            RS4P.Clear();
             RenderingShadows = false;
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_SOLID;
@@ -876,24 +906,30 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Stopwatch timer = new Stopwatch();
             timer.Start();
             oSetViewport();
+            TheClient.s_fbodecal = TheClient.s_fbodecal.Bind();
+            GL.UniformMatrix4(1, false, ref PrimaryMatrix);
+            GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform4(4, new Vector4(Width, Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             TheClient.s_fbov = TheClient.s_fbov.Bind();
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform2(8, new Vector2(TheClient.sl_min, TheClient.sl_max));
             TheClient.s_fbot = TheClient.s_fbot.Bind();
-            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             TheClient.s_fbo = TheClient.s_fbo.Bind();
-            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             FBOid = FBOID.MAIN;
             RenderingShadows = false;
             CFrust = camFrust;
             GL.ActiveTexture(TextureUnit.Texture0);
             RS4P.Bind();
+            RS4P.Clear();
             RenderLights = true;
             RenderSpecular = true;
             TheClient.Rendering.SetColor(Color4.White);
@@ -921,13 +957,60 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Render3D(this);
             }
             CheckError("AfterFBO");
-            RenderPass_RefractionBuffer(timer);
+            RenderPass_Decals();
+            RenderPass_RefractionBuffer();
+            timer.Stop();
+            FBOTime = (double)timer.ElapsedMilliseconds / 1000f;
+            if (FBOTime > FBOSpikeTime)
+            {
+                FBOSpikeTime = FBOTime;
+            }
+        }
+
+        /// <summary>
+        /// Adds decal data to the G-Buffer ("FBO").
+        /// </summary>
+        public void RenderPass_Decals()
+        {
+            TheClient.s_fbodecal = TheClient.s_fbodecal.Bind();
+            RS4P.Unbind();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbo_decal);
+            GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
+            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, RS4P.fbo);
+            GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Width, Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
+            RS4P.Bind();
+            GL.ActiveTexture(TextureUnit.Texture4);
+            GL.BindTexture(TextureTarget.Texture2D, fbo_decal_depth);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.DepthMask(false);
+            if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
+            {
+                Viewport(Width / 2, 0, Width / 2, Height);
+                DecalRender?.Invoke(this);
+                CFrust = cf2;
+                Viewport(0, 0, Width / 2, Height);
+                CameraPos = cameraBasePos - cameraAdjust;
+                GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
+                DecalRender?.Invoke(this);
+                Viewport(0, 0, Width, Height);
+                CameraPos = cameraBasePos + cameraAdjust;
+                CFrust = camFrust;
+            }
+            else
+            {
+                DecalRender?.Invoke(this);
+            }
+            GL.DepthMask(true);
+            GL.ActiveTexture(TextureUnit.Texture4);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.ActiveTexture(TextureUnit.Texture0);
         }
 
         /// <summary>
         /// Adds refraction data to the G-Buffer ("FBO").
         /// </summary>
-        public void RenderPass_RefractionBuffer(Stopwatch timer)
+        public void RenderPass_RefractionBuffer()
         {
             FBOid = FBOID.REFRACT;
             TheClient.s_fbov_refract = TheClient.s_fbov_refract.Bind();
@@ -966,12 +1049,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             RenderSpecular = false;
             RS4P.Unbind();
             FBOid = FBOID.NONE;
-            timer.Stop();
-            FBOTime = (double)timer.ElapsedMilliseconds / 1000f;
-            if (FBOTime > FBOSpikeTime)
-            {
-                FBOSpikeTime = FBOTime;
-            }
         }
 
         public Matrix4 SimpleOrthoMatrix = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
