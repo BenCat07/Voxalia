@@ -10,6 +10,7 @@
 
 #define MCM_VOX 0
 #define MCM_GEOM_ACTIVE 0
+#define MCM_INVERSE_FADE 0
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -131,11 +132,13 @@ void main()
 	fi.norm = fnorm.xyz / fnorm.w;
     fi.color = color_for(mv_matrix * vec4(pos1.xyz, 1.0), color * v_color);
 	gl_Position = proj_matrix * mv_matrix * vec4(pos1.xyz, 1.0);
+#if MCM_INVERSE_FADE
 	if (force_depth != 0.0)
 	{
 		gl_Position /= gl_Position.w;
 		gl_Position.z = 0.99 + gl_Position.z * 0.01;
 	}
+#endif // MCM_INVERSE_FADE
 #endif // else - MCM_GEOM_ACTIVE
 #endif // else - MCM_VOX
 }

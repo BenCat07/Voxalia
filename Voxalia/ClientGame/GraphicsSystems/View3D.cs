@@ -696,6 +696,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.BindTexture(TextureTarget.Texture2D, RS4P.DepthTexture);
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_EXTRAS;
+            GL.DepthMask(false);
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
             {
                 Viewport(Width / 2, 0, Width / 2, Height);
@@ -739,7 +740,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 PostFirstRender();
             }
-            GL.DepthMask(false);
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
             {
                 Viewport(Width / 2, 0, Width / 2, Height);

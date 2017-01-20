@@ -112,6 +112,10 @@ void main()
 	float dist = linearizeDepth(gl_FragCoord.z);
 	vec2 fc_xy = gl_FragCoord.xy / screen_size.xy;
 	float depthval = linearizeDepth(texture(depth, fc_xy).x);
-	color.w *= min(max(max((depthval - dist) * fi.size * 0.5 * (screen_size.z - screen_size.w), 0.01), 0.0), 1.0);
+	float mod = min(max(0.001 / max(depthval - dist, 0.001), 0.0), 1.0);
+	if (mod < 0.8)
+	{
+		discard;
+	}
 #endif
 }

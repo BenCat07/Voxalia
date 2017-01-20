@@ -1391,11 +1391,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <param name="view">The view to render.</param>
         public void RenderDecal(View3D view)
         {
-            GL.PolygonOffset(-1, -2);
+            //GL.PolygonOffset(-1, -2);
             GL.Disable(EnableCap.CullFace);
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2DArray, DecTextureID);
-            GL.Enable(EnableCap.PolygonOffsetFill);
+            //GL.Enable(EnableCap.PolygonOffsetFill);
             Vector3[] pos = new Vector3[Decals.Count];
             Vector3[] nrm = new Vector3[Decals.Count];
             Vector4[] col = new Vector4[Decals.Count];
@@ -1444,7 +1444,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.Enable(EnableCap.CullFace);
             GL.PolygonOffset(0, 0);
-            GL.Disable(EnableCap.PolygonOffsetFill);
+            //GL.Disable(EnableCap.PolygonOffsetFill);
         }
 
         /// <summary>
