@@ -165,7 +165,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
         }
 
-        const int HDR_SPREAD = 4;
+        const int HDR_SPREAD = 8;
         
         public void GenerateLightHelpers()
         {
