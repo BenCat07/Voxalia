@@ -86,8 +86,8 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
         {
             if (ResetOnRender)
             {
-                GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0, 0.5f, 0.5f, 1 });
-                GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1 });
+                GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0f, 0.5f, 0.5f, 1f });
+                GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
             }
             base.RenderChildren(delta, xoff, yoff);
         }

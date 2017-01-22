@@ -713,9 +713,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             renderGame();
                         }
                         TWOD_CFrame++;
-                        if (TWOD_CFrame > CVars.u_rate.ValueI)
+                        if (CScreen != TheGameScreen || TWOD_CFrame > CVars.u_rate.ValueI)
                         {
                             TWOD_CFrame = 0;
+                            Establish2D();
                             GL.BindFramebuffer(FramebufferTarget.Framebuffer, TWOD_FBO);
                             GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
                             GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0, 0, 0, 0 });
@@ -852,7 +853,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
-                Establish2D();
                 if (CVars.r_3d_enable.ValueB || VR != null)
                 {
                     CDrawWidth = Window.Width / 2;
