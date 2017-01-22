@@ -748,11 +748,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         Shaders.ColorMultShader.Bind();
                         Rendering.SetColor(Vector4.One);
                         Matrix4 ortho = Matrix4.CreateOrthographicOffCenter(0, Window.Width, 0, Window.Height, -1, 1);
+                        Matrix4 ident = Matrix4.Identity;
+                        GL.UniformMatrix4(40, false, ref ident);
                         GL.UniformMatrix4(1, false, ref ortho);
                         GL.BindTexture(TextureTarget.Texture2D, TWOD_FBO_Tex);
+                        GL.Disable(EnableCap.DepthTest);
+                        GL.Disable(EnableCap.CullFace);
                         Rendering.RenderRectangle(0, 0, Window.Width, Window.Height);
                         GL.BindTexture(TextureTarget.Texture2D, 0);
-                        GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
+                        GL.Enable(EnableCap.CullFace);
+                        GL.Enable(EnableCap.DepthTest);
                     }
                     catch (Exception ex)
                     {
