@@ -49,7 +49,7 @@ namespace Voxalia.ClientGame.CommandSystem
         public CVar u_mouse_sensitivity, u_reticle, u_reticlescale, u_showhud,
             u_highlight_targetblock, u_highlight_placeblock, u_showping,
             u_debug, u_showmap, u_showrangefinder, u_showcompass,
-            u_colortyping;
+            u_colortyping, u_rate;
         
         /// <summary>
         /// Prepares the CVar system, generating default CVars.
@@ -142,6 +142,7 @@ namespace Voxalia.ClientGame.CommandSystem
             u_showping = Register("u_showping", "true", CVarFlag.Boolean, "Whether to display the current ping on the UI.");
             u_showcompass = Register("u_showcompass", "false", CVarFlag.Boolean | CVarFlag.ServerControl, "Whether to display a compass on the HUD.");
             u_colortyping = Register("u_colortyping", "false", CVarFlag.Boolean, "Whether to color the text currently being typed typed (chat, console, ...).");
+            u_rate = Register("u_rate", "3", CVarFlag.Numeric, "How many frames between UI updates.");
         }
 
         CVar Register(string name, string value, CVarFlag flags, string desc = null)

@@ -23,7 +23,7 @@ namespace Voxalia.ServerGame.NetworkSystem
 
         public List<string> Strings = new List<string>();
 
-        public Dictionary<string, int> StringsMap = new Dictionary<string, int>();
+        public Dictionary<string, int> StringsMap = new Dictionary<string, int>(1000);
 
         public int IndexForString(string str)
         {

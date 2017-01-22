@@ -161,7 +161,34 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 skybox[i].GenerateVBO();
             }
+            RainCyl = Models.GetModel("raincyl");
+            RainCyl.LoadSkin(Textures);
+            SnowCyl = Models.GetModel("snowcyl");
+            SnowCyl.LoadSkin(Textures);
             View3D.CheckError("Load - Rendering - Final");
+            TWOD_FBO = GL.GenFramebuffer();
+            TWOD_FBO_Tex = GL.GenTexture();
+            TWOD_FixTexture();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, TWOD_FBO);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, TWOD_FBO_Tex, 0);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        }
+
+        public int TWOD_CFrame = 0;
+
+        public int TWOD_FBO;
+
+        public int TWOD_FBO_Tex;
+
+        public void TWOD_FixTexture()
+        {
+            GL.BindTexture(TextureTarget.Texture2D, TWOD_FBO_Tex);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Window.Width, Window.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
         }
 
         /// <summary>
@@ -219,11 +246,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_transponly_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
             s_transponlylit_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
             s_transponlylitsh_ll_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_LL,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
-            // TODO: Better place for models?
-            RainCyl = Models.GetModel("raincyl");
-            RainCyl.LoadSkin(Textures);
-            SnowCyl = Models.GetModel("snowcyl");
-            SnowCyl.LoadSkin(Textures);
         }
 
         /// <summary>
@@ -660,15 +682,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Draws the entire 2D environment.
         /// </summary>
-        /// <param name="w">The width of the screen currently.</param>
-        public void Draw2DEnv(int w)
+        public void Draw2DEnv()
         {
             CScreen.FullRender(gDelta, 0, 0);
-            if (Loading > 0)
-            {
-                RenderLoader(w - 100f, 100f, 100f, gDelta);
-            }
-            UIConsole.Draw();
         }
 
         /// <summary>
@@ -684,20 +700,52 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     try
                     {
+                        // TODO: Cleaner way to determine when to render 3D game.
+                        if (CScreen == TheGameScreen)
+                        {
+                            renderGame();
+                        }
+                        TWOD_CFrame++;
+                        if (TWOD_CFrame > CVars.u_rate.ValueI)
+                        {
+                            TWOD_CFrame = 0;
+                            GL.BindFramebuffer(FramebufferTarget.Framebuffer, TWOD_FBO);
+                            GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
+                            GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0, 0, 0, 0 });
+                            Shaders.ColorMultShader.Bind();
+                            GL.Uniform1(6, (float)GlobalTickTimeLocal);
+                            if (CVars.r_3d_enable.ValueB || VR != null)
+                            {
+                                GL.Viewport(Window.Width / 2, 0, Window.Width / 2, Window.Height);
+                                Draw2DEnv();
+                                GL.Viewport(0, 0, Window.Width / 2, Window.Height);
+                                Draw2DEnv();
+                                GL.Viewport(0, 0, Window.Width, Window.Height);
+                            }
+                            else
+                            {
+                                Draw2DEnv();
+                            }
+                            UIConsole.Draw();
+                        }
+                        if (VR != null)
+                        {
+                            Shaders.ColorMultShader.Bind();
+                            GL.UniformMatrix4(1, false, ref MainWorldView.SimpleOrthoMatrix);
+                            GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
+                            GL.BindTexture(TextureTarget.Texture2D, MainWorldView.CurrentFBOTexture);
+                            Rendering.RenderRectangle(-1, -1, 1, 1);
+                        }
+                        GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                        GL.DrawBuffer(DrawBufferMode.Back);
                         Shaders.ColorMultShader.Bind();
-                        GL.Uniform1(6, (float)GlobalTickTimeLocal);
-                        if (CVars.r_3d_enable.ValueB || VR != null)
-                        {
-                            GL.Viewport(Window.Width / 2, 0, Window.Width / 2, Window.Height);
-                            Draw2DEnv(Window.Width / 2);
-                            GL.Viewport(0, 0, Window.Width / 2, Window.Height);
-                            Draw2DEnv(Window.Width / 2);
-                            GL.Viewport(0, 0, Window.Width, Window.Height);
-                        }
-                        else
-                        {
-                            Draw2DEnv(Window.Width);
-                        }
+                        Rendering.SetColor(Vector4.One);
+                        Matrix4 ortho = Matrix4.CreateOrthographicOffCenter(0, Window.Width, 0, Window.Height, -1, 1);
+                        GL.UniformMatrix4(1, false, ref ortho);
+                        GL.BindTexture(TextureTarget.Texture2D, TWOD_FBO_Tex);
+                        Rendering.RenderRectangle(0, 0, Window.Width, Window.Height);
+                        GL.BindTexture(TextureTarget.Texture2D, 0);
+                        GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
                     }
                     catch (Exception ex)
                     {
@@ -723,14 +771,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 timer.Start();
                 View3D.CheckError("Finish");
-                if (VR != null)
-                {
-                    Shaders.ColorMultShader.Bind();
-                    GL.UniformMatrix4(1, false, ref MainWorldView.SimpleOrthoMatrix);
-                    GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
-                    GL.BindTexture(TextureTarget.Texture2D, MainWorldView.CurrentFBOTexture);
-                    Rendering.RenderRectangle(-1, -1, 1, 1);
-                }
                 Window.SwapBuffers();
                 if (VR != null)
                 {
@@ -803,6 +843,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Establish2D();
                 if (CVars.r_3d_enable.ValueB || VR != null)
                 {
+                    CDrawWidth = Window.Width / 2;
                     GL.Viewport(Window.Width / 2, 0, Window.Width / 2, Window.Height);
                     Render2D(false);
                     GL.Viewport(0, 0, Window.Width / 2, Window.Height);
@@ -811,6 +852,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 else
                 {
+                    CDrawWidth = Window.Width;
                     Render2D(false);
                 }
                 timer.Stop();
@@ -1870,7 +1912,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 FixPersp = Matrix4.Identity;
             }
+            else
+            {
+                if (Loading > 0)
+                {
+                    RenderLoader(CDrawWidth - 100f, 100f, 100f, gDelta);
+                }
+            }
         }
+
+        public int CDrawWidth;
 
         /// <summary>
         /// Renders a compass coordinate to the screen.

@@ -31,16 +31,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         const float LI1_START_MOD = (float)Math.PI * 2.0f * 0.5f;
 
-        public double LI_Time = 0;
+        public double LI1_Time = 0;
 
         public void RenderLoadIconV1(float x, float y, float size, double delta)
         {
             int spokes = (int)(size * 0.5f * LI1_SPOKE_REL);
             float sz = Math.Abs(size * 0.5f);
-            double rot = LI1_START_MOD * LI_Time;
+            double rot = LI1_START_MOD * LI1_Time;
             rot %= (Math.PI * 0.5);
             double sind = Math.Sin(rot * 2.0) * 0.5;
-            LI_Time += delta * Math.Max(sind, 0.0001);
+            LI1_Time += delta * Math.Max(sind, 0.0001);
             for (int i = 0; i < spokes; i++)
             {
                 rot = rot % (Math.PI * 0.5);
@@ -63,6 +63,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         const float LI2_ONE_OVER_SPOKES = 1.0f / LI2_SPOKES;
 
+        public double LI2_Time = 0;
+
         public void RenderLoadIconV2(float x, float y, float size, double delta, Vector3? color = null)
         {
             Vector4 fcol;
@@ -75,10 +77,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 fcol = new Vector4(0.1f, 1.0f, 0.1f, 1.0f);
             }
             float sz = Math.Abs(size * 0.5f);
-            double rot = LI2_START_MOD * LI_Time;
+            double rot = LI2_START_MOD * LI2_Time;
             rot %= (Math.PI * 0.5);
             double sind = Math.Sin(rot * 2.0) * 0.5;
-            LI_Time += delta * Math.Max(sind, 0.0001);
+            LI2_Time += delta * Math.Max(sind, 0.0001);
             for (int i = 0; i < LI2_SPOKES; i++)
             {
                 rot = rot % (Math.PI * 0.5);

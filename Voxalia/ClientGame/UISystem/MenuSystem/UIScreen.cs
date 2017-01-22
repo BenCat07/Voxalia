@@ -84,7 +84,6 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
 
         protected override void RenderChildren(double delta, int xoff, int yoff)
         {
-            TheClient.Establish2D();
             if (ResetOnRender)
             {
                 GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0, 0.5f, 0.5f, 1 });

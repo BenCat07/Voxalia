@@ -6,8 +6,12 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.ClientGame.UISystem;
 using Voxalia.ClientGame.UISystem.MenuSystem;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -22,11 +26,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             MouseHandler.CaptureMouse();
         }
-        
+
         protected override void Render(double delta, int xoff, int yoff)
         {
-            TheClient.renderGame();
-            TheClient.Establish2D();
             TheClient.Render2DGame();
         }
     }
