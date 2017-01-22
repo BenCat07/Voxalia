@@ -23,19 +23,20 @@ namespace Voxalia.ServerGame.NetworkSystem
 
         public List<string> Strings = new List<string>();
 
+        public Dictionary<string, int> StringsMap = new Dictionary<string, int>();
+
         public int IndexForString(string str)
         {
-            int i = Strings.IndexOf(str);
-            if (i < 0 || i >= Strings.Count)
+            int ind;
+            if (StringsMap.TryGetValue(str, out ind))
             {
-                Strings.Add(str);
-                TheServer.SendToAll(new NetStringPacketOut(str));
-                return Strings.Count - 1;
+                return ind;
             }
-            else
-            {
-                return i;
-            }
+            ind = Strings.Count;
+            Strings.Add(str);
+            StringsMap[str] = ind;
+            TheServer.SendToAll(new NetStringPacketOut(str));
+            return ind;
         }
 
         public string StringForIndex(int ind)
