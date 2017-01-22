@@ -664,6 +664,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public int gFPS = 0;
 
+        public int gFPS_Min = 0;
+
+        public int gFPS_Max = 0;
+
         /// <summary>
         /// Render ticks since last shadow update.
         /// </summary>
@@ -695,6 +699,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             lock (TickLock)
             {
                 gDelta = e.Time;
+                int gfps = (int)(1.0 / gDelta);
+                gFPS_Min = gFPS_Min == 0 ? gfps : Math.Min(gFPS_Min, gfps);
+                gFPS_Max = Math.Max(gFPS_Max, gfps);
                 gTicks++;
                 if (Window.Visible && Window.WindowState != WindowState.Minimized && Window.Width > 10 && Window.Height > 10)
                 {
@@ -1805,7 +1812,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 if (!sub3d && CVars.u_debug.ValueB)
                 {
-                    FontSets.Standard.DrawColoredText(FontSets.Standard.SplitAppropriately("^!^e^7gFPS(calc): " + (1f / gDelta).ToString(timeformat_fps2) + ", gFPS(actual): " + gFPS
+                    FontSets.Standard.DrawColoredText(FontSets.Standard.SplitAppropriately("^!^e^7gFPS(calc): " + (1f / gDelta).ToString(timeformat_fps2) + ", gFPS(actual): " + gFPS + ", gFPS(range): " + gFPS_Min + " to " + gFPS_Max
                         + "\nHeld Item: " + GetItemForSlot(QuickBarPos).ToString()
                         + "\nTimes -> Physics: " + TheRegion.PhysTime.ToString(timeformat) + ", Shadows: " + MainWorldView.ShadowTime.ToString(timeformat)
                         + ", FBO: " + MainWorldView.FBOTime.ToString(timeformat) + ", Lights: " + MainWorldView.LightsTime.ToString(timeformat) + ", 2D: " + TWODTime.ToString(timeformat)
