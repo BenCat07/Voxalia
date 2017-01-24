@@ -89,11 +89,11 @@ namespace Voxalia.ServerGame.WorldSystem
             Vector2i two4 = HigherLocFor(two3);
             // TODO: Send notice packet to affected players!
             bua.Edited = false;
-            ChunkManager.WriteTops(two.X, two.Y, bua.ToBytes()); // 1x
-            byte[] z1 = PushTopsToHigherStart(two1, two, bua); // 5x
-            byte[] z2 = PushTopsToHigherSubsequent(two2, two1, 2, z1); // 25x
-            byte[] z3 = PushTopsToHigherSubsequent(two3, two2, 3, z2); // 125x
-            PushTopsToHigherSubsequent(two4, two3, 4, z3); // 625x
+            ChunkManager.WriteTops(two.X, two.Y, bua.ToBytes(), bua.ToBytesTrans()); // 1x
+            KeyValuePair<byte[], byte[]> z1 = PushTopsToHigherStart(two1, two, bua); // 5x
+            KeyValuePair<byte[], byte[]> z2 = PushTopsToHigherSubsequent(two2, two1, 2, z1.Key, z1.Value); // 25x
+            KeyValuePair<byte[], byte[]> z3 = PushTopsToHigherSubsequent(two3, two2, 3, z2.Key, z2.Value); // 125x
+            PushTopsToHigherSubsequent(two4, two3, 4, z3.Key, z3.Value); // 625x
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -102,51 +102,78 @@ namespace Voxalia.ServerGame.WorldSystem
             return y * Constants.CHUNK_WIDTH + x;
         }
 
-        public byte[] PushTopsToHigherStart(Vector2i two, Vector2i two_lower, BlockUpperArea bua)
+        public KeyValuePair<byte[], byte[]> PushTopsToHigherStart(Vector2i two, Vector2i two_lower, BlockUpperArea bua)
         {
             Vector2i relPos;
             relPos.X = two_lower.X - two.X * HIGHER_DIV;
             relPos.Y = two_lower.Y - two.Y * HIGHER_DIV;
-            byte[] b = ChunkManager.GetTopsHigher(two.X, two.Y, 1);
+            KeyValuePair<byte[], byte[]> bses = ChunkManager.GetTopsHigher(two.X, two.Y, 1);
+            byte[] b = bses.Key;
+            byte[] bt = bses.Value;
             if (b == null)
             {
                 b = new byte[Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 2];
+            }
+            if (bt == null)
+            {
+                bt = new byte[Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 2 * 4];
             }
             for (int x = 0; x < HIGHER_SIZE; x++)
             {
                 for (int y = 0; y < HIGHER_SIZE; y++)
                 {
-                    Material mat = bua.Blocks[bua.BlockIndex(x * 5, y * 5)].BasicMat;
+                    int inder = bua.BlockIndex(x * 5, y * 5);
+                    Material mat = bua.Blocks[inder].BasicMat;
                     int ind = TopsHigherBlockIndex(x + relPos.X * HIGHER_SIZE, y + relPos.Y * HIGHER_SIZE);
                     Utilities.UshortToBytes((ushort)mat).CopyTo(b, ind * 2);
+                    ind *= 4;
+                    inder *= 4;
+                    for (int bz = 0; bz < 4; bz++)
+                    {
+                        mat = bua.BlocksTrans[inder + bz].BasicMat;
+                        Utilities.UshortToBytes((ushort)mat).CopyTo(bt, (ind + bz) * 2);
+                    }
                 }
             }
-            ChunkManager.WriteTopsHigher(two.X, two.Y, 1, b);
-            return b;
+            ChunkManager.WriteTopsHigher(two.X, two.Y, 1, b, bt);
+            return new KeyValuePair<byte[], byte[]>(b, bt);
         }
 
-        public byte[] PushTopsToHigherSubsequent(Vector2i two, Vector2i two_lower, int z, byte[] lb)
+        public KeyValuePair<byte[], byte[]> PushTopsToHigherSubsequent(Vector2i two, Vector2i two_lower, int z, byte[] lb, byte[] lbt)
         {
             Vector2i relPos;
             relPos.X = two_lower.X - two.X * HIGHER_DIV;
             relPos.Y = two_lower.Y - two.Y * HIGHER_DIV;
-            byte[] b = ChunkManager.GetTopsHigher(two.X, two.Y, z);
+            KeyValuePair<byte[], byte[]> bses = ChunkManager.GetTopsHigher(two.X, two.Y, z);
+            byte[] b = bses.Key;
+            byte[] bt = bses.Value;
             if (b == null)
             {
                 b = new byte[Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 2];
+            }
+            if (bt == null)
+            {
+                bt = new byte[Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 2 * 4];
             }
             for (int x = 0; x < HIGHER_SIZE; x++)
             {
                 for (int y = 0; y < HIGHER_SIZE; y++)
                 {
-                    int i1 = TopsHigherBlockIndex(x * 5, y * 5);
-                    int ind = TopsHigherBlockIndex(x + relPos.X, y + relPos.Y);
+                    int i1 = TopsHigherBlockIndex(x * 5, y * 5) * 2;
+                    int ind = TopsHigherBlockIndex(x + relPos.X, y + relPos.Y) * 2;
                     b[ind] = lb[i1];
                     b[ind + 1] = lb[i1 + 1];
+                    ind *= 4;
+                    i1 *= 4;
+                    for (int bz = 0; bz < 4; bz++)
+                    {
+                        bt[ind + bz * 2] = lbt[i1 + bz * 2];
+                        bt[ind + bz * 2 + 1] = lbt[i1 + bz * 2 + 1];
+                    }
                 }
             }
-            ChunkManager.WriteTopsHigher(two.X, two.Y, z, b);
-            return b;
+            ChunkManager.WriteTopsHigher(two.X, two.Y, z, b, bt);
+            return new KeyValuePair<byte[], byte[]>(b, bt);
         }
 
         public BlockUpperArea.TopBlock GetHighestBlock(Location pos)
@@ -179,11 +206,15 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
                 else
                 {
+                    if (mat.RendersAtAll())
+                    {
+                        bua.TryPushTrans(rx, ry, (int)pos.Z, mat);
+                    }
                     int min = ChunkManager.GetMins(two.X, two.Y);
                     for (int i = wpos.Z; i >= min; i--)
                     {
                         Chunk chk = LoadChunkNoPopulate(new Vector3i(wpos.X, wpos.Y, i));
-                        if (chk == null)
+                        if (chk == null || chk.Flags.HasFlag(ChunkFlags.ISCUSTOM))
                         {
                             continue;
                         }
@@ -220,11 +251,15 @@ namespace Voxalia.ServerGame.WorldSystem
             BlockUpperArea bua;
             if (!UpperAreas.TryGetValue(two, out bua))
             {
-                byte[] b = ChunkManager.GetTops(two.X, two.Y);
+                KeyValuePair<byte[], byte[]> b = ChunkManager.GetTops(two.X, two.Y);
                 bua = new BlockUpperArea();
-                if (b != null)
+                if (b.Key != null)
                 {
-                    bua.FromBytes(b);
+                    bua.FromBytes(b.Key);
+                }
+                if (b.Value != null)
+                {
+                    bua.FromBytesTrans(b.Value);
                 }
                 UpperAreas[two] = bua;
             }
@@ -268,6 +303,11 @@ namespace Voxalia.ServerGame.WorldSystem
                                 if (bi.IsOpaque())
                                 {
                                     bua.TryPush(x, y, z + chk.WorldPosition.Z * Constants.CHUNK_WIDTH, bi.Material);
+                                    break;
+                                }
+                                else if (bi.Material.RendersAtAll())
+                                {
+                                    bua.TryPushTrans(x, y, z + chk.WorldPosition.Z * Constants.CHUNK_WIDTH, bi.Material);
                                     break;
                                 }
                             }

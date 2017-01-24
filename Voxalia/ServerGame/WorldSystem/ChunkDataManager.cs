@@ -26,12 +26,6 @@ namespace Voxalia.ServerGame.WorldSystem
 
         LiteCollection<BsonDocument> DBChunks;
 
-        LiteCollection<BsonDocument> DBTops;
-
-        LiteCollection<BsonDocument> DBTopsHigher;
-
-        LiteCollection<BsonDocument> DBMins;
-
         LiteDatabase LODsDatabase;
 
         LiteCollection<BsonDocument> DBLODs;
@@ -39,7 +33,15 @@ namespace Voxalia.ServerGame.WorldSystem
         LiteDatabase EntsDatabase;
 
         LiteCollection<BsonDocument> DBEnts;
+
+        LiteDatabase TopsDatabase;
+
+        LiteCollection<BsonDocument> DBTops;
+
+        LiteCollection<BsonDocument> DBTopsHigher;
         
+        LiteCollection<BsonDocument> DBMins;
+
         public void Init(Region tregion)
         {
             TheRegion = tregion;
@@ -48,13 +50,14 @@ namespace Voxalia.ServerGame.WorldSystem
             dir = TheRegion.TheServer.Files.BaseDirectory + dir;
             Database = new LiteDatabase("filename=" + dir + "chunks.ldb");
             DBChunks = Database.GetCollection<BsonDocument>("chunks");
-            DBTops = Database.GetCollection<BsonDocument>("tops");
-            DBTopsHigher = Database.GetCollection<BsonDocument>("topshigh");
-            DBMins = Database.GetCollection<BsonDocument>("mins");
             LODsDatabase = new LiteDatabase("filename=" + dir + "lod_chunks.ldb");
             DBLODs = LODsDatabase.GetCollection<BsonDocument>("lodchunks");
             EntsDatabase = new LiteDatabase("filename=" + dir + "ents.ldb");
             DBEnts = EntsDatabase.GetCollection<BsonDocument>("ents");
+            TopsDatabase = new LiteDatabase("filename=" + dir + "tops.ldb");
+            DBTops = TopsDatabase.GetCollection<BsonDocument>("tops");
+            DBTopsHigher = TopsDatabase.GetCollection<BsonDocument>("topshigh");
+            DBMins = TopsDatabase.GetCollection<BsonDocument>("mins");
         }
         
         public void Shutdown()
@@ -62,6 +65,7 @@ namespace Voxalia.ServerGame.WorldSystem
             Database.Dispose();
             LODsDatabase.Dispose();
             EntsDatabase.Dispose();
+            TopsDatabase.Dispose();
         }
 
         public BsonValue GetIDFor(int x, int y, int z)
@@ -159,47 +163,53 @@ namespace Voxalia.ServerGame.WorldSystem
             BsonValue id = GetIDFor(details.X, details.Y, details.Z);
             DBChunks.Delete(id);
         }
-
-        public void WriteTopsHigher(int x, int y, int z, byte[] tops)
+        
+        public void WriteTopsHigher(int x, int y, int z, byte[] tops, byte[] tops_trans)
         {
             BsonValue id = GetIDFor(x, y, z);
             BsonDocument newdoc = new BsonDocument();
             Dictionary<string, BsonValue> tbs = newdoc.RawValue;
             tbs["_id"] = id;
             tbs["tops"] = new BsonValue(FileHandler.Compress(tops));
+            tbs["topstrans"] = new BsonValue(FileHandler.Compress(tops_trans));
             DBTopsHigher.Upsert(newdoc);
         }
 
-        public byte[] GetTopsHigher(int x, int y, int z)
+        public KeyValuePair<byte[], byte[]> GetTopsHigher(int x, int y, int z)
         {
             BsonDocument doc;
             doc = DBTopsHigher.FindById(GetIDFor(x, y, z));
             if (doc == null)
             {
-                return null;
+                return new KeyValuePair<byte[], byte[]>(null, null);
             }
-            return FileHandler.Uncompress(doc["tops"].AsBinary);
+            byte[] b1 = FileHandler.Uncompress(doc["tops"].AsBinary);
+            byte[] b2 = FileHandler.Uncompress(doc["topstrans"].AsBinary);
+            return new KeyValuePair<byte[], byte[]>(b1, b2);
         }
 
-        public void WriteTops(int x, int y, byte[] tops)
+        public void WriteTops(int x, int y, byte[] tops, byte[] tops_trans)
         {
             BsonValue id = GetIDFor(x, y, 0);
             BsonDocument newdoc = new BsonDocument();
             Dictionary<string, BsonValue> tbs = newdoc.RawValue;
             tbs["_id"] = id;
             tbs["tops"] = new BsonValue(FileHandler.Compress(tops));
+            tbs["topstrans"] = new BsonValue(FileHandler.Compress(tops_trans));
             DBTops.Upsert(newdoc);
         }
 
-        public byte[] GetTops(int x, int y)
+        public KeyValuePair<byte[], byte[]> GetTops(int x, int y)
         {
             BsonDocument doc;
             doc = DBTops.FindById(GetIDFor(x, y, 0));
             if (doc == null)
             {
-                return null;
+                return new KeyValuePair<byte[], byte[]>(null, null);
             }
-            return FileHandler.Uncompress(doc["tops"].AsBinary);
+            byte[] b1 = FileHandler.Uncompress(doc["tops"].AsBinary);
+            byte[] b2 = FileHandler.Uncompress(doc["topstrans"].AsBinary);
+            return new KeyValuePair<byte[], byte[]>(b1, b2);
         }
 
         /// <summary>

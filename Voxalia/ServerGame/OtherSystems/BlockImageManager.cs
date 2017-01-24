@@ -59,13 +59,27 @@ namespace Voxalia.ServerGame.OtherSystems
     {
         public const int TexWidth = 4;
         public MaterialImage[] MaterialImages;
-        
+
+        FastColor Blend(FastColor one, FastColor two)
+        {
+            int a2 = 255 - one.A;
+            return new FastColor()
+            {
+                R = (byte)(((one.R * one.A) / 255) + ((two.R * a2) / 255)),
+                G = (byte)(((one.G * one.A) / 255) + ((two.G * a2) / 255)),
+                B = (byte)(((one.B * one.A) / 255) + ((two.B * a2) / 255)),
+                A = (byte)Math.Min(one.A + two.A, 255)
+            };
+        }
+
         public byte[] GetChunkRenderHD(WorldSystem.Region tregion, int tx, int ty, bool fullzoom)
         {
             int wid = (fullzoom ? TexWidth * Constants.CHUNK_WIDTH : Constants.CHUNK_WIDTH);
             MaterialImage bmp = new MaterialImage() { Colors = new FastColor[wid * wid], Width = wid, Height = wid };
-            byte[] bits = tregion.ChunkManager.GetTops(tx, ty);
-            if (bits == null)
+            KeyValuePair<byte[], byte[]> bitters = tregion.ChunkManager.GetTops(tx, ty);
+            byte[] bits = bitters.Key;
+            byte[] bits_trans = bitters.Value;
+            if (bits == null || bits_trans == null)
             {
                 return null;
             }
@@ -82,13 +96,31 @@ namespace Voxalia.ServerGame.OtherSystems
                         {
                             for (int sy = 0; sy < TexWidth; sy++)
                             {
-                                bmp.SetAt(x * TexWidth + sx, y * TexWidth + sy, imag.GetAt(sx, sy));
+                                FastColor fc = imag.GetAt(sx, sy);
+                                fc.A = 255;
+                                for (int i = 3; i >= 0; i--)
+                                {
+                                    mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, (ind * 4 + i) * 2, 2));
+                                    imag = MaterialImages[mat];
+                                    FastColor fc2 = imag.GetAt(sx, sy);
+                                    fc = Blend(fc2, fc);
+                                }
+                                bmp.SetAt(x * TexWidth + sx, y * TexWidth + sy, fc);
                             }
                         }
                     }
                     else
                     {
-                        bmp.SetAt(x, y, imag.GetAt(0, 0));
+                        FastColor fc = imag.GetAt(0, 0);
+                        fc.A = 255;
+                        for (int i = 3; i >= 0; i--)
+                        {
+                            mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, ind * 2 * 4, 2));
+                            imag = MaterialImages[mat];
+                            FastColor fc2 = imag.GetAt(0, 0);
+                            fc = Blend(fc2, fc);
+                        }
+                        bmp.SetAt(x, y, fc);
                     }
                 }
             }

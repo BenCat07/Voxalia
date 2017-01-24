@@ -28,10 +28,18 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             BlockUpperArea bua = new BlockUpperArea();
             int x = Utilities.BytesToInt(Utilities.BytesPartial(data, 0, 4));
             int y = Utilities.BytesToInt(Utilities.BytesPartial(data, 4, 4));
-            byte[] subdata = FileHandler.Uncompress(Utilities.BytesPartial(data, 4 + 4, data.Length - (4 + 4)));
+            int len = Utilities.BytesToInt(Utilities.BytesPartial(data, 4 + 4, 4));
+            byte[] subdata = FileHandler.Uncompress(Utilities.BytesPartial(data, 4 + 4 + 4, len));
             for (int i = 0; i < (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH); i++)
             {
                 bua.Blocks[i] = Utilities.BytesToInt(Utilities.BytesPartial(subdata, i * 4, 4));
+            }
+            subdata = FileHandler.Uncompress(Utilities.BytesPartial(data, 4 + 4 + 4 + len, data.Length - (4 + 4 + 4 + len)));
+            for (int i = 0; i < (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 4); i++)
+            {
+                ushort mat = Utilities.BytesToUshort(Utilities.BytesPartial(subdata, i * 2, 2));
+                int height = Utilities.BytesToInt(Utilities.BytesPartial(subdata, (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 4 * 2) + i * 4, 4));
+                bua.BlocksTrans[i] = new BlockUpperArea.TopBlock() { BasicMat = (Material)mat, Height = height };
             }
             TheClient.TheRegion.UpperAreas[new Vector2i(x, y)] = bua;
             return true;

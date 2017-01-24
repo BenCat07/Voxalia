@@ -23,10 +23,13 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
         {
             ID = ServerToClientPacket.TOPS;
             byte[] tdat = bua.ToNetBytes();
-            Data = new byte[4 + 4 + tdat.Length];
+            byte[] tdat2 = bua.ToNetBytesTrans();
+            Data = new byte[4 + 4 + 4 + tdat.Length + tdat2.Length];
             Utilities.IntToBytes(pos.X).CopyTo(Data, 0);
             Utilities.IntToBytes(pos.Y).CopyTo(Data, 4);
-            tdat.CopyTo(Data, 4 + 4);
+            Utilities.IntToBytes(tdat.Length).CopyTo(Data, 4 + 4);
+            tdat.CopyTo(Data, 4 + 4 + 4);
+            tdat2.CopyTo(Data, 4 + 4 + 4 + tdat.Length);
         }
     }
 }
