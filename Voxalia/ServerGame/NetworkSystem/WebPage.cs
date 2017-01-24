@@ -24,6 +24,21 @@ namespace Voxalia.ServerGame.NetworkSystem
 {
     public class WebPage
     {
+        public static readonly byte[] BlankImage;
+
+        static WebPage()
+        {
+            using (Bitmap bmp = new Bitmap(1, 1))
+            {
+                bmp.SetPixel(0, 0, Color.Black);
+                using (DataStream ds = new DataStream())
+                {
+                    bmp.Save(ds, ImageFormat.Png);
+                    BlankImage = ds.ToArray();
+                }
+            }
+        }
+
         public Server TheServer;
 
         public Connection Network;
@@ -100,93 +115,30 @@ namespace Voxalia.ServerGame.NetworkSystem
         {
             // TODO: FIX ME!
             string pageLow = http_request_page.ToLowerFast();
-#if PAGE_MAGIC
             if (pageLow.StartsWith("/map/region/"))
             {
                 string after;
                 string region = pageLow.Substring("/map/region/".Length).BeforeAndAfter("/", out after);
-                for (int i = 0; i < TheServer.LoadedRegions.Count; i++)
+                for (int i = 0; i < TheServer.LoadedWorlds.Count; i++)
                 {
-                    if (TheServer.LoadedRegions[i].Name == region)
+                    World world = TheServer.LoadedWorlds[i];
+                    if (world.Name == region)
                     {
                         string[] dat = after.SplitFast('/');
-                        if (dat[0] == "img" && dat.Length >= 4)
-                        {
-                            int x = Utilities.StringToInt(dat[1]);
-                            int y = Utilities.StringToInt(dat[2]);
-                            int z = Utilities.StringToInt(dat[3].Before("."));
-                            byte[] data = TheServer.LoadedRegions[i].ChunkManager.GetImage(x, y, z);
-                            if (data != null)
-                            {
-                                http_response_contenttype = "image/png";
-                                http_response_content = data;
-                                return;
-                            }
-                        }
-                        else if (dat[0] == "full_img" && dat.Length >= 3)
+                        if (dat[0] == "full_img" && dat.Length >= 3)
                         {
                             int x = Utilities.StringToInt(dat[1]);
                             int y = Utilities.StringToInt(dat[2].Before("."));
-                            KeyValuePair<int, int> maxes = TheServer.LoadedRegions[i].ChunkManager.GetMaxes(x, y);
-                            List<byte[]> datums = new List<byte[]>();
-                            for (int z = maxes.Key; z <= maxes.Value; z++)
-                            {
-                                byte[] dt = TheServer.LoadedRegions[i].ChunkManager.GetImage(x, y, z);
-                                if (dt != null)
-                                {
-                                    datums.Add(dt);
-                                }
-                            }
                             http_response_contenttype = "image/png";
-                            if (datums.Count > 1)
+                            byte[] toSend = TheServer.BlockImages.GetChunkRenderHD(world.MainRegion, x, y, true);
+                            if (toSend == null)
                             {
-                                http_response_content = TheServer.BlockImages.Combine(datums, false);
-                            }
-                            else if (datums.Count == 1)
-                            {
-                                http_response_content = datums[0];
+                                http_response_content = BlankImage;
                             }
                             else
                             {
-                                Bitmap bmp = new Bitmap(1, 1);
-                                bmp.SetPixel(0, 0, Color.Black);
-                                DataStream ds = new DataStream();
-                                bmp.Save(ds, ImageFormat.Png);
-                                http_response_content = ds.ToArray();
-                                ds.Dispose();
-                                bmp.Dispose();
+                                http_response_content = toSend;
                             }
-                            return;
-                        }
-                        else if (dat[0] == "full_img_angle" && dat.Length >= 4)
-                        {
-                            int x = Utilities.StringToInt(dat[1]);
-                            int y = Utilities.StringToInt(dat[2]);
-                            int z = Utilities.StringToInt(dat[3].Before("."));
-                            byte[] dt = TheServer.LoadedRegions[i].ChunkManager.GetImageAngle(x, y, z);
-                            http_response_contenttype = "image/png";
-                            if (dt != null)
-                            {
-                                http_response_content = dt;
-                            }
-                            else
-                            {
-                                Bitmap bmp = new Bitmap(1, 1);
-                                bmp.SetPixel(0, 0, Color.Transparent);
-                                DataStream ds = new DataStream();
-                                bmp.Save(ds, ImageFormat.Png);
-                                http_response_content = ds.ToArray();
-                                ds.Dispose();
-                                bmp.Dispose();
-                            }
-                            return;
-                        }
-                        else if (dat[0] == "maxes" && dat.Length >= 3)
-                        {
-                            int x = Utilities.StringToInt(dat[1]);
-                            int y = Utilities.StringToInt(dat[2]);
-                            KeyValuePair<int, int> maxes = TheServer.LoadedRegions[i].ChunkManager.GetMaxes(x, y);
-                            http_response_content = FileHandler.encoding.GetBytes(maxes.Key + "," + maxes.Value);
                             return;
                         }
                         else if (dat[0] == "expquick" && dat.Length >= 3)
@@ -209,43 +161,11 @@ namespace Voxalia.ServerGame.NetworkSystem
                             http_response_content = FileHandler.encoding.GetBytes(content.ToString());
                             return;
                         }
-                        else if (dat[0] == "expquick_angle" && dat.Length >= 4)
-                        {
-                            int bx = Utilities.StringToInt(dat[1]);
-                            int by = Utilities.StringToInt(dat[2]);
-                            int bz = Utilities.StringToInt(dat[3]);
-                            int sz = Chunk.CHUNK_SIZE * BlockImageManager.TexWidth;
-                            int sz2 = Chunk.CHUNK_SIZE * BlockImageManager.TexWidth2;
-                            StringBuilder content = new StringBuilder();
-                            content.Append("<!doctype html>\n<html>\n<head>\n<title>Voxalia EXP-QUICK (Angled)</title>\n</head>\n<body>\n");
-                            const int SIZE = 3;
-                            for (int x = -SIZE; x <= SIZE; x++)
-                            {
-                                for (int y = -SIZE; y <= SIZE; y++)
-                                {
-                                    for (int z = -SIZE; z <= SIZE; z++)
-                                    {
-                                        int x1 = (x) * sz;
-                                        int y1 = (y) * sz;
-                                        int z1 = (bz + z) * sz;
-                                        int xw = (SIZE * 2 * sz) + (x1 - y1);
-                                        int yw = ((SIZE * 2 * sz) + ((x1 + y1) - (z1))) / 2;
-                                        content.Append("<img style=\"position:absolute;top:" + yw + "px;left:" + xw + "px;z-index:" + z + ";\" src=\"/map/region/"
-                                            + region + "/full_img_angle/" + (bx + x) + "/" + (by + y) + "/" + (bz + z) + ".png\" width=\"" + sz2 + "\" height=\"" + sz2 + "\" />");
-                                    }
-                                }
-                            }
-                            content.Append("\n</body>\n</html>\n");
-                            http_response_content = FileHandler.encoding.GetBytes(content.ToString());
-                            return;
-                        }
                         break;
                     }
                 }
             }
-            else
-#endif
-            if (pageLow.StartsWith("/log_view/"))
+            else if (pageLow.StartsWith("/log_view/"))
             {
                 string[] dat = pageLow.Substring("/log_view/".Length).SplitFast('/');
                 string username = dat[0];

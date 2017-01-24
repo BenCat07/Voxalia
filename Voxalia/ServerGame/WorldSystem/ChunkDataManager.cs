@@ -39,14 +39,6 @@ namespace Voxalia.ServerGame.WorldSystem
         LiteDatabase EntsDatabase;
 
         LiteCollection<BsonDocument> DBEnts;
-
-        LiteDatabase ImageDatabase;
-
-        LiteCollection<BsonDocument> DBImages;
-
-        LiteCollection<BsonDocument> DBMaxes;
-
-        LiteCollection<BsonDocument> DBImages2;
         
         public void Init(Region tregion)
         {
@@ -63,94 +55,13 @@ namespace Voxalia.ServerGame.WorldSystem
             DBLODs = LODsDatabase.GetCollection<BsonDocument>("lodchunks");
             EntsDatabase = new LiteDatabase("filename=" + dir + "ents.ldb");
             DBEnts = EntsDatabase.GetCollection<BsonDocument>("ents");
-            ImageDatabase = new LiteDatabase("filename=" + dir + "images.ldb");
-            DBImages = ImageDatabase.GetCollection<BsonDocument>("images");
-            DBMaxes = ImageDatabase.GetCollection<BsonDocument>("maxes");
-            DBImages2 = ImageDatabase.GetCollection<BsonDocument>("images_angle");
         }
         
-        /// <summary>
-        /// TODO: Probably clear this occasionally!
-        /// </summary>
-        public ConcurrentDictionary<Vector2i, Vector2i> Maxes = new ConcurrentDictionary<Vector2i, Vector2i>();
-
-        public Vector2i GetMaxes(int x, int y)
-        {
-            Vector2i input = new Vector2i(x, y);
-            Vector2i output;
-            if (Maxes.TryGetValue(input, out output))
-            {
-                return output;
-            }
-            BsonDocument doc;
-            doc = DBMaxes.FindById(GetIDFor(x, y, 0));
-            if (doc == null)
-            {
-                return new Vector2i(0, 0);
-            }
-            return new Vector2i(doc["min"].AsInt32, doc["max"].AsInt32);
-        }
-
-        public void SetMaxes(int x, int y, int min, int max)
-        {
-            BsonValue id = GetIDFor(x, y, 0);
-            BsonDocument newdoc = new BsonDocument();
-            Dictionary<string, BsonValue> tbs = newdoc.RawValue;
-            tbs["_id"] = id;
-            tbs["min"] = new BsonValue(min);
-            tbs["max"] = new BsonValue(max);
-            Maxes[new Vector2i(x, y)] = new Vector2i(min, max);
-            DBMaxes.Upsert(newdoc);
-        }
-
-        public byte[] GetImageAngle(int x, int y, int z)
-        {
-            BsonDocument doc;
-            doc = DBImages2.FindById(GetIDFor(x, y, z));
-            if (doc == null)
-            {
-                return null;
-            }
-            return doc["image"].AsBinary;
-        }
-
-        public byte[] GetImage(int x, int y, int z)
-        {
-            BsonDocument doc;
-            doc = DBImages.FindById(GetIDFor(x, y, z));
-            if (doc == null)
-            {
-                return null;
-            }
-            return doc["image"].AsBinary;
-        }
-
-        public void WriteImageAngle(int x, int y, int z, byte[] data)
-        {
-            BsonValue id = GetIDFor(x, y, z);
-            BsonDocument newdoc = new BsonDocument();
-            Dictionary<string, BsonValue> tbs = newdoc.RawValue;
-            tbs["_id"] = id;
-            tbs["image"] = new BsonValue(data);
-            DBImages2.Upsert(newdoc);
-        }
-
-        public void WriteImage(int x, int y, int z, byte[] data)
-        {
-            BsonValue id = GetIDFor(x, y, z);
-            BsonDocument newdoc = new BsonDocument();
-            Dictionary<string, BsonValue> tbs = newdoc.RawValue;
-            tbs["_id"] = id;
-            tbs["image"] = new BsonValue(data);
-            DBImages.Upsert(newdoc);
-        }
-
         public void Shutdown()
         {
             Database.Dispose();
             LODsDatabase.Dispose();
             EntsDatabase.Dispose();
-            ImageDatabase.Dispose();
         }
 
         public BsonValue GetIDFor(int x, int y, int z)

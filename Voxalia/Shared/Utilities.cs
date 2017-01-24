@@ -76,6 +76,8 @@ namespace Voxalia.Shared
         public static string HashQuick(string username, string password)
         {
             // TODO: Dynamic hash text maybe?
+            // TODO: Really, any amount of protection at all here ;-;
+            // Something fast but reasonably complex
             return Convert.ToBase64String(sha512.ComputeHash(encoding.GetBytes(salt1 + username + salt2 + password + salt3)));
         }
         
