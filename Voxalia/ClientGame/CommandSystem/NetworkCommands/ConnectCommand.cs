@@ -31,7 +31,7 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
                 return;
             }
             entry.Good(queue, "Connecting...");
-            TheClient.Network.Connect(entry.GetArgument(queue, 0), entry.GetArgument(queue, 1));
+            TheClient.Network.Connect(entry.GetArgument(queue, 0), entry.GetArgument(queue, 1), false);
         }
     }
 }

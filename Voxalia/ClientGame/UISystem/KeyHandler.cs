@@ -556,7 +556,7 @@ namespace Voxalia.ClientGame.UISystem
         /// <returns>Whether the keyboard is usable.</returns>
         public static bool IsValid()
         {
-            return Client.Central.Window.Focused && !UIConsole.Open && !Client.Central.InvShown() && !Client.Central.IsChatVisible();
+            return Client.Central.Window.Focused && !UIConsole.Open && !Client.Central.InvShown() && !Client.Central.IsChatVisible() && !Client.Central.IsMainMenu; // TODO: Remove static reference here
         }
 
         /// <summary>

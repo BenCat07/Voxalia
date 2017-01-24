@@ -23,6 +23,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
     {
         public SingleplayerMenuScreen(Client tclient) : base(tclient)
         {
+            ResetOnRender = false;
             AddChild(new UIButton("ui/menus/buttons/basic", "Back", TheClient.FontSets.SlightlyBigger, () => TheClient.ShowMainMenu(), UIAnchor.BOTTOM_LEFT, () => 350, () => 70, () => 10, () => -100));
             int start = 150;
             List<string> found = TheClient.Files.ListFolders("saves");

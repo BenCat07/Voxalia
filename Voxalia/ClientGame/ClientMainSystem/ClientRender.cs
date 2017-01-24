@@ -707,16 +707,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     try
                     {
-                        // TODO: Cleaner way to determine when to render 3D game.
-                        if (CScreen == TheGameScreen)
-                        {
-                            renderGame();
-                        }
+                        renderGame();
                         TWOD_CFrame++;
                         if (CScreen != TheGameScreen || TWOD_CFrame > CVars.u_rate.ValueI)
                         {
                             TWOD_CFrame = 0;
                             Establish2D();
+                            GL.Disable(EnableCap.CullFace);
                             GL.BindFramebuffer(FramebufferTarget.Framebuffer, TWOD_FBO);
                             GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
                             GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0, 0, 0, 0 });
@@ -736,25 +733,24 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             }
                             UIConsole.Draw();
                         }
+                        GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                        GL.DrawBuffer(DrawBufferMode.Back);
+                        Shaders.ColorMultShader.Bind();
+                        Rendering.SetColor(Vector4.One);
+                        GL.Disable(EnableCap.DepthTest);
+                        GL.Disable(EnableCap.CullFace);
                         if (VR != null)
                         {
-                            Shaders.ColorMultShader.Bind();
                             GL.UniformMatrix4(1, false, ref MainWorldView.SimpleOrthoMatrix);
                             GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
                             GL.BindTexture(TextureTarget.Texture2D, MainWorldView.CurrentFBOTexture);
                             Rendering.RenderRectangle(-1, -1, 1, 1);
                         }
-                        GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-                        GL.DrawBuffer(DrawBufferMode.Back);
-                        Shaders.ColorMultShader.Bind();
-                        Rendering.SetColor(Vector4.One);
+                        GL.BindTexture(TextureTarget.Texture2D, TWOD_FBO_Tex);
                         Matrix4 ortho = Matrix4.CreateOrthographicOffCenter(0, Window.Width, 0, Window.Height, -1, 1);
                         Matrix4 ident = Matrix4.Identity;
                         GL.UniformMatrix4(40, false, ref ident);
                         GL.UniformMatrix4(1, false, ref ortho);
-                        GL.BindTexture(TextureTarget.Texture2D, TWOD_FBO_Tex);
-                        GL.Disable(EnableCap.DepthTest);
-                        GL.Disable(EnableCap.CullFace);
                         Rendering.RenderRectangle(0, 0, Window.Width, Window.Height);
                         GL.BindTexture(TextureTarget.Texture2D, 0);
                         GL.Enable(EnableCap.CullFace);
@@ -891,10 +887,24 @@ namespace Voxalia.ClientGame.ClientMainSystem
             try
             {
                 MainWorldView.ForwardVec = Player.ForwardVector();
-                // Frustum cf1 = null;
                 if (VR != null)
                 {
                     MainWorldView.CameraPos = Player.GetPosition();
+                }
+                else if (IsMainMenu)
+                {
+                    Location forw = Utilities.ForwardVector_Deg((GlobalTickTimeLocal * 2.0) % 360.0, 65);
+                    MainWorldView.ForwardVec = -forw;
+                    Location eyep = Player.GetCameraPosition();
+                    CollisionResult cr = TheRegion.Collision.RayTrace(eyep, eyep + forw * Constants.CHUNK_WIDTH, IgnorePlayer);
+                    if (cr.Hit)
+                    {
+                        MainWorldView.CameraPos = cr.Position + cr.Normal * 0.05;
+                    }
+                    else
+                    {
+                        MainWorldView.CameraPos = cr.Position;
+                    }
                 }
                 else if (CVars.g_firstperson.ValueB)
                 {
@@ -1798,6 +1808,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void Render2D(bool sub3d)
         {
+            if (IsMainMenu)
+            {
+                return;
+            }
             if (sub3d)
             {
                 //GL.Disable(EnableCap.DepthTest);

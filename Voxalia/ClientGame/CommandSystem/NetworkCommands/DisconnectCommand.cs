@@ -25,7 +25,7 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
 
         public override void Execute(CommandQueue queue, CommandEntry entry)
         {
-            TheClient.Network.Disconnect();
+            TheClient.Network.Disconnect(TheClient.Network.ConnectionThread, TheClient.Network.ConnectionSocket, TheClient.Network.ChunkSocket);
         }
     }
 }

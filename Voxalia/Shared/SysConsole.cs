@@ -295,6 +295,7 @@ namespace Voxalia.Shared
             "^r^7^h^0",
             "^r^7",
             "^7^&",
+            "^r^@"
         };
 
         static string[] OutputNames = new string[]
@@ -306,6 +307,7 @@ namespace Voxalia.Shared
             "ERROR",
             "INFO",
             "DEBUG",
+            "INIT/CLIENT"
         };
     }
 
@@ -349,6 +351,10 @@ namespace Voxalia.Shared
         /// Disable-able minor debug information.
         /// </summary>
         DEBUG = 6,
+        /// <summary>
+        /// Initialization from the client
+        /// </summary>
+        CLIENINIT = 7
         // TODO: More?
     }
 }

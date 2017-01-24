@@ -147,6 +147,8 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// </summary>
         public Action ShutdownCallback = null;
 
+        public bool IsMenu = false;
+
         /// <summary>
         /// Shuts down the server, saving any necessary data.
         /// </summary>
@@ -386,10 +388,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
             SysConsole.Output(OutputType.INIT, "Preparing block image system...");
             BlockImages = new BlockImageManager();
             BlockImages.Init(this);
-            if (loaded != null)
-            {
-                loaded.Invoke();
-            }
+            loaded?.Invoke();
             SysConsole.Output(OutputType.INIT, "Ticking...");
             // Tick
             double TARGETFPS = 30d;

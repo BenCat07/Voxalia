@@ -66,7 +66,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void BuildWorld()
         {
-            // TODO: DESTROY OLD REGION!
+            // TODO: DESTROY OLD REGION!?
             BuildLightsForWorld();
             TheRegion = new Region();
             TheRegion.TheClient = this;

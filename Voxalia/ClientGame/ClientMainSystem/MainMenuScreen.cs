@@ -20,7 +20,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
 {
     public class MainMenuScreen: UIScreen
     {
-        public UIImage Background;
+        //public UIImage Background;
         
         public int Zero()
         {
@@ -29,8 +29,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
         
         public MainMenuScreen(Client tclient) : base(tclient)
         {
-            Background = new UIImage(TheClient.Textures.GetTexture("ui/menus/menuback"), UIAnchor.TOP_LEFT, GetWidth, GetHeight, Zero, Zero);
-            AddChild(Background);
+            ResetOnRender = false;
+            //Background = new UIImage(TheClient.Textures.GetTexture("ui/menus/menuback"), UIAnchor.TOP_LEFT, GetWidth, GetHeight, Zero, Zero);
+            //AddChild(Background);
             FontSet font = TheClient.FontSets.SlightlyBigger;
             UITextLink quit = new UITextLink(null, "^%Q^7uit", "^%Q^e^7uit", "^7^e^%Q^0uit", font, () => TheClient.Window.Close(), UIAnchor.BOTTOM_RIGHT, () => -100, () => -100);
             AddChild(quit);

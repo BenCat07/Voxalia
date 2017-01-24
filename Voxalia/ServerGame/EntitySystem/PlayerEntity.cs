@@ -890,7 +890,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Matrix proj = Matrix.CreatePerspectiveFieldOfViewRH(Max_FOV * (double)Utilities.PI180, 1, 0.5f, 3000f);
             Matrix view = Matrix.CreateLookAtRH((LoadRelPos - LoadRelDir * 8).ToBVector(), (LoadRelPos + LoadRelDir * 8).ToBVector(), new Vector3(0, 0, 1));
             Matrix combined = view * proj;
-            BFrustum bfs = new BFrustum(combined);
+            BFrustum bfs = TheServer.IsMenu ? null : new BFrustum(combined);
             Vector3i start = TheRegion.ChunkLocFor(LoadRelPos);
             HashSet<Vector3i> seen = new HashSet<Vector3i>();
             Queue<Vector3i> toSee = new Queue<Vector3i>();
@@ -950,7 +950,7 @@ namespace Voxalia.ServerGame.EntitySystem
                         //toSee.Enqueue(t);
                         for (int j = 0; j < MoveDirs.Length; j++)
                         {
-                            if (Vector3.Dot(MoveDirs[j].ToVector3(), LoadRelDir.ToBVector()) < -0.8f) // TODO: Wut?
+                            if (bfs != null && Vector3.Dot(MoveDirs[j].ToVector3(), LoadRelDir.ToBVector()) < -0.8f) // TODO: Wut?
                             {
                                 continue;
                             }
@@ -1105,7 +1105,7 @@ namespace Voxalia.ServerGame.EntitySystem
                                 if (val)
                                 {
                                     Location min = nt.ToLocation() * Chunk.CHUNK_SIZE;
-                                    if (bfs.ContainsBox(min, min + new Location(Chunk.CHUNK_SIZE)))
+                                    if (bfs == null || bfs.ContainsBox(min, min + new Location(Chunk.CHUNK_SIZE)))
                                     {
                                         toSee.Enqueue(nt);
                                     }
@@ -1534,6 +1534,10 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <param name="health">The health value.</param>
         public override void SetHealth(double health)
         {
+            if (TheServer.IsMenu)
+            {
+                health = GetMaxHealth();
+            }
             base.SetHealth(health);
             SendStatus();
         }

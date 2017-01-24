@@ -90,7 +90,7 @@ namespace Voxalia.ClientGame.NetworkSystem
             }
         }
 
-        public void Disconnect()
+        public void Disconnect(Thread ConnectionThread, Socket ConnectionSocket, Socket ChunkSocket)
         {
             if (norep)
             {
@@ -136,14 +136,20 @@ namespace Voxalia.ClientGame.NetworkSystem
             norep = false;
         }
 
-        public void Connect(string IP, string port)
+        public void Connect(string IP, string port, bool shortrender)
         {
-            Disconnect();
-            Strings.Strings.Clear();
-            TheClient.Resetregion();
             LastIP = IP;
             LastPort = port;
-            TheClient.Schedule.StartAsyncTask(ConnectInternal);
+            TheClient.Schedule.StartAsyncTask(() => ConnectInternal(shortrender, () =>
+            {
+                Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
+                Strings.Strings.Clear();
+                TheClient.Resetregion();
+                if (!shortrender)
+                {
+                    TheClient.ShowGame();
+                }
+            }));
         }
         
         public void Ping(string IP, string port, Action<PingInfo> callback)
@@ -469,6 +475,7 @@ namespace Voxalia.ClientGame.NetworkSystem
         {
             TheClient.Schedule.StartAsyncTask(() =>
             {
+                ConnectionThread = Thread.CurrentThread;
                 while (true)
                 {
                     try
@@ -503,7 +510,7 @@ namespace Voxalia.ClientGame.NetworkSystem
             {
                 if (!pLive)
                 {
-                    TheClient.Schedule.ScheduleSyncTask(() => { TheClient.ShowGame(); });
+                    TheClient.Schedule.ScheduleSyncTask(() => { if (!TheClient.IsMainMenu) { TheClient.ShowGame(); } });
                     pLive = true;
                 }
                 TickSocket(ConnectionSocket, ref recd, ref recdsofar);
@@ -512,9 +519,13 @@ namespace Voxalia.ClientGame.NetworkSystem
             }
             catch (Exception ex)
             {
+                if (ex is ThreadAbortException)
+                {
+                    throw ex;
+                }
                 SysConsole.Output(OutputType.ERROR, "Forcibly disconnected from server: " + ex.GetType().Name + ": " + ex.Message);
                 SysConsole.Output(OutputType.INFO, ex.ToString()); // TODO: Make me 'debug only'!
-                Disconnect();
+                Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
                 return false;
             }
         }
@@ -542,8 +553,12 @@ namespace Voxalia.ClientGame.NetworkSystem
             }
             catch (Exception ex)
             {
+                if (ex is ThreadAbortException)
+                {
+                    throw ex;
+                }
                 SysConsole.Output(OutputType.WARNING, "Forcibly disconnected from server: " + ex.GetType().Name + ": " + ex.Message);
-                Disconnect();
+                Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
             }
         }
 
@@ -559,15 +574,24 @@ namespace Voxalia.ClientGame.NetworkSystem
             }
             catch (Exception ex)
             {
+                if (ex is ThreadAbortException)
+                {
+                    throw ex;
+                }
                 SysConsole.Output(OutputType.WARNING, "Forcibly disconnected from server: " + ex.GetType().Name + ": " + ex.Message);
-                Disconnect();
+                Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
             }
         }
 
-        void ConnectInternal()
+        public bool LastConnectionFailed = false;
+
+        void ConnectInternal(bool shortrender, Action disco)
         {
             try
             {
+                Socket ConnectionSocket;
+                Socket ChunkSocket;
+                LastConnectionFailed = false;
                 Interlocked.Increment(ref TheClient.Loading);
                 string key = GetWebSession();
                 IPAddress address = GetAddress(LastIP);
@@ -580,11 +604,12 @@ namespace Voxalia.ClientGame.NetworkSystem
                 ConnectionSocket.SendBufferSize = 5 * 1024 * 1024;
                 int tport = Utilities.StringToInt(LastPort);
                 ConnectionSocket.Connect(new IPEndPoint(address, tport));
-                ConnectionSocket.Send(FileHandler.encoding.GetBytes("VOX__\r" + Username
-                    + "\r" + key + "\r" + LastIP + "\r" + LastPort +
-                    "\r" + TheClient.CVars.r_renderdist.ValueI + "," + TheClient.CVars.r_renderdist_2.ValueI + ","
+                string renderd = shortrender ? "2,0,0,0,0"
+                    : TheClient.CVars.r_renderdist.ValueI + "," + TheClient.CVars.r_renderdist_2.ValueI + ","
                     + TheClient.CVars.r_renderdist_2h.ValueI + "," + TheClient.CVars.r_renderdist_5.ValueI + ","
-                    + TheClient.CVars.r_renderdist_5h.ValueI + "\n"));
+                    + TheClient.CVars.r_renderdist_5h.ValueI;
+                ConnectionSocket.Send(FileHandler.encoding.GetBytes("VOX__\r" + Username
+                     + "\r" + key + "\r" + LastIP + "\r" + LastPort + "\r" + renderd + "\n"));
                 byte[] resp = ReceiveUntil(ConnectionSocket, 150, (byte)'\n');
                 if (FileHandler.encoding.GetString(resp) != "ACCEPT")
                 {
@@ -610,18 +635,25 @@ namespace Voxalia.ClientGame.NetworkSystem
                     throw new Exception("Server did not accept connection");
                 }
                 ChunkSocket.Blocking = false;
-                SysConsole.Output(OutputType.INFO, "Connected to " + address.ToString() + " " + tport);
-                IsAlive = true;
-                LaunchTicker();
-                Interlocked.Decrement(ref TheClient.Loading);
+                TheClient.Schedule.ScheduleSyncTask(() =>
+                {
+                    disco();
+                    this.ConnectionSocket = ConnectionSocket;
+                    this.ChunkSocket = ChunkSocket;
+                    SysConsole.Output(OutputType.INFO, "Connected to " + address.ToString() + " " + tport);
+                    IsAlive = true;
+                    LaunchTicker();
+                    Interlocked.Decrement(ref TheClient.Loading);
+                });
             }
             catch (Exception ex)
             {
-                Interlocked.Decrement(ref TheClient.Loading);
                 if (ex is ThreadAbortException)
                 {
                     throw ex;
                 }
+                LastConnectionFailed = true;
+                Interlocked.Decrement(ref TheClient.Loading);
                 TheClient.Schedule.ScheduleSyncTask(() =>
                 {
                     UIConsole.WriteLine("Connection failed: " + ex.Message);
