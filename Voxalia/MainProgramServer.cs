@@ -42,7 +42,15 @@ namespace Voxalia
             Program.Init();
             try
             {
-                Server.Init(args);
+                string game = "default";
+                if (args.Length > 0)
+                {
+                    game = args[0];
+                    string[] t = new string[args.Length - 1];
+                    Array.Copy(args, 1, t, 0, t.Length);
+                    args = t;
+                }
+                Server.Init(game, args);
             }
             catch (Exception ex)
             {

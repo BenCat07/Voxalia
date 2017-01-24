@@ -42,15 +42,14 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// <summary>
         /// Serverside file handler.
         /// </summary>
-        public FileHandler Files = new FileHandler();
+        public FileHandler Files;
 
         /// <summary>
         /// Starts up a new server.
         /// </summary>
-        public static void Init(string[] args)
+        public static void Init(string game, string[] args)
         {
-            Central = new Server(args.Length > 0 ? Utilities.StringToInt(args[0]) : 28010);
-            Central.StartUp(() =>
+            (Central = new Server(args.Length > 0 ? Utilities.StringToInt(args[0]) : 28010)).StartUp(game, () =>
             {
                 if (args.Length > 1)
                 {
@@ -65,12 +64,11 @@ namespace Voxalia.ServerGame.ServerMainSystem
         }
 
         /// <summary>
-        /// Construct the server object with a specific port. Call <see cref="StartUp(Action)"/> after this!
+        /// Construct the server object with a specific port. Call <see cref="StartUp(string, Action)"/> after this!
         /// </summary>
         /// <param name="port">The specific port.</param>
         public Server(int port)
         {
-            Files.Init();
             Port = port;
         }
 
@@ -329,13 +327,17 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// </summary>
         public Object TickLock = new Object();
 
+        public string GameName = null;
+
         /// <summary>
         /// Starts up and run the server.
         /// </summary>
         /// <param name="loaded">The action to fire when the server is loaded.</param>
-        public void StartUp(Action loaded = null)
+        public void StartUp(string game, Action loaded = null)
         {
             CurThread = Thread.CurrentThread;
+            Files = new FileHandler();
+            Files.SetSaveDirEarly(GameName = FileHandler.CleanFileName(game));
             SysConsole.Written += OnConsoleWritten;
             SysConsole.Output(OutputType.INIT, "Launching as new server, this is " + (this == Central ? "" : "NOT ") + "the Central server.");
             SysConsole.Output(OutputType.INIT, "Loading console input handler...");

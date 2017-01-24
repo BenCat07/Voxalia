@@ -40,9 +40,7 @@ namespace Voxalia.Shared.Files
 
         public void LoadDir(string dir)
         {
-            dir = dir.Replace('\\', '/');
-            dir = dir.Replace("..", "__error__");
-            string fdir = Environment.CurrentDirectory.Replace('\\', '/') + "/" + dir.ToLowerFast() + "/";
+            string fdir = Environment.CurrentDirectory.Replace('\\', '/') + "/" + CleanFileName(dir) + "/";
             if (SubDirectories.Contains(fdir))
             {
                 SysConsole.Output(OutputType.WARNING, "Ignoring attempt to add same directory twice.");
@@ -58,11 +56,23 @@ namespace Voxalia.Shared.Files
             Init();
         }
 
+        public string SaveDir = null;
+
+        public void SetSaveDirEarly(string dir)
+        {
+            SaveDir = Environment.CurrentDirectory.Replace('\\', '/') + "/" + CleanFileName(dir) + "/";
+            SubDirectories.Add(SaveDir);
+        }
+
         public void Init()
         {
             foreach (string str in SubDirectories)
             {
                 load(str, Directory.GetFiles(str, "*.*", SearchOption.AllDirectories));
+            }
+            if (SaveDir == null)
+            {
+                SaveDir = BaseDirectory;
             }
             load(BaseDirectory, Directory.GetFiles(BaseDirectory, "*.*", SearchOption.AllDirectories));
         }
@@ -325,14 +335,7 @@ namespace Voxalia.Shared.Files
         {
             string fname = CleanFileName(filename);
             string finname;
-            if (SubDirectories.Count > 0)
-            {
-                finname = SubDirectories[0] + fname;
-            }
-            else
-            {
-                finname = BaseDirectory + fname;
-            }
+            finname = SaveDir + fname;
             string dir = Path.GetDirectoryName(finname);
             if (!Directory.Exists(dir))
             {

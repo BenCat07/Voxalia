@@ -28,7 +28,7 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
             TheClient = tclient;
             Name = "startlocalserver";
             Description = "Launches you into a local game server";
-            Arguments = "[port]";
+            Arguments = "[port] [game]";
             Waitable = true;
         }
 
@@ -38,6 +38,11 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
             if (entry.Arguments.Count >= 1)
             {
                 arg0 = entry.GetArgument(queue, 0);
+            }
+            string game = "default";
+            if (entry.Arguments.Count >= 2)
+            {
+                game = entry.GetArgument(queue, 1);
             }
             if (TheClient.LocalServer != null)
             {
@@ -60,7 +65,7 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
             {
                 try
                 {
-                    TheClient.LocalServer.StartUp(callback);
+                    TheClient.LocalServer.StartUp(game, callback);
                 }
                 catch (Exception ex)
                 {
