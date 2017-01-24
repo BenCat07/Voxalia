@@ -175,27 +175,26 @@ namespace Voxalia.ServerGame.OtherSystems
                             : (xm == null ? height : Utilities.BytesToInt(Utilities.BytesPartial(xm, CWCW2 + tregion.TopsHigherBlockIndex(Constants.CHUNK_WIDTH - 1, y) * 4, 4)));
                         int relym = y - 1 >= 0 ? Utilities.BytesToInt(Utilities.BytesPartial(bits, CWCW2 + tregion.TopsHigherBlockIndex(x, y - 1) * 4, 4))
                             : (ym == null ? height : Utilities.BytesToInt(Utilities.BytesPartial(ym, CWCW2 + tregion.TopsHigherBlockIndex(x, Constants.CHUNK_WIDTH - 1) * 4, 4)));
-                        bmp.SetAt(x * 4 + 0, y * 4 + 0, ((relym < height) ? ((relxm < height) ? doubledarkened : (relxm > height ? fc : darkened)) :
-                            ((relym > height) ? ((relxm < height) ? fc : ((relxm > height) ? doublelightened : lightened)) : ((relxm < height) ? darkened : ((relxm > height) ? lightened : fc)))));
-                        bmp.SetAt(x * 4 + 1, y * 4 + 0, (relym < height) ? darkened : ((relym > height) ? lightened : fc));
-                        bmp.SetAt(x * 4 + 2, y * 4 + 0, (relym < height) ? darkened : ((relym > height) ? lightened : fc));
-                        bmp.SetAt(x * 4 + 3, y * 4 + 0, (relym < height) ? ((relxp < height) ? doubledarkened : ((relxp > height) ? fc : darkened)) :
-                        ((relym > height) ? ((relxp < height) ? fc : ((relxp > height) ? doublelightened : lightened)) : ((relxp < height) ? darkened : ((relxp > height) ? lightened : fc))));
-                        bmp.SetAt(x * 4 + 0, y * 4 + 1, (relxm < height) ? darkened : ((relxm > height) ? lightened : fc));
+                        bmp.SetAt(x * 4 + 0, y * 4 + 0, ((relym < height) ? ((relxm < height) ? doublelightened : (relxm > height ? fc : lightened)) :
+                            ((relym > height) ? ((relxm < height) ? fc : ((relxm > height) ? doubledarkened : darkened)) : ((relxm < height) ? lightened : ((relxm > height) ? darkened : fc)))));
+                        bmp.SetAt(x * 4 + 1, y * 4 + 0, (relym < height) ? lightened : ((relym > height) ? darkened : fc));
+                        bmp.SetAt(x * 4 + 2, y * 4 + 0, (relym < height) ? lightened : ((relym > height) ? darkened : fc));
+                        bmp.SetAt(x * 4 + 3, y * 4 + 0, (relym < height) ? ((relxp < height) ? doublelightened : ((relxp > height) ? fc : lightened)) :
+                        ((relym > height) ? ((relxp < height) ? fc : ((relxp > height) ? doubledarkened : darkened)) : ((relxp < height) ? lightened : ((relxp > height) ? darkened : fc))));
+                        bmp.SetAt(x * 4 + 0, y * 4 + 1, (relxm < height) ? lightened : ((relxm > height) ? darkened : fc));
                         bmp.SetAt(x * 4 + 1, y * 4 + 1, fc);
                         bmp.SetAt(x * 4 + 2, y * 4 + 1, fc);
-                        bmp.SetAt(x * 4 + 3, y * 4 + 1, (relxp < height) ? darkened : ((relxp > height) ? lightened : fc));
-                        bmp.SetAt(x * 4 + 0, y * 4 + 2, (relxm < height) ? darkened : ((relxm > height) ? lightened : fc));
+                        bmp.SetAt(x * 4 + 3, y * 4 + 1, (relxp < height) ? lightened : ((relxp > height) ? darkened : fc));
+                        bmp.SetAt(x * 4 + 0, y * 4 + 2, (relxm < height) ? lightened : ((relxm > height) ? darkened : fc));
                         bmp.SetAt(x * 4 + 1, y * 4 + 2, fc);
                         bmp.SetAt(x * 4 + 2, y * 4 + 2, fc);
-                        bmp.SetAt(x * 4 + 3, y * 4 + 2, (relxp < height) ? darkened : ((relxp > height) ? lightened : fc));
-                        bmp.SetAt(x * 4 + 0, y * 4 + 3, (relxm < height) ? ((relyp < height) ? doubledarkened : ((relyp > height) ? fc : darkened)) :
-                            ((relxm > height) ? ((relyp < height) ? darkened : ((relyp > height) ? doublelightened : lightened)) : ((relyp < height) ? darkened : ((relyp > height) ? lightened : fc))));
-                        bmp.SetAt(x * 4 + 1, y * 4 + 3, (relyp < height) ? darkened : ((relyp > height) ? lightened : fc));
-                        bmp.SetAt(x * 4 + 2, y * 4 + 3, (relyp < height) ? darkened : ((relyp > height) ? lightened : fc));
-                        bmp.SetAt(x * 4 + 3, y * 4 + 3, (relxp < height) ? ((relyp < height) ? doubledarkened : ((relyp > height) ? fc : darkened))
-                            : ((relxp > height) ? ((relyp < height) ? fc : ((relyp > height) ? doublelightened : lightened)) : ((relyp < height) ? darkened : ((relyp > height) ? lightened : fc))));
-                        bmp.SetAt(x, y, fc);
+                        bmp.SetAt(x * 4 + 3, y * 4 + 2, (relxp < height) ? lightened : ((relxp > height) ? darkened : fc));
+                        bmp.SetAt(x * 4 + 0, y * 4 + 3, (relxm < height) ? ((relyp < height) ? doublelightened : ((relyp > height) ? fc : lightened)) :
+                            ((relxm > height) ? ((relyp < height) ? lightened : ((relyp > height) ? doubledarkened : darkened)) : ((relyp < height) ? lightened : ((relyp > height) ? darkened : fc))));
+                        bmp.SetAt(x * 4 + 1, y * 4 + 3, (relyp < height) ? lightened : ((relyp > height) ? darkened : fc));
+                        bmp.SetAt(x * 4 + 2, y * 4 + 3, (relyp < height) ? lightened : ((relyp > height) ? darkened : fc));
+                        bmp.SetAt(x * 4 + 3, y * 4 + 3, (relxp < height) ? ((relyp < height) ? doublelightened : ((relyp > height) ? fc : lightened))
+                            : ((relxp > height) ? ((relyp < height) ? fc : ((relyp > height) ? doubledarkened : darkened)) : ((relyp < height) ? lightened : ((relyp > height) ? darkened : fc))));
                     }
                 }
             }
