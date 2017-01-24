@@ -14,6 +14,8 @@ namespace Voxalia.ServerGame.OtherSystems
     {
         public struct TopBlock
         {
+            public static readonly TopBlock AIR = new TopBlock() { BasicMat = 0, Height = 0 };
+
             public Material BasicMat;
 
             public int Height;
@@ -29,21 +31,44 @@ namespace Voxalia.ServerGame.OtherSystems
             return y * Constants.CHUNK_WIDTH + x;
         }
 
-        public bool TryPush(int x, int y, int z, Material mat)
+        public void TryPush(int x, int y, int z, Material mat)
         {
             if (!mat.IsOpaque())
             {
-                return false;
+                return;
             }
             int ind = BlockIndex(x, y);
             if (Blocks[ind].Height <= z || Blocks[ind].BasicMat == Material.AIR)
             {
                 Blocks[ind].Height = z;
                 Blocks[ind].BasicMat = mat;
+                ind *= 4;
+                if (BlocksTrans[ind].Height <= z)
+                {
+                    BlocksTrans[ind + 3] = TopBlock.AIR;
+                    BlocksTrans[ind + 2] = TopBlock.AIR;
+                    BlocksTrans[ind + 1] = TopBlock.AIR;
+                    BlocksTrans[ind + 0] = TopBlock.AIR;
+                }
+                else if (BlocksTrans[ind + 1].Height <= z)
+                {
+                    BlocksTrans[ind + 3] = TopBlock.AIR;
+                    BlocksTrans[ind + 2] = TopBlock.AIR;
+                    BlocksTrans[ind + 1] = TopBlock.AIR;
+                }
+                else if (BlocksTrans[ind + 2].Height <= z)
+                {
+                    BlocksTrans[ind + 3] = TopBlock.AIR;
+                    BlocksTrans[ind + 2] = TopBlock.AIR;
+                }
+                else if (BlocksTrans[ind + 3].Height <= z)
+                {
+                    BlocksTrans[ind + 3] = TopBlock.AIR;
+                }
                 Edited = true;
-                return true;
+                return;
             }
-            return false;
+            return;
         }
         
         public bool Edited = false;
@@ -79,20 +104,19 @@ namespace Voxalia.ServerGame.OtherSystems
         }
         
         public TopBlock[] BlocksTrans = new TopBlock[Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 4];
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int BlockIndexTrans(int x, int y)
+        
+        public void TryPushTrans(int x, int y, int z, Material mat)
         {
-            return (y * Constants.CHUNK_WIDTH + x) * 4;
-        }
-
-        public bool TryPushTrans(int x, int y, int z, Material mat)
-        {
-            if (!mat.IsOpaque())
+            if (!mat.RendersAtAll() || mat.IsOpaque())
             {
-                return false;
+                return;
             }
             int ind = BlockIndex(x, y);
+            if (Blocks[ind].Height >= z && Blocks[ind].BasicMat != Material.AIR)
+            {
+                return;
+            }
+            ind *= 4;
             if (BlocksTrans[ind].Height <= z || BlocksTrans[ind].BasicMat == Material.AIR)
             {
                 BlocksTrans[ind + 3] = BlocksTrans[ind + 2];
@@ -101,7 +125,7 @@ namespace Voxalia.ServerGame.OtherSystems
                 BlocksTrans[ind].Height = z;
                 BlocksTrans[ind].BasicMat = mat;
                 Edited = true;
-                return true;
+                return;
             }
             else if (BlocksTrans[ind + 1].Height <= z || BlocksTrans[ind + 1].BasicMat == Material.AIR)
             {
@@ -110,7 +134,7 @@ namespace Voxalia.ServerGame.OtherSystems
                 BlocksTrans[ind + 1].Height = z;
                 BlocksTrans[ind + 1].BasicMat = mat;
                 Edited = true;
-                return true;
+                return;
             }
             else if (BlocksTrans[ind + 2].Height <= z || BlocksTrans[ind + 2].BasicMat == Material.AIR)
             {
@@ -118,16 +142,16 @@ namespace Voxalia.ServerGame.OtherSystems
                 BlocksTrans[ind + 2].Height = z;
                 BlocksTrans[ind + 2].BasicMat = mat;
                 Edited = true;
-                return true;
+                return;
             }
             else if (BlocksTrans[ind + 3].Height <= z || BlocksTrans[ind + 3].BasicMat == Material.AIR)
             {
                 BlocksTrans[ind + 3].Height = z;
                 BlocksTrans[ind + 3].BasicMat = mat;
                 Edited = true;
-                return true;
+                return;
             }
-            return false;
+            return;
         }
         
         public byte[] ToBytesTrans()

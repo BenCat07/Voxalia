@@ -101,9 +101,12 @@ namespace Voxalia.ServerGame.OtherSystems
                                 for (int i = 3; i >= 0; i--)
                                 {
                                     mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, (ind * 4 + i) * 2, 2));
-                                    imag = MaterialImages[mat];
-                                    FastColor fc2 = imag.GetAt(sx, sy);
-                                    fc = Blend(fc2, fc);
+                                    if (mat != 0)
+                                    {
+                                        imag = MaterialImages[mat];
+                                        FastColor fc2 = imag.GetAt(sx, sy);
+                                        fc = Blend(fc2, fc);
+                                    }
                                 }
                                 bmp.SetAt(x * TexWidth + sx, y * TexWidth + sy, fc);
                             }
@@ -116,14 +119,18 @@ namespace Voxalia.ServerGame.OtherSystems
                         for (int i = 3; i >= 0; i--)
                         {
                             mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, ind * 2 * 4, 2));
-                            imag = MaterialImages[mat];
-                            FastColor fc2 = imag.GetAt(0, 0);
-                            fc = Blend(fc2, fc);
+                            if (mat != 0)
+                            {
+                                imag = MaterialImages[mat];
+                                FastColor fc2 = imag.GetAt(0, 0);
+                                fc = Blend(fc2, fc);
+                            }
                         }
                         bmp.SetAt(x, y, fc);
                     }
                 }
             }
+            // TODO: Add entity icons? (Trees in particular!)
             return MatImgToPng(bmp);
         }
 
