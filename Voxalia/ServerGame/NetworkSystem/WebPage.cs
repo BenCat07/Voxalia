@@ -159,7 +159,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                             int bx = Utilities.StringToInt(dat[1]);
                             int by = Utilities.StringToInt(dat[2]);
                             int bz = Utilities.StringToInt(dat[3]);
-                            int sz = (bz == -1) ? (Chunk.CHUNK_SIZE * BlockImageManager.TexWidth) : Chunk.CHUNK_SIZE;
+                            int sz = Chunk.CHUNK_SIZE * BlockImageManager.TexWidth;
                             StringBuilder content = new StringBuilder();
                             content.Append("<!doctype html>\n<html>\n<head>\n<title>Voxalia EXP-QUICK</title>\n</head>\n<body>\n");
                             const int SIZE = 6;
