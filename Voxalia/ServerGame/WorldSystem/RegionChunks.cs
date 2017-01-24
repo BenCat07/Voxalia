@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Voxalia.Shared;
 using Voxalia.ServerGame.ServerMainSystem;
 using BEPUphysics;
@@ -63,7 +64,90 @@ namespace Voxalia.ServerGame.WorldSystem
             PhysicsWorld.Remove(mesh);
         }
 
+        public const int HIGHER_DIV = 5;
+
+        public const int HIGHER_SIZE = Constants.CHUNK_WIDTH / HIGHER_DIV;
+
+        const double HIGHER_DIVIDED = 1.0 / HIGHER_DIV;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Vector2i HigherLocFor(Vector2i inp)
+        {
+            Vector2i temp;
+            temp.X = (int)Math.Floor(inp.X * HIGHER_DIVIDED);
+            temp.Y = (int)Math.Floor(inp.Y * HIGHER_DIVIDED);
+            return temp;
+        }
+
         public Dictionary<Vector2i, BlockUpperArea> UpperAreas = new Dictionary<Vector2i, BlockUpperArea>();
+
+        public void PushTopsEdited(Vector2i two, BlockUpperArea bua)
+        {
+            Vector2i two1 = HigherLocFor(two);
+            Vector2i two2 = HigherLocFor(two1);
+            Vector2i two3 = HigherLocFor(two2);
+            Vector2i two4 = HigherLocFor(two3);
+            // TODO: Send notice packet to affected players!
+            bua.Edited = false;
+            ChunkManager.WriteTops(two.X, two.Y, bua.ToBytes()); // 1x
+            byte[] z1 = PushTopsToHigherStart(two1, two, bua); // 5x
+            byte[] z2 = PushTopsToHigherSubsequent(two2, two1, 2, z1); // 25x
+            byte[] z3 = PushTopsToHigherSubsequent(two3, two2, 3, z2); // 125x
+            PushTopsToHigherSubsequent(two4, two3, 4, z3); // 625x
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public int TopsHigherBlockIndex(int x, int y)
+        {
+            return y * Constants.CHUNK_WIDTH + x;
+        }
+
+        public byte[] PushTopsToHigherStart(Vector2i two, Vector2i two_lower, BlockUpperArea bua)
+        {
+            Vector2i relPos;
+            relPos.X = two_lower.X - two.X * HIGHER_DIV;
+            relPos.Y = two_lower.Y - two.Y * HIGHER_DIV;
+            byte[] b = ChunkManager.GetTopsHigher(two.X, two.Y, 1);
+            if (b == null)
+            {
+                b = new byte[Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 2];
+            }
+            for (int x = 0; x < HIGHER_SIZE; x++)
+            {
+                for (int y = 0; y < HIGHER_SIZE; y++)
+                {
+                    Material mat = bua.Blocks[bua.BlockIndex(x * 5, y * 5)].BasicMat;
+                    int ind = TopsHigherBlockIndex(x + relPos.X * HIGHER_SIZE, y + relPos.Y * HIGHER_SIZE);
+                    Utilities.UshortToBytes((ushort)mat).CopyTo(b, ind * 2);
+                }
+            }
+            ChunkManager.WriteTopsHigher(two.X, two.Y, 1, b);
+            return b;
+        }
+
+        public byte[] PushTopsToHigherSubsequent(Vector2i two, Vector2i two_lower, int z, byte[] lb)
+        {
+            Vector2i relPos;
+            relPos.X = two_lower.X - two.X * HIGHER_DIV;
+            relPos.Y = two_lower.Y - two.Y * HIGHER_DIV;
+            byte[] b = ChunkManager.GetTopsHigher(two.X, two.Y, z);
+            if (b == null)
+            {
+                b = new byte[Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 2];
+            }
+            for (int x = 0; x < HIGHER_SIZE; x++)
+            {
+                for (int y = 0; y < HIGHER_SIZE; y++)
+                {
+                    int i1 = TopsHigherBlockIndex(x * 5, y * 5);
+                    int ind = TopsHigherBlockIndex(x + relPos.X, y + relPos.Y);
+                    b[ind] = lb[i1];
+                    b[ind + 1] = lb[i1 + 1];
+                }
+            }
+            ChunkManager.WriteTopsHigher(two.X, two.Y, z, b);
+            return b;
+        }
 
         public BlockUpperArea.TopBlock GetHighestBlock(Location pos)
         {
@@ -156,8 +240,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 bua.ChunksUsing.Remove(pos.Z);
                 if (bua.Edited)
                 {
-                    ChunkManager.WriteTops(two.X, two.Y, bua.ToBytes());
-                    bua.Edited = false;
+                    PushTopsEdited(two, bua);
                 }
                 if (bua.ChunksUsing.Count == 0)
                 {

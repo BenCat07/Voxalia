@@ -28,6 +28,8 @@ namespace Voxalia.ServerGame.WorldSystem
 
         LiteCollection<BsonDocument> DBTops;
 
+        LiteCollection<BsonDocument> DBTopsHigher;
+
         LiteCollection<BsonDocument> DBMins;
 
         LiteDatabase LODsDatabase;
@@ -55,6 +57,7 @@ namespace Voxalia.ServerGame.WorldSystem
             Database = new LiteDatabase("filename=" + dir + "chunks.ldb");
             DBChunks = Database.GetCollection<BsonDocument>("chunks");
             DBTops = Database.GetCollection<BsonDocument>("tops");
+            DBTopsHigher = Database.GetCollection<BsonDocument>("topshigh");
             DBMins = Database.GetCollection<BsonDocument>("mins");
             LODsDatabase = new LiteDatabase("filename=" + dir + "lod_chunks.ldb");
             DBLODs = LODsDatabase.GetCollection<BsonDocument>("lodchunks");
@@ -67,7 +70,7 @@ namespace Voxalia.ServerGame.WorldSystem
         }
         
         /// <summary>
-        /// TODO: potentially clear this occasionally?
+        /// TODO: Probably clear this occasionally!
         /// </summary>
         public ConcurrentDictionary<Vector2i, Vector2i> Maxes = new ConcurrentDictionary<Vector2i, Vector2i>();
 
@@ -246,6 +249,27 @@ namespace Voxalia.ServerGame.WorldSystem
             DBChunks.Delete(id);
         }
 
+        public void WriteTopsHigher(int x, int y, int z, byte[] tops)
+        {
+            BsonValue id = GetIDFor(x, y, z);
+            BsonDocument newdoc = new BsonDocument();
+            Dictionary<string, BsonValue> tbs = newdoc.RawValue;
+            tbs["_id"] = id;
+            tbs["tops"] = new BsonValue(FileHandler.Compress(tops));
+            DBTopsHigher.Upsert(newdoc);
+        }
+
+        public byte[] GetTopsHigher(int x, int y, int z)
+        {
+            BsonDocument doc;
+            doc = DBTopsHigher.FindById(GetIDFor(x, y, z));
+            if (doc == null)
+            {
+                return null;
+            }
+            return FileHandler.Uncompress(doc["tops"].AsBinary);
+        }
+
         public void WriteTops(int x, int y, byte[] tops)
         {
             BsonValue id = GetIDFor(x, y, 0);
@@ -268,7 +292,7 @@ namespace Voxalia.ServerGame.WorldSystem
         }
 
         /// <summary>
-        /// TODO: potentially clear this occasionally?
+        /// TODO: Probably clear this occasionally!
         /// </summary>
         public ConcurrentDictionary<Vector2i, int> Mins = new ConcurrentDictionary<Vector2i, int>();
         

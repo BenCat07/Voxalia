@@ -29,11 +29,11 @@ namespace Voxalia.ServerGame.OtherSystems
             return y * Constants.CHUNK_WIDTH + x;
         }
 
-        public void TryPush(int x, int y, int z, Material mat)
+        public bool TryPush(int x, int y, int z, Material mat)
         {
             if (!mat.IsOpaque())
             {
-                return;
+                return false;
             }
             int ind = BlockIndex(x, y);
             if (Blocks[ind].Height <= z || Blocks[ind].BasicMat == Material.AIR)
@@ -41,7 +41,9 @@ namespace Voxalia.ServerGame.OtherSystems
                 Blocks[ind].Height = z;
                 Blocks[ind].BasicMat = mat;
                 Edited = true;
+                return true;
             }
+            return false;
         }
         
         public bool Edited = false;

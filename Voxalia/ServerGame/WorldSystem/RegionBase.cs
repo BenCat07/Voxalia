@@ -184,8 +184,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 if (bua.Value.Edited)
                 {
-                    ChunkManager.WriteTops(bua.Key.X, bua.Key.Y, bua.Value.ToBytes());
-                    bua.Value.Edited = false;
+                    PushTopsEdited(bua.Key, bua.Value);
                 }
             }
         }

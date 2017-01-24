@@ -76,5 +76,10 @@ namespace Voxalia.Shared.Collision
         {
             return new Vector2i(one.X * two, one.Y * two);
         }
+
+        public static Vector2i operator /(Vector2i one, int two)
+        {
+            return new Vector2i(one.X / two, one.Y / two);
+        }
     }
 }
