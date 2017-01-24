@@ -319,7 +319,7 @@ namespace Voxalia.Shared.Files
 
         public void CreateDirectory(string path)
         {
-            string fname = BaseDirectory + CleanFileName(path);
+            string fname = SaveDir + CleanFileName(path);
             if (!Directory.Exists(fname))
             {
                 Directory.CreateDirectory(fname);

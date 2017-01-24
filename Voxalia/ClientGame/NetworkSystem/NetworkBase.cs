@@ -105,6 +105,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                 }
                 catch (Exception ex)
                 {
+                    if (ex is ThreadAbortException)
+                    {
+                        throw ex;
+                    }
                     SysConsole.Output(OutputType.WARNING, "Disconnecting: " + ex.ToString());
                 }
                 ConnectionThread = null;
@@ -119,6 +123,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                     }
                     catch (Exception ex)
                     {
+                        if (ex is ThreadAbortException)
+                        {
+                            throw ex;
+                        }
                         SysConsole.Output(OutputType.WARNING, "Disconnecting: " + ex.ToString());
                     }
                 }
@@ -199,6 +207,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                 }
                 catch (Exception ex)
                 {
+                    if (ex is ThreadAbortException)
+                    {
+                        throw ex;
+                    }
                     TheClient.Schedule.ScheduleSyncTask(() =>
                     {
                         callback.Invoke(new PingInfo() { Success = false, Message = "Failed: Network exception: " + ex.ToString(), Ping = -1 });
@@ -464,6 +476,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                         }
                         catch (Exception ex)
                         {
+                            if (ex is ThreadAbortException)
+                            {
+                                throw ex;
+                            }
                             SysConsole.Output(OutputType.ERROR, "Bad sync packet (ID=" + pid + ") data: " + ex.ToString());
                         }
                     });
@@ -488,6 +504,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                     }
                     catch (Exception ex)
                     {
+                        if (ex is ThreadAbortException)
+                        {
+                            throw ex;
+                        }
                         SysConsole.Output(OutputType.ERROR, "Connection: " + ex.ToString());
                     }
                 }
