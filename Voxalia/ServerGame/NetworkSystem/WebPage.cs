@@ -136,7 +136,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                             {
                                 toSend = TheServer.BlockImages.GetChunkRenderHD(world.MainRegion, x, y, z == -1);
                             }
-                            else if (z <= 3)
+                            else if (z <= 4)
                             {
                                 toSend = TheServer.BlockImages.GetChunkRenderLD(world.MainRegion, x, y, z);
                             }
