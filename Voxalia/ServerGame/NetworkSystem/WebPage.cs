@@ -125,12 +125,25 @@ namespace Voxalia.ServerGame.NetworkSystem
                     if (world.Name == region)
                     {
                         string[] dat = after.SplitFast('/');
-                        if (dat[0] == "full_img" && dat.Length >= 3)
+                        if (dat[0] == "full_img" && dat.Length >= 4)
                         {
                             int x = Utilities.StringToInt(dat[1]);
-                            int y = Utilities.StringToInt(dat[2].Before("."));
+                            int y = Utilities.StringToInt(dat[2]);
+                            int z = Utilities.StringToInt(dat[3].Before(".png"));
                             http_response_contenttype = "image/png";
-                            byte[] toSend = TheServer.BlockImages.GetChunkRenderHD(world.MainRegion, x, y, true);
+                            byte[] toSend;
+                            if (z <= 0)
+                            {
+                                toSend = TheServer.BlockImages.GetChunkRenderHD(world.MainRegion, x, y, z == -1);
+                            }
+                            else if (z <= 3)
+                            {
+                                toSend = TheServer.BlockImages.GetChunkRenderLD(world.MainRegion, x, y, z);
+                            }
+                            else
+                            {
+                                toSend = null;
+                            }
                             if (toSend == null)
                             {
                                 http_response_content = BlankImage;
@@ -141,11 +154,12 @@ namespace Voxalia.ServerGame.NetworkSystem
                             }
                             return;
                         }
-                        else if (dat[0] == "expquick" && dat.Length >= 3)
+                        else if (dat[0] == "expquick" && dat.Length >= 4)
                         {
                             int bx = Utilities.StringToInt(dat[1]);
                             int by = Utilities.StringToInt(dat[2]);
-                            int sz = Chunk.CHUNK_SIZE * BlockImageManager.TexWidth;
+                            int bz = Utilities.StringToInt(dat[3]);
+                            int sz = (bz == -1) ? (Chunk.CHUNK_SIZE * BlockImageManager.TexWidth) : Chunk.CHUNK_SIZE;
                             StringBuilder content = new StringBuilder();
                             content.Append("<!doctype html>\n<html>\n<head>\n<title>Voxalia EXP-QUICK</title>\n</head>\n<body>\n");
                             const int SIZE = 6;
@@ -154,7 +168,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                                 for (int y = -SIZE; y <= SIZE; y++)
                                 {
                                     content.Append("<img style=\"position:absolute;top:" + (y + SIZE) * sz + "px;left:" + (x + SIZE) * sz + "px;\" src=\"/map/region/"
-                                        + region + "/full_img/" + (bx + x) + "/" + (by + y) + ".png\" width=\"" + sz + "\" height=\"" + sz + "\" />");
+                                        + region + "/full_img/" + (bx + x) + "/" + (by + y) + "/" + bz + ".png\" width=\"" + sz + "\" height=\"" + sz + "\" />");
                                 }
                             }
                             content.Append("\n</body>\n</html>\n");

@@ -100,11 +100,11 @@ namespace Voxalia.ServerGame.OtherSystems
                                 fc.A = 255;
                                 for (int i = 3; i >= 0; i--)
                                 {
-                                    mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, (ind * 4 + i) * 2, 2));
-                                    if (mat != 0)
+                                    ushort smat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, (ind * 4 + i) * 2, 2));
+                                    if (smat != 0)
                                     {
-                                        imag = MaterialImages[mat];
-                                        FastColor fc2 = imag.GetAt(sx, sy);
+                                        MaterialImage simag = MaterialImages[smat];
+                                        FastColor fc2 = simag.GetAt(sx, sy);
                                         fc = Blend(fc2, fc);
                                     }
                                 }
@@ -128,6 +128,43 @@ namespace Voxalia.ServerGame.OtherSystems
                         }
                         bmp.SetAt(x, y, fc);
                     }
+                }
+            }
+            // TODO: Add entity icons? (Trees in particular!)
+            return MatImgToPng(bmp);
+        }
+
+        public byte[] GetChunkRenderLD(WorldSystem.Region tregion, int tx, int ty, int tz)
+        {
+            int wid = Constants.CHUNK_WIDTH;
+            MaterialImage bmp = new MaterialImage() { Colors = new FastColor[wid * wid], Width = wid, Height = wid };
+            KeyValuePair<byte[], byte[]> bitters = tregion.ChunkManager.GetTopsHigher(tx, ty, tz);
+            byte[] bits = bitters.Key;
+            byte[] bits_trans = bitters.Value;
+            if (bits == null || bits_trans == null)
+            {
+                return null;
+            }
+            for (int x = 0; x < Constants.CHUNK_WIDTH; x++)
+            {
+                for (int y = 0; y < Constants.CHUNK_WIDTH; y++)
+                {
+                    int ind = tregion.TopsHigherBlockIndex(x, y);
+                    ushort mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits, ind * 2, 2));
+                    MaterialImage imag = MaterialImages[mat];
+                    FastColor fc = imag.GetAt(0, 0);
+                    fc.A = 255;
+                    for (int i = 3; i >= 0; i--)
+                    {
+                        mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, ind * 2 * 4, 2));
+                        if (mat != 0)
+                        {
+                            imag = MaterialImages[mat];
+                            FastColor fc2 = imag.GetAt(0, 0);
+                            fc = Blend(fc2, fc);
+                        }
+                    }
+                    bmp.SetAt(x, y, fc);
                 }
             }
             // TODO: Add entity icons? (Trees in particular!)
