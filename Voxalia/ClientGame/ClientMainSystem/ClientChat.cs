@@ -123,6 +123,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        public bool ShouldShowMessage(TextChannel channel)
+        {
+            return channel == TextChannel.CHAT || channel == TextChannel.BROADCAST || channel == TextChannel.IMPORTANT;
+        }
+
         public void SetChatText(string text)
         {
             ChatBox.Text = text;
@@ -163,7 +168,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             ChatMessages.Clear();
             for (int i = 0; i < 100; i++)
             {
-                ChatMessage cm = new ChatMessage() { Channel = TextChannel.ALWAYS, Text = "" };
+                ChatMessage cm = new ChatMessage() { Channel = TextChannel.ALWAYS, Text = "", Sent = 0 };
                 ChatMessages.Add(cm);
             }
             UpdateChats();
@@ -178,7 +183,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             bool bottomed = ChatIsAtBottom();
             UIConsole.WriteLine(channel + ": " + message);
-            ChatMessage cm = new ChatMessage() { Channel = channel, Text = message };
+            ChatMessage cm = new ChatMessage() { Channel = channel, Text = message, Sent = GlobalTickTimeLocal };
             ChatMessages.Add(cm);
             if (ChatMessages.Count > 550)
             {
@@ -190,7 +195,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 ChatScrollToBottom();
             }
         }
-
+        
         public int ChatBottom = 0;
 
         public void ChatScrollToBottom()
@@ -220,6 +225,28 @@ namespace Voxalia.ClientGame.ClientMainSystem
             by += FontSets.Standard.font_default.Height;
             ChatBottom = (int)(by - ChatScroller.GetHeight());
             ChatScroller.MaxScroll = ChatBottom;
+        }
+
+        public void ChatRenderRecent()
+        {
+            int y = (Window.Height / 2);
+            for (int i = ChatMessages.Count - 1; i >= 0; i--)
+            {
+                if (ShouldShowMessage(ChatMessages[i].Channel) && ChatMessages[i].Sent != 0 && ChatMessages[i].Sent + 5 > GlobalTickTimeLocal)
+                {
+                    y -= (int)FontSets.Standard.font_default.Height;
+                    float tm = 1;
+                    if (ChatMessages[i].Sent + 2.5 < GlobalTickTimeLocal)
+                    {
+                        tm = (float)((ChatMessages[i].Sent + 5) - GlobalTickTimeLocal) * (1.0f / 2.5f);
+                    }
+                    FontSets.Standard.DrawColoredText(ChatMessages[i].Text, new Location(5, y, 0), transmod: tm);
+                }
+                else
+                {
+                    break;
+                }
+            }
         }
     }
 }

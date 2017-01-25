@@ -1932,6 +1932,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         RenderCompassCoord(new Vector4d(-1, 1, 0, 0), "NW");
                         RenderCompassCoord(new Vector4d(-1, -1, 0, 0), "SW");
                     }
+                    if (!IsChatVisible())
+                    {
+                        ChatRenderRecent();
+                    }
                 }
             }
             if (sub3d)

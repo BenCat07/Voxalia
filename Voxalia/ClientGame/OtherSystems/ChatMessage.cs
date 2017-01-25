@@ -20,5 +20,7 @@ namespace Voxalia.ClientGame.OtherSystems
         public string Text;
 
         public TextChannel Channel;
+
+        public double Sent;
     }
 }
