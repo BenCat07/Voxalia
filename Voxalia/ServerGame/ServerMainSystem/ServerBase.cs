@@ -162,6 +162,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
             ShuttingDown = true;
             SysConsole.Output(OutputType.INFO, "[Shutdown] Starting to close server...");
+            ConsoleHandler.OnCommandInput -= CommandInputHandle;
             Schedule.Tasks.Clear();
             foreach (PlayerEntity player in Players)
             {
