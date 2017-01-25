@@ -34,52 +34,9 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             return TheClient;
         }
 
-        private bool pDown;
-
         protected override void TickChildren(double delta)
         {
-            if (Parent != null)
-            {
-                base.TickChildren(delta);
-                return;
-            }
-            int mX = MouseHandler.MouseX();
-            int mY = MouseHandler.MouseY();
-            bool mDown = MouseHandler.CurrentMouse.IsButtonDown(MouseButton.Left);
-            foreach (UIElement element in Children)
-            {
-                if (element.Contains(mX, mY))
-                {
-                    if (!element.HoverInternal)
-                    {
-                        element.HoverInternal = true;
-                        element.MouseEnter(mX, mY);
-                    }
-                    if (mDown && !pDown)
-                    {
-                        element.MouseLeftDown(mX, mY);
-                    }
-                    else if (!mDown && pDown)
-                    {
-                        element.MouseLeftUp(mX, mY);
-                    }
-                }
-                else if (element.HoverInternal)
-                {
-                    element.HoverInternal = false;
-                    element.MouseLeave(mX, mY);
-                    if (mDown && !pDown)
-                    {
-                        element.MouseLeftDownOutside(mX, mY);
-                    }
-                }
-                else if (mDown && !pDown)
-                {
-                    element.MouseLeftDownOutside(mX, mY);
-                }
-                element.FullTick(TheClient.Delta);
-            }
-            pDown = mDown;
+            base.TickChildren(delta);
         }
 
         protected override void RenderChildren(double delta, int xoff, int yoff)

@@ -259,12 +259,13 @@ namespace Voxalia.Shared
     /// </summary>
     public enum TextChannel : byte
     {
-        UNSPECIFIED = 0,
+        ALWAYS = 0,
         CHAT = 1,
         BROADCAST = 2,
         COMMAND_RESPONSE = 3,
         DEBUG_INFO = 4,
         IMPORTANT = 5,
-        COUNT = 6
+        UNSPECIFIED = 6,
+        COUNT = 7
     }
 }

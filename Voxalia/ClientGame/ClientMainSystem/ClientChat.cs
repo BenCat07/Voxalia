@@ -25,7 +25,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
     {
         public UIGroup ChatMenu;
 
-        public List<ChatMessage> ChatMessages = new List<ChatMessage>();
+        public List<ChatMessage> ChatMessages = new List<ChatMessage>(600);
         
         public UIInputBox ChatBox;
 
@@ -45,7 +45,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             ChatMenu.AddChild(ChatScroller);
             Channels = new bool[(int)TextChannel.COUNT];
             Func<int> xer = () => 30;
-            for (int i = 0; i < Channels.Length; i++)
+            Channels[0] = true;
+            for (int i = 1; i < Channels.Length; i++)
             {
                 Channels[i] = true;
                 string n = ((TextChannel)i).ToString();
@@ -57,6 +58,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 xer = () => fxer() + len + 10;
                 ChatMenu.AddChild(link);
             }
+            ClearChat();
+            ChatScrollToBottom();
         }
 
         void EnterChatMessage()
@@ -94,10 +97,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         bool WVis = false;
 
+        public bool ChatBottomLastTick = true;
+
         public void TickChatSystem()
         {
             if (IsChatVisible())
             {
+                ChatBottomLastTick = ChatIsAtBottom();
                 if (ChatBox.TriedToEscape)
                 {
                     CloseChat();
@@ -109,6 +115,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     WVis = true;
                 }
                 ChatBox.Selected = true;
+            }
+            else
+            {
+                ChatBottomLastTick = true;
             }
         }
 
@@ -147,6 +157,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        public void ClearChat()
+        {
+            ChatMessages.Clear();
+            for (int i = 0; i < 100; i++)
+            {
+                ChatMessage cm = new ChatMessage() { Channel = TextChannel.ALWAYS, Text = "" };
+                ChatMessages.Add(cm);
+            }
+            UpdateChats();
+        }
+
         public bool IsChatVisible()
         {
             return TheGameScreen.HasChild(ChatMenu);
@@ -154,6 +175,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         public void WriteMessage(TextChannel channel, string message)
         {
+            bool bottomed = ChatIsAtBottom();
             UIConsole.WriteLine(channel + ": " + message);
             ChatMessage cm = new ChatMessage() { Channel = channel, Text = message };
             ChatMessages.Add(cm);
@@ -162,6 +184,22 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 ChatMessages.RemoveRange(0, 50);
             }
             UpdateChats();
+            if (bottomed)
+            {
+                ChatScrollToBottom();
+            }
+        }
+
+        public int ChatBottom = 0;
+
+        public void ChatScrollToBottom()
+        {
+            ChatScroller.Scroll = ChatBottom;
+        }
+
+        public bool ChatIsAtBottom()
+        {
+            return ChatScroller.Scroll >= (ChatBottom - 5);
         }
         
         public void UpdateChats()
@@ -174,9 +212,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     by += FontSets.Standard.font_default.Height;
                     int y = (int)by;
-                    ChatScroller.AddChild(new UILabel(ChatMessages[i].Channel.ToString() + ": " + ChatMessages[i].Text, FontSets.Standard, UIAnchor.TOP_LEFT, () => 0, () => y, () => (int)ChatScroller.GetWidth()));
+                    string ch = (ChatMessages[i].Channel == TextChannel.ALWAYS) ? "." : (ChatMessages[i].Channel.ToString() + ": ");
+                    ChatScroller.AddChild(new UILabel(ch + ChatMessages[i].Text, FontSets.Standard, UIAnchor.TOP_LEFT, () => 0, () => y, () => (int)ChatScroller.GetWidth()));
                 }
             }
+            by += FontSets.Standard.font_default.Height;
+            ChatBottom = (int)(by - ChatScroller.GetHeight());
         }
     }
 }

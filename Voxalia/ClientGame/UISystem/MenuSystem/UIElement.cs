@@ -12,6 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Voxalia.ClientGame.ClientMainSystem;
+using OpenTK;
+using OpenTK.Input;
 
 namespace Voxalia.ClientGame.UISystem.MenuSystem
 {
@@ -25,17 +27,17 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
         
         public bool HoverInternal;
 
-        public UIElement Parent
-        {
-            get;
-            private set;
-        }
+        public UIElement Parent;
 
-        private UIAnchor Anchor;
-        protected Func<float> Width;
-        protected Func<float> Height;
-        private Func<int> OffsetX;
-        private Func<int> OffsetY;
+        public UIAnchor Anchor;
+
+        public Func<float> Width;
+
+        public Func<float> Height;
+
+        public Func<int> OffsetX;
+
+        public Func<int> OffsetY;
 
         public UIElement(UIAnchor anchor, Func<float> width, Func<float> height, Func<int> xOff, Func<int> yOff)
         {
@@ -185,8 +187,47 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
         {
         }
 
+        private bool pDown;
+
         protected virtual void TickChildren(double delta)
         {
+            int mX = MouseHandler.MouseX();
+            int mY = MouseHandler.MouseY();
+            bool mDown = MouseHandler.CurrentMouse.IsButtonDown(MouseButton.Left);
+            foreach (UIElement element in Children)
+            {
+                if (element.Contains(mX, mY))
+                {
+                    if (!element.HoverInternal)
+                    {
+                        element.HoverInternal = true;
+                        element.MouseEnter(mX, mY);
+                    }
+                    if (mDown && !pDown)
+                    {
+                        element.MouseLeftDown(mX, mY);
+                    }
+                    else if (!mDown && pDown)
+                    {
+                        element.MouseLeftUp(mX, mY);
+                    }
+                }
+                else if (element.HoverInternal)
+                {
+                    element.HoverInternal = false;
+                    element.MouseLeave(mX, mY);
+                    if (mDown && !pDown)
+                    {
+                        element.MouseLeftDownOutside(mX, mY);
+                    }
+                }
+                else if (mDown && !pDown)
+                {
+                    element.MouseLeftDownOutside(mX, mY);
+                }
+                element.FullTick(delta);
+            }
+            pDown = mDown;
             foreach (UIElement element in Children)
             {
                 element.FullTick(delta);
@@ -218,19 +259,11 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
         public void MouseEnter(int x, int y)
         {
             MouseEnter();
-            foreach (UIElement child in GetAllAt(x, y))
-            {
-                child.MouseEnter(x, y);
-            }
         }
 
         public void MouseLeave(int x, int y)
         {
             MouseLeave();
-            foreach (UIElement child in GetAllNotAt(x, y))
-            {
-                child.MouseLeave(x, y);
-            }
         }
 
         public void MouseLeftDown(int x, int y)

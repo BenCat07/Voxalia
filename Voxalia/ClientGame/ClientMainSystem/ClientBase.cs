@@ -687,6 +687,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             CVars.r_width.Set(((int)(Window.ClientSize.Width / DPIScale)).ToString());
             CVars.r_height.Set(((int)(Window.ClientSize.Height / DPIScale)).ToString());
             Schedule.ScheduleSyncTask(windowupdatehandle);
+            if (ChatBottomLastTick)
+            {
+                ChatScrollToBottom();
+            }
         }
 
         /// <summary>
@@ -705,6 +709,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Window.ClientSize = new Size(CVars.r_width.ValueI, CVars.r_height.ValueI);
             Window.WindowState = CVars.r_fullscreen.ValueB ? WindowState.Fullscreen : WindowState.Normal;
             Schedule.ScheduleSyncTask(windowupdatehandle);
+            if (ChatBottomLastTick)
+            {
+                ChatScrollToBottom();
+            }
         }
 
         /// <summary>

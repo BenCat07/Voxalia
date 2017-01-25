@@ -22,6 +22,11 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 return false;
             }
             TextChannel tc = (TextChannel)data[0];
+            if (tc <= TextChannel.ALWAYS || tc >= TextChannel.COUNT)
+            {
+                SysConsole.Output(OutputType.WARNING, "Invalid TEXTCHANEL specified: " + tc);
+                return false;
+            }
             TheClient.WriteMessage(tc, FileHandler.encoding.GetString(data, 1, data.Length - 1));
             return true;
         }
