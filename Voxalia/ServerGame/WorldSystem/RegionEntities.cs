@@ -125,7 +125,8 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
-            if (e.EID < 1)
+            bool l1 = e.EID < 1;
+            if (l1)
             {
                 e.EID = TheServer.AdvanceCID();
             }
@@ -136,7 +137,11 @@ namespace Voxalia.ServerGame.WorldSystem
             catch (Exception ex)
             {
                 Utilities.CheckException(ex);
-                SysConsole.Output(OutputType.WARNING, "Failed to spawn entity with ID: " + e.EID + ": Duplicate EID!");
+                SysConsole.Output(OutputType.WARNING, "Failed to spawn entity with ID: " + e.EID + ": Duplicate EID?! " + ex.ToString());
+                if (l1)
+                {
+                    SysConsole.Output(OutputType.WARNING, "Worse news: That EID was generated, not loaded!");
+                }
             }
             e.IsSpawned = true;
             if (e.Ticks)

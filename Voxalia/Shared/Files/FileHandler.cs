@@ -193,7 +193,18 @@ namespace Voxalia.Shared.Files
         public bool Exists(string filename)
         {
             string cleaned = CleanFileName(filename);
-            return FileIndex(cleaned) != -1 || File.Exists(BaseDirectory + cleaned);
+            if (FileIndex(cleaned) != -1 || File.Exists(BaseDirectory + cleaned))
+            {
+                return true;
+            }
+            for (int i = 0; i < SubDirectories.Count; i++)
+            {
+                if (File.Exists(SubDirectories[i] + cleaned))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>
@@ -213,6 +224,13 @@ namespace Voxalia.Shared.Files
                 }
                 else
                 {
+                    for (int i = 0; i < SubDirectories.Count; i++)
+                    {
+                        if (File.Exists(SubDirectories[i] + fname))
+                        {
+                            return File.ReadAllBytes(SubDirectories[i] + fname);
+                        }
+                    }
                     throw new UnknownFileException(fname);
                 }
             }
