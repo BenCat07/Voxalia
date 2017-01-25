@@ -74,7 +74,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// How much time has passed since the world first loaded.
         /// </summary>
-        public double GlobalTickTime = 0;
+        public double GlobalTickTime = 1;
 
         /// <summary>
         /// Loads the world configuration onto this world object.

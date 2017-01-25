@@ -13,7 +13,7 @@ namespace Voxalia.Shared
 {
     /// <summary>
     /// Internal representation of a single block's data.
-    /// 5 bytes.
+    /// 5 bytes (40 bits).
     /// Structure:
     /// 14 bits: Material.
     /// 2 bits: block damage.
