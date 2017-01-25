@@ -243,7 +243,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// The time, in seconds, since the client started.
         /// </summary>
-        public double GlobalTickTimeLocal = 0;
+        public double GlobalTickTimeLocal = 1;
 
         /// <summary>
         /// The delta time (time between this frame and the previous) for the client tick.
