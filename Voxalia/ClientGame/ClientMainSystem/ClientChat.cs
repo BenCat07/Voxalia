@@ -17,6 +17,7 @@ using Voxalia.Shared;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
+using OpenTK;
 using OpenTK.Input;
 
 namespace Voxalia.ClientGame.ClientMainSystem
@@ -38,7 +39,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             FontSet font = FontSets.Standard;
             int minY = 10 + (int)font.font_default.Height;
             ChatMenu = new UIGroup(UIAnchor.TOP_CENTER, () => Window.Width, () => Window.Height - minY - UIBottomHeight, () => 0, () => 0);
-            ChatScroller = new UIScrollBox(UIAnchor.TOP_CENTER, () => ChatMenu.GetWidth() - (30 * 2), () => ChatMenu.GetHeight() - minY, () => 0, () => minY);
+            ChatScroller = new UIScrollBox(UIAnchor.TOP_CENTER, () => ChatMenu.GetWidth() - (30 * 2), () => ChatMenu.GetHeight() - minY, () => 0, () => minY) { Color = new Vector4(0f, 0.5f, 0.5f, 0.6f) };
             ChatBox = new UIInputBox("", "Enter a /command or a chat message...", font, UIAnchor.TOP_CENTER, ChatScroller.GetWidth, () => 0, () => (int)ChatScroller.GetHeight() + minY);
             ChatBox.EnterPressed = EnterChatMessage;
             ChatMenu.AddChild(ChatBox);
@@ -212,12 +213,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     by += FontSets.Standard.font_default.Height;
                     int y = (int)by;
-                    string ch = (ChatMessages[i].Channel == TextChannel.ALWAYS) ? "." : (ChatMessages[i].Channel.ToString() + ": ");
+                    string ch = (ChatMessages[i].Channel == TextChannel.ALWAYS) ? "" : (ChatMessages[i].Channel.ToString() + ": ");
                     ChatScroller.AddChild(new UILabel(ch + ChatMessages[i].Text, FontSets.Standard, UIAnchor.TOP_LEFT, () => 0, () => y, () => (int)ChatScroller.GetWidth()));
                 }
             }
             by += FontSets.Standard.font_default.Height;
             ChatBottom = (int)(by - ChatScroller.GetHeight());
+            ChatScroller.MaxScroll = ChatBottom;
         }
     }
 }

@@ -174,6 +174,8 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
 
         public Action EnterPressed;
 
+        public Vector4 Color = Vector4.One;
+
         protected override void Render(double delta, int xoff, int yoff)
         {
             string typed = Text;
@@ -202,7 +204,7 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             int y = GetY() + yoff;
             int w = (int)GetWidth();
             TheClient.Textures.White.Bind();
-            TheClient.Rendering.SetColor(Color4.White);
+            TheClient.Rendering.SetColor(Color);
             TheClient.Rendering.RenderRectangle(x - 1, y - 1, x + w + 1, y + Fonts.font_default.Height + 1);
             GL.Enable(EnableCap.ScissorTest);
             GL.Scissor(x, TheClient.Window.Height - (y + (int)Fonts.font_default.Height), w, (int)Fonts.font_default.Height);

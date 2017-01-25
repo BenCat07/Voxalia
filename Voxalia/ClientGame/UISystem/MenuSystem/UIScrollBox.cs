@@ -21,12 +21,16 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
     {
         public int Scroll = 0;
 
+        // TODO: Visible and clickable scroll bar, choose between left and right side of box, and choose width.
+
         public UIScrollBox(UIAnchor anchor, Func<float> width, Func<float> height, Func<int> xOff, Func<int> yOff)
             : base(anchor, width, height, xOff, yOff)
         {
         }
 
         bool watchMouse = false;
+
+        public int MaxScroll = 0;
 
         protected override void MouseEnter()
         {
@@ -65,20 +69,28 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
                 {
                     Scroll = 0;
                 }
-                // TODO: Upper limit?
+                if (Scroll > MaxScroll)
+                {
+                    Scroll = MaxScroll;
+                }
             }
         }
 
+        public Vector4 Color = new Vector4(0f, 1f, 1f, 0.5f);
+
         protected override void Render(double delta, int xoff, int yoff)
         {
-            int x = GetX() + xoff;
-            int y = GetY() + yoff;
-            int h = (int)GetHeight();
-            int w = (int)GetWidth();
-            Client TheClient = GetClient();
-            TheClient.Rendering.SetColor(new Vector4(0f, 0.5f, 0.5f, 0.3f));
-            TheClient.Rendering.RenderRectangle(x, y, x + w, y + h);
-            TheClient.Rendering.SetColor(new Vector4(1f));
+            if (Color.W > 0f)
+            {
+                int x = GetX() + xoff;
+                int y = GetY() + yoff;
+                int h = (int)GetHeight();
+                int w = (int)GetWidth();
+                Client TheClient = GetClient();
+                TheClient.Rendering.SetColor(Color);
+                TheClient.Rendering.RenderRectangle(x, y, x + w, y + h);
+                TheClient.Rendering.SetColor(new Vector4(1f));
+            }
         }
 
         protected override void RenderChildren(double delta, int xoff, int yoff)
