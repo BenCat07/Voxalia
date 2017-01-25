@@ -63,6 +63,14 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             MStart = Text.Length;
         }
 
+        public void Clear()
+        {
+            Text = "";
+            MinCursor = 0;
+            MaxCursor = 0;
+            TriedToEscape = false;
+        }
+
         protected override void MouseLeftDownOutside()
         {
             Selected = false;
@@ -89,6 +97,8 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             MaxCursor = Text.Length;
         }
 
+        public bool TriedToEscape = false;
+
         protected override void Tick(double delta)
         {
             if (MDown)
@@ -105,6 +115,10 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
                 }
                 bool modified = false;
                 KeyHandlerState khs = KeyHandler.GetKBState();
+                if (khs.Escaped)
+                {
+                    TriedToEscape = true;
+                }
                 if (khs.InitBS > 0)
                 {
                     int end;

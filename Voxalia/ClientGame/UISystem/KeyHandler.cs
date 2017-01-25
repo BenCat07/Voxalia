@@ -181,6 +181,8 @@ namespace Voxalia.ClientGame.UISystem
                 _Scrolls = 0;
                 KB.TogglerPressed = _TogglerPressed;
                 _TogglerPressed = false;
+                KB.Escaped = _EscapePressed;
+                _EscapePressed = false;
             }
             return KB;
         }
@@ -202,6 +204,8 @@ namespace Voxalia.ClientGame.UISystem
         static int _Scrolls = 0;
 
         static int _LeftRights = 0;
+
+        static bool _EscapePressed = false;
 
         static bool _BindsValid = false;
 
@@ -340,6 +344,9 @@ namespace Voxalia.ClientGame.UISystem
             {
                 switch (e.Key)
                 {
+                    case Key.Escape:
+                        _EscapePressed = true;
+                        break;
                     case Key.Enter:
                         _KeyboardString += "\n";
                         break;
@@ -633,19 +640,8 @@ namespace Voxalia.ClientGame.UISystem
         public int LeftRights = 0;
 
         /// <summary>
-        /// Defaults the keyboard state.
+        /// Whether the escape key was pressed at all.
         /// </summary>
-        public void Clear()
-        {
-            Pages = 0;
-            Scrolls = 0;
-            LeftRights = 0;
-            TogglerPressed = false;
-            CopyPressed = false;
-            ControlDown = false;
-            EndDelete = 0;
-            InitBS = 0;
-            KeyboardString = "";
-        }
+        public bool Escaped = false;
     }
 }

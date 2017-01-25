@@ -17,6 +17,7 @@ using Voxalia.Shared;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
+using OpenTK.Input;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -60,9 +61,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         void EnterChatMessage()
         {
-            CloseChat();
             if (ChatBox.Text.Length == 0)
             {
+                CloseChat();
                 return;
             }
             if (ChatBox.Text.StartsWith("/"))
@@ -74,9 +75,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 CommandPacketOut packet = new CommandPacketOut("say\n" + ChatBox.Text);
                 Network.SendPacket(packet);
             }
-            ChatBox.Text = "";
-            ChatBox.MinCursor = 0;
-            ChatBox.MaxCursor = 0;
+            CloseChat();
         }
 
         void ToggleLink(UITextLink link, string n, int chan)
@@ -99,7 +98,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             if (IsChatVisible())
             {
-                if (OpenTK.Input.Keyboard.GetState().IsKeyDown(OpenTK.Input.Key.Escape)) // TODO: Better method for this!
+                if (ChatBox.TriedToEscape)
                 {
                     CloseChat();
                     return;
@@ -144,6 +143,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 TheGameScreen.RemoveChild(ChatMenu);
                 WVis = false;
                 FixMouse();
+                ChatBox.Clear();
             }
         }
 
