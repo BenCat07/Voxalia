@@ -97,18 +97,29 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             }
             if (Selected)
             {
-                int min = MinCursor;
-                int max = MaxCursor;
-                if (min > max)
+                if (MinCursor > MaxCursor)
                 {
-                    MinCursor = max;
+                    int min = MinCursor;
+                    MinCursor = MaxCursor;
                     MaxCursor = min;
                 }
                 bool modified = false;
                 KeyHandlerState khs = KeyHandler.GetKBState();
                 if (khs.InitBS > 0)
                 {
-                    int end = MinCursor - Math.Min(khs.InitBS, MinCursor);
+                    int end;
+                    if (MaxCursor > MinCursor)
+                    {
+                        khs.InitBS--;
+                    }
+                    if (khs.InitBS > 0)
+                    {
+                        end = MinCursor - Math.Min(khs.InitBS, MinCursor);
+                    }
+                    else
+                    {
+                        end = MinCursor;
+                    }
                     Text = Text.Substring(0, end) + Text.Substring(MaxCursor);
                     MinCursor = end;
                     MaxCursor = end;
