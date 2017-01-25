@@ -154,6 +154,10 @@ vec4 color_for(in vec4 pos, in vec4 colt)
 		{
 			return vec4(1.0);
 		}
+		else if (colt.x > 0.3 && colt.x < 0.7 && colt.y > 0.3 && colt.y < 0.7 && colt.z > 0.3 && colt.z < 0.7)
+		{
+			return colt;
+		}
 		else
 		{
 			float adjust = abs(mod(time * 0.2, 2.0));

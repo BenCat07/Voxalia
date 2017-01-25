@@ -82,8 +82,29 @@ void main()
 {
 	vec4 col = texture(s, fi.texcoord);
 #if MCM_VOX
-	// TODO: Special color handlers?
-	col *= fi.tcol;
+	if (fi.tcol.w == 0.0 && fi.tcol.x == 0.0 && fi.tcol.z == 0.0 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7)
+	{
+		col *= fi.tcol;
+	}
+	else if (fi.tcol.w == 0.0 && fi.tcol.x > 0.3 && fi.tcol.x < 0.7 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7 && fi.tcol.z > 0.3 && fi.tcol.z < 0.7)
+	{
+		if (fi.tcol.z > 0.51)
+		{
+			col.xyz = vec3(1.0) - col.xyz;
+		}
+		else if (fi.tcol.x > 0.51)
+		{
+			col *= fi.tcol;
+		}
+		else
+		{
+			col *= vec4(texture(s, vec3(fi.texcoord.xy, 0)).xyz, 1.0);
+		}
+	}
+	else
+	{
+		col *= fi.tcol;
+	}
 #endif
 #if MCM_NO_ALPHA_CAP
 #else

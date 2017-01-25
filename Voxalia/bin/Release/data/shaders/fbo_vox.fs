@@ -168,7 +168,7 @@ void main()
 		}
 		else
 		{
-			col *= texture(s, vec3(f.texcoord.xy, 0));
+			col *= vec4(texture(s, vec3(f.texcoord.xy, 0)).xyz, 1.0);
 		}
 	}
 	else
