@@ -178,7 +178,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     return;
                 }
-                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, true, bua);
+                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, false, shaped, true, bua);
                 if (CancelToken.IsCancellationRequested)
                 {
                     return;
@@ -559,33 +559,36 @@ namespace Voxalia.ClientGame.WorldSystem
                     }
                     tVBO.GenerateOrUpdate();
                     tVBO.CleanLists();
-                    DestroyPlants();
-                    Plant_VAO = GL.GenVertexArray();
-                    Plant_VBO_Ind = GL.GenBuffer();
-                    Plant_VBO_Pos = GL.GenBuffer();
-                    Plant_VBO_Col = GL.GenBuffer();
-                    Plant_VBO_Tcs = GL.GenBuffer();
-                    Plant_C = posind.Length;
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * OpenTK.Vector3.SizeInBytes), posset, BufferUsageHint.StaticDraw);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(texcoordsset.Length * OpenTK.Vector2.SizeInBytes), texcoordsset, BufferUsageHint.StaticDraw);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
-                    GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colorset.Length * OpenTK.Vector4.SizeInBytes), colorset, BufferUsageHint.StaticDraw);
-                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, Plant_VBO_Ind);
-                    GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(posind.Length * sizeof(uint)), posind, BufferUsageHint.StaticDraw);
-                    GL.BindVertexArray(Plant_VAO);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
-                    GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-                    GL.EnableVertexAttribArray(0);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
-                    GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, 0);
-                    GL.EnableVertexAttribArray(2);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
-                    GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
-                    GL.EnableVertexAttribArray(4);
-                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, Plant_VBO_Ind);
-                    GL.BindVertexArray(0);
+                    if (plants)
+                    {
+                        DestroyPlants();
+                        Plant_VAO = GL.GenVertexArray();
+                        Plant_VBO_Ind = GL.GenBuffer();
+                        Plant_VBO_Pos = GL.GenBuffer();
+                        Plant_VBO_Col = GL.GenBuffer();
+                        Plant_VBO_Tcs = GL.GenBuffer();
+                        Plant_C = posind.Length;
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
+                        GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * OpenTK.Vector3.SizeInBytes), posset, BufferUsageHint.StaticDraw);
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
+                        GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(texcoordsset.Length * OpenTK.Vector2.SizeInBytes), texcoordsset, BufferUsageHint.StaticDraw);
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
+                        GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colorset.Length * OpenTK.Vector4.SizeInBytes), colorset, BufferUsageHint.StaticDraw);
+                        GL.BindBuffer(BufferTarget.ElementArrayBuffer, Plant_VBO_Ind);
+                        GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(posind.Length * sizeof(uint)), posind, BufferUsageHint.StaticDraw);
+                        GL.BindVertexArray(Plant_VAO);
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
+                        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+                        GL.EnableVertexAttribArray(0);
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
+                        GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, 0);
+                        GL.EnableVertexAttribArray(2);
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
+                        GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
+                        GL.EnableVertexAttribArray(4);
+                        GL.BindBuffer(BufferTarget.ElementArrayBuffer, Plant_VBO_Ind);
+                        GL.BindVertexArray(0);
+                    }
                 });
                 OwningRegion.DoneRendering(this);
             }

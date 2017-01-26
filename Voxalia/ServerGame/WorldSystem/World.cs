@@ -39,7 +39,7 @@ namespace Voxalia.ServerGame.WorldSystem
 
         /// <summary>
         /// Represents the only region currently contained by a world.
-        /// May in the future by changed to a dictionary of separate worldly regions.
+        /// May in the future be changed to a dictionary of separate worldly regions.
         /// At which point, this object will identify the "main" region only, IE the centermost.
         /// </summary>
         public Region MainRegion = null;
@@ -69,7 +69,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// The maximum allowed value of a seed.
         /// TODO: Change this value?
         /// </summary>
-        const int SeedMax = ushort.MaxValue;
+        public const int SeedMax = ushort.MaxValue;
 
         /// <summary>
         /// How much time has passed since the world first loaded.
