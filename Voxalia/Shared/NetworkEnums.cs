@@ -101,7 +101,8 @@ namespace Voxalia.Shared
         EXPLOSION = 0,
         SMOKE = 1,
         BIG_SMOKE = 2,
-        PAINT_BOMB = 3
+        PAINT_BOMB = 3,
+        FIREWORK = 4
     }
 
     /// <summary>

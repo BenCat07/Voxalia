@@ -240,7 +240,6 @@ namespace Voxalia.ClientGame.AudioSystem
             }
             foreach (string rem in ToRemove)
             {
-                SysConsole.Output(OutputType.DEBUG, "Clean up: " + rem);
                 Effects.Remove(rem);
             }
             ToRemove.Clear();

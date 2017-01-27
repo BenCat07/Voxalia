@@ -50,7 +50,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         public Action<ParticleEffect> OnDestroy = null;
 
-        public bool BlowsInWind = true;
+        public float WindMod = 1f;
 
         public Location WindOffset = Location.Zero;
 
@@ -110,9 +110,9 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 return null;
             }
             Location start = Start(this) + WindOffset;
-            if (BlowsInWind)
+            if (WindMod != 0)
             {
-                WindOffset += TheClient.TheRegion.ActualWind * SimplexNoiseInternal.Generate((start.X + TheClient.GlobalTickTimeLocal) * 0.2, (start.Y + TheClient.GlobalTickTimeLocal) * 0.2, start.Z * 0.2) * 0.1;
+                WindOffset += WindMod * TheClient.TheRegion.ActualWind * SimplexNoiseInternal.Generate((start.X + TheClient.GlobalTickTimeLocal) * 0.2, (start.Y + TheClient.GlobalTickTimeLocal) * 0.2, start.Z * 0.2) * 0.1;
             }
             Vector4 light = TheClient.TheRegion.GetLightAmountAdjusted(start, Location.UnitZ);
             Vector4 scolor = new Vector4((float)Color.X * light.X, (float)Color.Y * light.Y, (float)Color.Z * light.Z, Alpha * light.W);
@@ -161,9 +161,9 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             }
             texture.Bind();
             Location start = Start(this) + WindOffset;
-            if (BlowsInWind)
+            if (WindMod != 0)
             {
-                WindOffset += TheClient.TheRegion.ActualWind * SimplexNoiseInternal.Generate((start.X + TheClient.GlobalTickTimeLocal) * 0.2, (start.Y + TheClient.GlobalTickTimeLocal) * 0.2, start.Z * 0.2) * 0.1;
+                WindOffset += WindMod * TheClient.TheRegion.ActualWind * SimplexNoiseInternal.Generate((start.X + TheClient.GlobalTickTimeLocal) * 0.2, (start.Y + TheClient.GlobalTickTimeLocal) * 0.2, start.Z * 0.2) * 0.1;
             }
             Vector4 light = TheClient.TheRegion.GetLightAmountAdjusted(start, Location.UnitZ);
             Vector4 scolor = new Vector4((float)Color.X * light.X, (float)Color.Y * light.Y, (float)Color.Z * light.Z, Alpha * light.W);

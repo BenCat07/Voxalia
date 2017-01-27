@@ -30,6 +30,10 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         Texture White_Blur;
 
+        Texture Circle_Light;
+
+        Texture Circle_Heavy;
+
         Client TheClient;
 
         public ParticleHelper(Client tclient)
@@ -46,6 +50,8 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             //FlameLick = TheClient.Textures.GetTexture("effects/fire/flamelick01");
             BlueFlameLick = TheClient.Textures.GetTexture("effects/fire/blueflamelick01");
             WhiteFlameLick = TheClient.Textures.GetTexture("effects/fire/whiteflamelick01");
+            Circle_Light = TheClient.Textures.GetTexture("effects/particle/circle_light");
+            Circle_Heavy = TheClient.Textures.GetTexture("effects/particle/circle_heavy");
         }
 
         public void Sort()
@@ -190,6 +196,45 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     Smoke(o.Start(o) - new Location(0, 0, 1), 1, Location.One);
                 }
             };
+        }
+
+        public void Firework(Location pos, float rad, int lod, Location color, Location color2)
+        {
+            SysConsole.Output(OutputType.DEBUG, "Spawn " + lod + " effect with radius " + rad + " at " + pos + " colored " + color + " to " + color2);
+            Location temp = new Location(TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity * 0.1f);
+            Location size = new Location(0.3);
+            for (int i = 0; i < lod; i++)
+            {
+                Location col = color;
+                if (col.X < 0)
+                {
+                    col.X = Utilities.UtilRandom.NextDouble();
+                }
+                if (col.Y < 0)
+                {
+                    col.Y = Math.Max(Utilities.UtilRandom.NextDouble() - col.X * 0.25, 0.0);
+                }
+                if (col.Z < 0)
+                {
+                    col.Z = Math.Max(Utilities.UtilRandom.NextDouble() - col.X * 0.25 - col.Y * 0.25, 0.0);
+                }
+                Location col2 = color2;
+                if (col2.X < 0)
+                {
+                    col2.X = Utilities.UtilRandom.NextDouble();
+                }
+                if (col2.Y < 0)
+                {
+                    col2.Y = Math.Max(Utilities.UtilRandom.NextDouble() - col2.X * 0.25, 0.0);
+                }
+                if (col2.Z < 0)
+                {
+                    col2.Z = Math.Max(Utilities.UtilRandom.NextDouble() - col2.X * 0.25 - col2.Y * 0.25, 0.0);
+                }
+                Location speed = new Location(Utilities.UtilRandom.NextDouble() * (rad * 2) - rad, Utilities.UtilRandom.NextDouble() * (rad * 2) - rad, Utilities.UtilRandom.NextDouble() * (rad * 2) - rad) * 3.0;
+                ParticleEffect pe = Engine.AddEffect(ParticleEffectType.SQUARE, (o) => pos + (temp + speed) * (1 - o.TTL / o.O_TTL), (o) => size, (o) => 0, 8, col, col2, true, Utilities.UtilRandom.Next(1000) < 500 ? Circle_Light : Circle_Heavy);
+                pe.WindMod = 0.1f;
+            }
         }
     }
 }

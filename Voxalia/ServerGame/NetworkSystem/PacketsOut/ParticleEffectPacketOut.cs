@@ -36,5 +36,18 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             pos.ToDoubleBytes().CopyTo(Data, 1 + 4);
             dat2.ToDoubleBytes().CopyTo(Data, 1 + 4 + 24);
         }
+
+        public ParticleEffectPacketOut(ParticleEffectNetType type, double dat1, Location pos, Location dat2, Location dat3, int dat4)
+        {
+            UsageType = NetUsageType.EFFECTS;
+            ID = ServerToClientPacket.PARTICLE_EFFECT;
+            Data = new byte[1 + 4 + 24 + 24 + 24 + 4];
+            Data[0] = (byte)type;
+            Utilities.FloatToBytes((float)dat1).CopyTo(Data, 1);
+            pos.ToDoubleBytes().CopyTo(Data, 1 + 4);
+            dat2.ToDoubleBytes().CopyTo(Data, 1 + 4 + 24);
+            dat3.ToDoubleBytes().CopyTo(Data, 1 + 4 + 24 + 24);
+            Utilities.IntToBytes((int)dat4).CopyTo(Data, 1 + 4 + 24 + 24 + 24);
+        }
     }
 }

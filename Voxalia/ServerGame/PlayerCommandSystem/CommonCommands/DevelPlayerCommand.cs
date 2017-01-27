@@ -358,6 +358,30 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 }
 #endif
             }
+            else if (arg0 == "fireWork" && entry.InputArguments.Count > 1)
+            {
+                ParticleEffectPacketOut pepo;
+                Location pos = entry.Player.GetEyePosition() + entry.Player.ForwardVector() * 10;
+                switch (entry.InputArguments[1])
+                {
+                    case "rainbow_huge":
+                        pepo = new ParticleEffectPacketOut(ParticleEffectNetType.FIREWORK, 15, pos, new Location(-1, -1, -1), new Location(-1, -1, -1), 150);
+                        break;
+                    case "red_big":
+                        pepo = new ParticleEffectPacketOut(ParticleEffectNetType.FIREWORK, 10, pos, new Location(1, 0, 0), new Location(1, 0, 0), 100);
+                        break;
+                    case "green_medium":
+                        pepo = new ParticleEffectPacketOut(ParticleEffectNetType.FIREWORK, 7.5, pos, new Location(0.25, 1, 0.25), new Location(0.25, 1, 1), 100);
+                        break;
+                    case "blue_small":
+                        pepo = new ParticleEffectPacketOut(ParticleEffectNetType.FIREWORK, 5, pos, new Location(0, 0, 1), new Location(0, 0, -1), 50);
+                        break;
+                    default:
+                        ShowUsage(entry);
+                        return;
+                }
+                entry.Player.Network.SendPacket(pepo);
+            }
             else
             {
                 ShowUsage(entry);

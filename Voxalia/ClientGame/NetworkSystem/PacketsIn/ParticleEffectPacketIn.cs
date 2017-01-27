@@ -19,16 +19,26 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
         public override bool ParseBytesAndExecute(byte[] data)
         {
             if (data.Length != 1 + 4 + 24
-                && data.Length != 1 + 4 + 24 + 24)
+                && data.Length != 1 + 4 + 24 + 24
+                && data.Length != 1 + 4 + 24 + 24 + 24 + 4)
             {
                 return false;
             }
             ParticleEffectNetType type = (ParticleEffectNetType)data[0];
             float fdata1 = Utilities.BytesToFloat(Utilities.BytesPartial(data, 1, 4));
-            Location ldata2 = Location.NaN;
+            // TODO: Particle effect registry!
+            Location ldata2 = Location.Zero;
+            Location ldata3 = Location.Zero;
+            int idata4 = 0;
             if (data.Length == 1 + 4 + 24 + 24)
             {
                 ldata2 = Location.FromDoubleBytes(data, 1 + 4 + 24);
+            }
+            if (data.Length == 1 + 4 + 24 + 24 + 24 + 4)
+            {
+                ldata2 = Location.FromDoubleBytes(data, 1 + 4 + 24);
+                ldata3 = Location.FromDoubleBytes(data, 1 + 4 + 24 + 24);
+                idata4 = Utilities.BytesToInt(Utilities.BytesPartial(data, 1 + 4 + 24 + 24 + 24, 4));
             }
             Location pos = Location.FromDoubleBytes(data, 1 + 4);
             switch (type)
@@ -44,6 +54,9 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                     break;
                 case ParticleEffectNetType.PAINT_BOMB:
                     TheClient.Particles.PaintBomb(pos, fdata1, ldata2);
+                    break;
+                case ParticleEffectNetType.FIREWORK:
+                    TheClient.Particles.Firework(pos, fdata1, idata4, ldata2, ldata3);
                     break;
                 default:
                     return false;

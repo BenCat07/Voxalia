@@ -39,7 +39,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 Location tp = Position;
                 ParticleEffect pe = TheClient.Particles.Engine.AddEffect(ParticleEffectType.CYLINDER, (o) => tpp, (o) => tp, (o) => 0.03f, 1f, Location.One, Location.One, true, TheClient.Textures.White, 0.75f);
                 pe.MinimumLight = 1f;
-                pe.BlowsInWind = false;
+                pe.WindMod = 0;
                 ppos = Position;
             }
             else if (model.Name == "projectiles/arrow.dae") // TODO: More dynamic option for this
