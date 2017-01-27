@@ -595,10 +595,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Sounds.Play(mus, true, Location.NaN, CVars.a_musicpitch.ValueF, CVars.a_musicvolume.ValueF, 0, (asfx) =>
             {
                 CurrentMusic = asfx;
-                if (CurrentMusic != null)
-                {
-                    CurrentMusic.IsBackground = true;
-                }
             });
         }
 
