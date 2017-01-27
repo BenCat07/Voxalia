@@ -17,5 +17,7 @@ namespace Voxalia.ClientGame.AudioSystem
         public int Internal;
 
         public EventHandler<EventArgs> Loaded;
+
+        public double LastUse = 0.0;
     }
 }

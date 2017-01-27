@@ -110,6 +110,8 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public Location CPosition = Location.Zero;
 
+        public double TimeTowardsNextClean = 0.0;
+
         public void Update(Location position, Location forward, Location up, Location velocity, bool selected)
         {
             CPosition = position;
@@ -172,6 +174,9 @@ namespace Voxalia.ClientGame.AudioSystem
                     Deafness = DeafenState.NOT;
                 }
             }
+            DeafStart.LastUse = TheClient.GlobalTickTimeLocal;
+            DeafLoop.LastUse = TheClient.GlobalTickTimeLocal;
+            DeafEnd.LastUse = TheClient.GlobalTickTimeLocal;
             for (int i = 0; i < PlayingNow.Count; i++)
             {
                 if (!PlayingNow[i].Exists || PlayingNow[i].Src < 0 || AL.GetSourceState(PlayingNow[i].Src) == ALSourceState.Stopped)
@@ -182,6 +187,7 @@ namespace Voxalia.ClientGame.AudioSystem
                     i--;
                     continue;
                 }
+                PlayingNow[i].Effect.LastUse = TheClient.GlobalTickTimeLocal;
                 if (Deafness != DeafenState.NOT && sel && !PlayingNow[i].IsBackground)
                 {
                     PlayingNow[i].IsDeafened = true;
@@ -229,6 +235,35 @@ namespace Voxalia.ClientGame.AudioSystem
             float globvol = CVars.a_globalvolume.ValueF;
             AL.Listener(ALListenerf.Gain, globvol <= 0 ? 0.001f: (globvol > 1 ? 1: globvol));
             CheckError("Gain");
+            TimeTowardsNextClean += TheClient.Delta;
+            if (TimeTowardsNextClean > 10.0)
+            {
+                CleanTick();
+                TimeTowardsNextClean = 0.0;
+            }
+        }
+
+        List<string> ToRemove = new List<string>();
+
+        public void CleanTick()
+        {
+            foreach (KeyValuePair<string, SoundEffect> effect in Effects)
+            {
+                if (effect.Value.LastUse + 30.0 < TheClient.GlobalTickTimeLocal)
+                {
+                    if (effect.Value.Internal > -1)
+                    {
+                        AL.DeleteBuffer(effect.Value.Internal);
+                    }
+                    ToRemove.Add(effect.Key);
+                }
+            }
+            foreach (string rem in ToRemove)
+            {
+                SysConsole.Output(OutputType.DEBUG, "Clean up: " + rem);
+                Effects.Remove(rem);
+            }
+            ToRemove.Clear();
         }
 
         public Dictionary<string, SoundEffect> Effects;
@@ -362,11 +397,14 @@ namespace Voxalia.ClientGame.AudioSystem
             sfx = LoadSound(namelow);
             if (sfx != null)
             {
+                Effects.Add(namelow, sfx);
                 return sfx;
             }
             sfx = new SoundEffect();
             sfx.Name = namelow;
-            sfx.Internal = Noise.Internal;
+            sfx.Internal = -1;
+            sfx.LastUse = TheClient.GlobalTickTimeLocal;
+            Effects.Add(namelow, sfx);
             return sfx;
         }
 
@@ -393,6 +431,7 @@ namespace Voxalia.ClientGame.AudioSystem
                 SoundEffect tsfx = new SoundEffect();
                 tsfx.Name = name;
                 tsfx.Internal = -1;
+                tsfx.LastUse = TheClient.GlobalTickTimeLocal;
                 TheClient.Schedule.StartAsyncTask(() =>
                 {
                     SoundEffect ts = LoadVorbisSound(TheClient.Files.ReadToStream(newname), name);
@@ -449,6 +488,7 @@ namespace Voxalia.ClientGame.AudioSystem
         {
             SoundEffect sfx = new SoundEffect();
             sfx.Name = name;
+            sfx.LastUse = TheClient.GlobalTickTimeLocal;
             int channels;
             int bits;
             int rate;

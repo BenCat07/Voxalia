@@ -217,6 +217,11 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         TheClient.AddDecal(pos, new Location(0, 0, 1), Vector4.One, 1f, "white", 15);
                         break;
                     }
+                case "soundCount":
+                    {
+                        entry.Info(queue, "Sound effects: " + TheClient.Sounds.Effects.Count + ", playing now: " + TheClient.Sounds.PlayingNow.Count);
+                        break;
+                    }
                 default:
                     ShowUsage(queue, entry);
                     break;
