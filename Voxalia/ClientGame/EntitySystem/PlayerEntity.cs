@@ -964,7 +964,7 @@ namespace Voxalia.ClientGame.EntitySystem
         public override void Render()
         {
             Location renderrelpos = GetWeldSpot();
-            if (TheClient.IsMainMenu)
+            if (TheClient.IsMainMenu || !TheClient.CVars.r_drawself.ValueB)
             {
                 return;
             }
