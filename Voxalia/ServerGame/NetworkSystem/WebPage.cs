@@ -154,12 +154,22 @@ namespace Voxalia.ServerGame.NetworkSystem
                             }
                             return;
                         }
+                        else if (dat[0] == "approx_img" && dat.Length >= 4)
+                        {
+                            int x = Utilities.StringToInt(dat[1]);
+                            int y = Utilities.StringToInt(dat[2]);
+                            int x2 = Utilities.StringToInt(dat[3]);
+                            int y2 = Utilities.StringToInt(dat[4].Before(".png"));
+                            http_response_contenttype = "image/png";
+                            http_response_content = TheServer.BlockImages.GenerateSeedImage(world.MainRegion, x, y, x2, y2, 512);
+                            return;
+                        }
                         else if (dat[0] == "expquick" && dat.Length >= 4)
                         {
                             int bx = Utilities.StringToInt(dat[1]);
                             int by = Utilities.StringToInt(dat[2]);
                             int bz = Utilities.StringToInt(dat[3]);
-                            int sz = Chunk.CHUNK_SIZE * BlockImageManager.TexWidth;
+                            int sz = bz <= 0 ? Chunk.CHUNK_SIZE * BlockImageManager.TexWidth : Chunk.CHUNK_SIZE;
                             StringBuilder content = new StringBuilder();
                             content.Append("<!doctype html>\n<html>\n<head>\n<title>Voxalia EXP-QUICK</title>\n</head>\n<body>\n");
                             const int SIZE = 6;

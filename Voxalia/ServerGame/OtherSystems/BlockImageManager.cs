@@ -147,7 +147,7 @@ namespace Voxalia.ServerGame.OtherSystems
                             if (smat != 0)
                             {
                                 MaterialImage simag = MaterialImages[smat];
-                                FastColor fc2 = simag.GetAt(0, 0);
+                                FastColor fc2 = simag.Colors[0];
                                 fc = Blend(fc2, fc);
                             }
                         }
@@ -202,16 +202,27 @@ namespace Voxalia.ServerGame.OtherSystems
             return MatImgToPng(bmp);
         }
 
+        public int GetDividerForZ(int tz)
+        {
+            int divvy = 1;
+            for (int x = 0; x < tz; x++)
+            {
+                divvy *= 5;
+            }
+            return divvy;
+        }
+
         public byte[] GetChunkRenderLD(WorldSystem.Region tregion, int tx, int ty, int tz)
         {
             int wid = Constants.CHUNK_WIDTH;
-            MaterialImage bmp = new MaterialImage() { Colors = new FastColor[wid * wid], Width = wid, Height = wid };
+            int divvy = GetDividerForZ(tz) * Constants.CHUNK_WIDTH;
+            MaterialImage bmp = GenerateSeedImageBmp(tregion, tx * divvy, ty * divvy, (tx + 1) * divvy, (ty + 1) * divvy, wid);
             KeyValuePair<byte[], byte[]> bitters = tregion.ChunkManager.GetTopsHigher(tx, ty, tz);
             byte[] bits = bitters.Key;
             byte[] bits_trans = bitters.Value;
             if (bits == null || bits_trans == null)
             {
-                return null;
+                return MatImgToPng(bmp);
             }
             for (int x = 0; x < Constants.CHUNK_WIDTH; x++)
             {
@@ -219,24 +230,64 @@ namespace Voxalia.ServerGame.OtherSystems
                 {
                     int ind = tregion.TopsHigherBlockIndex(x, y);
                     ushort mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits, ind * 2, 2));
-                    MaterialImage imag = MaterialImages[mat];
-                    FastColor fc = imag.GetAt(0, 0);
-                    fc.A = 255;
+                    FastColor fc;
+                    if (mat == 0)
+                    {
+                        fc = new FastColor() { A = 0 };
+                    }
+                    else
+                    {
+                        MaterialImage imag = MaterialImages[mat];
+                        fc = imag.GetAt(0, 0);
+                    }
                     for (int i = 3; i >= 0; i--)
                     {
                         mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, ind * 2 * 4, 2));
                         if (mat != 0)
                         {
-                            imag = MaterialImages[mat];
-                            FastColor fc2 = imag.GetAt(0, 0);
+                            MaterialImage simag = MaterialImages[mat];
+                            FastColor fc2 = simag.Colors[0];
                             fc = Blend(fc2, fc);
                         }
                     }
+                    fc = Blend(fc, bmp.GetAt(x, y));
                     bmp.SetAt(x, y, fc);
                 }
             }
             // TODO: Add entity icons? (Trees in particular!)
             return MatImgToPng(bmp);
+        }
+
+        public MaterialImage GenerateSeedImageBmp(WorldSystem.Region tregion, int minx, int miny, int maxx, int maxy, int wid)
+        {
+            MaterialImage bmp = new MaterialImage() { Colors = new FastColor[wid * wid], Width = wid, Height = wid };
+            double one_div_wid = 1.0 / wid;
+            for (int x = 0; x < wid; x++)
+            {
+                for (int y = 0; y < wid; y++)
+                {
+                    Biome b;
+                    double h = tregion.Generator.GetHeight(tregion.TheWorld.Seed, tregion.TheWorld.Seed2, tregion.TheWorld.Seed3,
+                        tregion.TheWorld.Seed4, tregion.TheWorld.Seed5, minx + (maxx - minx) * x * one_div_wid, miny + (maxy - miny) * y * one_div_wid, 0, out b);
+                    Material renderme;
+                    if (h > 0)
+                    {
+                        renderme = b.GetAboveZeromat();
+                    }
+                    else
+                    {
+                        renderme = b.GetZeroOrLowerMat();
+                    }
+                    bmp.SetAt(x, y, MaterialImages[(int)renderme].Colors[0]);
+                }
+            }
+            return bmp;
+        }
+
+        public byte[] GenerateSeedImage(WorldSystem.Region tregion, int minx, int miny, int maxx, int maxy, int wid)
+        {
+
+            return MatImgToPng(GenerateSeedImageBmp(tregion, minx, miny, maxx, maxy, wid));
         }
 
         public byte[] MatImgToPng(MaterialImage img)

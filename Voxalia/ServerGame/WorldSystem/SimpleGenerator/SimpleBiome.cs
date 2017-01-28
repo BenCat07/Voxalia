@@ -50,5 +50,15 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         {
             return 0.8f;
         }
+
+        public override Material GetZeroOrLowerMat()
+        {
+            return WaterMaterial();
+        }
+
+        public override Material GetAboveZeromat()
+        {
+            return SurfaceBlock();
+        }
     }
 }

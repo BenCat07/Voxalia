@@ -6,6 +6,9 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
+using Voxalia.Shared;
+
 namespace Voxalia.ServerGame.WorldSystem
 {
     /// <summary>
@@ -18,5 +21,9 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         /// <returns>The name of the biome.</returns>
         public abstract string GetName();
+
+        public abstract Material GetZeroOrLowerMat();
+
+        public abstract Material GetAboveZeromat();
     }
 }
