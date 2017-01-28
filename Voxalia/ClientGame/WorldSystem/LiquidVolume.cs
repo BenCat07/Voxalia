@@ -72,18 +72,18 @@ namespace Voxalia.ClientGame.WorldSystem
                         float submod = 0.125f;
                         // TODO: Tracing accuracy!
                         Vector3 impulse = -(TheRegion.PhysicsWorld.ForceUpdater.Gravity + TheRegion.GravityNormal.ToBVector() * 0.4f) * e.Mass * dt * modifier * submod;
-                        // TODO: Don't apply smaller logic this if scale is big!
-                        for (float x2 = 0.25f; x2 < 1; x2 += 0.5f)
+                        // TODO: Don't apply small-scale logic (the loops below) if the entity scale is big enough to irrelevantize it!
+                        for (double x2 = 0.25; x2 < 1.0; x2 += 0.5)
                         {
-                            for (float y2 = 0.25f; y2 < 1; y2 += 0.5f)
+                            for (double y2 = 0.25; y2 < 1.0; y2 += 0.5)
                             {
-                                for (float z2 = 0.25f; z2 < 1; z2 += 0.5f)
+                                for (double z2 = 0.25; z2 < 1.0; z2 += 0.5)
                                 {
                                     Location lc = c + new Location(x2, y2, z2);
                                     RayHit rh;
-                                    if (e.CollisionInformation.RayCast(new Ray(lc.ToBVector(), new Vector3(0, 0, 1)), 0.01f, out rh)) // TODO: Efficiency!
+                                    Vector3 center = lc.ToBVector();
+                                    if (e.CollisionInformation.RayCast(new Ray(center, new Vector3(0, 0, 1)), 0.01f, out rh)) // TODO: Efficiency!
                                     {
-                                        Vector3 center = lc.ToBVector();
                                         e.ApplyImpulse(ref center, ref impulse);
                                         e.ModifyLinearDamping(mat.GetSpeedMod());
                                         e.ModifyAngularDamping(mat.GetSpeedMod());
