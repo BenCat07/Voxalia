@@ -570,14 +570,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 cVBO.Positions = new Vector4[len];
                 cVBO.TexCoords = new Vector4[len];
                 cVBO.Colors = new Vector4[len];
-                cVBO.TCInds = new float[len];
                 int pos = 0;
                 for (int i = 0; i < vbos.Count; i++)
                 {
                     vbos[i].Vecs.CopyTo(cVBO.Positions, pos);
                     vbos[i].Texs.CopyTo(cVBO.TexCoords, pos);
                     vbos[i].Cols.CopyTo(cVBO.Colors, pos);
-                    vbos[i].TCIs.CopyTo(cVBO.TCInds, pos);
                     pos += vbos[i].Vecs.Count;
                 }
             }
@@ -703,10 +701,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         /// <param name="line">The text to measure.</param>
         /// <returns>the X-width of the text.</returns>
-        public float MeasureFancyText(string line, string bcolor = "^r^7")
+        public float MeasureFancyText(string line, string bcolor = "^r^7", bool pushStr = false)
         {
             List<KeyValuePair<string, Rectangle2F>> links;
-            return MeasureFancyText(line, out links, bcolor);
+            return MeasureFancyText(line, out links, bcolor, pushStr: pushStr);
         }
         
         public List<string> csplit(string input)
@@ -740,7 +738,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         [ThreadStatic]
         static int r_depth = 0;
 
-        public float MeasureFancyText(string line, out List<KeyValuePair<string, Rectangle2F>> links, string bcolor = "^r^7", bool bold = false, bool italic = false, bool sub = false, GLFont font = null)
+        public float MeasureFancyText(string line, out List<KeyValuePair<string, Rectangle2F>> links, string bcolor = "^r^7", bool bold = false, bool italic = false, bool sub = false, GLFont font = null, bool pushStr = false)
         {
             List<KeyValuePair<string, Rectangle2F>> tlinks = new List<KeyValuePair<string, Rectangle2F>>();
             m_depth++;
@@ -766,6 +764,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     x++;
                     if (drawme.Length > 0)
                     {
+                        if (pushStr)
+                        {
+                            font.RecognizeCharacters(drawme);
+                        }
                         MeasWidth += font.MeasureString(drawme);
                     }
                     if (x < line.Length)
@@ -833,6 +835,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     }
                                     if (highl)
                                     {
+                                        if (pushStr)
+                                        {
+                                            font_default.RecognizeCharacters(ttext);
+                                        }
                                         float widt = font_default.MeasureString(ttext);
                                         tlinks.Add(new KeyValuePair<string, Rectangle2F>(sb.ToString().Before("|"), new Rectangle2F() { X = MeasWidth, Y = 0, Width = widt, Height = font_default.Height }));
                                         MeasWidth += widt;
@@ -928,8 +934,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="c">The color to use.</param>
         public void DrawRectangle(float X, float Y, float width, float height, GLFont font, Color c, TextVBO vbo)
         {
-            vbo.AddQuad(X, Y,X + width, Y + height, 2f / Engine.GLFonts.bwidth, 2f / Engine.GLFonts.bheight, 4f / Engine.GLFonts.bwidth, 4f / Engine.GLFonts.bheight,
-                new Vector4((float)c.R / 255f, (float)c.G / 255f, (float)c.B / 255f, (float)c.A / 255f), font.TexZ);
+            vbo.AddQuad(X, Y,X + width, Y + height, 2f / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH, 2f / Engine.GLFonts.CurrentHeight, 4f / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH, 4f / Engine.GLFonts.CurrentHeight,
+                new Vector4((float)c.R / 255f, (float)c.G / 255f, (float)c.B / 255f, (float)c.A / 255f));
         }
 
         /// <summary>

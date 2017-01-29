@@ -200,7 +200,6 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         public void Firework(Location pos, float rad, int lod, Location color, Location color2)
         {
-            SysConsole.Output(OutputType.DEBUG, "Spawn " + lod + " effect with radius " + rad + " at " + pos + " colored " + color + " to " + color2);
             Location temp = new Location(TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity * 0.1f);
             Location size = new Location(0.3);
             for (int i = 0; i < lod; i++)

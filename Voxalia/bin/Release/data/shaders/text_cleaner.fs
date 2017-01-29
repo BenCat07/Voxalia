@@ -8,12 +8,12 @@
 
 #version 430 core
 
-layout (binding = 0) uniform sampler2DArray tex;
+layout (binding = 0) uniform sampler2D tex;
 
 in struct text_fout
 {
 	vec4 color;
-	vec3 texcoord;
+	vec2 texcoord;
 } fi;
 
 out vec4 color;

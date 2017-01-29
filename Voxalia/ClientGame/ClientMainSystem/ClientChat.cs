@@ -181,6 +181,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         public void WriteMessage(TextChannel channel, string message)
         {
+            FontSets.Standard.MeasureFancyText(message, pushStr: true);
             bool bottomed = ChatIsAtBottom();
             UIConsole.WriteLine(channel + ": " + message);
             ChatMessage cm = new ChatMessage() { Channel = channel, Text = message, Sent = GlobalTickTimeLocal };

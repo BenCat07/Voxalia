@@ -140,6 +140,7 @@ namespace Voxalia.ClientGame.UISystem
                 pre_waiting += text;
                 return;
             }
+            Client.Central.FontSets.Standard.MeasureFancyText(text.Replace("\n", "").Replace("\r", ""), pushStr: true);
             if (!ConsoleText.EndsWith("\n"))
             {
                 for (int x = ConsoleText.Length - 1; x > 0; x--)
@@ -447,7 +448,7 @@ namespace Voxalia.ClientGame.UISystem
                 // Cursor
                 if (keymark_add)
                 {
-                    double XAdd = Client.Central.FontSets.Standard.MeasureFancyText(typed.Substring(0, TypingCursor + 1 + c)) - 1;
+                    double XAdd = Client.Central.FontSets.Standard.MeasureFancyText(typed.Substring(0, TypingCursor + 1 + c * 2), pushStr: true) - 1;
                     if (typed.Length > TypingCursor + 1 && typed[TypingCursor + c] == '^'
                         && FontSet.IsColorSymbol(typed[TypingCursor + 1 + c]))
                     {

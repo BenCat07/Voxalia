@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Text;
 using System.Collections.Generic;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
@@ -41,6 +42,54 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public Client TheClient;
 
+        public const int DEFAULT_TEXTURE_SIZE_WIDTH = 2048;
+        public const int DEFAULT_TEXTURE_SIZE_HEIGHT = 2048;
+
+        public void Expand()
+        {
+            CurrentHeight *= 2;
+            Bitmap bmp2 = new Bitmap(DEFAULT_TEXTURE_SIZE_WIDTH, CurrentHeight);
+            using (Graphics gfx = Graphics.FromImage(bmp2))
+            {
+                gfx.Clear(Color.Transparent);
+                gfx.DrawImage(CurrentBMP, new Point(0, 0));
+            }
+            CurrentBMP.Dispose();
+            CurrentBMP = bmp2;
+        }
+
+        public int CurrentHeight = DEFAULT_TEXTURE_SIZE_HEIGHT;
+
+        public Bitmap CurrentBMP;
+
+        public int CX = 26;
+        public int CY = 6;
+        public int CMinHeight = 20;
+
+        public void UpdateTexture()
+        {
+            if (TextureMain != -1)
+            {
+                GL.DeleteTexture(TextureMain);
+            }
+            TextureMain = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, TextureMain);
+            BitmapData bmp_data = CurrentBMP.LockBits(new Rectangle(0, 0, DEFAULT_TEXTURE_SIZE_WIDTH, CurrentHeight), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, DEFAULT_TEXTURE_SIZE_WIDTH, CurrentHeight, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, bmp_data.Scan0);
+            CurrentBMP.UnlockBits(bmp_data);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureCompareMode, (int)TextureCompareMode.CompareRefToTexture);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+        }
+
+        /// <summary>
+        /// Key this public and valid: if it gets released, the fonts it contains are lost for some reason!
+        /// </summary>
+        public PrivateFontCollection pfc;
+
         /// <summary>
         /// Prepares the font system.
         /// </summary>
@@ -55,10 +104,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     i--;
                 }
             }
-            // Generate the texture array
-            GL.GenTextures(1, out Texture3D);
-            GL.BindTexture(TextureTarget.Texture2DArray, Texture3D);
-            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 8, SizedInternalFormat.Rgba8, bwidth, bheight, bdepth);
+            // Generate the texture
+            CurrentBMP = new Bitmap(DEFAULT_TEXTURE_SIZE_WIDTH, DEFAULT_TEXTURE_SIZE_HEIGHT);
+            using (Graphics gfx = Graphics.FromImage(CurrentBMP))
+            {
+                gfx.Clear(Color.Transparent);
+                gfx.FillRectangle(new SolidBrush(Color.White), new Rectangle(0, 0, 20, 20));
+            }
             // Load other stuff
             LoadTextFile();
             Fonts = new List<GLFont>();
@@ -69,8 +121,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             string fname = "sourcecodepro";
             try
             {
-                PrivateFontCollection pfc = new PrivateFontCollection();
-                pfc.AddFontFile("data/fonts/" + fname + ".ttf");
+                pfc = new PrivateFontCollection();
+                pfc.AddFontFile(Environment.CurrentDirectory + "/data/fonts/" + fname + ".ttf");
                 family = pfc.Families[0];
                 family_priority = 100;
             }
@@ -104,6 +156,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Font def = new Font(family, 12);
             Standard = new GLFont(def, this);
             Fonts.Add(Standard);
+            UpdateTexture();
         }
 
         /// <summary>
@@ -144,7 +197,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             textfile = tempfile;
         }
 
-        public uint Texture3D;
+        public int TextureMain = -1;
 
         /// <summary>
         /// Gets the font matching the specified settings.
@@ -184,12 +237,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public GLFont LoadFont(string name, bool bold, bool italic, int size)
         {
             Font font = new Font(name, size / TheClient.DPIScale, (bold ? FontStyle.Bold : 0) | (italic ? FontStyle.Italic : 0));
-            return new GLFont(font, this);
+            GLFont f = new GLFont(font, this);
+            UpdateTexture();
+            return f;
         }
-
-        public int bwidth = 512;
-        public int bheight = 512;
-        public int bdepth = 48;
     }
 
     /// <summary>
@@ -239,8 +290,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public float Height;
 
-        static int cZ = 0;
-
         public GLFont(Font font, GLFontEngine eng)
         {
             Engine = eng;
@@ -252,50 +301,83 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Italic = font.Italic;
             Height = font.Height;
             CharacterLocations = new Dictionary<char, RectangleF>(2048);
-            StringFormat sf = new StringFormat(StringFormat.GenericTypographic);
-            sf.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces | StringFormatFlags.FitBlackBox | StringFormatFlags.NoWrap;
             Internal_Font = font;
-            Bitmap bmp = new Bitmap(Engine.bwidth, Engine.bheight);
-            GL.BindTexture(TextureTarget.Texture2DArray, Engine.Texture3D);
-            using (Graphics gfx = Graphics.FromImage(bmp))
+            AddAll(Engine.textfile);
+        }
+
+        static StringFormat sf;
+
+        static GLFont()
+        {
+            sf = new StringFormat(StringFormat.GenericTypographic);
+            sf.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces | StringFormatFlags.FitBlackBox | StringFormatFlags.NoWrap;
+        }
+
+
+        public void RecognizeCharacters(string inp)
+        {
+            StringBuilder NeedsAdding = new StringBuilder();
+            for (int i = 0; i < inp.Length; i++)
             {
-                gfx.Clear(Color.Transparent);
-                gfx.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                float X = 6;
-                float Y = 0;
-                gfx.FillRectangle(new SolidBrush(Color.White), new Rectangle(0, 0, 5, (int)Height));
-                Brush brush = new SolidBrush(Color.White);
-                for (int i = 0; i < Engine.textfile.Length; i++)
+                char c = inp[i];
+                if (!CharacterLocations.ContainsKey(c))
                 {
-                    string chr = Engine.textfile[i] == '\t' ? "    " : Engine.textfile[i].ToString();
-                    float nwidth = (float)Math.Ceiling(gfx.MeasureString(chr, font, new PointF(0, 0), sf).Width);
-                    if (font.Italic)
-                    {
-                        nwidth += 2;
-                    }
-                    if (X + nwidth >= Engine.bwidth)
-                    {
-                        Y += Height + 8;
-                        X = 6;
-                    }
-                    gfx.DrawString(chr, font, brush, new PointF(X, Y), sf);
-                    RectangleF rect = new RectangleF(X, Y, nwidth, Height);
-                    CharacterLocations.Add(Engine.textfile[i], rect);
-                    if (chr[0] < 128)
-                    {
-                        ASCIILocs[Engine.textfile[i]] = rect;
-                    }
-                    X += nwidth + 8f;
+                    NeedsAdding.Append(c);
                 }
             }
-            BitmapData data = bmp.LockBits(new Rectangle(0, 0, Engine.bwidth, Engine.bheight), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, 0, 0, cZ, Engine.bwidth, Engine.bheight, 1, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
-            TexZ = cZ;
-            cZ++;
-            cZ = cZ % 48;
-            // TODO: Handle > 24 fonts more cleanly
-            bmp.UnlockBits(data);
-            bmp.Dispose();
+            if (NeedsAdding.Length > 0)
+            {
+                string toadd = NeedsAdding.ToString();
+                while ((toadd = AddAll(toadd)) != null)
+                {
+                    Engine.Expand();
+                }
+                Engine.UpdateTexture();
+            }
+        }
+
+        private string AddAll(string inp)
+        {
+            using (Graphics gfx = Graphics.FromImage(Engine.CurrentBMP))
+            {
+                gfx.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                int X = Engine.CX;
+                int Y = Engine.CY;
+                Brush brush = new SolidBrush(Color.White);
+                Engine.CMinHeight = Math.Max((int)Height + 8, Engine.CMinHeight); // TODO: 8 -> ???
+                for (int i = 0; i < inp.Length; i++)
+                {
+                    string chr = inp[i] == '\t' ? "    " : inp[i].ToString();
+                    float nwidth = (float)Math.Ceiling(gfx.MeasureString(chr, Internal_Font, new PointF(0, 0), sf).Width);
+                    if (Internal_Font.Italic)
+                    {
+                        nwidth += (int)(Internal_Font.SizeInPoints * 0.17);
+                    }
+                    if (X + nwidth >= GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH)
+                    {
+                        Y += Engine.CMinHeight;
+                        Engine.CMinHeight = (int)Height + 8; // TODO: 8 -> ???
+                        X = 6;
+                        if (Y + Engine.CMinHeight > Engine.CurrentHeight)
+                        {
+                            Engine.CX = (int)X;
+                            Engine.CY = (int)Y;
+                            return inp.Substring(i);
+                        }
+                    }
+                    gfx.DrawString(chr, Internal_Font, brush, new PointF(X, Y), sf);
+                    RectangleF rect = new RectangleF(X, Y, nwidth, Height);
+                    CharacterLocations.Add(inp[i], rect);
+                    if (chr[0] < 128)
+                    {
+                        ASCIILocs[inp[i]] = rect;
+                    }
+                    X += (int)Math.Ceiling(nwidth + 8); // TODO: 8 -> ???
+                }
+                Engine.CX = (int)X;
+                Engine.CY = (int)Y;
+                return null;
+            }
         }
 
         /// <summary>
@@ -326,9 +408,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             return CharacterLocations['?'];
         }
-
-        public int TexZ = 0;
-
+        
         /// <summary>
         /// Draws a single symbol at a specified location.
         /// </summary>
@@ -339,8 +419,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public float DrawSingleCharacter(char symbol, float X, float Y, TextVBO vbo, Vector4 color)
         {
             RectangleF rec = RectForSymbol(symbol);
-            vbo.AddQuad(X, Y, X + rec.Width, Y + rec.Height, rec.X / Engine.bwidth, rec.Y / Engine.bwidth,
-                (rec.X + rec.Width) / Engine.bheight, (rec.Y + rec.Height) / Engine.bheight, color, TexZ);
+            vbo.AddQuad(X, Y, X + rec.Width, Y + rec.Height, rec.X / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH, rec.Y / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH,
+                (rec.X + rec.Width) / Engine.CurrentHeight, (rec.Y + rec.Height) / Engine.CurrentHeight, color);
             return rec.Width;
         }
 
@@ -354,8 +434,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public float DrawSingleCharacterFlipped(char symbol, float X, float Y, TextVBO vbo, Vector4 color)
         {
             RectangleF rec = RectForSymbol(symbol);
-            vbo.AddQuad(X, Y, X + rec.Width, Y + rec.Height, rec.X / Engine.bwidth, rec.Y / Engine.bwidth,
-                (rec.X + rec.Width) / Engine.bheight, (rec.Y + rec.Height) / Engine.bheight, color, TexZ);
+            vbo.AddQuad(X, Y, X + rec.Width, Y + rec.Height, rec.X / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH, rec.Y / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH,
+                (rec.X + rec.Width) / Engine.CurrentHeight, (rec.Y + rec.Height) / Engine.CurrentHeight, color);
             return rec.Width;
         }
 

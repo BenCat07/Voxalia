@@ -11,7 +11,6 @@
 layout (location = 0) in vec4 screenrect;
 layout (location = 1) in vec4 texcoord;
 layout (location = 2) in vec4 color;
-layout (location = 3) in float tcind;
 
 layout (location = 3) uniform vec3 v_color;
 
@@ -22,7 +21,6 @@ out struct text_out {
 	vec4 color;
 	vec4 texcoord;
 	vec4 screenrect;
-	float tcind;
 } f;
 
 void main()
@@ -30,5 +28,4 @@ void main()
 	f.color = vec4(color.xyz * v_color.xyz, color.w);
 	f.texcoord = texcoord;
 	f.screenrect = screenrect;
-	f.tcind = tcind;
 }
