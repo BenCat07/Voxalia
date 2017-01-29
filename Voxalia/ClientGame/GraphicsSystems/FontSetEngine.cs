@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using System.Drawing;
@@ -17,6 +18,7 @@ using Voxalia.ClientGame.ClientMainSystem;
 using FreneticScript;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {
@@ -629,9 +631,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
             if (obfu || pseudo || random || jello)
             {
                 float nX = 0;
-                for (int z = 0; z < text.Length; z++)
+                foreach (string txt in StringInfo.GetTextElementEnumerator(text).AsEnumerable<string>())
                 {
-                    char chr = text[z];
+                    string chr = txt;
                     // int col = color;
                     Color tcol = ColorFor(color, trans);
                     if (random)
@@ -643,7 +645,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                     else if (pseudo)
                     {
-                        tcol = ColorFor((chr % (colors.Length - 1)) + 1, trans);
+                        tcol = ColorFor((chr[0] % (colors.Length - 1)) + 1, trans);
                     }
                     else if (ccolor.A > 0)
                     {
@@ -651,7 +653,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                     if (obfu)
                     {
-                        chr = (char)Utilities.UtilRandom.Next(33, 126);
+                        chr = ((char)Utilities.UtilRandom.Next(33, 126)).ToString();
                     }
                     int iX = 0;
                     int iY = 0;
@@ -669,7 +671,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     {
                         font.DrawSingleCharacter(chr, X + iX + nX, Y + iY, vbo, col);
                     }
-                    nX += font.RectForSymbol(text[z]).Width;
+                    nX += font.RectForSymbol(txt).Width;
                 }
                 return nX;
             }

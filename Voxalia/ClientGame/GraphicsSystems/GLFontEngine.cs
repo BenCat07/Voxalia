@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Linq;
 using System.Text;
 using System.Collections.Generic;
 using OpenTK;
@@ -16,8 +17,8 @@ using System.Drawing.Text;
 using System.Drawing.Imaging;
 using Voxalia.Shared;
 using FreneticScript;
-using System.Linq;
 using Voxalia.ClientGame.ClientMainSystem;
+using System.Globalization;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {
@@ -258,7 +259,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <summary>
         /// A list of all character locations on the base texture.
         /// </summary>
-        public Dictionary<char, RectangleF> CharacterLocations;
+        public Dictionary<string, RectangleF> CharacterLocations;
 
         /// <summary>
         /// The name of the font.
@@ -300,9 +301,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Bold = font.Bold;
             Italic = font.Italic;
             Height = font.Height;
-            CharacterLocations = new Dictionary<char, RectangleF>(2048);
+            CharacterLocations = new Dictionary<string, RectangleF>(2048);
             Internal_Font = font;
-            AddAll(Engine.textfile);
+            AddAll(StringInfo.GetTextElementEnumerator(Engine.textfile).AsEnumerable<string>().ToList());
         }
 
         static StringFormat sf;
@@ -313,21 +314,19 @@ namespace Voxalia.ClientGame.GraphicsSystems
             sf.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces | StringFormatFlags.FitBlackBox | StringFormatFlags.NoWrap;
         }
 
-
         public void RecognizeCharacters(string inp)
         {
-            StringBuilder NeedsAdding = new StringBuilder();
-            for (int i = 0; i < inp.Length; i++)
+            List<string> NeedsAdding = new List<string>();
+            foreach (string str in StringInfo.GetTextElementEnumerator(inp).AsEnumerable<string>())
             {
-                char c = inp[i];
-                if (!CharacterLocations.ContainsKey(c))
+                if (!CharacterLocations.ContainsKey(str))
                 {
-                    NeedsAdding.Append(c);
+                    NeedsAdding.Add(str);
                 }
             }
-            if (NeedsAdding.Length > 0)
+            if (NeedsAdding.Count > 0)
             {
-                string toadd = NeedsAdding.ToString();
+                List<string> toadd = NeedsAdding;
                 while ((toadd = AddAll(toadd)) != null)
                 {
                     Engine.Expand();
@@ -336,7 +335,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
         }
 
-        private string AddAll(string inp)
+        private List<string> AddAll(List<string> inp)
         {
             using (Graphics gfx = Graphics.FromImage(Engine.CurrentBMP))
             {
@@ -345,9 +344,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 int Y = Engine.CY;
                 Brush brush = new SolidBrush(Color.White);
                 Engine.CMinHeight = Math.Max((int)Height + 8, Engine.CMinHeight); // TODO: 8 -> ???
-                for (int i = 0; i < inp.Length; i++)
+                for (int i = 0; i < inp.Count; i++)
                 {
-                    string chr = inp[i] == '\t' ? "    " : inp[i].ToString();
+                    string chr = inp[i] == "\t" ? "    " : inp[i];
                     float nwidth = (float)Math.Ceiling(gfx.MeasureString(chr, Internal_Font, new PointF(0, 0), sf).Width);
                     if (Internal_Font.Italic)
                     {
@@ -362,15 +361,20 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         {
                             Engine.CX = (int)X;
                             Engine.CY = (int)Y;
-                            return inp.Substring(i);
+                            List<string> toret = new List<string>();
+                            for (int x = i; x < inp.Count; x++)
+                            {
+                                toret.Add(inp[x]);
+                            }
+                            return toret;
                         }
                     }
                     gfx.DrawString(chr, Internal_Font, brush, new PointF(X, Y), sf);
                     RectangleF rect = new RectangleF(X, Y, nwidth, Height);
                     CharacterLocations.Add(inp[i], rect);
-                    if (chr[0] < 128)
+                    if (chr.Length == 1 && chr[0] < 128)
                     {
-                        ASCIILocs[inp[i]] = rect;
+                        ASCIILocs[inp[i][0]] = rect;
                     }
                     X += (int)Math.Ceiling(nwidth + 8); // TODO: 8 -> ???
                 }
@@ -395,18 +399,18 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         /// <param name="symbol">The symbol to find.</param>
         /// <returns>A rectangle containing the precise location of a symbol.</returns>
-        public RectangleF RectForSymbol(char symbol)
+        public RectangleF RectForSymbol(string symbol)
         {
-            if (symbol < 128)
+            if (symbol.Length == 1 && symbol[0] < 128)
             {
-                return ASCIILocs[symbol];
+                return ASCIILocs[symbol[0]];
             }
             RectangleF rect;
             if (CharacterLocations.TryGetValue(symbol, out rect))
             {
                 return rect;
             }
-            return CharacterLocations['?'];
+            return CharacterLocations["?"];
         }
         
         /// <summary>
@@ -416,7 +420,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="X">The X location to draw it at.</param>
         /// <param name="Y">The Y location to draw it at.</param>
         /// <returns>The length of the character in pixels.</returns>
-        public float DrawSingleCharacter(char symbol, float X, float Y, TextVBO vbo, Vector4 color)
+        public float DrawSingleCharacter(string symbol, float X, float Y, TextVBO vbo, Vector4 color)
         {
             RectangleF rec = RectForSymbol(symbol);
             vbo.AddQuad(X, Y, X + rec.Width, Y + rec.Height, rec.X / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH, rec.Y / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH,
@@ -431,7 +435,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="X">The X location to draw it at.</param>
         /// <param name="Y">The Y location to draw it at.</param>
         /// <returns>The length of the character in pixels.</returns>
-        public float DrawSingleCharacterFlipped(char symbol, float X, float Y, TextVBO vbo, Vector4 color)
+        public float DrawSingleCharacterFlipped(string symbol, float X, float Y, TextVBO vbo, Vector4 color)
         {
             RectangleF rec = RectForSymbol(symbol);
             vbo.AddQuad(X, Y, X + rec.Width, Y + rec.Height, rec.X / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH, rec.Y / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH,
@@ -448,29 +452,30 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <returns>The length of the string in pixels.</returns>
         public float DrawString(string str, float X, float Y, Vector4 color, TextVBO vbo, bool flip = false)
         {
+            List<string> strs = StringInfo.GetTextElementEnumerator(str).AsEnumerable<string>().ToList();
             float nX = 0;
             if (flip)
             {
-                for (int i = 0; i < str.Length; i++)
+                for (int i = 0; i < strs.Count; i++)
                 {
                     if (str[i] == '\n')
                     {
                         Y += Height;
                         nX = 0;
                     }
-                    nX += DrawSingleCharacterFlipped(str[i], X + nX, Y, vbo, color);
+                    nX += DrawSingleCharacterFlipped(strs[i], X + nX, Y, vbo, color);
                 }
             }
             else
             {
-                for (int i = 0; i < str.Length; i++)
+                for (int i = 0; i < strs.Count; i++)
                 {
                     if (str[i] == '\n')
                     {
                         Y += Height;
                         nX = 0;
                     }
-                    nX += DrawSingleCharacter(str[i], X + nX, Y, vbo, color);
+                    nX += DrawSingleCharacter(strs[i], X + nX, Y, vbo, color);
                 }
             }
             return nX;
@@ -486,9 +491,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public float MeasureString(string str)
         {
             float X = 0;
-            for (int i = 0; i < str.Length; i++)
+            foreach (string stx in StringInfo.GetTextElementEnumerator(str).AsEnumerable<string>())
             {
-                X += RectForSymbol(str[i]).Width;
+                X += RectForSymbol(stx).Width;
             }
             return X;
         }

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Globalization;
 
 namespace Voxalia.Shared
 {
@@ -18,6 +19,14 @@ namespace Voxalia.Shared
     /// </summary>
     public static class SystemExtensions
     {
+        public static IEnumerable<T> AsEnumerable<T>(this TextElementEnumerator enumerator)
+        {
+            while (enumerator.MoveNext())
+            {
+                yield return (T)enumerator.Current;
+            }
+        }
+
         /// <summary>
         /// Gets the part of a string before a specified portion.
         /// </summary>
