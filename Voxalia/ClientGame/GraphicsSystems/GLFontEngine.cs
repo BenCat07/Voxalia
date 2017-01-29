@@ -203,16 +203,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// The texture containing all character images.
         /// </summary>
         public Texture BaseTexture;
-
-        /// <summary>
-        /// A list of all supported characters.
-        /// </summary>
-        public string Characters;
-
+        
         /// <summary>
         /// A list of all character locations on the base texture.
         /// </summary>
-        public List<RectangleF> CharacterLocations;
+        public Dictionary<char, RectangleF> CharacterLocations;
 
         /// <summary>
         /// The name of the font.
@@ -256,13 +251,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Bold = font.Bold;
             Italic = font.Italic;
             Height = font.Height;
-            CharacterLocations = new List<RectangleF>();
+            CharacterLocations = new Dictionary<char, RectangleF>(2048);
             StringFormat sf = new StringFormat(StringFormat.GenericTypographic);
             sf.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces | StringFormatFlags.FitBlackBox | StringFormatFlags.NoWrap;
             Internal_Font = font;
             Bitmap bmp = new Bitmap(Engine.bwidth, Engine.bheight);
             GL.BindTexture(TextureTarget.Texture2DArray, Engine.Texture3D);
-            Characters = Engine.textfile;
             using (Graphics gfx = Graphics.FromImage(bmp))
             {
                 gfx.Clear(Color.Transparent);
@@ -286,10 +280,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                     gfx.DrawString(chr, font, brush, new PointF(X, Y), sf);
                     RectangleF rect = new RectangleF(X, Y, nwidth, Height);
-                    CharacterLocations.Add(rect);
+                    CharacterLocations.Add(Engine.textfile[i], rect);
                     if (chr[0] < 128)
                     {
-                        ASCIILocs[chr[0]] = rect;
+                        ASCIILocs[Engine.textfile[i]] = rect;
                     }
                     X += nwidth + 8f;
                 }
@@ -325,12 +319,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 return ASCIILocs[symbol];
             }
-            int loc = Characters.IndexOf(symbol);
-            if (loc < 0)
+            RectangleF rect;
+            if (CharacterLocations.TryGetValue(symbol, out rect))
             {
-                return CharacterLocations[0];
+                return rect;
             }
-            return CharacterLocations[loc];
+            return CharacterLocations['?'];
         }
 
         public int TexZ = 0;

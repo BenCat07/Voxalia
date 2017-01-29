@@ -445,7 +445,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                             {
                                                 const double modder = (1.0 - (0.01 + 0.01)) * 0.333333;
                                                 ulong seed = (ulong)(WorldPosition.X * Chunk.CHUNK_SIZE + x + WorldPosition.Y * Chunk.CHUNK_SIZE + y + WorldPosition.Z * Chunk.CHUNK_SIZE + z);
-                                                MTRandom rand = new MTRandom(39, seed); // TODO: One MTRandom per chunk, with a higher 'n' value?
+                                                MTRandom rand = new MTRandom(39, seed);
                                                 rxx += rand.NextDouble() * modder;
                                                 ryy += rand.NextDouble() * modder;
                                             }
