@@ -319,6 +319,11 @@ namespace Voxalia.Shared
             return ALL_MATS[(int)mat].BreaksFromOtherTools;
         }
 
+        public static bool PlantShouldProduceEvenRows(this Material mat)
+        {
+            return ALL_MATS[(int)mat].PlantEvenRows;
+        }
+
         public static List<string> Texture(this Material mat, MaterialSide side)
         {
             return ALL_MATS[(int)mat].Texture[(int)side];
@@ -688,6 +693,8 @@ namespace Voxalia.Shared
         /// What plant texture to render as.
         /// </summary>
         public string Plant = null;
+
+        public bool PlantEvenRows = false;
 
         /// <summary>
         /// Whether this material has ANY opaque pixels AT ALL!
