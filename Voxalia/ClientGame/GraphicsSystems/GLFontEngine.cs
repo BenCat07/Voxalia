@@ -91,6 +91,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public PrivateFontCollection pfc;
 
+        public FontFamily BackupFontFamily;
+
         /// <summary>
         /// Prepares the font system.
         /// </summary>
@@ -119,21 +121,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
             FontFamily[] families = FontFamily.Families;
             FontFamily family = FontFamily.GenericMonospace;
             int family_priority = 0;
-            string fname = "sourcecodepro";
-            try
-            {
-                pfc = new PrivateFontCollection();
-                pfc.AddFontFile(Environment.CurrentDirectory + "/data/fonts/" + fname + ".ttf");
-                family = pfc.Families[0];
-                family_priority = 100;
-            }
-            catch (Exception ex)
-            {
-                SysConsole.Output(OutputType.WARNING, "Loading " + fname + ": " + ex.ToString());
-            }
             for (int i = 0; i < families.Length; i++)
             {
-                if (family_priority < 20 && families[i].Name.ToLowerFast() == "dejavu serif")
+                if (family_priority < 20 && families[i].Name.ToLowerFast() == "segoe ui emoji")
                 {
                     family = families[i];
                     family_priority = 20;
@@ -153,10 +143,30 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     family = families[i];
                     family_priority = 2;
                 }
+                else if (family_priority < 1 && families[i].Name.ToLowerFast() == "dejavu serif")
+                {
+                    family = families[i];
+                    family_priority = 1;
+                }
+            }
+            BackupFontFamily = family;
+            SysConsole.Output(OutputType.INIT, "Select backup font: " + BackupFontFamily.Name);
+            string fname = "sourcecodepro";
+            try
+            {
+                pfc = new PrivateFontCollection();
+                pfc.AddFontFile(Environment.CurrentDirectory + "/data/fonts/" + fname + ".ttf");
+                family = pfc.Families[0];
+                family_priority = 100;
+            }
+            catch (Exception ex)
+            {
+                SysConsole.Output(OutputType.WARNING, "Loading " + fname + ": " + ex.ToString());
             }
             Font def = new Font(family, 12);
             Standard = new GLFont(def, this);
             Fonts.Add(Standard);
+            SysConsole.Output(OutputType.INIT, "Select main font: " + family.Name);
             UpdateTexture();
         }
 
@@ -286,6 +296,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public Font Internal_Font;
 
+        public Font BackupFont;
+
         /// <summary>
         /// How tall a rendered symbol is.
         /// </summary>
@@ -303,6 +315,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Height = font.Height;
             CharacterLocations = new Dictionary<string, RectangleF>(2048);
             Internal_Font = font;
+            BackupFont = new Font(Engine.BackupFontFamily, font.SizeInPoints);
             AddAll(StringInfo.GetTextElementEnumerator(Engine.textfile).AsEnumerable<string>().ToList());
         }
 
@@ -317,7 +330,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public void RecognizeCharacters(string inp)
         {
             List<string> NeedsAdding = new List<string>();
-            foreach (string str in StringInfo.GetTextElementEnumerator(inp).AsEnumerable<string>())
+            foreach (string str in StringInfo.GetTextElementEnumerator(inp).AsEnumerable<string>().Distinct())
             {
                 if (!CharacterLocations.ContainsKey(str))
                 {
@@ -346,11 +359,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Engine.CMinHeight = Math.Max((int)Height + 8, Engine.CMinHeight); // TODO: 8 -> ???
                 for (int i = 0; i < inp.Count; i++)
                 {
+                    Font fnt = (inp[i].Length == 1 ? Internal_Font : BackupFont);
                     string chr = inp[i] == "\t" ? "    " : inp[i];
-                    float nwidth = (float)Math.Ceiling(gfx.MeasureString(chr, Internal_Font, new PointF(0, 0), sf).Width);
-                    if (Internal_Font.Italic)
+                    float nwidth = (float)Math.Ceiling(gfx.MeasureString(chr, fnt, new PointF(0, 0), sf).Width);
+                    if (fnt.Italic)
                     {
-                        nwidth += (int)(Internal_Font.SizeInPoints * 0.17);
+                        nwidth += (int)(fnt.SizeInPoints * 0.17);
                     }
                     if (X + nwidth >= GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH)
                     {
@@ -369,9 +383,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             return toret;
                         }
                     }
-                    gfx.DrawString(chr, Internal_Font, brush, new PointF(X, Y), sf);
+                    gfx.DrawString(chr, fnt, brush, new PointF(X, Y), sf);
                     RectangleF rect = new RectangleF(X, Y, nwidth, Height);
-                    CharacterLocations.Add(inp[i], rect);
+                    CharacterLocations[inp[i]] = rect;
                     if (chr.Length == 1 && chr[0] < 128)
                     {
                         ASCIILocs[inp[i][0]] = rect;
