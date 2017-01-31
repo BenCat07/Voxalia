@@ -432,6 +432,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             TheMainMenuScreen = new MainMenuScreen(this);
             TheGameScreen = new GameScreen(this);
             TheSingleplayerMenuScreen = new SingleplayerMenuScreen(this);
+            TheLoadScreen = new LoadScreen(this);
+            CScreen = TheMainMenuScreen;
             SysConsole.Output(OutputType.CLIENINIT, "Trying to grab RawGamePad...");
             try
             {
@@ -528,6 +530,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void ShowGame()
         {
+            CScreen.SwitchFrom();
             CScreen = TheGameScreen;
             CScreen.SwitchTo();
             IsMainMenu = false;
@@ -538,6 +541,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void ShowSingleplayer()
         {
+            CScreen.SwitchFrom();
             CScreen = TheSingleplayerMenuScreen;
             CScreen.SwitchTo();
             SwitchToMainMenu();
@@ -548,9 +552,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void ShowMainMenu()
         {
+            CScreen.SwitchFrom();
             CScreen = TheMainMenuScreen;
             CScreen.SwitchTo();
             SwitchToMainMenu();
+        }
+
+        public void ShowLoading()
+        {
+            CScreen.SwitchFrom();
+            CScreen = TheLoadScreen;
+            CScreen.SwitchTo();
+            IsMainMenu = false;
         }
 
         void SwitchToMainMenu()
@@ -578,6 +591,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The "singleplayer" main menu screen.
         /// </summary>
         SingleplayerMenuScreen TheSingleplayerMenuScreen;
+
+        LoadScreen TheLoadScreen;
         
         /// <summary>
         /// The current sound object for the playing background music.

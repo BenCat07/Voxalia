@@ -707,7 +707,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     try
                     {
-                        renderGame();
+                        if (CScreen != TheLoadScreen)
+                        {
+                            renderGame();
+                        }
                         TWOD_CFrame++;
                         if (CScreen != TheGameScreen || TWOD_CFrame > CVars.u_rate.ValueI)
                         {

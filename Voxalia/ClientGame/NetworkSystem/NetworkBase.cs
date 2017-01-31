@@ -146,14 +146,15 @@ namespace Voxalia.ClientGame.NetworkSystem
 
         public void Connect(string IP, string port, bool shortrender, string game)
         {
+            Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
+            TheClient.Files.SetSaveDirLate(game == null ? null : "client_" + game);
+            Strings.Strings.Clear();
+            TheClient.Resetregion();
+            TheClient.ShowLoading();
             LastIP = IP;
             LastPort = port;
             TheClient.Schedule.StartAsyncTask(() => ConnectInternal(shortrender, () =>
             {
-                Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
-                TheClient.Files.SetSaveDirLate(game == null ? null : "client_" + game);
-                Strings.Strings.Clear();
-                TheClient.Resetregion();
                 if (!shortrender)
                 {
                     TheClient.ShowGame();

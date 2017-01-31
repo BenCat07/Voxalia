@@ -52,5 +52,9 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
         public virtual void SwitchTo()
         {
         }
+
+        public virtual void SwitchFrom()
+        {
+        }
     }
 }
