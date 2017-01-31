@@ -47,13 +47,18 @@ namespace Voxalia.Shared.Files
                 return;
             }
             SubDirectories.Add(fdir);
+            ClearAll();
+            Init();
+        }
+
+        public void ClearAll()
+        {
             foreach (PakFile pf in Paks)
             {
                 pf.Storer.Dispose();
             }
             Paks.Clear();
             Files.Clear();
-            Init();
         }
 
         public string SaveDir = null;
@@ -61,7 +66,18 @@ namespace Voxalia.Shared.Files
         public void SetSaveDirEarly(string dir)
         {
             SaveDir = Environment.CurrentDirectory.Replace('\\', '/') + "/" + CleanFileName(dir) + "/";
+            Directory.CreateDirectory(SaveDir);
             SubDirectories.Add(SaveDir);
+        }
+
+        public void SetSaveDirLate(string dir)
+        {
+            SaveDir = Environment.CurrentDirectory.Replace('\\', '/') + "/" + CleanFileName(dir) + "/";
+            Directory.CreateDirectory(SaveDir);
+            SubDirectories.Clear();
+            SubDirectories.Add(SaveDir);
+            ClearAll();
+            Init();
         }
 
         public void Init()

@@ -20,17 +20,15 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
             TheClient = tclient;
             Name = "connect";
             Description = "Connects to a server.";
-            Arguments = "<ip> <port>";
+            Arguments = "<ip> <port> <game>";
+            MinimumArguments = 3;
+            MaximumArguments = 3;
         }
 
         public override void Execute(CommandQueue queue, CommandEntry entry)
         {
-            if (entry.Arguments.Count < 2)
-            {
-                ShowUsage(queue, entry);
-                return;
-            }
             entry.Good(queue, "Connecting...");
+            TheClient.Files.SetSaveDirLate("client_" + entry.GetArgument(queue, 2));
             TheClient.Network.Connect(entry.GetArgument(queue, 0), entry.GetArgument(queue, 1), false);
         }
     }
