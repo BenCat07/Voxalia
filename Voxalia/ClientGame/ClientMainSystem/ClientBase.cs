@@ -474,9 +474,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             SysConsole.Output(OutputType.CLIENINIT, "Connecting to a menu server...");
             Network.LastConnectionFailed = false;
-            Network.Connect("localhost", "28009", true); // TODO: Grab accurate local IP?
+            Network.Connect("localhost", "28009", true, null); // TODO: Grab accurate local IP?
             Stopwatch sw = new Stopwatch();
             sw.Start();
+            bool annc = false;
             while (true)
             {
                 if (Network.LastConnectionFailed)
@@ -492,8 +493,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 sw.Stop();
                 long ms = sw.ElapsedMilliseconds;
                 sw.Start();
-                if (ms > 5000)
+                if (ms > 5000 && !annc)
                 {
+                    annc = true;
                     SysConsole.Output(OutputType.WARNING, "Taking weirdly long, did something fail?!");
                 }
                 if (ms > 10000)

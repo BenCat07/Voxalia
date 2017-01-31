@@ -72,10 +72,19 @@ namespace Voxalia.Shared.Files
 
         public void SetSaveDirLate(string dir)
         {
-            SaveDir = Environment.CurrentDirectory.Replace('\\', '/') + "/" + CleanFileName(dir) + "/";
-            Directory.CreateDirectory(SaveDir);
             SubDirectories.Clear();
-            SubDirectories.Add(SaveDir);
+            if (dir == null)
+            {
+                SaveDir = BaseDirectory;
+
+            }
+            else
+            {
+                dir = CleanFileName(dir);
+                SaveDir = Environment.CurrentDirectory.Replace('\\', '/') + "/" + dir + "/";
+                Directory.CreateDirectory(SaveDir);
+                SubDirectories.Add(SaveDir);
+            }
             ClearAll();
             Init();
         }

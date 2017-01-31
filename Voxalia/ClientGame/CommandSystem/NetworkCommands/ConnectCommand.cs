@@ -28,8 +28,7 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
         public override void Execute(CommandQueue queue, CommandEntry entry)
         {
             entry.Good(queue, "Connecting...");
-            TheClient.Files.SetSaveDirLate("client_" + entry.GetArgument(queue, 2));
-            TheClient.Network.Connect(entry.GetArgument(queue, 0), entry.GetArgument(queue, 1), false);
+            TheClient.Network.Connect(entry.GetArgument(queue, 0), entry.GetArgument(queue, 1), false, entry.GetArgument(queue, 2));
         }
     }
 }

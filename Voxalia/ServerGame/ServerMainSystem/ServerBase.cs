@@ -340,7 +340,8 @@ namespace Voxalia.ServerGame.ServerMainSystem
         {
             CurThread = Thread.CurrentThread;
             Files = new FileHandler();
-            Files.SetSaveDirEarly(GameName = FileHandler.CleanFileName(game));
+            GameName = FileHandler.CleanFileName(game);
+            Files.SetSaveDirEarly("server_" + GameName);
             SysConsole.Written += OnConsoleWritten;
             SysConsole.Output(OutputType.INIT, "Launching as new server, this is " + (this == Central ? "" : "NOT ") + "the Central server.");
             SysConsole.Output(OutputType.INIT, "Loading console input handler...");
