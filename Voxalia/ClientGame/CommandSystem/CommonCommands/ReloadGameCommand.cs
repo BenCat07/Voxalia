@@ -6,12 +6,15 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
+using System.Linq;
 using FreneticScript.CommandSystem;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.ClientMainSystem;
 using OpenTK;
 using FreneticScript;
 using Voxalia.Shared;
+using Voxalia.Shared.Collision;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {
@@ -24,7 +27,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             TheClient = tclient;
             Name = "reloadgame";
             Description = "Reloads all or part of the game.";
-            Arguments = "<chunks/screen/shaders/audio/textures/all>"; // TODO: List input?
+            Arguments = "<chunks/blocks/screen/shaders/audio/textures/all>"; // TODO: List input?
         }
 
         public override void Execute(CommandQueue queue, CommandEntry entry)
@@ -37,24 +40,47 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             string arg = entry.GetArgument(queue, 0).ToLowerFast();
             bool success = false;
             bool is_all = arg == "all";
-            if (arg == "blocks" || is_all)
+            bool is_textures = arg == "textures";
+            bool is_blocks = arg == "blocks";
+            if (is_textures  || is_all)
+            {
+                success = true;
+                TheClient.Textures.Empty();
+                TheClient.Textures.InitTextureSystem(TheClient);
+            }
+            if (is_blocks || is_textures || is_all)
             {
                 success = true;
                 MaterialHelpers.Populate(TheClient.Files);
+                // TODO: Delay TBlock generation with time!
                 TheClient.TBlock.Generate(TheClient, TheClient.CVars, TheClient.Textures);
-                TheClient.TheRegion.RenderingNow.Clear();
-                foreach (Chunk chunk in TheClient.TheRegion.LoadedChunks.Values)
-                {
-                    chunk.OwningRegion.UpdateChunk(chunk);
-                }
             }
-            if (arg == "chunks" || is_all)
+            if (arg == "chunks" || is_blocks || is_textures || is_all)
             {
+                // TODO: Efficiency of this method!
+                // TODO: Ensure this method allows for 
                 success = true;
                 TheClient.TheRegion.RenderingNow.Clear();
-                foreach (Chunk chunk in TheClient.TheRegion.LoadedChunks.Values)
+                Location pos = TheClient.Player.GetPosition();
+                double delay = 0.0;
+                double adder = 5.0 / TheClient.TheRegion.LoadedChunks.Count;
+                Vector3i lpos = Vector3i.Zero;
+                double ldelay = 0.0;
+                foreach (Chunk chunk in TheClient.TheRegion.LoadedChunks.Values.OrderBy((c) => (c.WorldPosition.ToLocation() * new Location(Constants.CHUNK_WIDTH)).DistanceSquared_Flat(pos)))
                 {
-                    chunk.OwningRegion.UpdateChunk(chunk);
+                    delay += adder;
+                    if (chunk.WorldPosition != lpos)
+                    {
+                        ldelay = delay;
+                        lpos = chunk.WorldPosition;
+                    }
+                    TheClient.Schedule.ScheduleSyncTask(() =>
+                    {
+                        if (chunk.IsAdded)
+                        {
+                            chunk.OwningRegion.UpdateChunk(chunk);
+                        }
+                    }, ldelay);
                 }
             }
             if (arg == "screen" || is_all)
@@ -72,13 +98,6 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             {
                 success = true;
                 TheClient.Sounds.Init(TheClient, TheClient.CVars);
-            }
-            if (arg == "textures" || is_all)
-            {
-                success = true;
-                TheClient.Textures.Empty();
-                TheClient.Textures.InitTextureSystem(TheClient);
-                TheClient.TBlock.Generate(TheClient, TheClient.CVars, TheClient.Textures);
             }
             if (!success)
             {

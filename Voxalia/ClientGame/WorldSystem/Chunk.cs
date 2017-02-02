@@ -85,7 +85,7 @@ namespace Voxalia.ClientGame.WorldSystem
             }
         }
 
-        bool IsAdded = false;
+        public bool IsAdded = false;
 
         /// <summary>
         /// Sync only.
