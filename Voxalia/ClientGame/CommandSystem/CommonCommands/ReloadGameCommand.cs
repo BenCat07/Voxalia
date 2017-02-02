@@ -53,7 +53,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                 success = true;
                 MaterialHelpers.Populate(TheClient.Files);
                 // TODO: Delay TBlock generation with time!
-                TheClient.TBlock.Generate(TheClient, TheClient.CVars, TheClient.Textures);
+                TheClient.TBlock.Generate(TheClient, TheClient.CVars, TheClient.Textures, true);
             }
             if (arg == "chunks" || is_blocks || is_textures || is_all)
             {

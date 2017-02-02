@@ -373,7 +373,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             PassLoadScreen();
             SysConsole.Output(OutputType.CLIENINIT, "Loading block textures...");
             TBlock = new TextureBlock();
-            TBlock.Generate(this, CVars, Textures);
+            TBlock.Generate(this, CVars, Textures, false);
             View3D.CheckError("Load - Textures");
             SysConsole.Output(OutputType.CLIENINIT, "Loading fonts...");
             Fonts = new GLFontEngine(Shaders);

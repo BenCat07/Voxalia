@@ -41,7 +41,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public string[] IntTexs;
 
-        public void Generate(Client tclient, ClientCVar cvars, TextureEngine eng)
+        public void Generate(Client tclient, ClientCVar cvars, TextureEngine eng, bool delayable)
         {
             TheClient = tclient;
             if (Anims != null)
@@ -84,12 +84,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
             // TODO: Use normal.a!
             List<MaterialTextureInfo> texs = new List<MaterialTextureInfo>(MaterialHelpers.Textures.Length);
             IntTexs = new string[MaterialHelpers.Textures.Length];
-            //float time = 0;
             for (int ia = 0; ia < MaterialHelpers.Textures.Length; ia++)
             {
                 int i = ia;
-                // TODO: Make this saner, and don't allow entering a game until it's done maybe?
-                //TheClient.Schedule.ScheduleSyncTask(() =>
+                Action a = () =>
                 {
                     MaterialTextureInfo tex = new MaterialTextureInfo();
                     tex.Mat = (Material)i;
@@ -152,14 +150,25 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                     texs.Add(tex);
                     IntTexs[(int)tex.Mat] = tex.Textures[0];
-                    TheClient.PassLoadScreen();
-                }//, i * LoadRate);
-                //time = i * 0.1f;
+                    if (!delayable)
+                    {
+                        TheClient.PassLoadScreen();
+                    }
+                };
+                if (delayable)
+                {
+                    TheClient.Schedule.ScheduleSyncTask(a, i * LoadRate);
+                }
+                else
+                {
+                    a();
+                }
             }
+            double time = (MaterialHelpers.Textures.Length + 1) * LoadRate;
             for (int ia = 0; ia < texs.Count; ia++)
             {
                 int i = ia;
-                //TheClient.Schedule.ScheduleSyncTask(() =>
+                Action a = () =>
                 {
                     GL.BindTexture(TextureTarget.Texture2DArray, HelpTextureID);
                     Bitmap combo = GetCombo(texs[i], 0);
@@ -179,14 +188,25 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         }
                     }
                     combo.Dispose();
-                    TheClient.PassLoadScreen();
-                }//, time + i * LoadRate);
+                    if (!delayable)
+                    {
+                        TheClient.PassLoadScreen();
+                    }
+                };
+                if (delayable)
+                {
+                    TheClient.Schedule.ScheduleSyncTask(a, time + i * LoadRate);
+                }
+                else
+                {
+                    a();
+                }
             }
             GL.BindTexture(TextureTarget.Texture2DArray, 0);
             GL.BindTexture(TextureTarget.Texture2DArray, 0);
         }
 
-        const float LoadRate = 0.1f;
+        const double LoadRate = 0.05;
 
         public Bitmap GetCombo(MaterialTextureInfo tex, int coord)
         {
