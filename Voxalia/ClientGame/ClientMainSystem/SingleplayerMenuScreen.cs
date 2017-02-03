@@ -30,7 +30,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             AddChild(new UIButton("ui/menus/buttons/basic", "Back", TheClient.FontSets.SlightlyBigger, () => TheClient.ShowMainMenu(), UIAnchor.BOTTOM_LEFT, () => 350, () => 70, () => 10, () => -100));
             int start = 150;
             IEnumerable<string> found = Directory.EnumerateDirectories(Environment.CurrentDirectory);
-            foreach (string fnd in found)
+            HashSet<string> fullList = new HashSet<string>(found);
+            fullList.Add(Environment.CurrentDirectory + "/default");
+            foreach (string fnd in fullList)
             {
                 int curr = start;
                 string str = fnd.Substring(Environment.CurrentDirectory.Length).Replace('\\', '/').Replace("/", "");
