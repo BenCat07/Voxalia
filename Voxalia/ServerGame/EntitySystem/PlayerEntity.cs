@@ -398,6 +398,11 @@ namespace Voxalia.ServerGame.EntitySystem
                 HookItem.RemoveHook(this);
                 RemoveMe();
             }
+            SaveToFile();
+        }
+
+        public void SaveToFile()
+        {
             string nl = Name.ToLower();
             string fn = "server_player_saves/" + nl[0].ToString() + "/" + nl + ".plr";
             SaveToConfig(PlayerConfig);
@@ -499,6 +504,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 PlayerConfig = new FDSSection();
                 SaveToConfig(PlayerConfig);
             }
+            SaveToFile();
         }
 
         /// <summary>
@@ -689,7 +695,15 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 Damage(1); // TODO: Configurable damage amount!
             }
+            AutoSaveTicks++;
+            if (AutoSaveTicks > 30) // TODO: Constant fix!
+            {
+                AutoSaveTicks = 0;
+                SaveToFile();
+            }
         }
+
+        public int AutoSaveTicks = 0;
 
         /// <summary>
         /// The player's current world selection (for items such as block copiers).
