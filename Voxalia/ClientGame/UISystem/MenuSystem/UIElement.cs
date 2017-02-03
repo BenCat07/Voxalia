@@ -78,6 +78,10 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
                     //throw new Exception("Tried to remove a child twice!");
                 }
             }
+            else if (ToAdd.Contains(child))
+            {
+                ToAdd.Remove(child);
+            }
             else
             {
                 throw new Exception("Tried to remove a child that does not belong to this element!");

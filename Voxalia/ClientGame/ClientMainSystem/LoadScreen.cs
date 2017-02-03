@@ -34,11 +34,23 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             BackDrop = new UIImage(TheClient.Textures.GetTexture("ui/menus/loadscreen"), UIAnchor.TOP_LEFT, () => TheClient.Window.Width, () => TheClient.Window.Height, Zero, Zero);
             AddChild(BackDrop);
+            AddHint();
+        }
+
+        UILabel Hint;
+
+        public void AddHint()
+        {
+            List<string> hints = TheClient.Languages.GetTextList(TheClient.Files, "voxalia", "hints.common");
+            Hint = new UILabel("^0^e^7" + hints[Utilities.UtilRandom.Next(hints.Count)], TheClient.FontSets.Standard, UIAnchor.BOTTOM_LEFT, () => 0, () => -(int)TheClient.Fonts.Standard.Height * 3, () => TheClient.Window.Width);
+            AddChild(Hint);
         }
 
         public override void SwitchTo()
         {
             MouseHandler.ReleaseMouse();
+            RemoveChild(Hint);
+            AddHint();
         }
 
         public override void FullRender(double delta, int xoff, int yoff)
