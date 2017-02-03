@@ -47,6 +47,8 @@ namespace Voxalia.Shared
             }
         }
 
+        public static bool AllowCursor = true;
+
         /// <summary>
         /// Prepares the system console.
         /// </summary>
@@ -180,7 +182,15 @@ namespace Voxalia.Shared
                 FSOUT.Write(b, 0, b.Length);
                 FSOUT.Flush(); // TODO: Flush(true)?
             }
-            Console.SetCursorPosition(0, Console.CursorTop);
+            if (AllowCursor)
+            {
+                Console.SetCursorPosition(0, Console.CursorTop);
+            }
+            else
+            {
+                Console.Write(bcolor + text.Replace("^B", bcolor));
+                return;
+            }
             StringBuilder outme = new StringBuilder();
             for (int i = 0; i < text.Length; i++)
             {
@@ -251,7 +261,10 @@ namespace Voxalia.Shared
             }
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write(">");// TODO + ConsoleHandler.read);
+            if (AllowCursor)
+            {
+                Console.Write(">");// TODO + ConsoleHandler.read);
+            }
         }
 
         public static void Output(string message, Exception ex)

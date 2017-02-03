@@ -147,17 +147,23 @@ namespace Voxalia.Shared
 
         public static void Update()
         {
-            Console.SetCursorPosition(0, Console.CursorTop);
+            if (SysConsole.AllowCursor)
+            {
+                Console.SetCursorPosition(0, Console.CursorTop);
+            }
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(">" + read + " ");
             // TODO: Replace this nonsense with scrolling, or multi-line working
-            if (pos + 2 >= Console.BufferWidth)
+            if (SysConsole.AllowCursor && pos + 2 >= Console.BufferWidth)
             {
                 Console.SetBufferSize(Console.BufferWidth + 1, Console.BufferHeight);
                 Console.SetCursorPosition(pos + 1, Console.CursorTop - 1);
             }
-            Console.SetCursorPosition(pos + 1, Console.CursorTop);
+            if (SysConsole.AllowCursor)
+            {
+                Console.SetCursorPosition(pos + 1, Console.CursorTop);
+            }
         }
 
         public static EventHandler<ConsoleCommandEventArgs> OnCommandInput;

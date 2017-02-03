@@ -212,9 +212,15 @@ namespace VoxaliaLauncher
 
         private void playButton_Click(object sender, EventArgs e)
         {
-            Process.Start("Voxalia.exe");
-            Thread.Sleep(1000);
-            Close();
+            playButton.Enabled = false;
+            ProcessStartInfo psi = new ProcessStartInfo("Voxalia.exe", "{{Launcher}}");
+            psi.RedirectStandardOutput = true;
+            // TODO: psi.RedirectStandardInput = true;
+            psi.UseShellExecute = false;
+            Process p = Process.Start(psi);
+            LauncherLog log = new LauncherLog(this, p.StandardOutput);
+            log.Show();
+            Hide();
         }
 
         private void logoutButton_Click(object sender, EventArgs e)

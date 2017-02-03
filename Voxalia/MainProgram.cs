@@ -17,6 +17,7 @@ using System.IO;
 using System.Threading;
 using System.Globalization;
 using Voxalia.Shared.Files;
+using System.Runtime.InteropServices;
 
 namespace Voxalia
 {
@@ -29,7 +30,15 @@ namespace Voxalia
         /// A handle for the console window.
         /// </summary>
         public static IntPtr ConsoleHandle;
-        
+
+#if !LINUX
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+#endif
+
         /// <summary>
         /// Central program entry point.
         /// Decides whether to lauch the server or the client.
@@ -38,7 +47,15 @@ namespace Voxalia
         static void Main(string[] args)
         {
             ConsoleHandle = Process.GetCurrentProcess().MainWindowHandle;
+            if (args.Length == 1 && args[0] == "{{Launcher}}")
+            {
+                args = new string[0];
+#if !LINUX
+                ShowWindow(ConsoleHandle, SW_HIDE);
+#endif
+            }
             Program.PreInit();
+            SysConsole.AllowCursor = false;
             SysConsole.Init();
             StringBuilder arger = new StringBuilder();
             for (int i = 0; i < args.Length; i++)
