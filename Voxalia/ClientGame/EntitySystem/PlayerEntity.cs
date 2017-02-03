@@ -239,7 +239,7 @@ namespace Voxalia.ClientGame.EntitySystem
             else
             {
                 double delta = lPT - now;
-                Location dir = pos - TheClient.Player.GetPosition();
+                Location dir = pos - GetPosition();
                 if (dir.LengthSquared() < TheClient.CVars.n_movement_maxdistance.ValueF * TheClient.CVars.n_movement_maxdistance.ValueF)
                 {
                     SetPosition(GetPosition() + dir / Math.Max(TheClient.CVars.n_movement_adjustment.ValueF / delta, 1));
@@ -248,8 +248,8 @@ namespace Voxalia.ClientGame.EntitySystem
                 }
                 else
                 {
-                    TheClient.Player.SetPosition(pos);
-                    TheClient.Player.SetVelocity(vel);
+                    SetPosition(pos);
+                    SetVelocity(vel);
                 }
                 lPT = now;
             }
@@ -454,10 +454,6 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public override void Tick()
         {
-            if (!(TheClient.CScreen is GameScreen))
-            {
-                return;
-            }
             if (CBody == null || Body == null)
             {
                 return;
