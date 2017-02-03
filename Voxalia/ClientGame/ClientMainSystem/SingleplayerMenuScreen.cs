@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
+using Voxalia.ServerGame.ServerMainSystem;
+using System.Threading.Tasks;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -26,12 +29,41 @@ namespace Voxalia.ClientGame.ClientMainSystem
             ResetOnRender = false;
             AddChild(new UIButton("ui/menus/buttons/basic", "Back", TheClient.FontSets.SlightlyBigger, () => TheClient.ShowMainMenu(), UIAnchor.BOTTOM_LEFT, () => 350, () => 70, () => 10, () => -100));
             int start = 150;
-            List<string> found = TheClient.Files.ListFolders("saves");
-            foreach (string str in found)
+            IEnumerable<string> found = Directory.EnumerateDirectories(Environment.CurrentDirectory);
+            foreach (string fnd in found)
             {
-                if (str.LastIndexOf('/') == "/saves/".Length - 1)
+                int curr = start;
+                string str = fnd.Substring(Environment.CurrentDirectory.Length).Replace('\\', '/').Replace("/", "");
+                if (str.StartsWith("server_"))
                 {
-                    AddChild(new UIButton("ui/menus/buttons/sp", "== " + str.Substring("/saves/".Length) + " ==", TheClient.FontSets.Standard, () => UIConsole.WriteLine("OPEN " + str), UIAnchor.TOP_LEFT, () => 600, () => 70, () => 10, () => start));
+                    str = str.Substring("serveR_".Length);
+                    AddChild(new UIButton("ui/menus/buttons/sp", "== " + str + " ==", TheClient.FontSets.Standard, () =>
+                    {
+                        UIConsole.WriteLine("Opening singleplayer game: " + str);
+                        if (TheClient.LocalServer != null)
+                        {
+                            UIConsole.WriteLine("Shutting down pre-existing server.");
+                            TheClient.LocalServer.ShutDown();
+                            TheClient.LocalServer = null;
+                        }
+                        TheClient.LocalServer = new Server(28010);
+                        Server.Central = TheClient.LocalServer;
+                        Task.Factory.StartNew(() =>
+                        {
+                            try
+                            {
+                                TheClient.LocalServer.StartUp(str, () =>
+                                {
+                                    TheClient.Network.Connect("localhost", "28010", false, str);
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                Utilities.CheckException(ex);
+                                SysConsole.Output("Running singleplayer game server", ex);
+                            }
+                        });
+                    }, UIAnchor.TOP_LEFT, () => 600, () => 70, () => 10, () => curr));
                     start += 100;
                 }
             }
