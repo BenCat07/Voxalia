@@ -8,19 +8,36 @@
 
 #version 430 core
 
+#define MCM_GEOM_ACTIVE 0
+
+#if MCM_GEOM_ACTIVE
+layout (binding = 0) uniform sampler2DArray s;
+#else
 layout (binding = 0) uniform sampler2D s;
+#endif
 
 layout (location = 4) uniform float allow_transp = 0.0;
 
-layout (location = 0) in vec4 f_pos;
-layout (location = 1) in vec2 f_texcoord;
-layout (location = 2) in vec4 f_color;
+in struct vox_fout
+{
+	vec4 position;
+#if MCM_GEOM_ACTIVE
+	vec3 texcoord;
+#else
+	vec2 texcoord;
+#endif
+	vec4 color;
+	mat3 tbn;
+#if MCM_INVERSE_FADE
+	float size;
+#endif
+} fi;
 
 layout (location = 0) out float color;
 
 void main()
 {
-	vec4 col = texture(s, f_texcoord) * f_color;
+	vec4 col = texture(s, fi.texcoord) * fi.color;
 	if (col.w < 0.9 && ((col.w < 0.05) || (allow_transp <= 0.5)))
 	{
 		discard;

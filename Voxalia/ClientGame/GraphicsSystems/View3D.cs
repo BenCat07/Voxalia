@@ -848,6 +848,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
                                 GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
                                 FBOid = FBOID.SHADOWS;
+                                TheClient.s_shadow_grass = TheClient.s_shadow_grass.Bind();
+                                SetMatrix(2, Matrix4d.Identity);
+                                GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
+                                GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
+                                Lights[i].InternalLights[x].SetProj();
                                 TheClient.s_shadow = TheClient.s_shadow.Bind();
                                 SetMatrix(2, Matrix4d.Identity);
                                 GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);

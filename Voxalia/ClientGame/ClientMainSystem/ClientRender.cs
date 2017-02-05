@@ -236,6 +236,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_hdrpass = Shaders.GetShader("hdrpass" + def);
             s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE?grass");
             s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY?grass");
+            s_shadow_grass = Shaders.GetShader("shadow" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_SHADOWS?grass");
             s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH?particles");
             s_fbodecal = Shaders.GetShader("fbo" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE,MCM_PRETTY?decal");
             s_forwdecal = Shaders.GetShader("forward" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE?decal");
@@ -400,6 +401,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The Shadow Pass shader, for voxels.
         /// </summary>
         public Shader s_shadowvox;
+
+        /// <summary>
+        /// The Shadow Pass shader, for grass.
+        /// </summary>
+        public Shader s_shadow_grass;
 
         /// <summary>
         /// The final write + godrays shader.

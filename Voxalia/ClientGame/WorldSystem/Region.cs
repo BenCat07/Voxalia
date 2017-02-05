@@ -549,10 +549,16 @@ namespace Voxalia.ClientGame.WorldSystem
                 GL.Uniform4(12, new OpenTK.Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
                 GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
                 GL.Uniform1(14, TheClient.ZFar());
+                GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
             }
             else if (TheClient.MainWorldView.FBOid == FBOID.MAIN)
             {
                 TheClient.s_fbo_grass = TheClient.s_fbo_grass.Bind();
+                GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
+            }
+            else if (TheClient.MainWorldView.FBOid == FBOID.SHADOWS && TheClient.MainWorldView.TranspShadows)
+            {
+                TheClient.s_shadow_grass = TheClient.s_shadow_grass.Bind();
             }
             else
             {
@@ -566,7 +572,6 @@ namespace Voxalia.ClientGame.WorldSystem
             GL.BindTexture(TextureTarget.Texture2DArray, 0);
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2DArray, TheClient.GrassTextureID);
-            GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
             GL.Uniform1(6, (float)GlobalTickTimeLocal);
             GL.Uniform3(7, ClientUtilities.Convert(ActualWind));
             TheClient.Rendering.SetColor(GetSunAdjust());
