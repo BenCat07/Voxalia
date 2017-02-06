@@ -21,10 +21,14 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
         Texture[] Explosion;
 
         Texture SmokeT;
+
+        Texture[] FlameLick;
         
         Texture BlueFlameLick;
 
         Texture WhiteFlameLick;
+
+        Texture FireTriangle;
 
         Texture White;
 
@@ -47,9 +51,14 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             White = TheClient.Textures.White;
             White_Blur = TheClient.Textures.GetTexture("common/white_blur");
             SmokeT = TheClient.Textures.GetTexture("effects/smoke/smoke1");
-            //FlameLick = TheClient.Textures.GetTexture("effects/fire/flamelick01");
+            FlameLick = new Texture[3];
+            for (int i = 0; i < 3; i++)
+            {
+                FlameLick[i] = TheClient.Textures.GetTexture("effects/fire/flamelick0" + (i + 1));
+            }
             BlueFlameLick = TheClient.Textures.GetTexture("effects/fire/blueflamelick01");
             WhiteFlameLick = TheClient.Textures.GetTexture("effects/fire/whiteflamelick01");
+            FireTriangle = TheClient.Textures.GetTexture("effects/fire/firetriangle");
             Circle_Light = TheClient.Textures.GetTexture("effects/particle/circle_light");
             Circle_Heavy = TheClient.Textures.GetTexture("effects/particle/circle_heavy");
         }
@@ -183,12 +192,43 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         public void Fire(Location pos, float sizemult)
         {
-            Location colOne = new Location(3.0, 3.0, 0);
-            Location colTwo = new Location(3.0, 2.0, 0.0);
-            Location temp = new Location(0, 0, -TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.09f * sizemult);
+            // TODO: Smoke type input?!
+            if (TheClient.CVars.r_firemode.ValueI == 1)
+            {
+                DenseFire(pos, sizemult);
+            }
+            else
+            {
+                FireSimple(pos, sizemult);
+            }
+        }
+
+        public void FireSimple(Location pos, float sizemult)
+        {
+            Location colOne = new Location(3.0, 3.0, 2.0);
+            Location colTwo = new Location(3.0, 2.0, 1.5);
+            Location temp = new Location(0, 0, -TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.4f * sizemult);
             ParticleEffect pe = Engine.AddEffect(ParticleEffectType.SQUARE, (o) => pos + temp * (1 - o.TTL / o.O_TTL),
-                (o) => new Location((o.TTL / o.O_TTL) * 2.0f), (o) => 0, sizemult, colOne, colTwo, true, WhiteFlameLick);
-            pe.AltAlpha = ParticleEffect.FadeInOut;
+                (o) => new Location((o.TTL / o.O_TTL) * 2.0f), (o) => 0, sizemult, colOne, colTwo, true, FlameLick[Utilities.UtilRandom.Next() % FlameLick.Length]);
+            pe.AltAlpha = ParticleEffect.FadeInOutHalf;
+            pe.OnDestroy = (o) =>
+            {
+                if (Utilities.UtilRandom.Next(5) == 1)
+                {
+                    Smoke(o.Start(o) - new Location(0, 0, 1), 1, Location.One);
+                }
+            };
+        }
+
+        public void DenseFire(Location pos, float sizemult)
+        {
+            double rando = Utilities.UtilRandom.NextDouble() * 1.0 + 2.0;
+            Location colOne = new Location(rando, rando, 2.0);
+            Location colTwo = new Location(rando, rando - 1.0, 1.5);
+            Location temp = new Location(0, 0, -TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.4f * sizemult);
+            ParticleEffect pe = Engine.AddEffect(ParticleEffectType.SQUARE, (o) => pos + temp * (1 - o.TTL / o.O_TTL),
+                (o) => new Location((o.TTL / o.O_TTL)), (o) => 0, sizemult, colOne, colTwo, true, FireTriangle);
+            pe.AltAlpha = ParticleEffect.FadeInOutHalf;
             pe.OnDestroy = (o) =>
             {
                 if (Utilities.UtilRandom.Next(5) == 1)

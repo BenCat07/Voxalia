@@ -36,7 +36,7 @@ namespace Voxalia.ClientGame.CommandSystem
         // Renderer CVars
         public CVar r_fullscreen, r_width, r_height, r_vsync, r_lighting, r_renderwireframe,
             r_fov, r_znear, r_renderdist, r_renderdist_2, r_renderdist_2h, r_renderdist_5, r_renderdist_5h,
-            r_dof_strength, r_fog, r_maxfps, r_drawself,
+            r_dof_strength, r_fog, r_maxfps, r_drawself, r_firemode,
             r_lightmaxdistance, r_shadowquality, r_shadowblur, r_shadowpace, r_shadows, r_cloudshadows,
             r_good_graphics, r_skybox, r_lensflare, r_blocktexturelinear, r_blocktexturewidth, r_toonify, r_transplighting, r_transpshadows,
             r_3d_enable, r_fast, r_chunksatonce, r_chunkoverrender, r_transpll, r_noblockshapes, r_treeshadows,
@@ -56,6 +56,7 @@ namespace Voxalia.ClientGame.CommandSystem
         /// </summary>
         public void Init(Client tclient, Outputter output)
         {
+            // TODO: Organize this mess!
             system = new CVarSystem(output);
 
             // System CVars
@@ -92,6 +93,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_dof_strength = Register("r_dof_strength", "4", CVarFlag.Numeric, "How strong the Depth Of Field effect should be.");
             r_maxfps = Register("r_maxfps", "600", CVarFlag.Numeric | CVarFlag.Delayed, "What the FPS cap should be.");
             r_drawself = Register("r_drawself", "true", CVarFlag.Boolean, "Whether the player entity should be visible.");
+            r_firemode = Register("r_firemode", "0", CVarFlag.Numeric, "What mode to display fire as (0 = simple, 1 = dense).");
             r_lightmaxdistance = Register("r_lightmaxdistance", "35", CVarFlag.Numeric, "How far away a light can be from the camera before it is disabled.");
             r_shadowquality = Register("r_shadowquality", "1024", CVarFlag.Numeric, "What texture size to use for shadow maps.");
             r_shadowblur = Register("r_shadowblur", "0.25", CVarFlag.Numeric, "What factor to use for shadow blurring. Smaller = blurrier.");

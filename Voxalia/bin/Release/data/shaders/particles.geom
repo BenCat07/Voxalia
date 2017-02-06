@@ -84,20 +84,31 @@ void main()
 #if MCM_FADE_DEPTH
 	fi.size = 1.0 / scale;
 #endif
+	float angle = (scale * 5.0) * (float(int(tid) % 2) * 2.0) - 1.0;
+	float c = cos(angle);
+	float s = sin(angle);
+	float C = 1.0 - c;
+	mat4 rot_mat = mat4(
+		pos_norm.x * pos_norm.x * C + c, pos_norm.x * pos_norm.y * C - pos_norm.z * s, pos_norm.x * pos_norm.z * C + pos_norm.y * s, 0.0,
+		pos_norm.y * pos_norm.x * C + pos_norm.z * s, pos_norm.y * pos_norm.y * C + c, pos_norm.y * pos_norm.z * C - pos_norm.x * s, 0.0,
+		pos_norm.z * pos_norm.x * C - pos_norm.y * s, pos_norm.z * pos_norm.y * C + pos_norm.x * s, pos_norm.z * pos_norm.z * C + c, 0.0,
+		0.0, 0.0, 0.0, 1.0);
+	vec3 right_n = (rot_mat * vec4(right, 1.0)).xyz;
+	vec3 up_n = (rot_mat * vec4(up, 1.0)).xyz;
 	// First Vertex
-	gl_Position = proj_matrix * qfix(vec4(pos - (right) * scale, 1.0), right, pos_norm);
+	gl_Position = proj_matrix * qfix(vec4(pos - (right_n + up_n) * scale, 1.0), right_n, pos_norm);
 	fi.texcoord = vec3(0.0, 1.0, tid);
 	EmitVertex();
 	// Second Vertex
-	gl_Position = proj_matrix * qfix(vec4(pos + (right) * scale, 1.0), right, pos_norm);
+	gl_Position = proj_matrix * qfix(vec4(pos + (right_n - up_n) * scale, 1.0), right_n, pos_norm);
 	fi.texcoord = vec3(1.0, 1.0, tid);
 	EmitVertex();
 	// Third Vertex
-	gl_Position = proj_matrix * qfix(vec4(pos - (right - up * 2.0) * scale, 1.0), right, pos_norm);
+	gl_Position = proj_matrix * qfix(vec4(pos - (right_n - up_n) * scale, 1.0), right_n, pos_norm);
 	fi.texcoord = vec3(0.0, 0.0, tid);
 	EmitVertex();
 	// Forth Vertex
-	gl_Position = proj_matrix * qfix(vec4(pos + (right + up * 2.0) * scale, 1.0), right, pos_norm);
+	gl_Position = proj_matrix * qfix(vec4(pos + (right_n + up_n) * scale, 1.0), right_n, pos_norm);
 	fi.texcoord = vec3(1.0, 0.0, tid);
 	EmitVertex();
 	EndPrimitive();

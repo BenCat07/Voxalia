@@ -56,6 +56,11 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         public float MinimumLight = 0f;
 
+        public static float FadeInOutHalf(ParticleEffect pe)
+        {
+            return FadeInOut(pe) * 0.5f;
+        }
+
         public static float FadeInOut(ParticleEffect pe)
         {
             float rel = pe.TTL / pe.O_TTL;

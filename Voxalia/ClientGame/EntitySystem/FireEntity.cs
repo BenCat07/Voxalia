@@ -41,6 +41,8 @@ namespace Voxalia.ClientGame.EntitySystem
 
         const double maxDist = 3.5;
 
+        double cdelt = 0;
+
         public override void Tick()
         {
             float size = 0.5f;
@@ -53,9 +55,18 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             if (AttachedTo == null)
             {
-                float heightmod;
-                Location rel = RelSpot(out heightmod);
-                TheClient.Particles.Fire(rel + new Location(0, 0, 0.5), size * heightmod * 0.2f);
+                cdelt += TheClient.Delta;
+                if (cdelt > 0.75)
+                {
+                    cdelt = 0.75;
+                }
+                while (cdelt > 0.01)
+                {
+                    float heightmod;
+                    Location rel = RelSpot(out heightmod);
+                    TheClient.Particles.Fire(rel + new Location(0, 0, 0.5), size * heightmod * 0.2f);
+                    cdelt -= 0.02;
+                }
             }
         }
 
