@@ -50,9 +50,13 @@
 
 ### How do I get started once I have the game?
 
-- Once you have a valid FreneticXYZ account and a copy of the game, open the Launcher and login.
-- One day you'll be able to click a singleplayer button in the main menu and start up a story, but for now...
-	- run singleplayer.bat or .sh depending on your OS, and mess about in the sandbox environment.
+- Once you have a valid FreneticXYZ account and a copy of the game:
+- Open the Launcher (bin/launcher.bat on Windows or bin/launcher\_linux.sh on Linux) and login.
+- Next, hit the "Play" button.
+- Almost there! Click "Singleplayer" in the main menu.
+- Finally, click the "default" button (or any other game name).
+- The game should load up now.
+- There's not all the much to do yet. Those trying it should be familiar enough with the code to be able to decipher the keybindings from `ClientGame/UISystem/KeyHandler.cs`!
 
 ### Do I need to run the Voxalia server to play with friends?
 
@@ -125,7 +129,7 @@
 
 ### Can I redistribute the files for the game?
 
-- Only the code and binaries resultant directly from the code (*.exe, *.dll, *.xml, *.pdb). Art assets (available separately) are licensed separately.
+- Only the code and binaries resultant directly from the code (*.exe, *.dll, *.xml, *.pdb) many be redistributed. Art assets (available separately) are licensed separately, and may not be redistributed!
 
 ### I want to know more about how the game is licensed!
 
