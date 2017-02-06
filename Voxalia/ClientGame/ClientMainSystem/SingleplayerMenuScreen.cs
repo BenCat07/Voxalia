@@ -30,15 +30,21 @@ namespace Voxalia.ClientGame.ClientMainSystem
             AddChild(new UIButton("ui/menus/buttons/basic", "Back", TheClient.FontSets.SlightlyBigger, () => TheClient.ShowMainMenu(), UIAnchor.BOTTOM_LEFT, () => 350, () => 70, () => 10, () => -100));
             int start = 150;
             IEnumerable<string> found = Directory.EnumerateDirectories(Environment.CurrentDirectory);
-            HashSet<string> fullList = new HashSet<string>(found);
-            fullList.Add(Environment.CurrentDirectory + "/default");
+            HashSet<string> fullList = new HashSet<string>();
+            foreach (string fnd in found)
+            {
+                string str = fnd.Substring(Environment.CurrentDirectory.Length).Replace('\\', '/').Replace("/", "");
+                fullList.Add(str);
+            }
+            fullList.Add("server_default");
+            fullList.Remove("server_menu");
             foreach (string fnd in fullList)
             {
+                string str = fnd;
                 int curr = start;
-                string str = fnd.Substring(Environment.CurrentDirectory.Length).Replace('\\', '/').Replace("/", "");
                 if (str.StartsWith("server_"))
                 {
-                    str = str.Substring("serveR_".Length);
+                    str = str.Substring("server_".Length);
                     AddChild(new UIButton("ui/menus/buttons/sp", "== " + str + " ==", TheClient.FontSets.Standard, () =>
                     {
                         UIConsole.WriteLine("Opening singleplayer game: " + str);
@@ -50,6 +56,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         }
                         TheClient.LocalServer = new Server(28010);
                         Server.Central = TheClient.LocalServer;
+                        TheClient.ShowLoading();
                         Task.Factory.StartNew(() =>
                         {
                             try
