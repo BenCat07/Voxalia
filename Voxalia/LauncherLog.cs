@@ -147,6 +147,32 @@ namespace VoxaliaLauncher
             InitializeComponent();
             OutputReader = input;
             OwnerForm = form;
+            Timer t = new Timer();
+            t.Interval = 500;
+            t.Tick += T_Tick;
+            t.Start();
+        }
+
+        private void T_Tick(object sender, EventArgs e)
+        {
+            if (!edited)
+            {
+                return;
+            }
+            edited = false;
+            RTFBuilder res = new RTFBuilder();
+            for (int i = 0; i < RTFBs.Count; i++)
+            {
+                res.Append(RTFBs[i]);
+                res.AppendLine();
+            }
+            bool canSelect = richTextBox1.SelectionLength <= 0;
+            richTextBox1.Rtf = res.FinalOutput(16);
+            if (CanSelect)
+            {
+                richTextBox1.Select(richTextBox1.Rtf.Length - 1, 1);
+                richTextBox1.ScrollToCaret();
+            }
         }
 
         private void LauncherLog_FormClosed(object sender, FormClosedEventArgs e)
@@ -179,8 +205,11 @@ namespace VoxaliaLauncher
 
         List<RTFBuilder> RTFBs = new List<RTFBuilder>();
 
+        bool edited = true;
+
         void WriteInternal(string text)
         {
+            edited = true;
             if (RTFBs.Count > 600)
             {
                 RTFBs.RemoveRange(0, 100);
@@ -261,13 +290,6 @@ namespace VoxaliaLauncher
             richTextBox1.BackColor = Color.Black;
             richTextBox1.ForeColor = Color.White;
             RTFBs.Add(rtfb);
-            RTFBuilder res = new RTFBuilder();
-            for (int i = 0; i < RTFBs.Count; i++)
-            {
-                res.Append(RTFBs[i]);
-                res.AppendLine();
-            }
-            richTextBox1.Rtf = res.FinalOutput(16);
         }
 
         private async void LauncherLog_Load(object sender, EventArgs e)
@@ -285,13 +307,7 @@ namespace VoxaliaLauncher
                     {
                         return;
                     }
-                    bool canSelect = richTextBox1.SelectionLength <= 0;
                     WriteInternal(read);
-                    if (CanSelect)
-                    {
-                        richTextBox1.Select(richTextBox1.Rtf.Length - 1, 1);
-                        richTextBox1.ScrollToCaret();
-                    }
                 }));
             }
         }
