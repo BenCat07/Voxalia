@@ -14,6 +14,14 @@ Also used libraries:
 - FreneticDataSyntax (used for FreneticScript data handling and some files in Voxalia's save structure)
 - lz4net (general data compression)
 
+## What is Voxalia
+
+Voxalia is a really cool game that will be lots of fun to play when it's ready!
+
+It's currently in pre-alpha, but it's already got a lot of power to it!
+
+View the [FAQ](/FAQ.md) for more information!
+
 ## Builds Status Reports and Badges
 
 | Build Service | Status |
