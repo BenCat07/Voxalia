@@ -88,8 +88,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.BindTexture(TextureTarget.Texture2D, 0);
             BaseTexture.Engine.TheClient.Rendering.SetColor(Color4.White);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, BaseTexture.Engine.TheClient.MainWorldView.cFBO);
-            BaseTexture.Engine.TheClient.MainWorldView.oSetViewport();
             GL.Enable(EnableCap.CullFace);
+            BaseTexture.Engine.TheClient.MainWorldView.FixVP();
         }
 
         public void Destroy()

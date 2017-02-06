@@ -98,14 +98,24 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Viewport(0, 0, Width, Height);
         }
 
+        public int vx;
+        public int vy;
+
         public int vw;
         public int vh;
 
         public void Viewport(int x, int y, int w, int h)
         {
+            vx = x;
+            vy = y;
             vw = w;
             vh = h;
             GL.Viewport(x, y, w, h);
+        }
+
+        public void FixVP()
+        {
+            GL.Viewport(vx, vy, vw, vh);
         }
 
         public void BindFramebuffer(FramebufferTarget fbt, int fbo)
@@ -648,6 +658,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             RS4P.Bind();
             RS4P.Clear();
             RenderingShadows = false;
+            RenderLights = false;
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_SOLID;
             Vector3 maxLit = TheClient.TheRegion.GetSunAdjust().Xyz;
@@ -692,9 +703,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 Viewport(Width / 2, 0, Width / 2, Height);
                 Render3D(this);
-                FBOid = FBOID.FORWARD_EXTRAS;
-                TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
-                DecalRender?.Invoke(this);
                 FBOid = FBOID.FORWARD_SOLID;
                 CFrust = cf2;
                 Viewport(0, 0, Width / 2, Height);
@@ -703,10 +711,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
                 TheClient.s_forw = TheClient.s_forw.Bind();
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
+                Matrix4 orig = PrimaryMatrix;
+                PrimaryMatrix = PrimaryMatrix_OffsetFor3D;
                 Render3D(this);
-                FBOid = FBOID.FORWARD_EXTRAS;
-                TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
-                DecalRender?.Invoke(this);
+                PrimaryMatrix = orig;
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
@@ -779,7 +787,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
                 TheClient.s_forw_trans = TheClient.s_forw_trans.Bind();
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
+                Matrix4 orig = PrimaryMatrix;
+                PrimaryMatrix = PrimaryMatrix_OffsetFor3D;
                 Render3D(this);
+                PrimaryMatrix = orig;
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
@@ -953,7 +964,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
                 TheClient.s_fbo = TheClient.s_fbo.Bind();
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
+                Matrix4 orig = PrimaryMatrix;
+                PrimaryMatrix = PrimaryMatrix_OffsetFor3D;
                 Render3D(this);
+                PrimaryMatrix = orig;
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
@@ -998,7 +1012,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Viewport(0, 0, Width / 2, Height);
                 CameraPos = cameraBasePos - cameraAdjust;
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
+                Matrix4 orig = PrimaryMatrix;
+                PrimaryMatrix = PrimaryMatrix_OffsetFor3D;
                 DecalRender?.Invoke(this);
+                PrimaryMatrix = orig;
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
@@ -1040,7 +1057,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
                 TheClient.s_fbo_refract = TheClient.s_fbo_refract.Bind();
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
+                Matrix4 orig = PrimaryMatrix;
+                PrimaryMatrix = PrimaryMatrix_OffsetFor3D;
                 Render3D(this);
+                PrimaryMatrix = orig;
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
@@ -1540,7 +1560,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 }
                 GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
                 CameraPos = cameraBasePos - cameraAdjust;
+                Matrix4 orig = PrimaryMatrix;
+                PrimaryMatrix = PrimaryMatrix_OffsetFor3D;
                 RenderTransp(ref lightc, cf2);
+                PrimaryMatrix = orig;
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;

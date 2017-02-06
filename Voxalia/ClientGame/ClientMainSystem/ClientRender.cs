@@ -757,8 +757,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         }
                         GL.BindTexture(TextureTarget.Texture2D, TWOD_FBO_Tex);
                         Matrix4 ortho = Matrix4.CreateOrthographicOffCenter(0, Window.Width, 0, Window.Height, -1, 1);
-                        Matrix4 ident = Matrix4.Identity;
-                        GL.UniformMatrix4(40, false, ref ident);
+                        GL.UniformMatrix4(40, false, ref View3D.IdentityMatrix);
                         GL.UniformMatrix4(1, false, ref ortho);
                         Rendering.RenderRectangle(0, 0, Window.Width, Window.Height);
                         GL.BindTexture(TextureTarget.Texture2D, 0);
