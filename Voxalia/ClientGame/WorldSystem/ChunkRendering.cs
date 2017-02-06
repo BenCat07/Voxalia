@@ -623,6 +623,16 @@ namespace Voxalia.ClientGame.WorldSystem
                 OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
                 _VBO.Render(false);
             }
+            if (OwningRegion.TheClient.MainWorldView.FBOid == FBOID.REFRACT)
+            {
+                _VBO = _VBOTransp;
+                if (_VBO != null && _VBO.generated)
+                {
+                    Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(WorldPosition.ToLocation() * CHUNK_SIZE));
+                    OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
+                    _VBO.Render(false);
+                }
+            }
         }
 
         public Chunk SucceededBy = null;
