@@ -615,7 +615,7 @@ namespace Voxalia.ClientGame.WorldSystem
             }
         }
 
-        public void Render()
+        public void ConfigureForRenderChunk()
         {
             TheClient.Rendering.SetColor(OpenTK.Vector4.One);
             TheClient.Rendering.SetMinimumLight(0f);
@@ -629,6 +629,25 @@ namespace Voxalia.ClientGame.WorldSystem
                 GL.BindTexture(TextureTarget.Texture2DArray, TheClient.TBlock.HelpTextureID);
                 GL.ActiveTexture(TextureUnit.Texture0);
             }
+        }
+
+        public void EndChunkRender()
+        {
+            if (TheClient.RenderTextures)
+            {
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.BindTexture(TextureTarget.Texture2DArray, 0);
+                GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2DArray, 0);
+                GL.ActiveTexture(TextureUnit.Texture1);
+                GL.BindTexture(TextureTarget.Texture2DArray, 0);
+                GL.ActiveTexture(TextureUnit.Texture0);
+            }
+        }
+
+        public void Render()
+        {
+            ConfigureForRenderChunk();
             /*foreach (Chunk chunk in LoadedChunks.Values)
             {
                 if (TheClient.CFrust == null || TheClient.CFrust.ContainsBox(chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE,
@@ -668,6 +687,10 @@ namespace Voxalia.ClientGame.WorldSystem
                     }
                 }
             }
+            else if (TheClient.MainWorldView.FBOid.IsMainTransp() || TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
+            {
+                // Do nothing.
+            }
             else
             {
                 foreach (Chunk ch in chToRender)
@@ -675,16 +698,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     ch.Render();
                 }
             }
-            if (TheClient.RenderTextures)
-            {
-                GL.BindTexture(TextureTarget.Texture2D, 0);
-                GL.BindTexture(TextureTarget.Texture2DArray, 0);
-                GL.ActiveTexture(TextureUnit.Texture2);
-                GL.BindTexture(TextureTarget.Texture2DArray, 0);
-                GL.ActiveTexture(TextureUnit.Texture1);
-                GL.BindTexture(TextureTarget.Texture2DArray, 0);
-                GL.ActiveTexture(TextureUnit.Texture0);
-            }
+            EndChunkRender();
         }
 
         public List<Chunk> chToRender = new List<Chunk>();
@@ -716,7 +730,6 @@ namespace Voxalia.ClientGame.WorldSystem
                 Chunk chcur = GetChunk(cur);
                 if (chcur != null)
                 {
-                    chcur.Render();
                     chToRender.Add(chcur);
                 }
                 for (int i = 0; i < MoveDirs.Length; i++)

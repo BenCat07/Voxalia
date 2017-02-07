@@ -649,7 +649,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void sortEntities()
         {
-            TheRegion.Entities = TheRegion.Entities.OrderBy(o => (o.GetPosition().DistanceSquared(MainWorldView.RenderRelative))).ToList();
+            TheRegion.Entities = TheRegion.Entities.OrderBy((o) => o.GetPosition().DistanceSquared(MainWorldView.RenderRelative)).ToList();
         }
 
         /// <summary>
@@ -1522,12 +1522,53 @@ namespace Voxalia.ClientGame.ClientMainSystem
             //GL.Disable(EnableCap.PolygonOffsetFill);
         }
 
+        public class ChunkEntity : Entity
+        {
+            public ChunkEntity(Chunk tchunk)
+                : base(tchunk.OwningRegion, false, false)
+            {
+                MainChunk = tchunk;
+            }
+
+            public Chunk MainChunk;
+
+            public override void Render()
+            {
+                TheClient.SetVox();
+                TheRegion.ConfigureForRenderChunk();
+                MainChunk.Render();
+                TheRegion.EndChunkRender();
+                TheClient.SetEnts();
+            }
+
+            public override BEPUutilities.Quaternion GetOrientation()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void SetOrientation(BEPUutilities.Quaternion quat)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override Location GetPosition()
+            {
+                return MainChunk.WorldPosition.ToLocation() * Constants.CHUNK_WIDTH;
+            }
+
+            public override void SetPosition(Location pos)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         /// <summary>
         /// Renders the 3D world upon instruction from the internal view render code.
         /// </summary>
         /// <param name="view">The view to render.</param>
         public void Render3D(View3D view)
         {
+            bool transparents = MainWorldView.FBOid.IsMainTransp() || MainWorldView.FBOid == FBOID.FORWARD_TRANSP;
             GL.Enable(EnableCap.CullFace);
             if (view.ShadowsOnly)
             {
@@ -1555,9 +1596,26 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     s_forw.Bind();
                 }
                 SetEnts();
-                for (int i = 0; i < TheRegion.Entities.Count; i++)
+                if (transparents)
                 {
-                    TheRegion.Entities[i].Render();
+                    List<Entity> entsRender = new List<Entity>(TheRegion.Entities);
+                    foreach (Chunk ch in TheRegion.chToRender)
+                    {
+                        entsRender.Add(new ChunkEntity(ch));
+                    }
+                    Location pos = Player.GetPosition();
+                    IEnumerable<Entity> ents = entsRender.OrderBy((e) => e.GetPosition().DistanceSquared(MainWorldView.RenderRelative));
+                    foreach (Entity ent in ents)
+                    {
+                        ent.Render();
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < TheRegion.Entities.Count; i++)
+                    {
+                        TheRegion.Entities[i].Render();
+                    }
                 }
                 SetEnts();
                 if (CVars.g_weathermode.ValueI > 0)
@@ -1588,12 +1646,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
             }
             SetEnts();
-            isVox = false;
-            SetVox();
-            TheRegion.Render();
-            SetEnts();
-            TheRegion.RenderPlants();
-            if (!view.ShadowsOnly)
+            if (!transparents)
+            {
+                isVox = false;
+                SetVox();
+                TheRegion.Render();
+                SetEnts();
+                TheRegion.RenderPlants();
+            }
+            else if (!view.ShadowsOnly)
             {
                 GL.ActiveTexture(TextureUnit.Texture1);
                 Textures.NormalDef.Bind();
