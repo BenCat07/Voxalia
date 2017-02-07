@@ -57,13 +57,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         TheClient.LocalServer = new Server(28010);
                         Server.Central = TheClient.LocalServer;
                         TheClient.ShowLoading();
-                        Task.Factory.StartNew(() =>
+                        TheClient.Schedule.StartAsyncTask(() =>
                         {
                             try
                             {
                                 TheClient.LocalServer.StartUp(str, () =>
                                 {
-                                    TheClient.Network.Connect("localhost", "28010", false, str);
+                                    TheClient.Schedule.ScheduleSyncTask(() =>
+                                    {
+                                        TheClient.Network.Connect("localhost", "28010", false, str);
+                                    }, 1.0);
                                 });
                             }
                             catch (Exception ex)
