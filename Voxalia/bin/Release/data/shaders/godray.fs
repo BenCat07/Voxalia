@@ -44,7 +44,7 @@ vec4 regularize(in vec4 input_r) // TODO: Is this working the best it can?
 void main()
 {
 	vec4 grinp = vec4(0.0);
-	float fsize = 0.2 * exposure;
+	float fsize = 0.11 * exposure; // TODO: 0.2 WAY too strong, 0.1 too weak...
 	for (float fx = -fsize; fx <= fsize; fx += 0.02)
 	{
 		for (float fy = -fsize; fy <= fsize; fy += 0.02)
