@@ -89,12 +89,19 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public void Destroy()
         {
             GL.DeleteFramebuffer(fbo);
+            View3D.CheckError("RS4P - Destroy - 0.1");
             GL.DeleteTexture(DiffuseTexture);
+            View3D.CheckError("RS4P - Destroy - 0.2");
             GL.DeleteTexture(PositionTexture);
+            View3D.CheckError("RS4P - Destroy - 0.3");
             GL.DeleteTexture(NormalsTexture);
+            View3D.CheckError("RS4P - Destroy - 0.5");
             GL.DeleteTexture(DepthTexture);
+            View3D.CheckError("RS4P - Destroy - 0.6");
             GL.DeleteTexture(RenderhintTexture);
+            View3D.CheckError("RS4P - Destroy - 0.7");
             GL.DeleteTexture(Rh2Texture);
+            View3D.CheckError("RS4P - Destroy");
         }
 
         public void Bind()

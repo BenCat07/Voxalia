@@ -101,6 +101,7 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             {
                 TextFont.DrawColoredText(tt, new Location(GetX() + xoff, GetY() + yoff, 0), int.MaxValue, 1, false, BColor);
             }
+            View3D.CheckError("RenderScreen - TextLink");
         }
     }
 }

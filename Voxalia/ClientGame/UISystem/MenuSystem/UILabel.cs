@@ -50,6 +50,7 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
                 TheClient.Rendering.SetColor(Vector4.One);
             }
             TextFont.DrawColoredText(tex, new Location(bx, by, 0), int.MaxValue, 1, false, BColor);
+            View3D.CheckError("RenderScreen - Label");
         }
     }
 }

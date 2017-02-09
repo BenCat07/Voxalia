@@ -709,6 +709,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 gFPS_Min = gFPS_Min == 0 ? gfps : Math.Min(gFPS_Min, gfps);
                 gFPS_Max = Math.Max(gFPS_Max, gfps);
                 gTicks++;
+                View3D.CheckError("RenderFrame - Start");
                 if (Window.Visible && Window.WindowState != WindowState.Minimized && Window.Width > 10 && Window.Height > 10)
                 {
                     try
@@ -722,12 +723,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         {
                             TWOD_CFrame = 0;
                             Establish2D();
+                            View3D.CheckError("RenderFrame - Establish");
                             GL.Disable(EnableCap.CullFace);
                             GL.BindFramebuffer(FramebufferTarget.Framebuffer, TWOD_FBO);
                             GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
                             GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0, 0, 0, 0 });
                             Shaders.ColorMultShader.Bind();
                             GL.Uniform1(6, (float)GlobalTickTimeLocal);
+                            View3D.CheckError("RenderFrame - Setup2D");
                             if (CVars.r_3d_enable.ValueB || VR != null)
                             {
                                 GL.Viewport(Window.Width / 2, 0, Window.Width / 2, Window.Height);
@@ -740,8 +743,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             {
                                 Draw2DEnv();
                             }
+                            View3D.CheckError("RenderFrame - 2DEnv");
                             UIConsole.Draw();
                         }
+                        View3D.CheckError("RenderFrame - Basic");
                         GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                         GL.DrawBuffer(DrawBufferMode.Back);
                         Shaders.ColorMultShader.Bind();
@@ -755,11 +760,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             GL.BindTexture(TextureTarget.Texture2D, MainWorldView.CurrentFBOTexture);
                             Rendering.RenderRectangle(-1, -1, 1, 1);
                         }
+                        View3D.CheckError("RenderFrame - VR");
                         GL.BindTexture(TextureTarget.Texture2D, TWOD_FBO_Tex);
                         Matrix4 ortho = Matrix4.CreateOrthographicOffCenter(0, Window.Width, 0, Window.Height, -1, 1);
                         GL.UniformMatrix4(40, false, ref View3D.IdentityMatrix);
                         GL.UniformMatrix4(1, false, ref ortho);
                         Rendering.RenderRectangle(0, 0, Window.Width, Window.Height);
+                        View3D.CheckError("RenderFrame - TWOD");
                         GL.BindTexture(TextureTarget.Texture2D, 0);
                         GL.Enable(EnableCap.CullFace);
                         GL.Enable(EnableCap.DepthTest);
@@ -769,11 +776,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         SysConsole.Output(OutputType.ERROR, "Rendering (general): " + ex.ToString());
                     }
                 }
+                View3D.CheckError("PreTick");
                 Stopwatch timer = new Stopwatch();
                 try
                 {
                     timer.Start();
                     tick(e.Time);
+                    View3D.CheckError("Tick");
                     timer.Stop();
                     TickTime = (double)timer.ElapsedMilliseconds / 1000f;
                     if (TickTime > TickSpikeTime)
@@ -1655,6 +1664,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     Rendering.SetMinimumLight(1f);
                 }
             }
+            View3D.CheckError("Rendering - 1");
             SetEnts();
             if (!transparents)
             {
@@ -1677,6 +1687,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Textures.NormalDef.Bind();
                 GL.ActiveTexture(TextureUnit.Texture0);
             }
+            View3D.CheckError("Rendering - 2");
             if (view.FBOid == FBOID.STATIC_SHADOWS)
             {
                 return;
@@ -1730,6 +1741,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Rendering.SetColor(Color4.White);
             }
             RenderVR();
+            View3D.CheckError("Rendering - 3");
             Textures.White.Bind();
             Rendering.SetMinimumLight(1);
             TheRegion.RenderEffects();
@@ -1801,6 +1813,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     }
                 }
             }
+            View3D.CheckError("Rendering - 4");
             Rendering.SetColor(Color4.White);
             Rendering.SetMinimumLight(0);
             Textures.White.Bind();
@@ -1811,6 +1824,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.ActiveTexture(TextureUnit.Texture0);
                 Render2D(true);
             }
+            View3D.CheckError("Rendering - 5");
         }
 
         /// <summary>

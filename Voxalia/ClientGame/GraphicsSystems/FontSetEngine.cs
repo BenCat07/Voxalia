@@ -198,6 +198,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             int _ucolor = DefaultColor, int _scolor = DefaultColor, int _ocolor = DefaultColor, int _hcolor = DefaultColor, int _ecolor = DefaultColor,
             bool _super = false, bool _sub = false, bool _flip = false, bool _pseudo = false, bool _jello = false, bool _obfu = false, bool _random = false, bool _shadow = false, GLFont _font = null)
         {
+            View3D.CheckError("Render FontSet - Pre");
             r_depth++;
             if (r_depth >= 100 && Text != "{{Recursion error}}")
             {
@@ -535,8 +536,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             TextVBO cVBO = new TextVBO(Engine.GLFonts);
             Engine.GLFonts.Shaders.TextCleanerShader.Bind();
             GL.UniformMatrix4(1, false, ref Client.Central.Ortho); // TODO: Pass Client reference
-            Matrix4 ident = Matrix4.Identity;
-            GL.UniformMatrix4(2, false, ref ident);
+            //Matrix4 ident = Matrix4.Identity;
+            //GL.UniformMatrix4(2, false, ref ident);
             Vector3 col = new Vector3(1, 1, 1);
             GL.Uniform3(3, ref col);
             if (lines.Length <= 1)
@@ -586,6 +587,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Engine.GLFonts.Shaders.ColorMultShader.Bind();
             r_depth--;
             cVBO.Destroy();
+            View3D.CheckError("Render FontSet");
         }
 
         public string GrabAllColors(string input)

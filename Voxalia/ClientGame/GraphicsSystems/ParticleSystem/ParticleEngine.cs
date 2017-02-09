@@ -181,6 +181,10 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 {
                     TheClient.s_forw_particles = TheClient.s_forw_particles.Bind();
                     GL.Uniform4(4, new Vector4(TheClient.MainWorldView.Width, TheClient.MainWorldView.Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
+                    GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+                    GL.Uniform4(12, new Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
+                    GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+                    GL.Uniform1(14, TheClient.ZFar());
                 }
                 else
                 {
@@ -210,13 +214,10 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     GL.ActiveTexture(TextureUnit.Texture1);
                     GL.BindTexture(TextureTarget.Texture2D, TheClient.MainWorldView.RS4P.DepthTexture);
                 }
+                View3D.CheckError("Rendering - Particles - 1");
                 GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
                 Matrix4 ident = Matrix4.Identity;
                 GL.UniformMatrix4(2, false, ref ident);
-                GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
-                GL.Uniform4(12, new Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
-                GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
-                GL.Uniform1(14, TheClient.ZFar());
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, TextureID);
                 Vector3[] posset = pos.ToArray();
@@ -227,6 +228,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 {
                     posind[i] = i;
                 }
+                View3D.CheckError("Rendering - Particles - 2");
                 Part_C = posind.Length;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Part_VBO_Pos);
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * OpenTK.Vector3.SizeInBytes), posset, BufferUsageHint.StaticDraw);
@@ -259,6 +261,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 GL.BindTexture(TextureTarget.Texture2D, 0);
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
+                View3D.CheckError("Rendering - Particles - 3");
             }
         }
     }

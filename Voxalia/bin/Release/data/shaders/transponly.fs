@@ -45,6 +45,7 @@ const int LIGHTS_MAX = 10; // How many lights we can ever have.
 
 layout (location = 4) uniform float desaturationAmount = 1.0;
 layout (location = 5) uniform float minimum_light;
+// ...
 layout (location = 8) uniform vec2 u_screensize = vec2(1024, 1024);
 layout (location = 9) uniform mat4 lights_used_helper;
 layout (location = 10) uniform mat4 shadow_matrix_array[LIGHTS_MAX];

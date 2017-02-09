@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenTK;
 using Voxalia.Shared;
+using Voxalia.ClientGame.GraphicsSystems;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -21,6 +22,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public void RenderLoader(float x, float y, float size, double delta)
         {
             RenderLoadIconV2(x, y, size, delta);
+            View3D.CheckError("RenderLoader");
         }
 
         const float LI1_SPOKE_REL = 1.0f / 16.0f;

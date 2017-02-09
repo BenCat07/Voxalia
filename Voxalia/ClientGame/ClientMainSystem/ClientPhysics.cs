@@ -14,6 +14,7 @@ using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared.Collision;
+using Voxalia.ClientGame.GraphicsSystems;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -91,16 +92,21 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 ThePlanet.Destroy();
                 MainWorldView.Lights.Remove(ThePlanet);
             }
+            View3D.CheckError("Load - World - Deletes");
             int wid = CVars.r_shadowquality.ValueI;
             TheSun = new SkyLight(Location.Zero, MaximumStraightBlockDistance() * 2, SunLightDef, new Location(0, 0, -1), MaximumStraightBlockDistance() * 2 + Chunk.CHUNK_SIZE * 2, false, wid);
             MainWorldView.Lights.Add(TheSun);
+            View3D.CheckError("Load - World - Sun");
             // TODO: Separate cloud quality CVar?
             TheSunClouds = new SkyLight(Location.Zero, MaximumStraightBlockDistance() * 2, CloudSunLightDef, new Location(0, 0, -1), MaximumStraightBlockDistance() * 2 + Chunk.CHUNK_SIZE * 2, true, wid);
             MainWorldView.Lights.Add(TheSunClouds);
+            View3D.CheckError("Load - World - Clouds");
             // TODO: Separate planet quality CVar?
             ThePlanet = new SkyLight(Location.Zero, MaximumStraightBlockDistance() * 2, PlanetLightDef, new Location(0, 0, -1), MaximumStraightBlockDistance() * 2 + Chunk.CHUNK_SIZE * 2, false, wid);
             MainWorldView.Lights.Add(ThePlanet);
+            View3D.CheckError("Load - World - Planet");
             onCloudShadowChanged(null, null);
+            View3D.CheckError("Load - World - Changed");
         }
 
         /// <summary>
