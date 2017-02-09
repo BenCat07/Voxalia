@@ -1585,6 +1585,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     for (int i = 0; i < TheRegion.ShadowCasters.Count; i++)
                     {
+                        if (view.FBOid == FBOID.DYNAMIC_SHADOWS && ((TheRegion.ShadowCasters[i] as PhysicsEntity)?.GenBlockShadows).GetValueOrDefault(false))
+                        {
+                            continue;
+                        }
                         TheRegion.ShadowCasters[i].Render();
                     }
                 }
