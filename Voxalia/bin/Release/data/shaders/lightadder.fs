@@ -14,7 +14,7 @@
 layout (binding = 1) uniform sampler2D positiontex; // The G-Buffer positions texture.
 layout (binding = 2) uniform sampler2D normaltex; // The G-Buffer normals texture.
 // ...
-layout (binding = 4) uniform sampler2DArray shadowtex; // The shadow map for the current light.
+layout (binding = 4) uniform sampler2DArray shadowtex; // The shadow maps for the current lights.
 layout (binding = 5) uniform sampler2D renderhinttex; // Rendering hint texture (x is specular strength, z is ambient light strength).
 layout (binding = 6) uniform sampler2D diffusetex; // The diffuse texture (G-Buffer colors).
 
@@ -43,6 +43,7 @@ float fix_sqr(in float inTemp)
 
 void main() // Let's put all code in main, why not...
 {
+	color = texture(shadowtex, vec3(f.texcoord, 2.0));return;
 	vec3 res_color = vec3(0.0);
 	float aff = 0.0;
 	// Gather all the texture information.

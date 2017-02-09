@@ -174,6 +174,7 @@ vec4 getColor(in vec2 pos, in float exposure, in float mblen) // Grab the color 
 
 void main() // The central entry point of the shader. Handles everything!
 {
+	color = texture(lighttex, f_texcoord);return;
 	vec2 hdr_data = getHDRValue(); // Grab HDR values.
 	float mblen = dot(mot_blur, mot_blur) <= 0.0001 ? 0.0001 : length(mot_blur);
 	vec4 light_color = vec4(getColor(f_texcoord, hdr_data.x, mblen).xyz, 1.0); // Grab the basic color of our pixel.

@@ -880,17 +880,19 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     {
                                         SysConsole.Output(OutputType.DEBUG, "Render a sky light!" + i);
                                         sky.InternalLights[0].NeedsUpdate = false;
-                                        BindFramebuffer(FramebufferTarget.Framebuffer, sky.FBO);
-                                        GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                        DrawBuffer(DrawBufferMode.ColorAttachment0);
                                         GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
-                                        FBOid = FBOID.STATIC_SHADOWS;
+                                        GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+                                        FBOid = FBOID.SHADOWS;
                                         Render3D(this);
                                     }
-                                    BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                    /*BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
                                     GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, sky.FBO);
-                                    GL.BlitFramebuffer(0, 0, sky.TexWidth, sky.TexWidth, 0, 0, sp, sp, ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                                    GL.BlitFramebuffer(0, 0, sky.TexWidth, sky.TexWidth, 0, 0, sp, sp, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);*/
                                     if (TheClient.CVars.r_dynamicshadows.ValueB)
                                     {
+                                        GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
                                         FBOid = FBOID.DYNAMIC_SHADOWS;
                                         Render3D(this);
                                     }
@@ -1968,7 +1970,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public static bool IsSolid(this FBOID id)
         {
-            return id == FBOID.SHADOWS || id == FBOID.FORWARD_SOLID || id == FBOID.REFRACT || id == FBOID.MAIN;
+            return id == FBOID.SHADOWS || id == FBOID.STATIC_SHADOWS || id == FBOID.DYNAMIC_SHADOWS || id == FBOID.FORWARD_SOLID || id == FBOID.REFRACT || id == FBOID.MAIN;
         }
     }
 }

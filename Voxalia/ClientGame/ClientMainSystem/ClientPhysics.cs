@@ -185,13 +185,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 if (playerChunkPos != SunChunkPos) // TODO: Or sun/planet angle changed!
                 {
                     SunChunkPos = playerChunkPos;
+                    Location corPos = (SunChunkPos.ToLocation() * Constants.CHUNK_WIDTH) + new Location(Constants.CHUNK_WIDTH * 0.5);
                     TheSun.Direction = Utilities.ForwardVector_Deg(SunAngle.Yaw, SunAngle.Pitch);
-                    TheSun.Reposition(Player.GetPosition().GetBlockLocation() - TheSun.Direction * 30 * 6);
+                    TheSun.Reposition(corPos - TheSun.Direction * 30 * 6);
                     TheSunClouds.Direction = TheSun.Direction;
                     TheSunClouds.Reposition(TheSun.EyePos);
                     PlanetDir = Utilities.ForwardVector_Deg(PlanetAngle.Yaw, PlanetAngle.Pitch);
                     ThePlanet.Direction = PlanetDir;
-                    ThePlanet.Reposition(Player.GetPosition().GetBlockLocation() - ThePlanet.Direction * 30 * 6);
+                    ThePlanet.Reposition(corPos - ThePlanet.Direction * 30 * 6);
                     Quaternion diff;
                     Vector3 tsd = TheSun.Direction.ToBVector();
                     Vector3 tpd = PlanetDir.ToBVector();
