@@ -676,7 +676,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     }
                 }
             }
-            else if (TheClient.MainWorldView.FBOid == FBOID.SHADOWS)
+            else if (TheClient.MainWorldView.FBOid == FBOID.SHADOWS || TheClient.MainWorldView.FBOid == FBOID.STATIC_SHADOWS)
             {
                 foreach (Chunk ch in LoadedChunks.Values)
                 {
