@@ -43,7 +43,6 @@ float fix_sqr(in float inTemp)
 
 void main() // Let's put all code in main, why not...
 {
-	color = texture(shadowtex, vec3(f.texcoord, 2.0));return;
 	vec3 res_color = vec3(0.0);
 	float aff = 0.0;
 	// Gather all the texture information.
