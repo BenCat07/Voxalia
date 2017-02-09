@@ -501,7 +501,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public static void CheckError(string loc)
         {
-#if !DEBUG
+#if DEBUG
             ErrorCode ec = GL.GetError();
             while (ec != ErrorCode.NoError)
             {
@@ -889,9 +889,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 SkyLight sky = Lights[i] as SkyLight;
                                 if (sky != null)
                                 {
-                                    if (redraw || sky.InternalLights[0].NeedsUpdate || true)
+                                    if (redraw || sky.InternalLights[0].NeedsUpdate)
                                     {
-                                        SysConsole.Output(OutputType.DEBUG, "Render a sky light!" + i);
                                         sky.InternalLights[0].NeedsUpdate = false;
                                         BindFramebuffer(FramebufferTarget.Framebuffer, sky.FBO);
                                         DrawBuffer(DrawBufferMode.ColorAttachment0);
@@ -906,7 +905,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
                                     if (TheClient.CVars.r_dynamicshadows.ValueB)
                                     {
-                                        GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
                                         GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
                                         FBOid = FBOID.DYNAMIC_SHADOWS;
                                         Render3D(this);
