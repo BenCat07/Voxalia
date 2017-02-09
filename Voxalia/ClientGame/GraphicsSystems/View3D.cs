@@ -817,6 +817,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             if (TheClient.shouldRedrawShadows && ShadowingAllowed)
             {
+                bool redraw = TheClient.TheRegion.AnyChunksRendered;
+                TheClient.TheRegion.AnyChunksRendered = false;
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
                 TheClient.s_shadow = TheClient.s_shadow.Bind();
@@ -858,7 +860,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 Lights[i].InternalLights[x].SetProj();
                                 GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
                                 GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
-                                FBOid = FBOID.SHADOWS;
                                 TheClient.s_shadow_grass = TheClient.s_shadow_grass.Bind();
                                 SetMatrix(2, Matrix4d.Identity);
                                 GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
@@ -870,12 +871,38 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
                                 TranspShadows = Lights[i].InternalLights[x].transp;
                                 Lights[i].InternalLights[x].SetProj();
-                                BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
                                 DrawBuffer(DrawBufferMode.ColorAttachment0);
-                                GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
-                                GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
                                 GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
-                                Render3D(this);
+                                SkyLight sky = Lights[i] as SkyLight;
+                                if (sky != null)
+                                {
+                                    if (redraw || sky.InternalLights[0].NeedsUpdate || true)
+                                    {
+                                        SysConsole.Output(OutputType.DEBUG, "Render a sky light!" + i);
+                                        sky.InternalLights[0].NeedsUpdate = false;
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, sky.FBO);
+                                        GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+                                        GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
+                                        FBOid = FBOID.STATIC_SHADOWS;
+                                        Render3D(this);
+                                    }
+                                    BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                    GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, sky.FBO);
+                                    GL.BlitFramebuffer(0, 0, sky.TexWidth, sky.TexWidth, 0, 0, sp, sp, ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                                    if (TheClient.CVars.r_dynamicshadows.ValueB)
+                                    {
+                                        FBOid = FBOID.DYNAMIC_SHADOWS;
+                                        Render3D(this);
+                                    }
+                                }
+                                else // TODO: lights[i].ShouldCastShadows?
+                                {
+                                    BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                    GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+                                    GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
+                                    FBOid = FBOID.SHADOWS;
+                                    Render3D(this);
+                                }
                                 FBOid = FBOID.NONE;
                                 n++;
                                 if (n >= LIGHTS_MAX)
@@ -1919,6 +1946,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         MAIN_EXTRAS = 2,
         TRANSP_UNLIT = 3,
         SHADOWS = 4,
+        STATIC_SHADOWS = 5,
+        DYNAMIC_SHADOWS = 6,
         TRANSP_LIT = 7,
         TRANSP_SHADOWS = 8,
         TRANSP_LL = 12,

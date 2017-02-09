@@ -1067,6 +1067,7 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             lock (RenderingNow)
             {
+                AnyChunksRendered = true;
                 RenderingNow.Remove(ch.WorldPosition);
             }
         }
@@ -1087,6 +1088,8 @@ namespace Voxalia.ClientGame.WorldSystem
                 return false;
             }
         }
+
+        public bool AnyChunksRendered = true;
 
         public void DoNotRenderYet(Chunk ch)
         {

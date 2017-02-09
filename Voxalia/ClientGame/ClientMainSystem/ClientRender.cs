@@ -1220,7 +1220,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 s_forw_vox_trans = s_forw_vox_trans.Bind();
                 GL.BindTexture(TextureTarget.Texture2DArray, TBlock.TextureID);
             }
-            else if (MainWorldView.FBOid == FBOID.SHADOWS)
+            else if (MainWorldView.FBOid == FBOID.SHADOWS || MainWorldView.FBOid == FBOID.STATIC_SHADOWS || MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
             {
                 s_shadowvox = s_shadowvox.Bind();
                 GL.BindTexture(TextureTarget.Texture2DArray, TBlock.TextureID);
@@ -1341,7 +1341,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 s_fbodecal = s_fbodecal.Bind();
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
-            else if (MainWorldView.FBOid == FBOID.SHADOWS)
+            else if (MainWorldView.FBOid == FBOID.SHADOWS || MainWorldView.FBOid == FBOID.STATIC_SHADOWS || MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
             {
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
                 s_shadow = s_shadow.Bind();
@@ -1572,9 +1572,19 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.Enable(EnableCap.CullFace);
             if (view.ShadowsOnly)
             {
-                for (int i = 0; i < TheRegion.ShadowCasters.Count; i++)
+                if (view.FBOid != FBOID.STATIC_SHADOWS)
                 {
-                    TheRegion.ShadowCasters[i].Render();
+                    for (int i = 0; i < TheRegion.ShadowCasters.Count; i++)
+                    {
+                        TheRegion.ShadowCasters[i].Render();
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < TheRegion.GenShadowCasters.Length; i++)
+                    {
+                        TheRegion.GenShadowCasters[i].Render();
+                    }
                 }
             }
             else
@@ -1648,10 +1658,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SetEnts();
             if (!transparents)
             {
-                isVox = false;
-                SetVox();
-                TheRegion.Render();
-                SetEnts();
+                if (view.FBOid != FBOID.DYNAMIC_SHADOWS)
+                {
+                    isVox = false;
+                    SetVox();
+                    TheRegion.Render();
+                    SetEnts();
+                }
                 TheRegion.RenderPlants();
             }
             else if (!view.ShadowsOnly)
@@ -1663,6 +1676,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.ActiveTexture(TextureUnit.Texture1);
                 Textures.NormalDef.Bind();
                 GL.ActiveTexture(TextureUnit.Texture0);
+            }
+            if (view.FBOid == FBOID.STATIC_SHADOWS)
+            {
+                return;
             }
             Textures.White.Bind();
             Location itemSource = Player.ItemSource();

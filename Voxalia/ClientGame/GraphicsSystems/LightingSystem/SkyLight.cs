@@ -6,9 +6,12 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.Shared;
 using OpenTK;
 using Voxalia.ClientGame.OtherSystems;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Voxalia.ClientGame.GraphicsSystems.LightingSystem
 {
@@ -22,7 +25,13 @@ namespace Voxalia.ClientGame.GraphicsSystems.LightingSystem
 
         float Width;
 
-        public SkyLight(Location pos, float radius, Location col, Location dir, float size, bool transp)
+        public int FBO = -1;
+        public int FBO_Tex = -1;
+        public int FBO_DepthTex = -1;
+
+        public int TexWidth = 0;
+
+        public SkyLight(Location pos, float radius, Location col, Location dir, float size, bool transp, int twidth)
         {
             EyePos = pos;
             Radius = radius;
@@ -41,11 +50,34 @@ namespace Voxalia.ClientGame.GraphicsSystems.LightingSystem
             Direction = dir;
             InternalLights[0].Create(ClientUtilities.ConvertD(pos), ClientUtilities.ConvertD(pos + dir), Width, Radius, ClientUtilities.Convert(Color));
             MaxDistance = radius;
+            TexWidth = twidth;
+            FBO = GL.GenFramebuffer();
+            FBO_Tex = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, FBO_Tex);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, TexWidth, TexWidth, 0, PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            FBO_DepthTex = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, FBO_DepthTex);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32, TexWidth, TexWidth, 0, PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, FBO);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, FBO_Tex, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, FBO_DepthTex, 0);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
 
         public void Destroy()
         {
             InternalLights[0].Destroy();
+            GL.DeleteFramebuffer(FBO);
+            GL.DeleteTexture(FBO_Tex);
+            GL.DeleteTexture(FBO_DepthTex);
         }
 
         public override void Reposition(Location pos)
