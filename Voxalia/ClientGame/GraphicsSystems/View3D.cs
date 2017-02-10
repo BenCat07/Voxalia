@@ -1852,6 +1852,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 CheckError("PreRenderTranspLights - 1.5");
                 Matrix4 mat_lhelp = new Matrix4(c, TheClient.CVars.r_znear.ValueF, TheClient.ZFar(), Width, Height, 0, 0, 0, 0, 0, 0, 0, (float)FogCol.X, (float)FogCol.Y, (float)FogCol.Z, FogAlpha);
                 GL.UniformMatrix4(2, false, ref IdentityMatrix);
+                GL.Uniform1(4, DesaturationAmount);
                 //GL.Uniform1(7, (float)TheClient.GlobalTickTimeLocal);
                 GL.Uniform2(8, new Vector2(Width, Height));
                 CheckError("PreRenderTranspLights - 1.75");
