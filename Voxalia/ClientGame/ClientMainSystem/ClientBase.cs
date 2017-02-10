@@ -699,12 +699,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             CVars.r_width.Set(((int)(Window.ClientSize.Width / DPIScale)).ToString());
             CVars.r_height.Set(((int)(Window.ClientSize.Height / DPIScale)).ToString());
-            Schedule.ScheduleSyncTask(windowupdatehandle);
+            if (!tryingUpdate)
+            {
+                Schedule.ScheduleSyncTask(windowupdatehandle);
+                tryingUpdate = true;
+            }
             if (ChatBottomLastTick)
             {
                 ChatScrollToBottom();
             }
         }
+
+        bool tryingUpdate = false;
 
         /// <summary>
         /// Called to update the window to match CVars.
@@ -733,6 +739,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         void windowupdatehandle()
         {
+            tryingUpdate = false;
             if (Window.Width < 10 || Window.Height < 10)
             {
                 return;
