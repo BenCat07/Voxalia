@@ -18,7 +18,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
     {
         public virtual Material SurfaceBlock()
         {
-            return Material.GRASS_FOREST;
+            return Material.GRASS_FOREST_TALL;
         }
 
         public virtual Material SecondLayerBlock()

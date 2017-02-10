@@ -2,7 +2,6 @@ Name=Grass_Plains
 Sound=GRASS
 BreakTime=1
 Breaker=SHOVEL
-Plant=blocks/transparent/tallgrass
 TextureBasic=blocks/solid/natural/grass_plains_side
 Texture_TOP=blocks/solid/natural/grass_plains
 Texture_BOTTOM=blocks/solid/natural/dirt
