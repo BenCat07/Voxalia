@@ -425,16 +425,67 @@ namespace Voxalia.ServerGame.WorldSystem
             ch.SetBlockAt(x, y, z, bi);
             ch.LastEdited = GlobalTickTime;
             ch.Flags |= ChunkFlags.NEEDS_DETECT;
-            ch.ChunkDetect(); // TODO: Make this optional?
+            ch.ChunkDetect();
             TryPushOne(pos, mat);
-            // TODO: See if this makes any new chunks visible!
             if (broadcast)
             {
-                // TODO: Send per-person based on chunk awareness details
                 ChunkSendToAll(new BlockEditPacketOut(new Location[] { pos }, new ushort[] { bi._BlockMaterialInternal }, new byte[] { dat }, new byte[] { paint }), ch.WorldPosition);
             }
         }
-        
+
+        public void MassBlockEdit(Location[] locs, BlockInternal[] bis, bool override_protection = false)
+        {
+            try
+            {
+                Dictionary<Vector3i, Chunk> chunksEdited = new Dictionary<Vector3i, Chunk>();
+                for (int i = 0; i < locs.Length; i++)
+                {
+                    Location pos = locs[i];
+                    Chunk ch;
+                    Vector3i cl = ChunkLocFor(pos);
+                    if (!chunksEdited.TryGetValue(cl, out ch))
+                    {
+                        ch = LoadChunk(cl);
+                        chunksEdited[cl] = ch;
+                    }
+                    int x = (int)Math.Floor(pos.X) - (int)cl.X * Chunk.CHUNK_SIZE;
+                    int y = (int)Math.Floor(pos.Y) - (int)cl.Y * Chunk.CHUNK_SIZE;
+                    int z = (int)Math.Floor(pos.Z) - (int)cl.Z * Chunk.CHUNK_SIZE;
+                    if (!override_protection && ((BlockFlags)ch.GetBlockAt(x, y, z).BlockLocalData).HasFlag(BlockFlags.PROTECTED))
+                    {
+                        return;
+                    }
+                    ch.SetBlockAt(x, y, z, bis[i]);
+                }
+                foreach (KeyValuePair<Vector3i, Chunk> pair in chunksEdited)
+                {
+                    pair.Value.LastEdited = GlobalTickTime;
+                    pair.Value.Flags |= ChunkFlags.NEEDS_DETECT;
+                    pair.Value.ChunkDetect();
+                    PushNewChunkDetailsToUpperArea(pair.Value);
+                    ChunkUpdateForAll(pair.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.CheckException(ex);
+                SysConsole.Output("Running a mass block edit", ex);
+            }
+        }
+
+        public void ChunkUpdateForAll(Chunk chk)
+        {
+            for (int i = 0; i < Players.Count; i++)
+            {
+                int lod;
+                if (Players[i].CanSeeChunk(chk.WorldPosition, out lod))
+                {
+                    Players[i].Network.SendPacket(new ChunkInfoPacketOut(chk, lod));
+                }
+            }
+        }
+
+
         /// <summary>
         /// Breaks a block naturally.
         /// </summary>

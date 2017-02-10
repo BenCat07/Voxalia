@@ -6,6 +6,9 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
+using System.Linq;
+using System.Collections.Generic;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.WorldSystem;
@@ -34,12 +37,20 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
                 return;
             }
             Location start = entry.Player.GetPosition().GetBlockLocation() + new Location(0, 0, 1);
-            FloodFrom(entry.Player.TheRegion, start, start, chosenMat, maxRad);
+            HashSet<Location> locs = new HashSet<Location>();
+            FloodFrom(entry.Player.TheRegion, start, start, maxRad, locs);
+            Location[] tlocs = locs.ToArray();
+            BlockInternal[] bis = new BlockInternal[tlocs.Length];
+            for (int i = 0; i < bis.Length; i++)
+            {
+                bis[i] = new BlockInternal((ushort)chosenMat, 0, 0, (byte)BlockFlags.EDITED);
+            }
+            entry.Player.TheRegion.MassBlockEdit(tlocs, bis, false);
         }
 
         Location[] FloodDirs = new Location[] { Location.UnitX, Location.UnitY, -Location.UnitX, -Location.UnitY, -Location.UnitZ };
 
-        void FloodFrom(Region tregion, Location start, Location c, Material mat, double maxRad)
+        void FloodFrom(Region tregion, Location start, Location c, double maxRad, HashSet<Location> locs)
         {
             if ((c - start).LengthSquared() > maxRad * maxRad)
             {
@@ -49,10 +60,14 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
             {
                 return;
             }
-            tregion.SetBlockMaterial(c, mat);
+            if (locs.Contains(c))
+            {
+                return;
+            }
+            locs.Add(c);
             foreach (Location dir in FloodDirs)
             {
-                FloodFrom(tregion, start, c + dir, mat, maxRad);
+                FloodFrom(tregion, start, c + dir, maxRad, locs);
             }
         }
     }

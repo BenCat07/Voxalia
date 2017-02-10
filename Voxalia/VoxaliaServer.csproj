@@ -189,9 +189,7 @@
     <Compile Include="ServerGame\JointSystem\JointWeld.cs" />
     <Compile Include="ServerGame\NetworkSystem\AbstractPacketIn.cs" />
     <Compile Include="ServerGame\NetworkSystem\AbstractPacketOut.cs" />
-    <Compile Include="ServerGame\NetworkSystem\Connection.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="ServerGame\NetworkSystem\Connection.cs" />
     <Compile Include="ServerGame\NetworkSystem\NetStringManager.cs" />
     <Compile Include="ServerGame\NetworkSystem\NetworkBase.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\CommandPacketIn.cs" />

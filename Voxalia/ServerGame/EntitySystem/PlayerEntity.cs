@@ -1432,6 +1432,21 @@ namespace Voxalia.ServerGame.EntitySystem
             return ChunksAwareOf.ContainsKey(cpos);
         }
 
+        public bool CanSeeChunk(Vector3i cpos, out int lod)
+        {
+            ChunkAwarenessInfo cai;
+            if (ChunksAwareOf.TryGetValue(cpos, out cai))
+            {
+                lod = cai.LOD;
+                return true;
+            }
+            else
+            {
+                lod = 0;
+                return false;
+            }
+        }
+
         /// <summary>
         /// This is a lazy way of tracking known entities to prevent double-spawning.
         /// It's not incredibly clever, but it works well enough for the current time.
