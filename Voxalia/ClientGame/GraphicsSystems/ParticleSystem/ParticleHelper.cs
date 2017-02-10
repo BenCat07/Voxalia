@@ -207,9 +207,9 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
         {
             Location colOne = new Location(3.0, 3.0, 2.0);
             Location colTwo = new Location(3.0, 2.0, 1.5);
-            Location temp = new Location(0, 0, -TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.4f * sizemult);
+            Location temp = new Location(0, 0, -TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.3f * sizemult);
             ParticleEffect pe = Engine.AddEffect(ParticleEffectType.SQUARE, (o) => pos + temp * (1 - o.TTL / o.O_TTL),
-                (o) => new Location((o.TTL / o.O_TTL) * 2.0f), (o) => 0, sizemult, colOne, colTwo, true, FlameLick[Utilities.UtilRandom.Next() % FlameLick.Length]);
+                (o) => new Location((o.TTL / o.O_TTL) * 2.0f), (o) => 0, sizemult * 2.0f, colOne, colTwo, true, FlameLick[Utilities.UtilRandom.Next() % FlameLick.Length]);
             pe.AltAlpha = ParticleEffect.InstantInSlowOutHalf;
             pe.OnDestroy = (o) =>
             {
@@ -225,7 +225,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             double rando = Utilities.UtilRandom.NextDouble() * 1.0 + 2.0;
             Location colOne = new Location(rando, rando, 2.0);
             Location colTwo = new Location(rando, rando - 1.0, 1.5);
-            Location temp = new Location(0, 0, -TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.4f * sizemult);
+            Location temp = new Location(0, 0, -TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.3f * sizemult);
             ParticleEffect pe = Engine.AddEffect(ParticleEffectType.SQUARE, (o) => pos + temp * (1 - o.TTL / o.O_TTL),
                 (o) => new Location((o.TTL / o.O_TTL)), (o) => 0, sizemult, colOne, colTwo, true, FireTriangle);
             pe.AltAlpha = ParticleEffect.InstantInSlowOutHalf;
