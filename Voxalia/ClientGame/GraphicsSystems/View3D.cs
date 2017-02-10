@@ -1246,17 +1246,33 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0.0f, 0.0f, 0.0f, RenderClearAlpha });
             if (TheClient.CVars.r_shadows.ValueB)
             {
-                TheClient.s_shadowadder = TheClient.s_shadowadder.Bind();
+                if (TheClient.CVars.r_ssao.ValueB)
+                {
+                    TheClient.s_shadowadder_ssao = TheClient.s_shadowadder_ssao.Bind();
+                }
+                else
+                {
+                    TheClient.s_shadowadder = TheClient.s_shadowadder.Bind();
+                }
                 GL.Uniform1(3, TheClient.CVars.r_shadowblur.ValueF);
             }
             else
             {
-                TheClient.s_lightadder = TheClient.s_lightadder.Bind();
+                if (TheClient.CVars.r_ssao.ValueB)
+                {
+                    TheClient.s_lightadder_ssao = TheClient.s_lightadder_ssao.Bind();
+                }
+                else
+                {
+                    TheClient.s_lightadder = TheClient.s_lightadder.Bind();
+                }
             }
             GL.ActiveTexture(TextureUnit.Texture1);
             GL.BindTexture(TextureTarget.Texture2D, RS4P.PositionTexture);
             GL.ActiveTexture(TextureUnit.Texture2);
             GL.BindTexture(TextureTarget.Texture2D, RS4P.NormalsTexture);
+            GL.ActiveTexture(TextureUnit.Texture3);
+            GL.BindTexture(TextureTarget.Texture2D, RS4P.DepthTexture);
             GL.ActiveTexture(TextureUnit.Texture4);
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.BindTexture(TextureTarget.Texture2DArray, fbo_shadow_tex);
@@ -1334,6 +1350,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 lights_apply:
                 GL.ActiveTexture(TextureUnit.Texture4);
                 GL.BindTexture(TextureTarget.Texture2DArray, fbo_shadow_tex);
+                GL.Uniform2(7, new Vector2(TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
+                GL.UniformMatrix4(8, false, ref PrimaryMatrix); // TODO: Render both eyes separately here for SSAO accuracy?
                 GL.Uniform1(9, (float)c);
                 GL.UniformMatrix4(10, LIGHTS_MAX, false, shadowmat_dat);
                 GL.UniformMatrix4(10 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);

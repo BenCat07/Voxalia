@@ -206,6 +206,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_fbov_refract = Shaders.GetShader("fbo_vox" + def + ",MCM_REFRACT");
             s_shadowadder = Shaders.GetShader("lightadder" + def + ",MCM_SHADOWS");
             s_lightadder = Shaders.GetShader("lightadder" + def);
+            s_shadowadder_ssao = Shaders.GetShader("lightadder" + def + ",MCM_SHADOWS,MCM_SSAO");
+            s_lightadder_ssao = Shaders.GetShader("lightadder" + def + ",MCM_SSAO");
             s_transponly = Shaders.GetShader("transponly" + def);
             s_transponlyvox = Shaders.GetShader("transponlyvox" + def);
             s_transponlylit = Shaders.GetShader("transponly" + def + ",MCM_LIT");
@@ -466,6 +468,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The shader that adds lights to a scene.
         /// </summary>
         public Shader s_lightadder;
+
+        /// <summary>
+        /// The shader that adds shadowed lights to a scene, with SSAO.
+        /// </summary>
+        public Shader s_shadowadder_ssao;
+
+        /// <summary>
+        /// The shader that adds lights to a scene, with SSAO.
+        /// </summary>
+        public Shader s_lightadder_ssao;
 
         /// <summary>
         /// The shader used only for transparent data.
