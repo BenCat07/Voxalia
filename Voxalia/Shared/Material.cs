@@ -106,6 +106,13 @@ namespace Voxalia.Shared
                         case "plant":
                             inf.Plant = opt[1];
                             break;
+                        case "plantscale":
+                            inf.PlantScale = float.Parse(opt[1]);
+                            break;
+                        case "plantmultiplier":
+                            inf.PlantMultiplier = float.Parse(opt[1]);
+                            inf.InversePlantMultiplier = 1.0f / inf.PlantMultiplier;
+                            break;
                         case "sound":
                             inf.Sound = (MaterialSound)Enum.Parse(typeof(MaterialSound), opt[1].ToUpperInvariant());
                             break;
@@ -434,6 +441,21 @@ namespace Voxalia.Shared
             return ALL_MATS[(int)mat].Plant;
         }
 
+        public static float GetPlantScale(this Material mat)
+        {
+            return ALL_MATS[(int)mat].PlantScale;
+        }
+
+        public static float GetPlantMultiplier(this Material mat)
+        {
+            return ALL_MATS[(int)mat].PlantMultiplier;
+        }
+
+        public static float GetPlantMultiplierInverse(this Material mat)
+        {
+            return ALL_MATS[(int)mat].InversePlantMultiplier;
+        }
+
         public static MaterialSpawnType GetSpawnType(this Material mat)
         {
             return ALL_MATS[(int)mat].SpawnType;
@@ -693,6 +715,21 @@ namespace Voxalia.Shared
         /// What plant texture to render as.
         /// </summary>
         public string Plant = null;
+
+        /// <summary>
+        /// The scale of plants.
+        /// </summary>
+        public float PlantScale = 1f;
+
+        /// <summary>
+        /// Inverse of plant multiplier.
+        /// </summary>
+        public float InversePlantMultiplier = 1f / 3f;
+
+        /// <summary>
+        /// The multiplier for plants.
+        /// </summary>
+        public float PlantMultiplier = 3f;
 
         public bool PlantEvenRows = false;
 

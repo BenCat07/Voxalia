@@ -435,17 +435,23 @@ namespace Voxalia.ClientGame.WorldSystem
                                     Location skylight = OwningRegion.GetLightAmountForSkyValue(new Location(WorldPosition.X * Chunk.CHUNK_SIZE + x + 0.5, WorldPosition.Y * Chunk.CHUNK_SIZE + y + 0.5,
                                         WorldPosition.Z * Chunk.CHUNK_SIZE + z + 1.0), Location.UnitZ, potentials, zp.BlockLocalData / 255f);
                                     bool even = c.Material.PlantShouldProduceEvenRows();
-                                    for (int plx = 0; plx < 3; plx++)
+                                    MTRandom rand = null;
+                                    if (!even)
                                     {
-                                        for (int ply = 0; ply < 3; ply++)
+                                        ulong seed = (ulong)(WorldPosition.X * Chunk.CHUNK_SIZE + x + WorldPosition.Y * Chunk.CHUNK_SIZE + y + WorldPosition.Z * Chunk.CHUNK_SIZE + z);
+                                        rand = new MTRandom(39, seed);
+                                    }
+                                    float mult = c.Material.GetPlantMultiplier();
+                                    float inv = c.Material.GetPlantMultiplierInverse() * 0.9f;
+                                    for (int plx = 0; plx < mult; plx++)
+                                    {
+                                        for (int ply = 0; ply < mult; ply++)
                                         {
-                                            double rxx = 0.333333 * plx + 0.01;
-                                            double ryy = 0.333333 * ply + 0.01;
+                                            double rxx = inv * plx + 0.1;
+                                            double ryy = inv * ply + 0.1;
                                             if (!even)
                                             {
-                                                const double modder = (1.0 - (0.01 + 0.01)) * 0.333333;
-                                                ulong seed = (ulong)(WorldPosition.X * Chunk.CHUNK_SIZE + x + WorldPosition.Y * Chunk.CHUNK_SIZE + y + WorldPosition.Z * Chunk.CHUNK_SIZE + z);
-                                                MTRandom rand = new MTRandom(39, seed);
+                                                double modder = inv;
                                                 rxx += rand.NextDouble() * modder;
                                                 ryy += rand.NextDouble() * modder;
                                             }
@@ -456,7 +462,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                             }
                                             poses.Add(new Vector3(x + (float)rayhit.Location.X, y + (float)rayhit.Location.Y, z + (float)rayhit.Location.Z));
                                             colorses.Add(new Vector4((float)skylight.X, (float)skylight.Y, (float)skylight.Z, 1.0f));
-                                            tcses.Add(new Vector2(1, OwningRegion.TheClient.GrassMatSet[(int)c.Material])); // TODO: 1 -> custom per-mat scaling!
+                                            tcses.Add(new Vector2(c.Material.GetPlantScale(), OwningRegion.TheClient.GrassMatSet[(int)c.Material]));
                                         }
                                     }
                                 }
