@@ -147,7 +147,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 }
                 if (TheClient.CVars.r_clouds.ValueB)
                 {
-                    int cloudID = GetTextureID("effects/clouds/cloud1"); // TODO: Cache!
+                    int cloudID = GetTextureID("effects/clouds/cloud2"); // TODO: Cache!
                     List<Task> tasks = new List<Task>(TheClient.TheRegion.Clouds.Count); // This could be an array.
                     List<ParticleData> datas = new List<ParticleData>(tasks.Capacity);
                     foreach (Cloud tcl in TheClient.TheRegion.Clouds)

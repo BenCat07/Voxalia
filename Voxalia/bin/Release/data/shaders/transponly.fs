@@ -240,7 +240,8 @@ void main()
 	vec4 fogCol = lights_used_helper[3];
 	float fogMod = dist * exp(fogCol.w) * fogCol.w;
 	float fmz = min(fogMod, 1.0);
-	fcolor.xyz = fcolor.xyz * (1.0 - fmz) + fogCol.xyz * fmz + vec3(fogMod - fmz);
+	// TODO: apply fog to things that aren't clouds only!
+	//fcolor.xyz = fcolor.xyz * (1.0 - fmz) + fogCol.xyz * fmz + vec3(fogMod - fmz);
 	fcolor = vec4(fcolor.xyz, tcolor.w * f.color.w);
 #if MCM_FADE_DEPTH
 	vec2 fc_xy = gl_FragCoord.xy / vec2(lights_used_helper[0][3], lights_used_helper[1][0]);
