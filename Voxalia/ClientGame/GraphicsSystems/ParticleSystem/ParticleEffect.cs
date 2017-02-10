@@ -56,6 +56,52 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         public float MinimumLight = 0f;
 
+        public static float InstantInSlowOutWeak(ParticleEffect pe)
+        {
+            return InstantInSlowOut(pe) * 0.75f;
+        }
+
+        public static float InstantInSlowOutHalf(ParticleEffect pe)
+        {
+            return InstantInSlowOut(pe) * 0.5f;
+        }
+
+        public static float InstantInSlowOut(ParticleEffect pe)
+        {
+            float rel = pe.TTL / pe.O_TTL;
+            if (rel >= 0.75f)
+            {
+                return 1.0f;
+            }
+            else
+            {
+                return rel * 1.3333f;
+            }
+        }
+
+        public static float QuickInSlowOutWeak(ParticleEffect pe)
+        {
+            return QuickInSlowOut(pe) * 0.75f;
+        }
+
+        public static float QuickInSlowOutHalf(ParticleEffect pe)
+        {
+            return QuickInSlowOut(pe) * 0.5f;
+        }
+
+        public static float QuickInSlowOut(ParticleEffect pe)
+        {
+            float rel = pe.TTL / pe.O_TTL;
+            if (rel >= 0.75f)
+            {
+                return 1 - ((rel - 0.75f) * 4.0f);
+            }
+            else
+            {
+                return rel * 1.3333f;
+            }
+        }
+
         public static float FadeInOutHalf(ParticleEffect pe)
         {
             return FadeInOut(pe) * 0.5f;
@@ -64,13 +110,13 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
         public static float FadeInOut(ParticleEffect pe)
         {
             float rel = pe.TTL / pe.O_TTL;
-            if (rel >= 0.5)
+            if (rel >= 0.5f)
             {
-                return 1 - ((rel - 0.5f) * 2);
+                return 1.0f - ((rel - 0.5f) * 2.0f);
             }
             else
             {
-                return rel * 2;
+                return rel * 2.0f;
             }
         }
 

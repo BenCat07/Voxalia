@@ -210,7 +210,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             Location temp = new Location(0, 0, -TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.4f * sizemult);
             ParticleEffect pe = Engine.AddEffect(ParticleEffectType.SQUARE, (o) => pos + temp * (1 - o.TTL / o.O_TTL),
                 (o) => new Location((o.TTL / o.O_TTL) * 2.0f), (o) => 0, sizemult, colOne, colTwo, true, FlameLick[Utilities.UtilRandom.Next() % FlameLick.Length]);
-            pe.AltAlpha = ParticleEffect.FadeInOutHalf;
+            pe.AltAlpha = ParticleEffect.InstantInSlowOutHalf;
             pe.OnDestroy = (o) =>
             {
                 if (Utilities.UtilRandom.Next(5) == 1)
@@ -228,7 +228,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             Location temp = new Location(0, 0, -TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.4f * sizemult);
             ParticleEffect pe = Engine.AddEffect(ParticleEffectType.SQUARE, (o) => pos + temp * (1 - o.TTL / o.O_TTL),
                 (o) => new Location((o.TTL / o.O_TTL)), (o) => 0, sizemult, colOne, colTwo, true, FireTriangle);
-            pe.AltAlpha = ParticleEffect.FadeInOutHalf;
+            pe.AltAlpha = ParticleEffect.InstantInSlowOutHalf;
             pe.OnDestroy = (o) =>
             {
                 if (Utilities.UtilRandom.Next(5) == 1)
