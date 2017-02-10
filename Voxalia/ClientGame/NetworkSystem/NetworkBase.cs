@@ -143,6 +143,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                 TheClient.Schedule.ScheduleSyncTask(() => csock.Close(2), 2);
                 ChunkSocket = null;
             }
+            TheClient.ShowMainMenu();
             IsAlive = false;
             norep = false;
         }
@@ -526,7 +527,6 @@ namespace Voxalia.ClientGame.NetworkSystem
             {
                 if (pLive)
                 {
-                    TheClient.Schedule.ScheduleSyncTask(() => { TheClient.ShowMainMenu(); });
                     pLive = false;
                 }
                 return false;
