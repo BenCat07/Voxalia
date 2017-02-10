@@ -82,7 +82,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             toret.Add(new Tuple<string, long>("Chunks", chunkc));
             toret.Add(new Tuple<string, long>("Chunks_Transparent", chunkc_transp));
-            // TODO: Maybe also View3D render helper usage?
+            // TODO: Maybe also View3D render helpers usage?
             return toret;
         }
 

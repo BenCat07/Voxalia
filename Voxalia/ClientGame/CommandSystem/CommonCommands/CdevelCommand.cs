@@ -189,6 +189,12 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         TheClient.FogEnhanceTime = time;
                         break;
                     }
+                case "flashBang":
+                    {
+                        double time = NumberTag.TryFor(entry.GetArgumentObject(queue, 1)).Internal;
+                        TheClient.MainWorldView.Flashbang(time);
+                        break;
+                    }
                 case "earRing":
                     {
                         double time = NumberTag.TryFor(entry.GetArgumentObject(queue, 1)).Internal;

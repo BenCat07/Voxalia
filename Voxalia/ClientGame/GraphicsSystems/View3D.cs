@@ -350,6 +350,46 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.BindTexture(TextureTarget.Texture2D, 0);
             View3D.CheckError("Load - View3D - GenFBO");
         }
+
+        int NF_Tex = -1;
+        int NF_FBO = -1;
+        int NF_DTx = -1;
+
+        public int NextFrameToTexture()
+        {
+            if (NF_Tex != -1)
+            {
+                return NF_Tex;
+            }
+            if (FB_Tex != -1)
+            {
+                return FB_Tex;
+            }
+            View3D.CheckError("View3D - NFTex - Pre");
+            GL.ActiveTexture(TextureUnit.Texture0);
+            NF_Tex = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, NF_Tex);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Width, Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            NF_DTx = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, NF_DTx);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.DepthComponent32, Width, Height, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            NF_FBO = GL.GenFramebuffer();
+            BindFramebuffer(FramebufferTarget.Framebuffer, NF_FBO);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, NF_Tex, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, NF_DTx, 0);
+            BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            View3D.CheckError("View3D - NFTex");
+            return NF_Tex;
+        }
         
         int transp_fbo_main = 0;
         int transp_fbo_texture = 0;
@@ -527,16 +567,86 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public bool FastOnly = false;
 
+        public double FB_DurLeft = 0.0;
+
+        public int FB_Tex = -1;
+
+        public void Flashbang(double duration_add)
+        {
+            if (FB_DurLeft == 0.0)
+            {
+                FB_Tex = NextFrameToTexture();
+            }
+            FB_DurLeft += duration_add;
+        }
+
+        public void EndNF(int pfbo)
+        {
+            if (FB_Tex != -1)
+            {
+                FB_DurLeft -= TheClient.gDelta;
+                if (FB_DurLeft > 0)
+                {
+                    TheClient.Shaders.ColorMultShader.Bind();
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.BindTexture(TextureTarget.Texture2D, FB_Tex);
+                    float power = FB_DurLeft > 2.0 ? 1f : ((float)FB_DurLeft * 0.5f);
+                    TheClient.Rendering.SetColor(new Vector4(1f, 1f, 1f, power));
+                    GL.Disable(EnableCap.DepthTest);
+                    GL.Disable(EnableCap.CullFace);
+                    GL.UniformMatrix4(1, false, ref SimpleOrthoMatrix);
+                    GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
+                    TheClient.Rendering.RenderRectangle(-1, -1, 1, 1);
+                    TheClient.Textures.White.Bind();
+                    if (power < 1f)
+                    {
+                        TheClient.Rendering.SetColor(new Vector4(1f, 1f, 1f, (1f - power) * power));
+                        TheClient.Rendering.RenderRectangle(-1, -1, 1, 1);
+                    }
+                }
+                else
+                {
+                    FB_DurLeft = 0;
+                    GL.DeleteTexture(FB_Tex);
+                    FB_Tex = -1;
+                }
+            }
+            if (pfbo != 0)
+            {
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, pfbo);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, NF_FBO);
+                GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Width, Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
+            }
+            GL.DeleteFramebuffer(NF_FBO);
+            GL.DeleteTexture(NF_DTx);
+            CurrentFBO = pfbo;
+            NF_FBO = -1;
+            NF_DTx = -1;
+            NF_Tex = -1;
+        }
+
         public void Render()
         {
+            int pfbo = CurrentFBO;
             try
             {
+                if (NF_FBO != -1)
+                {
+                    if (pfbo == 0)
+                    {
+                        CurrentFBO = NF_FBO;
+                    }
+                }
                 RenderPass_Setup();
                 CheckError("Render - Setup");
                 if (FastOnly || TheClient.CVars.r_fast.ValueB)
                 {
                     RenderPass_FAST();
                     CheckError("Render - Fast");
+                    EndNF(pfbo);
                     return;
                 }
                 Stopwatch timer = new Stopwatch();
@@ -559,11 +669,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     TotalSpikeTime = TotalTime;
                 }
+                EndNF(pfbo);
             }
             catch (Exception ex)
             {
                 Utilities.CheckException(ex);
                 SysConsole.Output("Rendering (3D)", ex);
+                CurrentFBO = pfbo;
             }
         }
 
