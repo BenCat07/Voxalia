@@ -101,7 +101,10 @@ namespace Voxalia.ClientGame.NetworkSystem
             {
                 try
                 {
-                    ConnectionThread.Abort();
+                    TheClient.Schedule.StartAsyncTask(() =>
+                    {
+                        ConnectionThread.Abort();
+                    });
                 }
                 catch (Exception ex)
                 {
