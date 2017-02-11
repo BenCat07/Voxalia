@@ -1627,7 +1627,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(4, DesaturationAmount);
             GL.DepthMask(false);
-            if (TheClient.CVars.r_transpll.ValueB)
+            if (TheClient.CVars.r_transpll.ValueB || !TheClient.CVars.r_brighttransp.ValueB)
             {
                 StandardBlend();
             }
