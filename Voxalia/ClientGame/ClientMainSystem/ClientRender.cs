@@ -1543,6 +1543,50 @@ namespace Voxalia.ClientGame.ClientMainSystem
             //GL.Disable(EnableCap.PolygonOffsetFill);
         }
 
+        public class ParticlesEntity : Entity
+        {
+            public double DistMin;
+
+            public double DistMax;
+
+            public ParticlesEntity(Region tregion)
+                : base(tregion, false, false)
+            {
+            }
+            
+            public override void Render()
+            {
+                TheClient.SetEnts();
+                GL.ActiveTexture(TextureUnit.Texture1);
+                TheClient.Textures.NormalDef.Bind();
+                GL.ActiveTexture(TextureUnit.Texture0);
+                TheClient.Particles.Engine.Render(DistMin, DistMax);
+                GL.ActiveTexture(TextureUnit.Texture1);
+                TheClient.Textures.NormalDef.Bind();
+                GL.ActiveTexture(TextureUnit.Texture0);
+            }
+
+            public override BEPUutilities.Quaternion GetOrientation()
+            {
+                throw new NotImplementedException();
+            }
+
+            public override void SetOrientation(BEPUutilities.Quaternion quat)
+            {
+                throw new NotImplementedException();
+            }
+
+            public override Location GetPosition()
+            {
+                return TheClient.MainWorldView.CameraPos + new Location((DistMin + DistMax) * 0.5, 0, 0);
+            }
+
+            public override void SetPosition(Location pos)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public class ChunkEntity : Entity
         {
             public ChunkEntity(Chunk tchunk)
@@ -1638,8 +1682,20 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     {
                         entsRender.Add(new ChunkEntity(ch));
                     }
+                    // TODO: More clever logic, based on actual entity and particle clumpings?
+                    // TODO: Alternately, each set of particles (per source) as its own separate bit?
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0, DistMax = 0.5 });
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0.5, DistMax = 1 });
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1, DistMax = 1.75 });
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1.75, DistMax = 3 });
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 3, DistMax = 4.5 });
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 4.5, DistMax = 7 });
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 7, DistMax = 12 });
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 12, DistMax = 20 });
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 20, DistMax = 40 });
+                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 40, DistMax = 100 }); // TODO: 100 -> particles view render distance!
                     Location pos = Player.GetPosition();
-                    IEnumerable<Entity> ents = entsRender.OrderBy((e) => e.GetPosition().DistanceSquared(MainWorldView.RenderRelative));
+                    IEnumerable<Entity> ents = entsRender.OrderBy((e) => e.GetPosition().DistanceSquared(MainWorldView.RenderRelative)).Reverse();
                     foreach (Entity ent in ents)
                     {
                         ent.Render();
@@ -1692,16 +1748,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     SetEnts();
                 }
                 TheRegion.RenderPlants();
-            }
-            else if (!view.ShadowsOnly)
-            {
-                GL.ActiveTexture(TextureUnit.Texture1);
-                Textures.NormalDef.Bind();
-                GL.ActiveTexture(TextureUnit.Texture0);
-                Particles.Engine.Render();
-                GL.ActiveTexture(TextureUnit.Texture1);
-                Textures.NormalDef.Bind();
-                GL.ActiveTexture(TextureUnit.Texture0);
             }
             View3D.CheckError("Rendering - 2");
             if (view.FBOid == FBOID.STATIC_SHADOWS)

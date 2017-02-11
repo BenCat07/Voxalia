@@ -108,8 +108,10 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             public Vector2[] TCs;
         }
 
-        public void Render()
+        public void Render(double mind, double maxd)
         {
+            double mindsq = mind * mind;
+            double maxdsq = maxd * maxd;
             if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP || TheClient.MainWorldView.FBOid.IsMainTransp())
             {
                 List<Vector3> pos = new List<Vector3>();
@@ -120,6 +122,11 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 {
                     if (ActiveEffects[i].Type == ParticleEffectType.SQUARE)
                     {
+                        double dist = ActiveEffects[i].Start(ActiveEffects[i]).DistanceSquared(TheClient.MainWorldView.CameraPos);
+                        if (dist < mindsq || dist >= maxdsq)
+                        {
+                            continue;
+                        }
                         Tuple<Location, Vector4, Vector2> dets = ActiveEffects[i].GetDetails();
                         if (dets != null)
                         {
