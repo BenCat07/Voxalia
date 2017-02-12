@@ -1677,7 +1677,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 SetEnts();
                 if (transparents)
                 {
-                    List<Entity> entsRender = new List<Entity>(TheRegion.Entities);
+                    List<Entity> entsRender = CVars.r_drawents.ValueB ? new List<Entity>(TheRegion.Entities) : new List<Entity>();
                     foreach (Chunk ch in TheRegion.chToRender)
                     {
                         entsRender.Add(new ChunkEntity(ch));
@@ -1704,7 +1704,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         ent.Render();
                     }
                 }
-                else
+                else if (CVars.r_drawents.ValueB)
                 {
                     for (int i = 0; i < TheRegion.Entities.Count; i++)
                     {
