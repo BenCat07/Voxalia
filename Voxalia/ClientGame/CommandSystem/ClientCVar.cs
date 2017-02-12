@@ -34,7 +34,7 @@ namespace Voxalia.ClientGame.CommandSystem
         public CVar n_first, n_debugmovement, n_movement_maxdistance, n_movement_adjustment, n_movemode, n_ourvehiclelerp, n_online;
 
         // Renderer CVars
-        public CVar r_fullscreen, r_width, r_height, r_vsync, r_lighting, r_renderwireframe, r_brighttransp,
+        public CVar r_fullscreen, r_width, r_height, r_vsync, r_lighting, r_renderwireframe, r_brighttransp,  r_decals,
             r_fov, r_znear, r_renderdist, r_renderdist_2, r_renderdist_2h, r_renderdist_5, r_renderdist_5h,
             r_dof_strength, r_fog, r_maxfps, r_drawself, r_firemode, r_dynamicshadows, r_ssao, r_particles,
             r_lightmaxdistance, r_shadowquality, r_shadowblur, r_shadowpace, r_shadows, r_cloudshadows,
@@ -83,6 +83,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_vsync = Register("r_vsync", "false", CVarFlag.Boolean, "Whether to use vertical synchronization mode.");
             r_lighting = Register("r_lighting", "true", CVarFlag.Boolean, "Whether to enable 3D lighting (Otherwise, use FullBright).");
             r_brighttransp = Register("r_brighttransp", "true", CVarFlag.Boolean, "Whether transparent objects should be 'bright' or 'normal'.");
+            r_decals = Register("r_decals", "true", CVarFlag.Boolean, "Whether to render decals at all.");
             r_renderwireframe = Register("r_renderwireframe", "false", CVarFlag.Boolean, "Whether to render a wireframe.");
             r_fov = Register("r_fov", "70", CVarFlag.Numeric, "What Field of Vision range value to use.");
             r_znear = Register("r_znear", "0.1", CVarFlag.Numeric, "How close the near plane should be to the camera.");

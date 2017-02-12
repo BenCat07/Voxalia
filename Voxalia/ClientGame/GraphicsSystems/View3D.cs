@@ -780,8 +780,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public void RenderPass_FAST()
         {
-            RS4P.Bind();
-            RS4P.Clear();
+            if (TheClient.CVars.r_decals.ValueB)
+            {
+                RS4P.Bind();
+                RS4P.Clear();
+            }
             RenderingShadows = false;
             RenderLights = false;
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -848,36 +851,39 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 Render3D(this);
             }
-            RS4P.Unbind();
-            BindFramebuffer(FramebufferTarget.Framebuffer, CurrentFBO);
-            DrawBuffer(CurrentFBO == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0);
-            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, RS4P.fbo);
-            GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Width, Height, ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
-            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
-            TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
-            GL.ActiveTexture(TextureUnit.Texture4);
-            GL.BindTexture(TextureTarget.Texture2D, RS4P.DepthTexture);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            FBOid = FBOID.FORWARD_EXTRAS;
-            GL.DepthMask(false);
-            if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
+            if (TheClient.CVars.r_decals.ValueB)
             {
-                Viewport(Width / 2, 0, Width / 2, Height);
-                DecalRender?.Invoke(this);
-                CFrust = cf2;
-                Viewport(0, 0, Width / 2, Height);
-                CameraPos = cameraBasePos - cameraAdjust;
-                GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
-                DecalRender?.Invoke(this);
-                Viewport(0, 0, Width, Height);
-                CameraPos = cameraBasePos + cameraAdjust;
-                CFrust = camFrust;
-            }
-            else
-            {
-                FBOid = FBOID.FORWARD_EXTRAS;
+                RS4P.Unbind();
+                BindFramebuffer(FramebufferTarget.Framebuffer, CurrentFBO);
+                DrawBuffer(CurrentFBO == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0);
+                GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, RS4P.fbo);
+                GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Width, Height, ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+                GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
                 TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
-                DecalRender?.Invoke(this);
+                GL.ActiveTexture(TextureUnit.Texture4);
+                GL.BindTexture(TextureTarget.Texture2D, RS4P.DepthTexture);
+                GL.ActiveTexture(TextureUnit.Texture0);
+                FBOid = FBOID.FORWARD_EXTRAS;
+                GL.DepthMask(false);
+                if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
+                {
+                    Viewport(Width / 2, 0, Width / 2, Height);
+                    DecalRender?.Invoke(this);
+                    CFrust = cf2;
+                    Viewport(0, 0, Width / 2, Height);
+                    CameraPos = cameraBasePos - cameraAdjust;
+                    GL.UniformMatrix4(1, false, ref PrimaryMatrix_OffsetFor3D);
+                    DecalRender?.Invoke(this);
+                    Viewport(0, 0, Width, Height);
+                    CameraPos = cameraBasePos + cameraAdjust;
+                    CFrust = camFrust;
+                }
+                else
+                {
+                    FBOid = FBOID.FORWARD_EXTRAS;
+                    TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
+                    DecalRender?.Invoke(this);
+                }
             }
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_TRANSP;
