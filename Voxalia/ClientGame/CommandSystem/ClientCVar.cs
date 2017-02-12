@@ -36,7 +36,7 @@ namespace Voxalia.ClientGame.CommandSystem
         // Renderer CVars
         public CVar r_fullscreen, r_width, r_height, r_vsync, r_lighting, r_renderwireframe, r_brighttransp,  r_decals,
             r_fov, r_znear, r_renderdist, r_renderdist_2, r_renderdist_2h, r_renderdist_5, r_renderdist_5h,
-            r_dof_strength, r_fog, r_maxfps, r_drawself, r_firemode, r_dynamicshadows, r_ssao, r_particles,
+            r_dof_strength, r_fog, r_maxfps, r_drawself, r_firemode, r_dynamicshadows, r_ssao, r_particles, r_drawchunks,
             r_lightmaxdistance, r_shadowquality, r_shadowblur, r_shadowpace, r_shadows, r_cloudshadows,
             r_good_graphics, r_skybox, r_lensflare, r_blocktexturelinear, r_blocktexturewidth, r_toonify, r_transplighting, r_transpshadows,
             r_3d_enable, r_fast, r_chunksatonce, r_chunkoverrender, r_transpll, r_noblockshapes, r_treeshadows,
@@ -99,6 +99,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_dynamicshadows = Register("r_dynamicshadows", "true", CVarFlag.Boolean, "Whether dynamic objects should ever cast shadows.");
             r_ssao = Register("r_ssao", "true", CVarFlag.Boolean, "Whether SSAO (Ambient Occlusion) should be used.");
             r_particles = Register("r_particles", "true", CVarFlag.Boolean, "Whether to render any particle effects.");
+            r_drawchunks = Register("r_drawchunks", "true", CVarFlag.Boolean, "Whether to draw any chunks at all.");
             r_lightmaxdistance = Register("r_lightmaxdistance", "35", CVarFlag.Numeric, "How far away a light can be from the camera before it is disabled.");
             r_shadowquality = Register("r_shadowquality", "1024", CVarFlag.Numeric, "What texture size to use for shadow maps.");
             r_shadowblur = Register("r_shadowblur", "0.25", CVarFlag.Numeric, "What factor to use for shadow blurring. Smaller = blurrier.");

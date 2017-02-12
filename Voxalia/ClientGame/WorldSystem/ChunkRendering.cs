@@ -622,6 +622,10 @@ namespace Voxalia.ClientGame.WorldSystem
         
         public void Render()
         {
+            if (!OwningRegion.TheClient.CVars.r_drawchunks.ValueB)
+            {
+                return;
+            }
             VBO _VBO = OwningRegion.TheClient.MainWorldView.FBOid.IsSolid() ? _VBOSolid : _VBOTransp;
             if (_VBO != null && _VBO.generated)
             {
