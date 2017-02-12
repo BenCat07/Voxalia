@@ -1682,18 +1682,21 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     {
                         entsRender.Add(new ChunkEntity(ch));
                     }
-                    // TODO: More clever logic, based on actual entity and particle clumpings?
-                    // TODO: Alternately, each set of particles (per source) as its own separate bit?
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0, DistMax = 0.5 });
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0.5, DistMax = 1 });
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1, DistMax = 1.75 });
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1.75, DistMax = 3 });
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 3, DistMax = 4.5 });
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 4.5, DistMax = 7 });
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 7, DistMax = 12 });
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 12, DistMax = 20 });
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 20, DistMax = 40 });
-                    entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 40, DistMax = 100 }); // TODO: 100 -> particles view render distance!
+                    if (CVars.r_particles.ValueB)
+                    {
+                        // TODO: More clever logic, based on actual entity and particle clumpings?
+                        // TODO: Alternately, each set of particles (per source) as its own separate bit?
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0, DistMax = 0.5 });
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0.5, DistMax = 1 });
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1, DistMax = 1.75 });
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1.75, DistMax = 3 });
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 3, DistMax = 4.5 });
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 4.5, DistMax = 7 });
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 7, DistMax = 12 });
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 12, DistMax = 20 });
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 20, DistMax = 40 });
+                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 40, DistMax = 100 }); // TODO: 100 -> particles view render distance!
+                    }
                     Location pos = Player.GetPosition();
                     IEnumerable<Entity> ents = entsRender.OrderBy((e) => e.GetPosition().DistanceSquared(MainWorldView.RenderRelative)).Reverse();
                     foreach (Entity ent in ents)
