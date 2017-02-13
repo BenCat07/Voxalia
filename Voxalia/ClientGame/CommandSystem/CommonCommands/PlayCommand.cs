@@ -55,6 +55,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             {
                 seek = (float)(float)Utilities.StringToFloat(entry.GetArgument(queue, 4));
             }
+            entry.Good(queue, "Requesting audio...");
             TheClient.Sounds.Play(TheClient.Sounds.GetSound(sfx), false, loc, pitch, gain, seek);
         }
     }

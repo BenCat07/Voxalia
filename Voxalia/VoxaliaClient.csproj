@@ -100,6 +100,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientGame\AudioSystem\ActiveSound.cs" />
+    <Compile Include="ClientGame\AudioSystem\Enforcer\AudioEnforcer.cs" />
+    <Compile Include="ClientGame\AudioSystem\Enforcer\AudioState.cs" />
+    <Compile Include="ClientGame\AudioSystem\Enforcer\LiveAudioClip.cs" />
+    <Compile Include="ClientGame\AudioSystem\Enforcer\LiveAudioInstance.cs" />
     <Compile Include="ClientGame\AudioSystem\OggDecodeStream.cs" />
     <Compile Include="ClientGame\AudioSystem\OpusWrapper\OpusAPI.cs" />
     <Compile Include="ClientGame\AudioSystem\OpusWrapper\OpusDecoder.cs" />

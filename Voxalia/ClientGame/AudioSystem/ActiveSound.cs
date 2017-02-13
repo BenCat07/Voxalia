@@ -10,6 +10,7 @@ using OpenTK;
 using OpenTK.Audio.OpenAL;
 using Voxalia.Shared;
 using Voxalia.ClientGame.OtherSystems;
+using Voxalia.ClientGame.AudioSystem.Enforcer;
 
 namespace Voxalia.ClientGame.AudioSystem
 {
@@ -34,6 +35,8 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public int Src = -1;
 
+        public LiveAudioInstance AudioInternal = null;
+
         public bool Exists = false;
 
         public bool IsBackground = false;
@@ -44,40 +47,52 @@ namespace Voxalia.ClientGame.AudioSystem
         {
             if (!Exists)
             {
-                Engine.CheckError("PRECREATE:" + Effect.Name);
-                Src = AL.GenSource();
-                if (Src < 0 || AL.GetError() != ALError.NoError)
+                if (Engine.AudioInternal != null)
                 {
-                    Src = -1;
-                    return;
-                }
-                AL.Source(Src, ALSourcei.Buffer, Effect.Internal);
-                AL.Source(Src, ALSourceb.Looping, Loop);
-                Engine.CheckError("Preconfig:" + Effect.Name);
-                if (Pitch != 1f)
-                {
-                    UpdatePitch();
-                }
-                if (Gain != 1f)
-                {
-                    UpdateGain();
-                }
-                Engine.CheckError("GP:" + Effect.Name);
-                if (!Position.IsNaN())
-                {
-                    Vector3 zero = Vector3.Zero;
-                    Vector3 vec = ClientUtilities.Convert(Position);
-                    AL.Source(Src, ALSource3f.Direction, ref zero);
-                    AL.Source(Src, ALSource3f.Velocity, ref zero);
-                    AL.Source(Src, ALSource3f.Position, ref vec);
-                    AL.Source(Src, ALSourceb.SourceRelative, false);
-                    AL.Source(Src, ALSourcef.EfxAirAbsorptionFactor, 1f);
-                    Engine.CheckError("Positioning:" + Effect.Name);
+                    AudioInternal = new LiveAudioInstance();
+                    AudioInternal.Clip = Effect.Clip;
+                    AudioInternal.Gain = Gain;
+                    AudioInternal.Loop = Loop;
+                    AudioInternal.Pitch = Pitch;
+                    // TODO: pos, vel, dir, etc.
                 }
                 else
                 {
-                    AL.Source(Src, ALSourceb.SourceRelative, true);
-                    Engine.CheckError("Relative:" + Effect.Name);
+                    Engine.CheckError("PRECREATE:" + Effect.Name);
+                    Src = AL.GenSource();
+                    if (Src < 0 || AL.GetError() != ALError.NoError)
+                    {
+                        Src = -1;
+                        return;
+                    }
+                    AL.Source(Src, ALSourcei.Buffer, Effect.Internal);
+                    AL.Source(Src, ALSourceb.Looping, Loop);
+                    Engine.CheckError("Preconfig:" + Effect.Name);
+                    if (Pitch != 1f)
+                    {
+                        UpdatePitch();
+                    }
+                    if (Gain != 1f)
+                    {
+                        UpdateGain();
+                    }
+                    Engine.CheckError("GP:" + Effect.Name);
+                    if (!Position.IsNaN())
+                    {
+                        Vector3 zero = Vector3.Zero;
+                        Vector3 vec = ClientUtilities.Convert(Position);
+                        AL.Source(Src, ALSource3f.Direction, ref zero);
+                        AL.Source(Src, ALSource3f.Velocity, ref zero);
+                        AL.Source(Src, ALSource3f.Position, ref vec);
+                        AL.Source(Src, ALSourceb.SourceRelative, false);
+                        AL.Source(Src, ALSourcef.EfxAirAbsorptionFactor, 1f);
+                        Engine.CheckError("Positioning:" + Effect.Name);
+                    }
+                    else
+                    {
+                        AL.Source(Src, ALSourceb.SourceRelative, true);
+                        Engine.CheckError("Relative:" + Effect.Name);
+                    }
                 }
                 Exists = true;
             }
@@ -85,7 +100,14 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public void UpdatePitch()
         {
-            AL.Source(Src, ALSourcef.Pitch, Pitch);
+            if (Engine.AudioInternal != null)
+            {
+                AudioInternal.Pitch = Pitch;
+            }
+            else
+            {
+                AL.Source(Src, ALSourcef.Pitch, Pitch);
+            }
         }
 
         public bool IsDeafened = false;
@@ -93,29 +115,53 @@ namespace Voxalia.ClientGame.AudioSystem
         public void UpdateGain()
         {
             bool sel = Engine.Selected;
-            if (sel)
+            if (Engine.AudioInternal != null)
             {
-                AL.Source(Src, ALSourcef.Gain, Gain);
-                Backgrounded = false;
+                if (sel)
+                {
+                    AudioInternal.Gain = Gain;
+                    Backgrounded = false;
+                }
+                else
+                {
+                    AudioInternal.Gain = 0.0001f;
+                    Backgrounded = true;
+                }
             }
             else
             {
-                AL.Source(Src, ALSourcef.Gain, 0.0001f);
-                Backgrounded = true;
+                if (sel)
+                {
+                    AL.Source(Src, ALSourcef.Gain, Gain);
+                    Backgrounded = false;
+                }
+                else
+                {
+                    AL.Source(Src, ALSourcef.Gain, 0.0001f);
+                    Backgrounded = true;
+                }
             }
         }
 
         public void Play()
         {
-            if (Src < 0)
+            if (Engine.AudioInternal != null)
             {
-                return;
+                Engine.AudioInternal.Add(AudioInternal);
             }
-            AL.SourcePlay(Src);
+            else
+            {
+                if (Src < 0)
+                {
+                    return;
+                }
+                AL.SourcePlay(Src);
+            }
         }
 
         public void Seek(float f)
         {
+            // TODO: Enforcer!
             if (Src < 0)
             {
                 return;
@@ -125,33 +171,58 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public void Pause()
         {
-            if (Src < 0)
+            if (Engine.AudioInternal != null)
             {
-                return;
+                AudioInternal.State = AudioState.PAUSED;
             }
-            AL.SourcePause(Src);
+            else
+            {
+                if (Src < 0)
+                {
+                    return;
+                }
+                AL.SourcePause(Src);
+            }
         }
 
         public void Stop()
         {
-            if (Src < 0)
+            if (Engine.AudioInternal != null)
             {
-                return;
+                AudioInternal.State = AudioState.STOP;
             }
-            AL.SourceStop(Src);
+            else
+            {
+                if (Src < 0)
+                {
+                    return;
+                }
+                AL.SourceStop(Src);
+            }
         }
 
         public bool IsPlaying()
         {
-            if (Src < 0)
+            if (Engine.AudioInternal != null)
             {
-                return false;
+                return AudioInternal.State == AudioState.PLAYING;
             }
-            return (AL.GetSourceState(Src) == ALSourceState.Playing);
+            else
+            {
+                if (Src < 0)
+                {
+                    return false;
+                }
+                return (AL.GetSourceState(Src) == ALSourceState.Playing);
+            }
         }
 
         public void Destroy()
         {
+            if (Engine.AudioInternal != null)
+            {
+                return;
+            }
             if (Src < 0)
             {
                 return;

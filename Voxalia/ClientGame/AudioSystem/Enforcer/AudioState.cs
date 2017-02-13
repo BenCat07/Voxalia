@@ -10,6 +10,8 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
     {
         WAITING = 0,
         PLAYING = 1,
-        DONE = 2
+        DONE = 2,
+        STOP = 3,
+        PAUSED = 4
     }
 }
