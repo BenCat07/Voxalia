@@ -7,6 +7,8 @@
 //
 
 using System;
+using OpenTK.Audio;
+using Voxalia.ClientGame.AudioSystem.Enforcer;
 
 namespace Voxalia.ClientGame.AudioSystem
 {
@@ -19,5 +21,7 @@ namespace Voxalia.ClientGame.AudioSystem
         public EventHandler<EventArgs> Loaded;
 
         public double LastUse = 0.0;
+
+        public LiveAudioClip Clip;
     }
 }

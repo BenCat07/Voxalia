@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using OpenTK;
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
@@ -19,6 +20,7 @@ using Voxalia.ClientGame.OtherSystems;
 using Voxalia.ClientGame.ClientMainSystem;
 using FreneticScript;
 using System.Threading;
+using Voxalia.ClientGame.AudioSystem.Enforcer;
 
 namespace Voxalia.ClientGame.AudioSystem
 {
@@ -28,6 +30,8 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public AudioContext Context;
 
+        public AudioEnforcer AudioInternal;
+
         public MicrophoneHandler Microphone = null;
 
         public Client TheClient;
@@ -36,6 +40,10 @@ namespace Voxalia.ClientGame.AudioSystem
         
         public void Init(Client tclient, ClientCVar cvar)
         {
+            if (AudioInternal != null)
+            {
+                AudioInternal.Shutdown();
+            }
             if (Context != null)
             {
                 Context.Dispose();
@@ -43,7 +51,16 @@ namespace Voxalia.ClientGame.AudioSystem
             TheClient = tclient;
             CVars = cvar;
             Context = new AudioContext(AudioContext.DefaultDevice, 0, 0, false, true);
-            Context.MakeCurrent();
+            if (TheClient.CVars.a_enforce.ValueB)
+            {
+                AudioInternal = new AudioEnforcer();
+                AudioInternal.Init(Context);
+                Context = null;
+            }
+            else
+            {
+                Context.MakeCurrent();
+            }
             try
             {
                 if (Microphone != null)
@@ -474,8 +491,30 @@ namespace Voxalia.ClientGame.AudioSystem
             int bits;
             int rate;
             byte[] data = LoadWAVE(stream, out channels, out bits, out rate);
-            sfx.Internal = AL.GenBuffer();
-            AL.BufferData(sfx.Internal, GetSoundFormat(channels, bits), data, data.Length, rate);
+            if (AudioInternal != null)
+            {
+                LiveAudioClip clip = new LiveAudioClip();
+                clip.Data = data;
+                if (bits == 1)
+                {
+                    clip.Data = new byte[data.Length * 2];
+                    for (int i = 0; i < data.Length; i++)
+                    {
+                        // TODO: Sanity?
+                        clip.Data[i] = data[i + 1];
+                        clip.Data[i + 1] = (byte)0;
+                    }
+                    data = clip.Data;
+                }
+                // TODO: clip.Rate = rate;
+                sfx.Clip.Channels = (byte)channels;
+                sfx.Clip = clip;
+            }
+            else
+            {
+                sfx.Internal = AL.GenBuffer();
+                AL.BufferData(sfx.Internal, GetSoundFormat(channels, bits), data, data.Length, rate);
+            }
             return sfx;
         }
 
