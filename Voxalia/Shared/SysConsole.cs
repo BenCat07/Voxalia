@@ -367,7 +367,7 @@ namespace Voxalia.Shared
         /// <summary>
         /// Initialization from the client
         /// </summary>
-        CLIENINIT = 7
+        CLIENTINIT = 7
         // TODO: More?
     }
 }

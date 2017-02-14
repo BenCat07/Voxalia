@@ -122,21 +122,21 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public void StartUp(string args)
         {
             Files.Init();
-            SysConsole.Output(OutputType.CLIENINIT, "Launching as new client, this is " + (this == Central ? "" : "NOT ") + "the Central client.");
-            SysConsole.Output(OutputType.CLIENINIT, "Loading command system...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Launching as new client, this is " + (this == Central ? "" : "NOT ") + "the Central client.");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading command system...");
             Commands = new ClientCommands();
             Commands.Init(new ClientOutputter(this), this);
-            SysConsole.Output(OutputType.CLIENINIT, "Loading CVar system...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading CVar system...");
             CVars = new ClientCVar();
             CVars.Init(this, Commands.Output);
-            SysConsole.Output(OutputType.CLIENINIT, "Loading default settings...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading default settings...");
             if (Files.Exists("clientdefaultsettings.cfg"))
             {
                 string contents = Files.ReadText("clientdefaultsettings.cfg");
                 Commands.ExecuteCommands(contents);
             }
             Commands.ExecuteCommands(args);
-            SysConsole.Output(OutputType.CLIENINIT, "Generating window...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Generating window...");
             DisplayDevice dd = DisplayDevice.Default;
             Window = new GameWindow(CVars.r_width.ValueI, CVars.r_height.ValueI, new GraphicsMode(24, 24, 0, 0),
                 Program.GameName + " v" + Program.GameVersion + " (" + Program.GameVersionDescription + ")", GameWindowFlags.Default, dd, 4, 3, GraphicsContextFlags.ForwardCompatible);
@@ -340,15 +340,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         void Window_Load(object sender, EventArgs e)
         {
-            SysConsole.Output(OutputType.CLIENINIT, "Window generated!");
+            SysConsole.Output(OutputType.CLIENTINIT, "Window generated!");
             DPIScale = Window.Width / CVars.r_width.ValueF;
-            SysConsole.Output(OutputType.CLIENINIT, "DPIScale is " + DPIScale + "!");
-            SysConsole.Output(OutputType.CLIENINIT, "Loading base textures...");
+            SysConsole.Output(OutputType.CLIENTINIT, "DPIScale is " + DPIScale + "!");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading base textures...");
             PreInitRendering();
             Textures = new TextureEngine();
             Textures.InitTextureSystem(this);
             ItemFrame = Textures.GetTexture("ui/hud/item_frame");
-            SysConsole.Output(OutputType.CLIENINIT, "Loading shaders...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading shaders...");
             Shaders = new ShaderEngine();
             GLVendor = GL.GetString(StringName.Vendor);
             CVars.s_glvendor.Value = GLVendor;
@@ -356,72 +356,72 @@ namespace Voxalia.ClientGame.ClientMainSystem
             CVars.s_glversion.Value = GLVersion;
             GLRenderer = GL.GetString(StringName.Renderer);
             CVars.s_glrenderer.Value = GLRenderer;
-            SysConsole.Output(OutputType.CLIENINIT, "Vendor: " + GLVendor + ", GLVersion: " + GLVersion + ", Renderer: " + GLRenderer);
+            SysConsole.Output(OutputType.CLIENTINIT, "Vendor: " + GLVendor + ", GLVersion: " + GLVersion + ", Renderer: " + GLRenderer);
             if (GLVendor.ToLowerFast().Contains("intel"))
             {
-                SysConsole.Output(OutputType.CLIENINIT, "Disabling good graphics (Appears to be Intel: '" + GLVendor + "')");
+                SysConsole.Output(OutputType.CLIENTINIT, "Disabling good graphics (Appears to be Intel: '" + GLVendor + "')");
                 Shaders.MCM_GOOD_GRAPHICS = false;
             }
             Shaders.InitShaderSystem(this);
             View3D.CheckError("Load - Shaders");
-            SysConsole.Output(OutputType.CLIENINIT, "Loading rendering helper...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading rendering helper...");
             Rendering = new Renderer(Textures, Shaders);
             Rendering.Init();
-            SysConsole.Output(OutputType.CLIENINIT, "Preparing load screen...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Preparing load screen...");
             load_screen = Textures.GetTexture("ui/menus/loadscreen");
             Establish2D();
             SWLoading.Start();
             PassLoadScreen();
-            SysConsole.Output(OutputType.CLIENINIT, "Loading block textures...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading block textures...");
             TBlock = new TextureBlock();
             TBlock.Generate(this, CVars, Textures, false);
             View3D.CheckError("Load - Textures");
-            SysConsole.Output(OutputType.CLIENINIT, "Loading fonts...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading fonts...");
             Fonts = new GLFontEngine(Shaders);
             Fonts.Init(this);
             FontSets = new FontSetEngine(Fonts);
             FontSets.Init(this);
             View3D.CheckError("Load - Fonts");
             PassLoadScreen();
-            SysConsole.Output(OutputType.CLIENINIT, "Loading animation engine...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading animation engine...");
             Animations = new AnimationEngine();
-            SysConsole.Output(OutputType.CLIENINIT, "Loading model engine...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading model engine...");
             Models = new ModelEngine();
             Models.Init(Animations, this);
-            SysConsole.Output(OutputType.CLIENINIT, "Loading general graphics settings...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading general graphics settings...");
             CVars.r_vsync.OnChanged += onVsyncChanged;
             onVsyncChanged(CVars.r_vsync, null);
             CVars.r_cloudshadows.OnChanged += onCloudShadowChanged;
             View3D.CheckError("Load - General Graphics");
-            SysConsole.Output(OutputType.CLIENINIT, "Loading UI engine...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading UI engine...");
             UIConsole.InitConsole(); // TODO: make this non-static
             InitChatSystem();
             PassLoadScreen();
             View3D.CheckError("Load - UI");
-            SysConsole.Output(OutputType.CLIENINIT, "Preparing rendering engine...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Preparing rendering engine...");
             InitRendering();
             View3D.CheckError("Load - Rendering");
-            SysConsole.Output(OutputType.CLIENINIT, "Loading particle effect engine...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading particle effect engine...");
             Particles = new ParticleHelper(this) { Engine = new ParticleEngine(this) };
-            SysConsole.Output(OutputType.CLIENINIT, "Preparing mouse, keyboard, and gamepad handlers...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Preparing mouse, keyboard, and gamepad handlers...");
             KeyHandler.Init();
             GamePadHandler.Init();
             PassLoadScreen();
             View3D.CheckError("Load - Keyboard/mouse");
-            SysConsole.Output(OutputType.CLIENINIT, "Building the sound system...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Building the sound system...");
             Sounds = new SoundEngine();
             Sounds.Init(this, CVars);
             View3D.CheckError("Load - Sound");
-            SysConsole.Output(OutputType.CLIENINIT, "Building game world...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Building game world...");
             BuildWorld();
             PassLoadScreen();
             View3D.CheckError("Load - World");
-            SysConsole.Output(OutputType.CLIENINIT, "Preparing networking...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Preparing networking...");
             Network = new NetworkBase(this);
             RegisterDefaultEntityTypes();
             View3D.CheckError("Load - Net");
             PassLoadScreen();
-            SysConsole.Output(OutputType.CLIENINIT, "Playing background music...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Playing background music...");
             BackgroundMusic();
             CVars.a_musicvolume.OnChanged += onMusicVolumeChanged;
             CVars.a_musicpitch.OnChanged += onMusicPitchChanged;
@@ -429,25 +429,25 @@ namespace Voxalia.ClientGame.ClientMainSystem
             CVars.a_echovolume.OnChanged += OnEchoVolumeChanged;
             OnEchoVolumeChanged(null, null);
             PassLoadScreen();
-            SysConsole.Output(OutputType.CLIENINIT, "Setting up screens...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Setting up screens...");
             TheMainMenuScreen = new MainMenuScreen(this);
             TheGameScreen = new GameScreen(this);
             TheSingleplayerMenuScreen = new SingleplayerMenuScreen(this);
             TheLoadScreen = new LoadScreen(this);
             CScreen = TheMainMenuScreen;
-            SysConsole.Output(OutputType.CLIENINIT, "Trying to grab RawGamePad...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Trying to grab RawGamePad...");
             try
             {
                 RawGamePad = new XInput();
             }
             catch (Exception ex)
             {
-                SysConsole.Output(OutputType.CLIENINIT, "Failed to grab RawGamePad: " + ex.Message);
+                SysConsole.Output(OutputType.CLIENTINIT, "Failed to grab RawGamePad: " + ex.Message);
             }
-            SysConsole.Output(OutputType.CLIENINIT, "Preparing inventory...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Preparing inventory...");
             InitInventory();
             PassLoadScreen();
-            SysConsole.Output(OutputType.CLIENINIT, "Requesting a menu server...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Requesting a menu server...");
             LocalServer?.ShutDown();
             LocalServer = new Server(28009); // TODO: Grab first free port?
             LocalServer.IsMenu = true;
@@ -475,7 +475,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 PassLoadScreen();
                 Thread.Sleep(50);
             }
-            SysConsole.Output(OutputType.CLIENINIT, "Connecting to a menu server...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Connecting to a menu server...");
             Network.LastConnectionFailed = false;
             Network.Connect("localhost", "28009", true, null); // TODO: Grab accurate local IP?
             Stopwatch sw = new Stopwatch();
@@ -485,7 +485,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 if (Network.LastConnectionFailed)
                 {
-                    SysConsole.Output(OutputType.CLIENINIT, "Failed to connect to menu server! Failing!");
+                    SysConsole.Output(OutputType.CLIENTINIT, "Failed to connect to menu server! Failing!");
                     Window.Close();
                     return;
                 }
@@ -503,17 +503,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 if (ms > 10000)
                 {
-                    SysConsole.Output(OutputType.CLIENINIT, "Timed out while trying to connect to menu server! Failing!");
+                    SysConsole.Output(OutputType.CLIENTINIT, "Timed out while trying to connect to menu server! Failing!");
                     Window.Close();
                     return;
                 }
                 PassLoadScreen();
                 Thread.Sleep(50);
             }
-            SysConsole.Output(OutputType.CLIENINIT, "Showing main menu...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Showing main menu...");
             ShowMainMenu();
             View3D.CheckError("Load - Final");
-            SysConsole.Output(OutputType.CLIENINIT, "Ready and looping!");
+            SysConsole.Output(OutputType.CLIENTINIT, "Ready and looping!");
         }
 
         /// <summary>
