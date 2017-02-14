@@ -284,7 +284,9 @@ namespace Voxalia.ClientGame.AudioSystem
             }
             else
             {
-                // TODO: pos, vel, dir
+                // TODO: vel
+                AudioInternal.Left = CVars.a_left.ValueB;
+                AudioInternal.Right = CVars.a_right.ValueB;
                 AudioInternal.Position = position;
                 AudioInternal.ForwardDirection = forward;
                 AudioInternal.UpDirection = up;

@@ -32,6 +32,8 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
 
         public const int ACTUAL_SAMPLES = (int)((FREQUENCY * SAMPLE_LOAD) / 1000.0) * CHANNELS * BYTERATE;
 
+        public const float MINUS_THREE_DB = 0.707106781f;
+
         public bool Run = false;
 
         public float Volume = 0.5f;
@@ -47,6 +49,10 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
         public Location ForwardDirection;
 
         public Location UpDirection;
+
+        public bool Left = true;
+
+        public bool Right = true;
 
         public void Add(LiveAudioInstance inst)
         {
@@ -75,6 +81,8 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
             Run = false;
         }
 
+        const float QUARTER_PI = (float)Math.PI * 0.25f;
+
         public void ForceAudioLoop()
         {
             try
@@ -96,6 +104,8 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                     }
                     sw.Stop();
                     double elSec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
+                    sw.Reset();
+                    sw.Start();
                     int proc;
                     AL.GetSource(src, ALGetSourcei.BuffersProcessed, out proc);
                     while (proc > 0)
@@ -106,9 +116,8 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                     }
                     int waiting;
                     AL.GetSource(src, ALGetSourcei.BuffersQueued, out waiting);
-                    //long blast = 0;
-                    //long vol = 0;
-                    //long samps = 0;
+                    BEPUutilities.Vector3 bforw = ForwardDirection.ToBVector();
+                    BEPUutilities.Vector3 bup = UpDirection.ToBVector();
                     if (waiting < BUFFERS_AT_ONCE)
                     {
                         byte[] b = new byte[ACTUAL_SAMPLES];
@@ -125,26 +134,71 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                     int bpos = 0;
                                     int pos = 0;
                                     float tvol = 1f;
+                                    float tvol_2 = 1f;
                                     if (toAdd.UsePosition)
                                     {
-                                        tvol = 1.0f / Math.Max(1.0f, (float)toAdd.Position.DistanceSquared(Position));
+                                        float tempvol = 1.0f / Math.Max(1.0f, (float)toAdd.Position.DistanceSquared(Position));
+                                        BEPUutilities.Vector3 rel = ((toAdd.Position - Position).Normalize().ToBVector());
+                                        BEPUutilities.Quaternion quat;
+                                        BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref rel, ref bforw, out quat);
+                                        float angle = (float)quat.AxisAngleFor(bup);
+
+                                        if (angle > (float)Math.PI)
+                                        {
+                                            angle -= (float)Math.PI * 2f;
+                                        }
+                                        else if (angle < -(float)Math.PI)
+                                        {
+                                            angle += (float)Math.PI * 2f;
+                                        }
+
+                                        bool any_left = true;
+                                        bool any_right = true;
+
+                                        if (angle > QUARTER_PI)
+                                        {
+                                            if (angle > QUARTER_PI * 3f)
+                                            {
+                                                angle = (float)Math.PI - angle;
+                                            }
+                                            else
+                                            {
+                                                any_right = false;
+                                            }
+                                        }
+                                        else if (angle < -QUARTER_PI)
+                                        {
+                                            if (angle < -QUARTER_PI * 3f)
+                                            {
+                                                angle = (-(float)Math.PI) - angle;
+                                            }
+                                            else
+                                            {
+                                                any_left = false;
+                                            }
+                                        }
+                                        
+                                        tvol = Right && any_right ? (float)Math.Cos(angle + QUARTER_PI) : 0f;
+                                        tvol_2 = Left && any_left ? (float)Math.Sin(angle + QUARTER_PI) : 0f;
+                                        
+                                        tvol *= tvol;
+                                        tvol_2 *= tvol_2;
                                     }
                                     float gain = toAdd.Gain * Volume;
-                                    int mod = (int)((tvol * gain * gain) * ushort.MaxValue);
-                                    //vol += mod;
+                                    gain *= gain;
+                                    int mod = (int)((tvol * gain) * ushort.MaxValue);
+                                    int mod_2 = (int)((tvol_2 * gain) * ushort.MaxValue);
                                     int lim = Math.Min(toAdd.Clip.Data.Length - toAdd.CurrentSample, ACTUAL_SAMPLES);
-                                    //SysConsole.Output(OutputType.DEBUG, "Sample / " + lim + ", " + toAdd.CurrentSample);
                                     while (bpos < lim && bpos + 3 < ACTUAL_SAMPLES)
                                     {
-                                        // TODO: pitch, rate, position, velocity, direction, etc.?
+                                        // TODO: pitch, velocity, etc.?
                                         int sample = (short)((toAdd.Clip.Data[pos + toAdd.CurrentSample + 1] << 8) | toAdd.Clip.Data[pos + toAdd.CurrentSample]);
-                                        int bproc = (sample * mod) >> 16;
+                                        int bproc = (sample * mod_2) >> 16;
                                         int bsample = (short)((b[bpos + 1] << 8) | b[bpos]);
                                         bproc += bsample; // TODO: Better scaled adder
                                         bproc = Math.Max(short.MinValue, Math.Min(short.MaxValue, bproc));
                                         b[bpos] = (byte)bproc;
                                         b[bpos + 1] = (byte)(bproc >> 8);
-                                        //blast += Math.Abs(b[bpos + 1]);
                                         bpos += 2;
                                         if (toAdd.Clip.Channels == 2)
                                         {
@@ -158,12 +212,14 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                         }
                                         else
                                         {
+                                            bproc = (sample * mod) >> 16;
+                                            bsample = (short)((b[bpos + 1] << 8) | b[bpos]);
+                                            bproc += bsample; // TODO: Better scaled adder
                                             b[bpos] = (byte)bproc;
                                             b[bpos + 1] = (byte)(bproc >> 8);
                                         }
                                         pos += 2;
                                         bpos += 2;
-                                        //samps += 4;
                                     }
                                     toAdd.CurrentSample += pos;
                                     if (toAdd.CurrentSample >= toAdd.Clip.Data.Length)
@@ -194,9 +250,6 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                             AL.SourcePlay(src);
                         }
                     }
-                    //SysConsole.Output(OutputType.DEBUG, "blasted: " + blast + " at " + vol + " across " + samps + "/" + ACTUAL_SAMPLES);
-                    sw.Reset();
-                    sw.Start();
                     int ms = PAUSE - (int)(elSec * 1000.0);
                     if (ms > 0)
                     {

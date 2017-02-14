@@ -43,7 +43,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_godrays, r_hdr, r_chunkmarch, r_clouds, r_motionblur, r_plants, r_exposure, r_grayscale, r_vrscale;
 
         // Audio CVars
-        public CVar a_musicvolume, a_musicpitch, a_globalvolume, a_globalpitch, a_music, a_quietondeselect, a_echovolume, a_enforce;
+        public CVar a_musicvolume, a_musicpitch, a_globalvolume, a_globalpitch, a_music, a_quietondeselect, a_echovolume, a_enforce, a_left, a_right;
 
         // UI CVars
         public CVar u_mouse_sensitivity, u_reticle, u_reticlescale, u_showhud,
@@ -140,6 +140,8 @@ namespace Voxalia.ClientGame.CommandSystem
             a_quietondeselect = Register("a_quietondeselect", "true", CVarFlag.Boolean, "Whether to quiet music when the window is deselected.");
             a_echovolume = Register("a_echovolume", "0", CVarFlag.Numeric, "What volume to echo microphone pickup at, for audio testing purposes. Specify 0 to not listen to the microphone at all.");
             a_enforce = Register("a_enforce", "true", CVarFlag.Boolean, "Whether to use the audio enforcement mode.");
+            a_left = Register("a_left", "true", CVarFlag.Boolean, "Whether to play left-channel audio.");
+            a_right = Register("a_right", "true", CVarFlag.Boolean, "Whether to play right-channel audio.");
             // UI CVars
             u_mouse_sensitivity = Register("u_mouse_sensitivity", "1", CVarFlag.Numeric, "How sensitive the mouse is.");
             u_reticle = Register("u_reticle", "1", CVarFlag.Textual, "What reticle to use.");

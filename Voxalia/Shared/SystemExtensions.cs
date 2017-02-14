@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using BEPUutilities;
 
 namespace Voxalia.Shared
 {
@@ -19,6 +20,16 @@ namespace Voxalia.Shared
     /// </summary>
     public static class SystemExtensions
     {
+        public static double AxisAngleFor(this Quaternion rotation, Vector3 axis)
+        {
+            Vector3 ra = new Vector3(rotation.X, rotation.Y, rotation.Z);
+            Vector3 p = Utilities.Project(ra, axis);
+            Quaternion twist = new Quaternion(p.X, p.Y, p.Z, rotation.W);
+            twist.Normalize();
+            Vector3 new_forward = Quaternion.Transform(Vector3.UnitX, twist);
+            return Utilities.VectorToAngles(new Location(new_forward)).Yaw * Math.PI / 180.0;
+        }
+
         public static IEnumerable<T> AsEnumerable<T>(this TextElementEnumerator enumerator)
         {
             while (enumerator.MoveNext())
