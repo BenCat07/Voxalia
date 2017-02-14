@@ -299,6 +299,13 @@ namespace VoxaliaLauncher
                 string read = await OutputReader.ReadLineAsync();
                 if (!Visible || IsDisposed || read == null)
                 {
+                    if (checkBox1.Checked)
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            Close();
+                        }));
+                    }
                     return;
                 }
                 Invoke(new Action(() =>
@@ -310,6 +317,11 @@ namespace VoxaliaLauncher
                     WriteInternal(read);
                 }));
             }
+        }
+
+        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
