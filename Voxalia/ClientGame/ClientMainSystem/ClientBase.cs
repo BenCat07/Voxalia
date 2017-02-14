@@ -322,6 +322,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             double delta = sectime - psectime;
             if (delta > 0.02)
             {
+                Window.ProcessEvents();
                 Schedule.RunAllSyncTasks(delta);
                 load_screen.Bind();
                 Shaders.ColorMultShader.Bind();
