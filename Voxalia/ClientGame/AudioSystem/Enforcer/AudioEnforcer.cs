@@ -30,7 +30,7 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
 
         public const int BUFFERS_AT_ONCE = 2;
 
-        public const int ACTUAL_SAMPLES = (int)((FREQUENCY * CHANNELS * BYTERATE) * (1000.0 / SAMPLE_LOAD));
+        public const int ACTUAL_SAMPLES = (int)((FREQUENCY * SAMPLE_LOAD) / 1000.0) * CHANNELS * BYTERATE;
 
         public bool Run = false;
 
@@ -101,6 +101,7 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                     AL.GetSource(src, ALGetSourcei.BuffersQueued, out waiting);
                     long blast = 0;
                     long vol = 0;
+                    long samps = 0;
                     if (waiting < BUFFERS_AT_ONCE)
                     {
                         byte[] b = new byte[ACTUAL_SAMPLES];
@@ -118,7 +119,8 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                     int pos = 0;
                                     int mod = (int)(toAdd.Gain * Volume * ushort.MaxValue);
                                     vol += mod;
-                                    int lim = Math.Min(toAdd.Clip.Data.Length, toAdd.CurrentSample + ACTUAL_SAMPLES) - toAdd.CurrentSample;
+                                    int lim = Math.Min(toAdd.Clip.Data.Length - toAdd.CurrentSample, ACTUAL_SAMPLES);
+                                    //SysConsole.Output(OutputType.DEBUG, "Sample / " + lim + ", " + toAdd.CurrentSample);
                                     while (bpos < lim && bpos + 3 < ACTUAL_SAMPLES)
                                     {
                                         // TODO: pitch, rate, position, velocity, direction, etc.?
@@ -126,9 +128,10 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                         int bproc = (sample * mod) >> 16;
                                         int bsample = (short)((b[bpos + 1] << 8) | b[bpos]);
                                         bproc += bsample; // TODO: Better scaled adder
+                                        bproc = Math.Max(short.MinValue, Math.Min(short.MaxValue, bproc));
                                         b[bpos] = (byte)bproc;
                                         b[bpos + 1] = (byte)(bproc >> 8);
-                                        blast += bsample;
+                                        blast += Math.Abs(b[bpos + 1]);
                                         bpos += 2;
                                         if (toAdd.Clip.Channels == 2)
                                         {
@@ -145,12 +148,12 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                             b[bpos] = (byte)bproc;
                                             b[bpos + 1] = (byte)(bproc >> 8);
                                         }
-                                        blast += bsample;
                                         pos += 2;
                                         bpos += 2;
+                                        samps += 4;
                                     }
                                     toAdd.CurrentSample += pos;
-                                    if (toAdd.CurrentSample > toAdd.Clip.Data.Length)
+                                    if (toAdd.CurrentSample >= toAdd.Clip.Data.Length)
                                     {
                                         toAdd.CurrentSample = 0;
                                         if (toAdd.Loop)
@@ -178,7 +181,7 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                             AL.SourcePlay(src);
                         }
                     }
-                    SysConsole.Output(OutputType.DEBUG, "blasted: " + blast + " at " + vol);
+                    //SysConsole.Output(OutputType.DEBUG, "blasted: " + blast + " at " + vol + " across " + samps + "/" + ACTUAL_SAMPLES);
                     sw.Reset();
                     sw.Start();
                     int ms = PAUSE - (int)(elSec * 1000.0);
