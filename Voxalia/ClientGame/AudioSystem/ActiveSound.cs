@@ -54,7 +54,10 @@ namespace Voxalia.ClientGame.AudioSystem
                     AudioInternal.Gain = Gain;
                     AudioInternal.Loop = Loop;
                     AudioInternal.Pitch = Pitch;
-                    // TODO: pos, vel, dir, etc.
+                    AudioInternal.Position = Position;
+                    AudioInternal.Velocity = Location.Zero; // TODO: Velocity!
+                    // TODO: Direction?
+                    AudioInternal.UsePosition = !Position.IsNaN();
                 }
                 else
                 {

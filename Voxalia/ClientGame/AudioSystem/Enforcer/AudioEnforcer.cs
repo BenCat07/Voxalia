@@ -42,6 +42,12 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
 
         public AudioContext Context;
 
+        public Location Position;
+
+        public Location ForwardDirection;
+
+        public Location UpDirection;
+
         public void Add(LiveAudioInstance inst)
         {
             lock (Locker)
@@ -85,6 +91,7 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                 {
                     if (!Run)
                     {
+                        Context.Dispose();
                         return;
                     }
                     sw.Stop();
@@ -99,9 +106,9 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                     }
                     int waiting;
                     AL.GetSource(src, ALGetSourcei.BuffersQueued, out waiting);
-                    long blast = 0;
-                    long vol = 0;
-                    long samps = 0;
+                    //long blast = 0;
+                    //long vol = 0;
+                    //long samps = 0;
                     if (waiting < BUFFERS_AT_ONCE)
                     {
                         byte[] b = new byte[ACTUAL_SAMPLES];
@@ -117,8 +124,14 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                 {
                                     int bpos = 0;
                                     int pos = 0;
-                                    int mod = (int)(toAdd.Gain * Volume * ushort.MaxValue);
-                                    vol += mod;
+                                    float tvol = 1f;
+                                    if (toAdd.UsePosition)
+                                    {
+                                        tvol = 1.0f / Math.Max(1.0f, (float)toAdd.Position.DistanceSquared(Position));
+                                    }
+                                    float gain = toAdd.Gain * Volume;
+                                    int mod = (int)((tvol * gain * gain) * ushort.MaxValue);
+                                    //vol += mod;
                                     int lim = Math.Min(toAdd.Clip.Data.Length - toAdd.CurrentSample, ACTUAL_SAMPLES);
                                     //SysConsole.Output(OutputType.DEBUG, "Sample / " + lim + ", " + toAdd.CurrentSample);
                                     while (bpos < lim && bpos + 3 < ACTUAL_SAMPLES)
@@ -131,7 +144,7 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                         bproc = Math.Max(short.MinValue, Math.Min(short.MaxValue, bproc));
                                         b[bpos] = (byte)bproc;
                                         b[bpos + 1] = (byte)(bproc >> 8);
-                                        blast += Math.Abs(b[bpos + 1]);
+                                        //blast += Math.Abs(b[bpos + 1]);
                                         bpos += 2;
                                         if (toAdd.Clip.Channels == 2)
                                         {
@@ -150,7 +163,7 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                         }
                                         pos += 2;
                                         bpos += 2;
-                                        samps += 4;
+                                        //samps += 4;
                                     }
                                     toAdd.CurrentSample += pos;
                                     if (toAdd.CurrentSample >= toAdd.Clip.Data.Length)

@@ -46,8 +46,8 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
         // TODO: Move to a manager class rather than this packet class!
         public void PlayDefaultBlockSound(Location pos, MaterialSound sound, float pitchmod, float volumemod)
         {
-            float pitch = (float)(Utilities.UtilRandom.NextDouble() * 0.1 + 1.0 - 0.05);
-            float volume = (float)Math.Min((Utilities.UtilRandom.NextDouble() * 0.1 + 1.0 - 0.1) * volumemod, 1.0);
+            float pitch = (float)(Utilities.UtilRandom.NextDouble() * 0.1 + 0.95);
+            float volume = (float)Math.Min((Utilities.UtilRandom.NextDouble() * 0.1 + 0.9) * volumemod, 1.0);
             // TODO: registry of some form?
             switch (sound)
             {

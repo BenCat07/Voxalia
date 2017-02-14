@@ -267,14 +267,14 @@ namespace Voxalia.ClientGame.AudioSystem
                 Microphone.Tick();
             }
             CheckError("Microphone");
-            Vector3 pos = ClientUtilities.Convert(position);
-            Vector3 forw = ClientUtilities.Convert(forward);
-            Vector3 upvec = ClientUtilities.Convert(up);
-            Vector3 vel = ClientUtilities.Convert(velocity);
             float globvol = CVars.a_globalvolume.ValueF;
             globvol = globvol <= 0 ? 0.001f : (globvol > 1 ? 1 : globvol);
             if (AudioInternal == null)
             {
+                Vector3 pos = ClientUtilities.Convert(position);
+                Vector3 forw = ClientUtilities.Convert(forward);
+                Vector3 upvec = ClientUtilities.Convert(up);
+                Vector3 vel = ClientUtilities.Convert(velocity);
                 AL.Listener(ALListener3f.Position, ref pos);
                 AL.Listener(ALListenerfv.Orientation, ref forw, ref upvec);
                 AL.Listener(ALListener3f.Velocity, ref vel);
@@ -285,6 +285,9 @@ namespace Voxalia.ClientGame.AudioSystem
             else
             {
                 // TODO: pos, vel, dir
+                AudioInternal.Position = position;
+                AudioInternal.ForwardDirection = forward;
+                AudioInternal.UpDirection = up;
                 AudioInternal.Volume = globvol;
             }
             TimeTowardsNextClean += TheClient.Delta;
@@ -539,7 +542,7 @@ namespace Voxalia.ClientGame.AudioSystem
             }
             catch (Exception ex)
             {
-                //SysConsole.Output(OutputType.ERROR, "Reading sound file '" + name + "': " + ex.ToString());
+                SysConsole.Output(OutputType.ERROR, "Reading sound file '" + name + "': " + ex.ToString());
                 return null;
             }
         }
