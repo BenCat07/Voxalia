@@ -204,7 +204,10 @@ namespace Voxalia.Shared
         public static byte[] BytesPartial(byte[] full, int start, int length)
         {
             byte[] data = new byte[length];
-            Array.Copy(full, start, data, 0, length);
+            for (int i = 0; i < length; i++)
+            {
+                data[i] = full[i + start];
+            }
             return data;
         }
 
