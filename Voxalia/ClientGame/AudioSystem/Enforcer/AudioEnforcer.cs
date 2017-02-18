@@ -188,9 +188,9 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                         
                                         tvol = Right && any_right ? (float)Math.Cos(angle + QUARTER_PI) : 0f;
                                         tvol_2 = Left && any_left ? (float)Math.Sin(angle + QUARTER_PI) : 0f;
-                                        
-                                        tvol *= tvol;
-                                        tvol_2 *= tvol_2;
+
+                                        tvol *= tvol * tempvol;
+                                        tvol_2 *= tvol_2 * tempvol;
                                     }
                                     float gain = toAdd.Gain * Volume;
                                     gain *= gain;
