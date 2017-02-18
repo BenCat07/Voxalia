@@ -897,6 +897,15 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return Vehicle.GetOrientation();
             }
+            else if (AutoGravityScale > 0.0)
+            {
+                Vector3 up = Vector3.UnitZ;
+                Vector3 antigrav = -Body.Gravity.Value;
+                antigrav.Normalize();
+                Quaternion q;
+                Quaternion.GetQuaternionBetweenNormalizedVectors(ref up, ref antigrav, out q);
+                return q;
+            }
             return Quaternion.Identity;
         }
 

@@ -159,6 +159,8 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public Location GravityNormal = new Location(0, 0, -1);
 
+        public double GravityStrength = 9.8 * (3.0 / 2.0);
+
         /// <summary>
         /// Returns whether is any solid entity that is not a player in the bounding box area.
         /// </summary>

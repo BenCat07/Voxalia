@@ -22,6 +22,7 @@ using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.ServerGame.NetworkSystem;
 using System.Threading;
 using LiteDB;
+using Voxalia.ServerGame.WorldSystem.SphereGenerator;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -64,7 +65,7 @@ namespace Voxalia.ServerGame.EntitySystem
             return base.GetRAMUsage() + 200;
         }
 
-        public const int PhysicsNetLength = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1;
+        public const int PhysicsNetLength = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1 + 8;
 
         public byte[] GetPhysicsNetData()
         {
@@ -108,6 +109,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 cg = 16;
             }
             Data[4 + 24 + 24 + 16 + 24 + 4 + 4 + 1] = cg;
+            Utilities.DoubleToBytes(TheRegion.Generator is SphereGeneratorCore ? TheRegion.TheWorld.GeneratorScale : 0.0).CopyTo(Data, 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1);
             return Data;
         }
 
@@ -187,7 +189,7 @@ namespace Voxalia.ServerGame.EntitySystem
         }
         
         /// <summary>
-        /// Ticks the physics entity, doing nothing at all.
+        /// Ticks the physics entity.
         /// </summary>
         public override void Tick()
         {
@@ -209,9 +211,25 @@ namespace Voxalia.ServerGame.EntitySystem
                 Body.ActivityInformation.Activate();
             }
             Vector3i cpos = TheRegion.ChunkLocFor(GetPosition());
-            if (CanSave && !TheRegion.LoadedChunks.ContainsKey(cpos))
+            if (CanSave && !TheRegion.LoadedChunks.ContainsKey(cpos)) // TODO: is this really needed every tick?
             {
                 TheRegion.LoadChunk(cpos);
+            }
+            // TODO: More genericish
+            if (TheRegion.Generator is SphereGeneratorCore)
+            {
+                Location pos = new Location(Body.Position);
+                double scale = TheRegion.TheWorld.GeneratorScale;
+                Location gravDir;
+                if (pos.LengthSquared() > scale * scale)
+                {
+                    gravDir = new Location(scale / pos.X, scale / pos.Y, scale / pos.Z);
+                }
+                else
+                {
+                    gravDir = pos / scale;
+                }
+                SetGravity(gravDir * (-TheRegion.GravityStrength));
             }
         }
 

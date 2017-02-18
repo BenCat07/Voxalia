@@ -137,7 +137,7 @@ namespace Voxalia.ServerGame.WorldSystem
             CollisionDetectionSettings.AllowedPenetration = 0.01f; // TODO: This is a global setting - handle it elsewhere, or make it non-global?
             PhysicsWorld = new Space(pl);
             PhysicsWorld.TimeStepSettings.MaximumTimeStepsPerFrame = 10;
-            PhysicsWorld.ForceUpdater.Gravity = new Vector3(0, 0, -9.8f * 3f / 2f);
+            PhysicsWorld.ForceUpdater.Gravity = (GravityNormal * GravityStrength).ToBVector();
             PhysicsWorld.DuringForcesUpdateables.Add(new LiquidVolume(this));
             PhysicsWorld.TimeStepSettings.TimeStepDuration = 1f / TheServer.CVars.g_fps.ValueF;
             Collision = new CollisionUtil(PhysicsWorld);

@@ -94,7 +94,20 @@ namespace Voxalia.ClientGame.EntitySystem
         
         public override void Tick()
         {
-            // NOTE: Do nothing here.
+            if (AutoGravityScale > 0.0)
+            {
+                Location pos = new Location(Body.Position);
+                Location gravDir;
+                if (pos.LengthSquared() > AutoGravityScale * AutoGravityScale)
+                {
+                    gravDir = new Location(AutoGravityScale / pos.X, AutoGravityScale / pos.Y, AutoGravityScale / pos.Z);
+                }
+                else
+                {
+                    gravDir = pos / AutoGravityScale;
+                }
+                Body.Gravity = (gravDir * (-9.8 * 3.0 / 2.0)).ToBVector(); // TODO: Correct gravity field, non-constant
+            }
         }
 
         /// <summary>
@@ -389,7 +402,9 @@ namespace Voxalia.ClientGame.EntitySystem
             }
         }
 
-        public const int PhysicsNetworkDataLength = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1;
+        public double AutoGravityScale = 0.0;
+
+        public const int PhysicsNetworkDataLength = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1 + 8;
 
         public bool ApplyPhysicsNetworkData(byte[] dat)
         {
@@ -437,6 +452,9 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 CGroup = CollisionUtil.Player;
             }
+            // TODO: non-entity property
+            AutoGravityScale = Utilities.BytesToDouble(Utilities.BytesPartial(dat, 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1, 8));
+            TheClient.Player.AutoGravityScale = AutoGravityScale;
             return true;
         }
     }
