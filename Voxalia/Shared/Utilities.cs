@@ -146,6 +146,16 @@ namespace Voxalia.Shared
         /// </summary>
         /// <param name="bytes">The byte array.</param>
         /// <returns>The actual value of it.</returns>
+        public static short BytesToShort(byte[] bytes)
+        {
+            return BitConverter.ToInt16(bytes, 0);
+        }
+
+        /// <summary>
+        /// Converts a byte array to an int.
+        /// </summary>
+        /// <param name="bytes">The byte array.</param>
+        /// <returns>The actual value of it.</returns>
         public static int BytesToInt(byte[] bytes)
         {
             return BitConverter.ToInt32(bytes, 0);

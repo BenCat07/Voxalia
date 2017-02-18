@@ -61,7 +61,7 @@ namespace Voxalia.ServerGame.ItemSystem
                 byte b = dr.ReadByte();
                 if (b == 0)
                 {
-                    Attributes.Add(cattrib, new IntegerTag(dr.ReadInt64()));
+                    Attributes.Add(cattrib, new IntegerTag(dr.ReadLong()));
                 }
                 else if (b == 1)
                 {

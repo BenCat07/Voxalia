@@ -614,43 +614,54 @@ namespace Voxalia.ClientGame.AudioSystem
         public byte[] LoadWAVE(DataStream stream, out int channels, out int bits, out int rate)
         {
             DataReader dr = new DataReader(stream);
-            string signature = new string(dr.ReadChars(4));
+            string signature = dr.ReadString(4);
             if (signature != "RIFF")
             {
                 throw new NotSupportedException("Not a RIFF .wav file: " + signature);
             }
-            /*int riff_chunk_size = */dr.ReadInt32();
-            string format = new string(dr.ReadChars(4));
+            /*int riff_chunk_size = */dr.ReadInt();
+            string format = dr.ReadString(4);
             if (format != "WAVE")
             {
                 throw new NotSupportedException("Not a WAVE .wav file: " + format);
             }
-            string format_signature = new string(dr.ReadChars(4));
+            string format_signature = dr.ReadString(4);
             if (format_signature != "fmt ")
             {
                 throw new NotSupportedException("Not a 'fmt ' .wav file: " + format_signature);
             }
-            /*int format_chunk_size = */dr.ReadInt32();
-            /*int audio_format = */dr.ReadInt16();
-            int num_channels = dr.ReadInt16();
+            /*int format_chunk_size = */dr.ReadInt();
+            /*int audio_format = */dr.ReadShort();
+            int num_channels = dr.ReadShort();
             if (num_channels != 1 && num_channels != 2)
             {
                 throw new NotSupportedException("Invalid number of channels: " + num_channels);
             }
-            int sample_rate = dr.ReadInt32();
-            /*int byte_rate = */dr.ReadInt32();
-            /*int block_align = */dr.ReadInt16();
-            int bits_per_sample = dr.ReadInt16();
-            string data_signature = new string(dr.ReadChars(4));
+            int sample_rate = dr.ReadInt();
+            /*int byte_rate = */dr.ReadInt();
+            /*int block_align = */dr.ReadShort();
+            int bits_per_sample = dr.ReadShort();
+            string data_signature = dr.ReadString(4);
             if (data_signature != "data")
             {
                 throw new NotSupportedException("Not a DATA .wav file: " + data_signature);
             }
-            int data_chunk_size = dr.ReadInt32();
+            int data_chunk_size = dr.ReadInt();
             channels = num_channels;
             bits = bits_per_sample;
             rate = sample_rate;
-            return dr.ReadBytes(data_chunk_size);
+            int extra = data_chunk_size - dr.Available;
+            if (extra == 0)
+            {
+                return dr.ReadBytes(data_chunk_size);
+            }
+            else
+            {
+                byte[] b = new byte[data_chunk_size];
+                byte[] t = dr.ReadBytes(dr.Available);
+                t.CopyTo(b, 0);
+                return b;
+            }
         }
     }
 }

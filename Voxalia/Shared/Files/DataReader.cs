@@ -10,31 +10,71 @@ using System.IO;
 
 namespace Voxalia.Shared.Files
 {
-    public class DataReader: BinaryReader
+    public class DataReader
     {
+        public Stream Internal;
+
         public DataReader(Stream stream)
-            : base(stream, FileHandler.encoding)
         {
+            Internal = stream;
+        }
+
+        public byte ReadByte()
+        {
+            int r = Internal.ReadByte();
+            if (r < 0)
+            {
+                throw new EndOfStreamException("Failed to read from stream, " + Internal.Length + " bytes were available (now none)...");
+            }
+            return (byte)r;
+        }
+
+        public int Available
+        {
+            get
+            {
+                return (int)(Internal.Length - Internal.Position);
+            }
+        }
+
+        public byte[] ReadBytes(int count)
+        {
+            byte[] b = new byte[count];
+            for (int i = 0; i < count; i++)
+            {
+                b[i] = ReadByte();
+            }
+            return b;
+        }
+
+        public short ReadShort()
+        {
+            return Utilities.BytesToShort(ReadBytes(2));
         }
 
         public int ReadInt()
         {
-            return Utilities.BytesToInt(base.ReadBytes(4));
+            return Utilities.BytesToInt(ReadBytes(4));
         }
 
         public long ReadLong()
         {
-            return Utilities.BytesToLong(base.ReadBytes(8));
+            return Utilities.BytesToLong(ReadBytes(8));
         }
 
         public float ReadFloat()
         {
-            return Utilities.BytesToFloat(base.ReadBytes(4));
+            return Utilities.BytesToFloat(ReadBytes(4));
+        }
+
+        public double ReadDouble()
+        {
+            return Utilities.BytesToDouble(ReadBytes(8));
         }
 
         public string ReadString(int length)
         {
-            return FileHandler.encoding.GetString(base.ReadBytes(length));
+            return FileHandler.encoding.GetString(ReadBytes(length));
         }
 
         public byte[] ReadFullBytes()
@@ -47,6 +87,11 @@ namespace Voxalia.Shared.Files
         {
             int len = ReadInt();
             return ReadString(len);
+        }
+
+        public void Close()
+        {
+            Internal.Close();
         }
     }
 }

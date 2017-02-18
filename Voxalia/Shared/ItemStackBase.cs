@@ -250,7 +250,7 @@ namespace Voxalia.Shared
                 byte b = dr.ReadByte();
                 if (b == 0)
                 {
-                    SharedAttributes.Add(cattrib, new IntegerTag(dr.ReadInt64()));
+                    SharedAttributes.Add(cattrib, new IntegerTag(dr.ReadLong()));
                 }
                 else if (b == 1)
                 {
