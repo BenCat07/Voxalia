@@ -18,6 +18,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
     {
         public SimpleBiomeGenerator Biomes = new SimpleBiomeGenerator();
 
+        public override BiomeGenerator GetBiomeGen()
+        {
+            return Biomes;
+        }
+
         public const double GlobalHeightMapSize = 400;
 
         public const double LocalHeightMapSize = 40;

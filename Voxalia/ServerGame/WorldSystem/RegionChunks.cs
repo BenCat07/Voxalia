@@ -756,13 +756,8 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// The current world generator.
         /// </summary>
-        public BlockPopulator Generator = new SimpleGeneratorCore();
-
-        /// <summary>
-        /// The current biome generator.
-        /// </summary>
-        public BiomeGenerator BiomeGen = new SimpleBiomeGenerator();
-
+        public BlockPopulator Generator;
+        
         /// <summary>
         /// Immediately populates a chunk.
         /// </summary>

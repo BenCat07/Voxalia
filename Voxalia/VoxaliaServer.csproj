@@ -347,6 +347,9 @@
     <Compile Include="ServerGame\ServerMainSystem\ServerPhysics.cs" />
     <Compile Include="ServerGame\ServerMainSystem\ServerBase.cs" />
     <Compile Include="ServerGame\ServerMainSystem\ServerTick.cs" />
+    <Compile Include="ServerGame\WorldSystem\SphereGenerator\SphereBiome.cs" />
+    <Compile Include="ServerGame\WorldSystem\SphereGenerator\SphereBiomeGenerator.cs" />
+    <Compile Include="ServerGame\WorldSystem\SphereGenerator\SphereGeneratorCore.cs" />
     <Compile Include="ServerGame\WorldSystem\Structure.cs" />
     <Compile Include="ServerGame\WorldSystem\World.cs" />
   </ItemGroup>

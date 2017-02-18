@@ -147,8 +147,8 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                     + ", xp: " + BlockShapeRegistry.BSD[bi.BlockData].OccupiesXP() + ", xm: " + BlockShapeRegistry.BSD[bi.BlockData].OccupiesXM()
                     + ", yp: " + BlockShapeRegistry.BSD[bi.BlockData].OccupiesYP() + ", ym: " + BlockShapeRegistry.BSD[bi.BlockData].OccupiesYM()
                     + ", zp: " + BlockShapeRegistry.BSD[bi.BlockData].OccupiesTOP() + ", zm: " + BlockShapeRegistry.BSD[bi.BlockData].OccupiesBOTTOM());
-                double temp = entry.Player.TheRegion.BiomeGen.GetTemperature(entry.Player.TheRegion.TheWorld.Seed2, entry.Player.TheRegion.TheWorld.Seed3, (double)posBlock.X, (double)posBlock.Y);
-                double down = entry.Player.TheRegion.BiomeGen.GetDownfallRate(entry.Player.TheRegion.TheWorld.Seed3, entry.Player.TheRegion.TheWorld.Seed4, (double)posBlock.X, (double)posBlock.Y);
+                double temp = entry.Player.TheRegion.Generator.GetBiomeGen().GetTemperature(entry.Player.TheRegion.TheWorld.Seed2, entry.Player.TheRegion.TheWorld.Seed3, (double)posBlock.X, (double)posBlock.Y);
+                double down = entry.Player.TheRegion.Generator.GetBiomeGen().GetDownfallRate(entry.Player.TheRegion.TheWorld.Seed3, entry.Player.TheRegion.TheWorld.Seed4, (double)posBlock.X, (double)posBlock.Y);
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Height: " + h + ", temperature: " + temp + ", downfallrate: " + down + ", biome yield: " + biome.GetName());
                 BlockUpperArea.TopBlock top = entry.Player.TheRegion.GetHighestBlock(posBlock);
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Material: " + top.BasicMat + ", height: " + top.Height);

@@ -76,6 +76,10 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public double GlobalTickTime = 1;
 
+        public string Generator;
+
+        public double GeneratorScale = 1.0;
+
         /// <summary>
         /// Loads the world configuration onto this world object.
         /// Is called as part of the startup sequence for a world.
@@ -100,11 +104,15 @@ namespace Voxalia.ServerGame.WorldSystem
             Config.Default("general.spawnpoint", new Location(0, 0, 50).ToString());
             Config.Default("general.flat", "false");
             Config.Default("general.time", 0);
+            Config.Default("general.generator", "simple");
+            Config.Default("general.generator_scale", 1.0);
             GlobalTickTime = Config.GetLong("general.time", 0).Value;
             CFGEdited = true;
             Seed = Config.GetInt("general.seed", DefaultSeed).Value;
             SpawnPoint = Location.FromString(Config.GetString("general.spawnpoint", DefaultSpawnPoint));
             Flat = Config.GetString("general.flat", "false").ToString().ToLowerFast() == "true";
+            Generator = Config.GetString("general.generator", "simple").ToLowerFast();
+            GeneratorScale = Config.GetDouble("general.generator_scale", 1.0).Value;
             MTRandom seedGen = new MTRandom(39, (ulong)Seed);
             Seed2 = (seedGen.Next(SeedMax) - SeedMax / 2);
             Seed3 = (seedGen.Next(SeedMax) - SeedMax / 2);

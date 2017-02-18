@@ -20,5 +20,7 @@ namespace Voxalia.ServerGame.WorldSystem
         public abstract List<Tuple<string, double>> GetTimings();
 
         public abstract void ClearTimings();
+
+        public abstract BiomeGenerator GetBiomeGen();
     }
 }

@@ -19,6 +19,7 @@ using Voxalia.ServerGame.JointSystem;
 using Voxalia.ServerGame.NetworkSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using BEPUutilities.Threading;
+using Voxalia.ServerGame.WorldSystem.SphereGenerator;
 using Voxalia.ServerGame.WorldSystem.SimpleGenerator;
 using System.Threading;
 using System.Threading.Tasks;
@@ -119,6 +120,15 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public void BuildRegion()
         {
+            // TODO: generator registry
+            if (TheWorld.Generator == "sphere")
+            {
+                Generator = new SphereGeneratorCore();
+            }
+            else
+            {
+                Generator = new SimpleGeneratorCore();
+            }
             ParallelLooper pl = new ParallelLooper();
             for (int i = 0; i < Environment.ProcessorCount; i++)
             {
