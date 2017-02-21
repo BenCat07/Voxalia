@@ -44,13 +44,13 @@
 
 ### Where can I get Voxalia?
 
-- Talk to us! Check the contact page on the FreneticXYZ official website, and join us on IRC or Discord to get involved!
+- Talk to us! Check the contact page on the FreneticLLC official website, and join us on IRC or Discord to get involved!
 - At this time, assets are being kept private to only people who've spoken directly with us about trying it out.
 - In the future, you'll be able to get the game without having to go through people, we have it this way only in early development.
 
 ### How do I get started once I have the game?
 
-- Once you have a valid FreneticXYZ account and a copy of the game:
+- Once you have a valid FreneticLLC account and a copy of the game:
 - Open the Launcher (bin/launcher.bat on Windows or bin/launcher\_linux.sh on Linux) and login.
 - Next, hit the "Play" button.
 - Almost there! Click "Singleplayer" in the main menu.
@@ -103,11 +103,11 @@
 
 - A drunken mistranslation of a YAML specification written in a foreign language.
 
-### What is FreneticXYZ?
+### What is FreneticLLC?
 
-- Our company! We've not finished registering it yet, but we will complete that process soon!
+- Our company! It's a limited liability company owned and operated by CEO Alex "mcmonkey" Goodwin.
 
-### No, what is FreneticXYZ *really*?
+### No, what is FreneticLLC *really*?
 
 - A drunken misunderstanding of government guidelines.
 
@@ -121,7 +121,7 @@
 
 ### Can I open an issue or pull request?
 
-- Yes! Just be sure to read the issue template ( https://github.com/FreneticXYZ/Voxalia/blob/master/ISSUE_TEMPLATE ) and the contributing doc ( https://github.com/FreneticXYZ/Voxalia/blob/master/CONTRIBUTING.md )!
+- Yes! Just be sure to read the issue template ( https://github.com/FreneticLLC/Voxalia/blob/master/ISSUE_TEMPLATE ) and the contributing doc ( https://github.com/FreneticLLC/Voxalia/blob/master/CONTRIBUTING.md )!
 
 ### Can I resell the game or any large portion of it?
 
@@ -133,7 +133,7 @@
 
 ### I want to know more about how the game is licensed!
 
-- Check out the full terms of the license at https://github.com/FreneticXYZ/Voxalia/blob/master/LICENSE.txt
+- Check out the full terms of the license at https://github.com/FreneticLLC/Voxalia/blob/master/LICENSE.txt
 
 ### I want to sue you or otherwise engage you in court!
 
