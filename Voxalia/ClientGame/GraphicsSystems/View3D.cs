@@ -706,11 +706,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public void RenderPass_Setup()
         {
-            Location camup = CameraUp();
             BEPUutilities.Quaternion cammod = CameraModifier();
-            Location camforward = ForwardVec;
-            camup = new Location(BEPUutilities.Quaternion.Transform(camup.ToBVector(), cammod));
-            camforward = new Location(BEPUutilities.Quaternion.Transform(camforward.ToBVector(), cammod));
+            Location camup = new Location(BEPUutilities.Quaternion.Transform(CameraUp().ToBVector(), cammod));
+            Location camforward = new Location(BEPUutilities.Quaternion.Transform(ForwardVec.ToBVector(), cammod));
             CameraForward = camforward;
             BindFramebuffer(FramebufferTarget.Framebuffer, CurrentFBO);
             DrawBuffer(CurrentFBO == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0);
@@ -740,6 +738,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 PrimaryMatrix_OffsetFor3D = view2 * proj2;
                 PrimaryMatrixd = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view) * ClientUtilities.ConvertToD(proj);
                 PrimaryMatrix_OffsetFor3Dd = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view2) * ClientUtilities.ConvertToD(proj2);
+                // TODO: Transform VR by cammod?
             }
             else
             {

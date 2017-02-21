@@ -891,9 +891,19 @@ namespace Voxalia.ClientGame.EntitySystem
             NMTWOWorld.Remove(NMTWOCBody);
         }
 
+        public Location UpDir()
+        {
+            return Location.UnitZ;
+        }
+
+        public bool InPlane()
+        {
+            return InVehicle && Vehicle != null && Vehicle is ModelEntity && (Vehicle as ModelEntity).Plane != null;
+        }
+
         public Quaternion GetRelativeQuaternion()
         {
-            if (InVehicle && Vehicle != null && Vehicle is ModelEntity && (Vehicle as ModelEntity).Plane != null)
+            if (InPlane())
             {
                 return Vehicle.GetOrientation();
             }
@@ -903,7 +913,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 Vector3 antigrav = -Body.Gravity.Value;
                 antigrav.Normalize();
                 Quaternion q;
-                Quaternion.GetQuaternionBetweenNormalizedVectors(ref up, ref antigrav, out q);
+                Quaternion.GetQuaternionBetweenNormalizedVectors(ref antigrav, ref up, out q);
                 return q;
             }
             return Quaternion.Identity;

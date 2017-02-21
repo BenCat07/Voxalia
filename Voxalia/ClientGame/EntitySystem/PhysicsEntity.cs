@@ -100,7 +100,8 @@ namespace Voxalia.ClientGame.EntitySystem
                 Location gravDir;
                 if (pos.LengthSquared() > AutoGravityScale * AutoGravityScale)
                 {
-                    gravDir = new Location(AutoGravityScale / pos.X, AutoGravityScale / pos.Y, AutoGravityScale / pos.Z);
+                    double len = pos.Length();
+                    gravDir = (pos / (len * AutoGravityScale));
                 }
                 else
                 {

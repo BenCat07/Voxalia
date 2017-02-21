@@ -75,6 +75,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             TheRegion.BuildWorld();
             Player = new PlayerEntity(TheRegion);
             TheRegion.SpawnEntity(Player);
+            MainWorldView.CameraUp = Player.UpDir;
         }
 
         /// <summary>
