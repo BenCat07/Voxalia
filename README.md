@@ -28,8 +28,8 @@ View the [FAQ](/FAQ.md) for more information!
 | ------------- | ------ |
 | AppVeyor | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/inbj8vbo0fx4a8io/branch/master?svg=true)](https://ci.appveyor.com/project/mcmonkey4eva/voxalia/branch/master) |
 | Website ([Frenetic.XYZ](https://frenetic.xyz)) | [![Website](https://img.shields.io/website-up-down-green-red/https/frenetic.xyz.svg)](https://frenetic.xyz) |
-| Issues Open | [![Issues_Open](https://img.shields.io/github/issues/FreneticXYZ/Voxalia.svg)](https://github.com/FreneticXYZ/Voxalia/issues) |
-| License | [![License](https://img.shields.io/badge/license-Frenetic-blue.svg)](https://github.com/FreneticXYZ/Voxalia/blob/master/LICENSE.txt) |
+| Issues Open | [![Issues_Open](https://img.shields.io/github/issues/FreneticLLC/Voxalia.svg)](https://github.com/FreneticLLC/Voxalia/issues) |
+| License | [![License](https://img.shields.io/badge/license-Frenetic-blue.svg)](https://github.com/FreneticLLC/Voxalia/blob/master/LICENSE.txt) |
 
 ## Windows Install Notes
 
@@ -66,7 +66,7 @@ View the [FAQ](/FAQ.md) for more information!
 - Switch the configuration to `Release (Linux)|x64`
 - Build as per normal
 - Be aware that some things may not function properly!
-	- If you are a Linux/Mac|mono|C# developer, consider trying to improve what you can and sending it back through a Github pull request to FreneticXYZ!
+	- If you are a Linux/Mac|mono|C# developer, consider trying to improve what you can and sending it back through a Github pull request to FreneticLLC!
 
 ## Playing
 
@@ -92,7 +92,7 @@ View the [FAQ](/FAQ.md) for more information!
 (This portion is not a legal notice, only the "long version" is!)
 
 - You can do basically whatever you want (within reason), except you may not hold any developer liable for what you do with the software.
-- You may also not sell or relicense the game without explicit permission granted by FreneticXYZ.
+- You may also not sell or relicense the game without explicit permission granted by FreneticLLC.
 
 ### "In Human Terms":
 
@@ -113,7 +113,7 @@ The Frenetic License (FreneticLicense)
 
 Based upon the MIT license, though heavily modified.
 
-Copyright (C) 2016-2017 FreneticXYZ
+Copyright (C) 2016-2017 FreneticLLC
 
 WARNING: This license is not yet fully reviewed and complete!
 AS SUCH: we do not recommend using it!
@@ -195,7 +195,7 @@ SOFTWARE.
 
 ![YourKit](https://www.yourkit.com/images/yklogo.png)
 
-The FreneticXYZ team uses YourKit .NET Profiler to improve performance. We'd like to thank them for their amazing tool and recommend them to all .NET developers!
+The FreneticLLC team uses YourKit .NET Profiler to improve performance. We'd like to thank them for their amazing tool and recommend them to all .NET developers!
 
 YourKit supports open source projects with its full-featured .NET Profiler.  
 YourKit, LLC is the creator of [YourKit .NET Profiler](https://www.yourkit.com/.net/profiler/index.jsp)  
