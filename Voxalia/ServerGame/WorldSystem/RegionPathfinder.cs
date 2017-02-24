@@ -18,6 +18,31 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public partial class Region
     {
+        public PathFindNode GetNode(ref PathFindNode[] nodes, ref int nloc, Location loc, double f, double g)
+        {
+            if (nloc == 0)
+            {
+                PathFindNode[] new_nodes = new PathFindNode[nodes.Length * 2];
+                Array.Copy(nodes, 0, new_nodes, nodes.Length, nodes.Length);
+                for (int i = 0; i < nodes.Length; i++)
+                {
+                    new_nodes[i] = new PathFindNode();
+                }
+                nloc = nodes.Length - 1;
+                nodes = new_nodes;
+            }
+            PathFindNode pf = nodes[nloc--];
+            pf.Parent = null;
+            pf.Internal = loc;
+            pf.F = f;
+            pf.G = g;
+            return pf;
+        }
+
+        public Object PFNodeSetLock = new Object();
+
+        public Stack<PathFindNode[]> PFNodeSet = new Stack<PathFindNode[]>();
+
         /// <summary>
         /// Finds a path from the start to the end, if one exists.
         /// Current implementation is A-Star (A*).
@@ -40,19 +65,44 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return null;
             }
-            PathFindNode start = new PathFindNode() { Internal = startloc, F = 0, G = 0 };
-            PathFindNode end = new PathFindNode() { Internal = endloc, F = 0, G = 0 };
-            SimplePriorityQueue<PathFindNode> open = new SimplePriorityQueue<PathFindNode>();
+            PathFindNode[] nodes;
+            lock (PFNodeSetLock)
+            {
+                if (PFNodeSet.Count == 0)
+                {
+                    nodes = null;
+                }
+                else
+                {
+                    nodes = PFNodeSet.Pop();
+                }
+            }
+            if (nodes == null)
+            {
+                nodes = new PathFindNode[512];
+                for (int i = 0; i < nodes.Length; i++)
+                {
+                    nodes[i] = new PathFindNode();
+                }
+            }
+            int nloc = nodes.Length - 1;
+            PathFindNode start = GetNode(ref nodes, ref nloc, startloc, 0.0, 0.0);
+            SimplePriorityQueue<PathFindNode> open = new SimplePriorityQueue<PathFindNode>(512);
             HashSet<Location> closed = new HashSet<Location>();
             HashSet<Location> openset = new HashSet<Location>();
             open.Enqueue(start, start.F);
             openset.Add(start.Internal);
+            // TODO: relevant chunk map, to shorten the block solidity lookup time!
             while (open.Count > 0)
             {
                 PathFindNode next = open.Dequeue();
                 openset.Remove(next.Internal);
-                if (next.Internal.DistanceSquared(end.Internal) < gosq)
+                if (next.Internal.DistanceSquared(endloc) < gosq)
                 {
+                    lock (PFNodeSetLock)
+                    {
+                        PFNodeSet.Push(nodes);
+                    }
                     return Reconstruct(next);
                 }
                 closed.Add(next.Internal);
@@ -79,9 +129,10 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         continue;
                     }
-                    PathFindNode node = new PathFindNode() { Internal = neighb };
-                    node.G = next.G + 1; // Note: Distance beween 'node' and 'next' is 1.
-                    node.F = node.G + node.Distance(end);
+                    PathFindNode node = GetNode(ref nodes, ref nloc, neighb, 0.0, next.G + 1.0);
+                    //PathFindNode node = new PathFindNode() { Internal = neighb };
+                    //node.G = next.G + 1; // Note: Distance beween 'node' and 'next' is 1.
+                    node.F = node.G + node.Internal.Distance(endloc);
                     node.Parent = next;
                     if (openset.Contains(node.Internal))
                     {
@@ -90,6 +141,10 @@ namespace Voxalia.ServerGame.WorldSystem
                     open.Enqueue(node, node.F);
                     openset.Add(node.Internal);
                 }
+            }
+            lock (PFNodeSetLock)
+            {
+                PFNodeSet.Push(nodes);
             }
             return null;
         }
@@ -115,7 +170,7 @@ namespace Voxalia.ServerGame.WorldSystem
     /// <summary>
     /// Represents a node in a path.
     /// </summary>
-    public class PathFindNode: FastPriorityQueueNode, IComparable<PathFindNode>, IEquatable<PathFindNode>, IComparer<PathFindNode>, IEqualityComparer<PathFindNode>
+    public class PathFindNode: IComparable<PathFindNode>, IEquatable<PathFindNode>, IComparer<PathFindNode>, IEqualityComparer<PathFindNode>
     {
         /// <summary>
         /// The actual block location this node represents.

@@ -36,6 +36,11 @@ namespace Priority_Queue
             _queue = new FastPriorityQueue<SimpleNode>(INITIAL_QUEUE_SIZE);
         }
 
+        public SimplePriorityQueue(int capacity) // mcmonkey: this overload
+        {
+            _queue = new FastPriorityQueue<SimpleNode>(capacity);
+        }
+
         /// <summary>
         /// Given an item of type T, returns the exist SimpleNode in the queue
         /// </summary>
