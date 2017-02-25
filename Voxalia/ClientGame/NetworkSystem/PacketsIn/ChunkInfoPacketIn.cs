@@ -7,6 +7,9 @@
 //
 
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Voxalia.Shared;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.Shared.Files;
@@ -29,36 +32,32 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             int y = dr.ReadInt();
             int z = dr.ReadInt();
             int posMult = dr.ReadInt();
-            double prio = (new Location(x, y, z) * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition());
             lock (TheClient.TheRegion.PreppingNow)
             {
-                Region.EquatableAction act = new Region.EquatableAction()
+                Action act = () =>
                 {
-                    Act = () =>
+                    lock (TheClient.TheRegion.PreppingNow)
                     {
-                        lock (TheClient.TheRegion.PreppingNow)
-                        {
-                            TheClient.TheRegion.PreppingNow.Add(new Vector3i(x, y, z));
-                        }
-                        TheClient.Schedule.StartAsyncTask(() =>
-                        {
-                            try
-                            {
-                                ParseData(data, dr, x, y, z, posMult);
-                            }
-                            catch (Exception ex)
-                            {
-                                Utilities.CheckException(ex);
-                                SysConsole.Output(ex);
-                                lock (TheClient.TheRegion.PreppingNow)
-                                {
-                                    TheClient.TheRegion.PreppingNow.Remove(new Vector3i(x, y, z));
-                                }
-                            }
-                        });
+                        TheClient.TheRegion.PreppingNow.Add(new Vector3i(x, y, z));
                     }
+                    TheClient.Schedule.StartAsyncTask(() =>
+                    {
+                        try
+                        {
+                            ParseData(data, dr, x, y, z, posMult);
+                        }
+                        catch (Exception ex)
+                        {
+                            Utilities.CheckException(ex);
+                            SysConsole.Output(ex);
+                            lock (TheClient.TheRegion.PreppingNow)
+                            {
+                                TheClient.TheRegion.PreppingNow.Remove(new Vector3i(x, y, z));
+                            }
+                        }
+                    });
                 };
-                TheClient.TheRegion.PrepChunks.Enqueue(ref act, prio);
+                TheClient.TheRegion.PrepChunks.Add(new KeyValuePair<Vector3i, Action>(new Vector3i(x, y, z), act));
             }
             return true;
         }

@@ -1034,20 +1034,10 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             return amb + sky + blk;
         }
-
-        public class EquatableAction : IEquatable<EquatableAction>
-        {
-            public Action Act;
-
-            public bool Equals(EquatableAction other)
-            {
-                return other != null && Act == other.Act;
-            }
-        }
-
-        public SimplePriorityQueue<EquatableAction> PrepChunks = new SimplePriorityQueue<EquatableAction>();
         
-        public SimplePriorityQueue<Vector3i> NeedsRendering = new SimplePriorityQueue<Vector3i>();
+        public List<KeyValuePair<Vector3i, Action>> PrepChunks = new List<KeyValuePair<Vector3i, Action>>();
+        
+        public List<Vector3i> NeedsRendering = new List<Vector3i>();
 
         public HashSet<Vector3i> RenderingNow = new HashSet<Vector3i>();
 
@@ -1057,23 +1047,59 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             lock (RenderingNow)
             {
-                while (NeedsRendering.Count > 0 && RenderingNow.Count < TheClient.CVars.r_chunksatonce.ValueI)
+                int removed = 0;
+                if (NeedsRendering.Count > 0)
                 {
-                    Vector3i temp = NeedsRendering.Dequeue();
-                    Chunk ch = GetChunk(temp);
-                    if (ch != null)
+                    NeedsRendering.Sort((a, b) => (a.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition()).CompareTo(
+                        (b.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition())));
+                    while (NeedsRendering.Count > removed && RenderingNow.Count < TheClient.CVars.r_chunksatonce.ValueI)
                     {
-                        ch.MakeVBONow();
-                        RenderingNow.Add(temp);
+                        Vector3i temp = NeedsRendering[removed++];
+                        try
+                        {
+                            Chunk ch = GetChunk(temp);
+                            if (ch != null)
+                            {
+                                ch.MakeVBONow();
+                                RenderingNow.Add(temp);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Utilities.CheckException(ex);
+                            SysConsole.Output("Pre-rendering chunks", ex);
+                        }
+                    }
+                    if (removed > 0)
+                    {
+                        NeedsRendering.RemoveRange(0, removed);
                     }
                 }
             }
             lock (PreppingNow)
             {
-                while (PrepChunks.Count > 0 && PreppingNow.Count < TheClient.CVars.r_chunksatonce.ValueI)
+                if (PrepChunks.Count > 0)
                 {
-                    Action temp = PrepChunks.Dequeue().Act;
-                    temp.Invoke();
+                    PrepChunks.Sort((a, b) => (a.Key.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition()).CompareTo(
+                        (b.Key.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition())));
+                    int removed = 0;
+                    while (PrepChunks.Count > removed && PreppingNow.Count < TheClient.CVars.r_chunksatonce.ValueI)
+                    {
+                        Action temp = PrepChunks[removed++].Value;
+                        try
+                        {
+                            temp.Invoke();
+                        }
+                        catch (Exception ex)
+                        {
+                            Utilities.CheckException(ex);
+                            SysConsole.Output("Prepping chunks", ex);
+                        }
+                    }
+                    if (removed > 0)
+                    {
+                        PrepChunks.RemoveRange(0, removed);
+                    }
                 }
             }
         }
@@ -1095,9 +1121,9 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             lock (RenderingNow)
             {
-                if (!NeedsRendering.Contains(ref ch.WorldPosition))
+                if (!NeedsRendering.Contains(ch.WorldPosition))
                 {
-                    NeedsRendering.Enqueue(ref ch.WorldPosition, (ch.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition()));
+                    NeedsRendering.Add(ch.WorldPosition);
                     return true;
                 }
                 return false;
@@ -1110,9 +1136,9 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             lock (RenderingNow)
             {
-                while (NeedsRendering.Contains(ref ch.WorldPosition))
+                while (NeedsRendering.Contains(ch.WorldPosition))
                 {
-                    NeedsRendering.Remove(ref ch.WorldPosition);
+                    NeedsRendering.Remove(ch.WorldPosition);
                 }
             }
         }

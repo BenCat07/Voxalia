@@ -248,7 +248,7 @@ namespace Priority_Queue
 
             SysConsole.OutputCustom("Queue", "Dequeue");
             T returnMe = _nodes[1];
-            Remove(ref returnMe);
+            Remove(ref _nodes[1]);
             return returnMe;
         }
 
