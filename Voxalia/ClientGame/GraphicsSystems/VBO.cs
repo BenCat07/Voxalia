@@ -82,12 +82,19 @@ namespace Voxalia.ClientGame.GraphicsSystems
             verts = null;
             indices = null;
             normals = null;
+            tangents = null;
             texts = null;
             TCOLs = null;
             THVs = null;
             THWs = null;
             THVs2 = null;
             THWs2 = null;
+            v4_colors = null;
+            v4_tcolors = null;
+            v4_thvs = null;
+            v4_thws = null;
+            v4_thvs2 = null;
+            v4_thws2 = null;
         }
 
         public int vC;
@@ -279,9 +286,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
             verts = Vertices.ToArray();
             normals = Normals.ToArray();
             texts = TexCoords.ToArray();
+            tangents = Tangents != null ? Tangents.ToArray() : TangentsFor(verts, normals, texts);
+            v4_colors = Colors != null ? Colors.ToArray() : null;
+            v4_tcolors = TCOLs != null ? TCOLs.ToArray() : null;
+            v4_thvs = THVs != null ? THVs.ToArray() : null;
+            v4_thws = THWs != null ? THWs.ToArray() : null;
+            v4_thvs2 = THVs2 != null ? THVs.ToArray() : null;
+            v4_thws2 = THWs2 != null ? THWs2.ToArray() : null;
             Vertices = null;
             Normals = null;
             TexCoords = null;
+            Tangents = null;
             // TODO: Other arrays?
         }
 
@@ -293,6 +308,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public uint[] indices = null;
         Vector3[] normals = null;
         Vector3[] texts = null;
+        Vector3[] tangents = null;
+        Vector4[] v4_colors = null;
+        Vector4[] v4_tcolors = null;
+        Vector4[] v4_thvs = null;
+        Vector4[] v4_thws = null;
+        Vector4[] v4_thvs2 = null;
+        Vector4[] v4_thws2 = null;
 
         public void UpdateBuffer()
         {
@@ -306,13 +328,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
             uint[] inds = indices == null ? Indices.ToArray() : indices;
             Vector3[] norms = normals == null ? Normals.ToArray() : normals;
             Vector3[] texs = texts == null ? TexCoords.ToArray() : texts;
-            Vector3[] tangs = Tangents != null ? Tangents.ToArray() : TangentsFor(vecs, norms, texs);
-            Vector4[] cols = Colors != null ? Colors.ToArray() : null;
-            Vector4[] tcols = TCOLs != null ? TCOLs.ToArray() : null;
-            Vector4[] thvs = THVs != null ? THVs.ToArray() : null;
-            Vector4[] thws = THWs != null ? THWs.ToArray() : null;
-            Vector4[] thvs2 = THVs2 != null ? THVs2.ToArray() : null;
-            Vector4[] thws2 = THWs2 != null ? THWs2.ToArray() : null;
+            Vector3[] tangs = Tangents != null ? Tangents.ToArray() : (tangents != null ? tangents : TangentsFor(vecs, norms, texs));
+            Vector4[] cols = Colors != null ? Colors.ToArray() : v4_colors;
+            Vector4[] tcols = TCOLs != null ? TCOLs.ToArray() : v4_tcolors;
+            Vector4[] thvs = THVs != null ? THVs.ToArray() : v4_thvs;
+            Vector4[] thws = THWs != null ? THWs.ToArray() : v4_thws;
+            Vector4[] thvs2 = THVs2 != null ? THVs2.ToArray() : v4_thvs2;
+            Vector4[] thws2 = THWs2 != null ? THWs2.ToArray() : v4_thws2;
             vC = vecs.Length;
             // Vertex buffer
             GL.BindBuffer(BufferTarget.ArrayBuffer, _VertexVBO);
