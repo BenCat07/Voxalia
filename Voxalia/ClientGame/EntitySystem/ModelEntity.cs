@@ -275,6 +275,7 @@ namespace Voxalia.ClientGame.EntitySystem
             model = TheClient.Models.GetModel(mod);
             model.LoadSkin(TheClient.Textures);
             int ignoreme;
+            // TODO: Cache this info below!
             if (mode == ModelCollisionMode.PRECISE)
             {
                 Shape = TheClient.Models.Handler.MeshToBepu(model.Original, out ignoreme);
@@ -325,26 +326,37 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             BEPUutilities.Vector3 offs = Offset.ToBVector();
             transform = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(Offset));
-            List<BEPUutilities.Vector3> tvecs = TheClient.Models.Handler.GetVertices(model.Original);
-            if (tvecs.Count == 0)
+            if (model.ModelBoundsSet)
             {
-                ModelMin = new BEPUutilities.Vector3(0, 0, 0);
-                ModelMax = new BEPUutilities.Vector3(0, 0, 0);
+                ModelMin = model.ModelMin;
+                ModelMax = model.ModelMax;
             }
             else
             {
-                ModelMin = tvecs[0];
-                ModelMax = tvecs[0];
-                foreach (BEPUutilities.Vector3 vec in tvecs)
+                List<BEPUutilities.Vector3> tvecs = TheClient.Models.Handler.GetVertices(model.Original);
+                if (tvecs.Count == 0)
                 {
-                    BEPUutilities.Vector3 tvec = vec + offs;
-                    if (tvec.X < ModelMin.X) { ModelMin.X = tvec.X; }
-                    if (tvec.Y < ModelMin.Y) { ModelMin.Y = tvec.Y; }
-                    if (tvec.Z < ModelMin.Z) { ModelMin.Z = tvec.Z; }
-                    if (tvec.X > ModelMax.X) { ModelMax.X = tvec.X; }
-                    if (tvec.Y > ModelMax.Y) { ModelMax.Y = tvec.Y; }
-                    if (tvec.Z > ModelMax.Z) { ModelMax.Z = tvec.Z; }
+                    ModelMin = new BEPUutilities.Vector3(0, 0, 0);
+                    ModelMax = new BEPUutilities.Vector3(0, 0, 0);
                 }
+                else
+                {
+                    ModelMin = tvecs[0];
+                    ModelMax = tvecs[0];
+                    foreach (BEPUutilities.Vector3 vec in tvecs)
+                    {
+                        BEPUutilities.Vector3 tvec = vec + offs;
+                        if (tvec.X < ModelMin.X) { ModelMin.X = tvec.X; }
+                        if (tvec.Y < ModelMin.Y) { ModelMin.Y = tvec.Y; }
+                        if (tvec.Z < ModelMin.Z) { ModelMin.Z = tvec.Z; }
+                        if (tvec.X > ModelMax.X) { ModelMax.X = tvec.X; }
+                        if (tvec.Y > ModelMax.Y) { ModelMax.Y = tvec.Y; }
+                        if (tvec.Z > ModelMax.Z) { ModelMax.Z = tvec.Z; }
+                    }
+                }
+                model.ModelMin = ModelMin;
+                model.ModelMax = ModelMax;
+                model.ModelBoundsSet = true;
             }
             if (GenBlockShadows)
             {

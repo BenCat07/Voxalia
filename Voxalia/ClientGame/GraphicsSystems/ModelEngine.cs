@@ -323,6 +323,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
         
         public ModelNode RootNode;
 
+        public bool ModelBoundsSet = false;
+
+        public BEPUutilities.Vector3 ModelMin;
+
+        public BEPUutilities.Vector3 ModelMax;
+
         public ModelMesh MeshFor(string name)
         {
             name = name.ToLowerFast();
