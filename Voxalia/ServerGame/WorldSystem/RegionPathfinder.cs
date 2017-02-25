@@ -80,16 +80,16 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 nodes = new PathFindNodeSet() { Nodes = new PathFindNode[512] };
             }
-            PFEntry pfet;
-            pfet.Nodes = nodes;
             int nloc = 0;
             int start = GetNode(nodes, ref nloc, startloc, 0.0, 0.0, -1);
             // TODO: remove the 'simple' bit and replace with 'fast'? - simple causes allocations and slow down :(
             SimplePriorityQueue<PFEntry> open = new SimplePriorityQueue<PFEntry>(512);
             HashSet<Location> closed = new HashSet<Location>();
             HashSet<Location> openset = new HashSet<Location>();
+            PFEntry pfet;
+            pfet.Nodes = nodes;
             pfet.ID = start;
-            open.Enqueue(pfet, 0.0);
+            open.Enqueue(ref pfet, 0.0);
             openset.Add(startloc);
             // TODO: relevant chunk map, to shorten the block solidity lookup time!
             while (open.Count > 0)
@@ -136,8 +136,10 @@ namespace Voxalia.ServerGame.WorldSystem
                         continue;
                     }
                     int node = GetNode(nodes, ref nloc, neighb, next.G + 1.0 + neighb.Distance(endloc), next.G + 1.0, nextid);
-                    pfet.ID = node;
-                    open.Enqueue(pfet, nodes.Nodes[node].F);
+                    PFEntry tpfet;
+                    tpfet.Nodes = nodes;
+                    tpfet.ID = node;
+                    open.Enqueue(ref tpfet, nodes.Nodes[node].F);
                     openset.Add(nodes.Nodes[node].Internal);
                 }
             }

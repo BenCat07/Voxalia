@@ -8,26 +8,35 @@
 
 namespace Priority_Queue
 {
-    // mcmonkey: Got this off https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
+    // mcmonkey: Originally based on https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
     // mcmonkey: original license was MIT, Copyright(c) 2013 Daniel "BlueRaja" Pflughoeft
 
-    public class FastPriorityQueueNode
+    // mcmonkey: convert to interface
+    // mcmonkey: add 'Valid'
+    // mcmonkey: rework docs a bit
+
+    public interface FastPriorityQueueNode
     {
         /// <summary>
-        /// The Priority to insert this node at.  Must be set BEFORE adding a node to the queue
+        /// The Priority to insert this node at.
         /// </summary>
-        public double Priority;
+        double Priority { get; set; }
 
         /// <summary>
-        /// <b>Used by the priority queue - do not edit this value.</b>
+        /// Used by the priority queue - do not edit this value.
         /// Represents the order the node was inserted in
         /// </summary>
-        public long InsertionIndex;
+        long InsertionIndex { get; set; }
 
         /// <summary>
-        /// <b>Used by the priority queue - do not edit this value.</b>
+        /// Used by the priority queue - do not edit this value.
         /// Represents the current position in the queue
         /// </summary>
-        public int QueueIndex;
+        int QueueIndex { get; set; }
+
+        /// <summary>
+        /// Equivalent to nulling the node.
+        /// </summary>
+        bool Valid { get; set; }
     }
 }

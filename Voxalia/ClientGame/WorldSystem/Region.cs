@@ -1035,7 +1035,17 @@ namespace Voxalia.ClientGame.WorldSystem
             return amb + sky + blk;
         }
 
-        public SimplePriorityQueue<Action> PrepChunks = new SimplePriorityQueue<Action>();
+        public class EquatableAction : IEquatable<EquatableAction>
+        {
+            public Action Act;
+
+            public bool Equals(EquatableAction other)
+            {
+                return other != null && Act == other.Act;
+            }
+        }
+
+        public SimplePriorityQueue<EquatableAction> PrepChunks = new SimplePriorityQueue<EquatableAction>();
         
         public SimplePriorityQueue<Vector3i> NeedsRendering = new SimplePriorityQueue<Vector3i>();
 
@@ -1062,7 +1072,7 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 while (PrepChunks.Count > 0 && PreppingNow.Count < TheClient.CVars.r_chunksatonce.ValueI)
                 {
-                    Action temp = PrepChunks.Dequeue();
+                    Action temp = PrepChunks.Dequeue().Act;
                     temp.Invoke();
                 }
             }
@@ -1085,9 +1095,9 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             lock (RenderingNow)
             {
-                if (!NeedsRendering.Contains(ch.WorldPosition))
+                if (!NeedsRendering.Contains(ref ch.WorldPosition))
                 {
-                    NeedsRendering.Enqueue(ch.WorldPosition, (ch.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition()));
+                    NeedsRendering.Enqueue(ref ch.WorldPosition, (ch.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition()));
                     return true;
                 }
                 return false;
@@ -1100,9 +1110,9 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             lock (RenderingNow)
             {
-                while (NeedsRendering.Contains(ch.WorldPosition))
+                while (NeedsRendering.Contains(ref ch.WorldPosition))
                 {
-                    NeedsRendering.Remove(ch.WorldPosition);
+                    NeedsRendering.Remove(ref ch.WorldPosition);
                 }
             }
         }

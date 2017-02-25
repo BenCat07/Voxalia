@@ -14,18 +14,103 @@ using System.Collections.Generic;
 // mcmonkey: original license was MIT, Copyright(c) 2013 Daniel "BlueRaja" Pflughoeft
 
 // mcmonkey: remove all locks
+// mcmonkey: fix for structs
 
 namespace Priority_Queue
 {
     public sealed class SimplePriorityQueue<T> : IPriorityQueue<T>
+        where T : IEquatable<T>
     {
-        private class SimpleNode : FastPriorityQueueNode
+        public class SimpleComparer : NodeComparer<SimpleNode>
+        {
+            public bool AreEqual(SimpleNode a, SimpleNode b)
+            {
+                if (a.Valid == false)
+                {
+                    if (b.Valid == false)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+                if (b.Valid == false)
+                {
+                    return false;
+                }
+                return a.Data.Equals(b.Data);
+            }
+        }
+
+        public struct SimpleNode : FastPriorityQueueNode
         {
             public T Data { get; private set; }
+
+            public double InternalPriority;
+
+            public long InternalInsertionIndex;
+
+            public int InternalQueueIndex;
+
+            public bool InternalValid;
+
+            public double Priority
+            {
+                get
+                {
+                    return InternalPriority;
+                }
+                set
+                {
+                    InternalPriority = value;
+                }
+            }
+
+            public long InsertionIndex
+            {
+                get
+                {
+                    return InternalInsertionIndex;
+                }
+
+                set
+                {
+                    InternalInsertionIndex = value;
+                }
+            }
+
+            public int QueueIndex
+            {
+                get
+                {
+                    return InternalQueueIndex;
+                }
+
+                set
+                {
+                    InternalQueueIndex = value;
+                }
+            }
+
+            public bool Valid
+            {
+                get
+                {
+                    return InternalValid;
+                }
+
+                set
+                {
+                    InternalValid = value;
+                }
+            }
 
             public SimpleNode(T data)
             {
                 Data = data;
+                InternalValid = true;
+                InternalQueueIndex = 0;
+                InternalPriority = 0;
+                InternalInsertionIndex = 0;
             }
         }
 
@@ -34,18 +119,18 @@ namespace Priority_Queue
 
         public SimplePriorityQueue()
         {
-            _queue = new FastPriorityQueue<SimpleNode>(INITIAL_QUEUE_SIZE);
+            _queue = new FastPriorityQueue<SimpleNode>(INITIAL_QUEUE_SIZE, new SimpleComparer());
         }
 
         public SimplePriorityQueue(int capacity) // mcmonkey: this overload
         {
-            _queue = new FastPriorityQueue<SimpleNode>(capacity);
+            _queue = new FastPriorityQueue<SimpleNode>(capacity, new SimpleComparer());
         }
 
         /// <summary>
         /// Given an item of type T, returns the exist SimpleNode in the queue
         /// </summary>
-        private SimpleNode GetExistingNode(T item)
+        private SimpleNode GetExistingNode(ref T item)
         {
             var comparer = EqualityComparer<T>.Default;
             foreach (var node in _queue)
@@ -86,7 +171,7 @@ namespace Priority_Queue
                 }
 
                 SimpleNode first = _queue.First;
-                return (first != null ? first.Data : default(T));
+                return (first.Valid ? first.Data : default(T));
             }
         }
 
@@ -103,12 +188,12 @@ namespace Priority_Queue
         /// Returns whether the given item is in the queue.
         /// O(n)
         /// </summary>
-        public bool Contains(T item)
+        public bool Contains(ref T item)
         {
             var comparer = EqualityComparer<T>.Default;
             foreach (var node in _queue)
             {
-                if (comparer.Equals(node.Data, item))
+                if (node.Data.Equals(item))
                 {
                     return true;
                 }
@@ -138,14 +223,14 @@ namespace Priority_Queue
         /// Duplicates are allowed.
         /// O(log n)
         /// </summary>
-        public void Enqueue(T item, double priority)
+        public void Enqueue(ref T item, double priority)
         {
             SimpleNode node = new SimpleNode(item);
             if (_queue.Count == _queue.MaxSize)
             {
                 _queue.Resize(_queue.MaxSize * 2 + 1);
             }
-            _queue.Enqueue(node, priority);
+            _queue.Enqueue(ref node, priority);
         }
 
         /// <summary>
@@ -154,39 +239,19 @@ namespace Priority_Queue
         /// If multiple copies of the item are enqueued, only the first one is removed. 
         /// O(n)
         /// </summary>
-        public void Remove(T item)
+        public void Remove(ref T item)
         {
             try
             {
-                _queue.Remove(GetExistingNode(item));
+                SimpleNode n = GetExistingNode(ref item);
+                _queue.Remove(ref n);
             }
             catch (InvalidOperationException ex)
             {
                 throw new InvalidOperationException("Cannot call Remove() on a node which is not enqueued: " + item, ex);
             }
         }
-
-        /// <summary>
-        /// Call this method to change the priority of an item.
-        /// Calling this method on a item not in the queue will throw an exception.
-        /// If the item is enqueued multiple times, only the first one will be updated.
-        /// (If your requirements are complex enough that you need to enqueue the same item multiple times <i>and</i> be able
-        /// to update all of them, please wrap your items in a wrapper class so they can be distinguished).
-        /// O(n)
-        /// </summary>
-        public void UpdatePriority(T item, double priority)
-        {
-            try
-            {
-                SimpleNode updateMe = GetExistingNode(item);
-                _queue.UpdatePriority(updateMe, priority);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new InvalidOperationException("Cannot call UpdatePriority() on a node which is not enqueued: " + item, ex);
-            }
-        }
-
+        
         public IEnumerator<T> GetEnumerator()
         {
             List<T> queueData = new List<T>();
@@ -202,11 +267,6 @@ namespace Priority_Queue
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
-        }
-
-        public bool IsValidQueue()
-        {
-            return _queue.IsValidQueue();
         }
     }
 }

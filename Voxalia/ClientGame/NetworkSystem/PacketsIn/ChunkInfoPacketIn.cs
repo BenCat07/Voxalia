@@ -32,29 +32,33 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             double prio = (new Location(x, y, z) * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition());
             lock (TheClient.TheRegion.PreppingNow)
             {
-                TheClient.TheRegion.PrepChunks.Enqueue(() =>
+                Region.EquatableAction act = new Region.EquatableAction()
                 {
-                    lock (TheClient.TheRegion.PreppingNow)
+                    Act = () =>
                     {
-                        TheClient.TheRegion.PreppingNow.Add(new Vector3i(x, y, z));
-                    }
-                    TheClient.Schedule.StartAsyncTask(() =>
-                    {
-                        try
+                        lock (TheClient.TheRegion.PreppingNow)
                         {
-                            ParseData(data, dr, x, y, z, posMult);
+                            TheClient.TheRegion.PreppingNow.Add(new Vector3i(x, y, z));
                         }
-                        catch (Exception ex)
+                        TheClient.Schedule.StartAsyncTask(() =>
                         {
-                            Utilities.CheckException(ex);
-                            SysConsole.Output(ex);
-                            lock (TheClient.TheRegion.PreppingNow)
+                            try
                             {
-                                TheClient.TheRegion.PreppingNow.Remove(new Vector3i(x, y, z));
+                                ParseData(data, dr, x, y, z, posMult);
                             }
-                        }
-                    });
-                }, prio);
+                            catch (Exception ex)
+                            {
+                                Utilities.CheckException(ex);
+                                SysConsole.Output(ex);
+                                lock (TheClient.TheRegion.PreppingNow)
+                                {
+                                    TheClient.TheRegion.PreppingNow.Remove(new Vector3i(x, y, z));
+                                }
+                            }
+                        });
+                    }
+                };
+                TheClient.TheRegion.PrepChunks.Enqueue(ref act, prio);
             }
             return true;
         }
@@ -63,7 +67,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
         {
             byte[] reach = dr.ReadBytes((int)ChunkReachability.COUNT);
             int csize = Chunk.CHUNK_SIZE / posMult;
-            byte[] data_unzipped = dr.ReadBytes(data.Length - 16 - (int)ChunkReachability.COUNT);
+            byte[] data_unzipped = dr.ReadBytes(dr.Available);
             byte[] data_orig = FileHandler.Uncompress(data_unzipped);
             if (posMult == 1)
             {

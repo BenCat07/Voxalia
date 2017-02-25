@@ -76,6 +76,7 @@
     <Compile Include="PriorityQueue\FastPriorityQueue.cs" />
     <Compile Include="PriorityQueue\FastPriorityQueueNode.cs" />
     <Compile Include="PriorityQueue\IPriorityQueue.cs" />
+    <Compile Include="PriorityQueue\NodeComparer.cs" />
     <Compile Include="PriorityQueue\SimplePriorityQueue.cs" />
     <Compile Include="Shared\BFrustum.cs" />
     <Compile Include="Shared\BlockInternal.cs" />
