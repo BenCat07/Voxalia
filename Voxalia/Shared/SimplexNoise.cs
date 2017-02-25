@@ -44,21 +44,18 @@ namespace Voxalia.Shared // mcmonkey - namespace change
     // mcmonkey - ORIGINAL HEADER END
 
     // This class all mcmonkey
-    public class SimplexNoise
+    public static class SimplexNoise
     {
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static double Generate(double x, double y)
         {
-            x = System.Math.Abs(x);
-            y = System.Math.Abs(y);
-            return (SimplexNoiseInternal.Generate(x, y) + 1f) * 0.5f;
+            return (SimplexNoiseInternal.Generate(System.Math.Abs(x), System.Math.Abs(y)) + 1.0) * 0.5;
         }
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         public static double Generate(double x, double y, double z)
         {
-            x = System.Math.Abs(x);
-            y = System.Math.Abs(y);
-            z = System.Math.Abs(z);
-            return (SimplexNoiseInternal.Generate(x, y, z) + 1f) * 0.5f;
+            return (SimplexNoiseInternal.Generate(System.Math.Abs(x), System.Math.Abs(y), System.Math.Abs(z)) + 1.0) * 0.5;
         }
     }
 

@@ -291,12 +291,18 @@ namespace Voxalia.ClientGame.GraphicsSystems
             v4_tcolors = TCOLs != null ? TCOLs.ToArray() : null;
             v4_thvs = THVs != null ? THVs.ToArray() : null;
             v4_thws = THWs != null ? THWs.ToArray() : null;
-            v4_thvs2 = THVs2 != null ? THVs.ToArray() : null;
+            v4_thvs2 = THVs2 != null ? THVs2.ToArray() : null;
             v4_thws2 = THWs2 != null ? THWs2.ToArray() : null;
             Vertices = null;
             Normals = null;
             TexCoords = null;
             Tangents = null;
+            Colors = null;
+            TCOLs = null;
+            THVs = null;
+            THWs = null;
+            THVs2 = null;
+            THWs2 = null;
             // TODO: Other arrays?
         }
 
@@ -479,13 +485,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
             uint[] inds = indices == null ? Indices.ToArray() : indices;
             Vector3[] norms = normals == null ? Normals.ToArray() : normals;
             Vector3[] texs = texts == null ? TexCoords.ToArray() : texts;
-            Vector3[] tangs = Tangents != null ? Tangents.ToArray() : TangentsFor(vecs, norms, texs);
-            Vector4[] cols = Colors != null ? Colors.ToArray() : null;
-            Vector4[] tcols = TCOLs != null ? TCOLs.ToArray() : null;
-            Vector4[] thvs = THVs != null ? THVs.ToArray() : null;
-            Vector4[] thws = THWs != null ? THWs.ToArray() : null;
-            Vector4[] thvs2 = THVs != null ? THVs2.ToArray() : null;
-            Vector4[] thws2 = THWs != null ? THWs2.ToArray() : null;
+            Vector3[] tangs = Tangents != null ? Tangents.ToArray() : (tangents != null ? tangents : TangentsFor(vecs, norms, texs));
+            Vector4[] cols = Colors != null ? Colors.ToArray() : v4_colors;
+            Vector4[] tcols = TCOLs != null ? TCOLs.ToArray() : v4_tcolors;
+            Vector4[] thvs = THVs != null ? THVs.ToArray() : v4_thvs;
+            Vector4[] thws = THWs != null ? THWs.ToArray() : v4_thws;
+            Vector4[] thvs2 = THVs2 != null ? THVs2.ToArray() : v4_thvs2;
+            Vector4[] thws2 = THWs2 != null ? THWs2.ToArray() : v4_thws2;
             vC = inds.Length;
             Vector4[] ids = null;
             if (BoneIDs != null)
