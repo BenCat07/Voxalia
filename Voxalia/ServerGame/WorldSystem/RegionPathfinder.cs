@@ -96,7 +96,6 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 int nextid = open.Dequeue().ID;
                 PathFindNode next = nodes.Nodes[nextid];
-                SysConsole.Output(OutputType.WARNING, "Try : " + next.Internal);
                 openset.Remove(next.Internal);
                 if (next.Internal.DistanceSquared(endloc) < gosq)
                 {
