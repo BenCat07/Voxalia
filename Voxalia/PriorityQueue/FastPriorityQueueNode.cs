@@ -8,6 +8,9 @@
 
 namespace Priority_Queue
 {
+    // mcmonkey: Got this off https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
+    // mcmonkey: original license was MIT, Copyright(c) 2013 Daniel "BlueRaja" Pflughoeft
+
     public class FastPriorityQueueNode
     {
         /// <summary>

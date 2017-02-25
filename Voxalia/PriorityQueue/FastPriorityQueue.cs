@@ -12,6 +12,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 // mcmonkey: Got this off https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
+// mcmonkey: original license was MIT, Copyright(c) 2013 Daniel "BlueRaja" Pflughoeft
+
+// mcmonkey: remove incorrect preproceesors for .NET 4.5
 
 namespace Priority_Queue
 {
@@ -73,9 +76,7 @@ namespace Priority_Queue
         /// Removes every node from the queue.
         /// O(n) (So, don't do this often!)
         /// </summary>
-#if NET_VERSION_4_5
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Clear()
         {
             Array.Clear(_nodes, 1, _numNodes);
@@ -85,9 +86,7 @@ namespace Priority_Queue
         /// <summary>
         /// Returns (in O(1)!) whether the given node is in the queue.  O(1)
         /// </summary>
-#if NET_VERSION_4_5
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public bool Contains(T node)
         {
 #if DEBUG
@@ -110,9 +109,7 @@ namespace Priority_Queue
         /// If the node is already enqueued, the result is undefined.
         /// O(log n)
         /// </summary>
-#if NET_VERSION_4_5
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Enqueue(T node, double priority)
         {
 #if DEBUG
@@ -137,10 +134,8 @@ namespace Priority_Queue
             node.InsertionIndex = _numNodesEverEnqueued++;
             CascadeUp(_nodes[_numNodes]);
         }
-
-#if NET_VERSION_4_5
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private void Swap(T node1, T node2)
         {
             //Swap the nodes
@@ -170,10 +165,8 @@ namespace Priority_Queue
                 parent = node.QueueIndex / 2;
             }
         }
-
-#if NET_VERSION_4_5
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private void CascadeDown(T node)
         {
             //aka Heapify-down
@@ -235,9 +228,7 @@ namespace Priority_Queue
         /// Returns true if 'higher' has higher priority than 'lower', false otherwise.
         /// Note that calling HasHigherPriority(node, node) (ie. both arguments the same node) will return false
         /// </summary>
-#if NET_VERSION_4_5
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private bool HasHigherPriority(T higher, T lower)
         {
             return (higher.Priority < lower.Priority ||
@@ -323,9 +314,7 @@ namespace Priority_Queue
         /// Calling this method on a node not in the queue results in undefined behavior
         /// O(log n)
         /// </summary>
-#if NET_VERSION_4_5
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void UpdatePriority(T node, double priority)
         {
 #if DEBUG

@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 
 // mcmonkey: Got this off https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
+// mcmonkey: original license was MIT, Copyright(c) 2013 Daniel "BlueRaja" Pflughoeft
 
 namespace Priority_Queue
 {
