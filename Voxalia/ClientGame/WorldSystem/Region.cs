@@ -939,21 +939,38 @@ namespace Voxalia.ClientGame.WorldSystem
         public Location GetBlockLight(Location pos, Location norm, List<Chunk> potentials)
         {
             Location lit = Location.Zero;
-            foreach (Chunk ch in potentials)
+            for (int i = 0; i < potentials.Count; i++)
             {
-                foreach (KeyValuePair<Vector3i, Material> pot in ch.Lits)
+                Location loc = potentials[i].WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
+                KeyValuePair<Vector3i, Material>[] arr = potentials[i].Lits;
+                for (int k = 0; k < arr.Length; k++)
                 {
-                    double distsq = (pot.Key.ToLocation() + ch.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(pos);
-                    double range = pot.Value.GetLightEmitRange();
+                    double distsq = (arr[k].Key.ToLocation() + loc).DistanceSquared(pos);
+                    double range = arr[k].Value.GetLightEmitRange();
                     // TODO: Apply normal vector stuff?
                     if (distsq < range * range)
                     {
-                        lit += pot.Value.GetLightEmit() * (range - Math.Sqrt(distsq)); // TODO: maybe apply normals?
+                        lit += arr[k].Value.GetLightEmit() * (range - Math.Sqrt(distsq)); // TODO: maybe apply normals?
                     }
                 }
             }
             return lit;
         }
+
+        public static readonly Vector3i[] RelativeChunks = new Vector3i[] {
+            // x = -1
+            new Vector3i(-1, -1, -1), new Vector3i(-1, -1, 0), new Vector3i(-1, -1, 1),
+            new Vector3i(-1, 0, -1), new Vector3i(-1, 0, 0), new Vector3i(-1, 0, 1),
+            new Vector3i(-1, 1, -1), new Vector3i(-1, 1, 0), new Vector3i(-1, 1, 1),
+            // x = 0
+            new Vector3i(0, -1, -1), new Vector3i(0, -1, 0), new Vector3i(0, -1, 1),
+            new Vector3i(0, 0, -1), new Vector3i(0, 0, 0), new Vector3i(0, 0, 1),
+            new Vector3i(0, 1, -1), new Vector3i(0, 1, 0), new Vector3i(0, 1, 1),
+            // x = 1
+            new Vector3i(1, -1, -1), new Vector3i(1, -1, 0), new Vector3i(1, -1, 1),
+            new Vector3i(1, 0, -1), new Vector3i(1, 0, 0), new Vector3i(1, 0, 1),
+            new Vector3i(1, 1, -1), new Vector3i(1, 1, 0), new Vector3i(1, 1, 1)
+        };
 
         public Location GetLightAmountForSkyValue(Location pos, Location norm, List<Chunk> potentials, float skyPrecalc)
         {
@@ -962,18 +979,12 @@ namespace Voxalia.ClientGame.WorldSystem
                 SysConsole.Output(OutputType.WARNING, "Region - GetLightAmountForSkyValue : null potentials! Correcting...");
                 potentials = new List<Chunk>();
                 Vector3i pos_c = ChunkLocFor(pos);
-                for (int x = -1; x <= 1; x++)
+                for (int i = 0; i < RelativeChunks.Length; i++)
                 {
-                    for (int y = -1; y <= 1; y++)
+                    Chunk tch = GetChunk(pos_c + RelativeChunks[i]);
+                    if (tch != null)
                     {
-                        for (int z = -1; z <= 1; z++)
-                        {
-                            Chunk tch = GetChunk(pos_c + new Vector3i(x, y, z));
-                            if (tch != null)
-                            {
-                                potentials.Add(tch);
-                            }
-                        }
+                        potentials.Add(tch);
                     }
                 }
             }
@@ -1001,18 +1012,12 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 potentials = new List<Chunk>();
                 Vector3i pos_c = ChunkLocFor(pos);
-                for (int x = -1; x <= 1; x++)
+                for (int i = 0; i < RelativeChunks.Length; i++)
                 {
-                    for (int y = -1; y <= 1; y++)
+                    Chunk tch = GetChunk(pos_c + RelativeChunks[i]);
+                    if (tch != null)
                     {
-                        for (int z = -1; z <= 1; z++)
-                        {
-                            Chunk tch = GetChunk(pos_c + new Vector3i(x, y, z));
-                            if (tch != null)
-                            {
-                                potentials.Add(tch);
-                            }
-                        }
+                        potentials.Add(tch);
                     }
                 }
             }

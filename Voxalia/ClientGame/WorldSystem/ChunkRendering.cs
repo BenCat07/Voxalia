@@ -26,7 +26,8 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public VBO _VBOTransp = null;
 
-        public List<KeyValuePair<Vector3i, Material>> Lits = new List<KeyValuePair<Vector3i, Material>>();
+        // TODO: Possibly store world locations rather than local block locs?
+        public KeyValuePair<Vector3i, Material>[] Lits = new KeyValuePair<Vector3i, Material>[0];
 
         public bool Edited = true;
 
@@ -77,7 +78,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     }
                 });
             }
-            Lits = tLits;
+            Lits = tLits.ToArray();
             return OwningRegion.NeedToRender(this);
         }
         
@@ -148,18 +149,12 @@ namespace Voxalia.ClientGame.WorldSystem
             Chunk c_xmyp = OwningRegion.GetChunk(WorldPosition + new Vector3i(-1, 1, 0));
             Chunk c_xmym = OwningRegion.GetChunk(WorldPosition + new Vector3i(-1, -1, 0));
             List<Chunk> potentials = new List<Chunk>();
-            for (int x = -1; x <= 1; x++)
+            for (int i = 0; i < Region.RelativeChunks.Length; i++)
             {
-                for (int y = -1; y <= 1; y++)
+                Chunk tch = OwningRegion.GetChunk(WorldPosition + Region.RelativeChunks[i]);
+                if (tch != null)
                 {
-                    for (int z = -1; z <= 1; z++)
-                    {
-                        Chunk tch = OwningRegion.GetChunk(WorldPosition + new Vector3i(x, y, z));
-                        if (tch != null)
-                        {
-                            potentials.Add(tch);
-                        }
-                    }
+                    potentials.Add(tch);
                 }
             }
             bool plants = PosMultiplier == 1 && OwningRegion.TheClient.CVars.r_plants.ValueB;
