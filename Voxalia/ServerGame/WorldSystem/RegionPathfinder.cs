@@ -41,6 +41,8 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public Stack<PathFindNodeSet> PFNodeSet = new Stack<PathFindNodeSet>();
 
+        public Stack<PriorityQueue<PFEntry>> PFQueueSet = new Stack<PriorityQueue<PFEntry>>();
+
         /// <summary>
         /// Finds a path from the start to the end, if one exists.
         /// Current implementation is A-Star (A*).
@@ -64,24 +66,27 @@ namespace Voxalia.ServerGame.WorldSystem
                 return null;
             }
             PathFindNodeSet nodes;
+            PriorityQueue<PFEntry> open;
             lock (PFNodeSetLock)
             {
                 if (PFNodeSet.Count == 0)
                 {
                     nodes = null;
+                    open = null;
                 }
                 else
                 {
                     nodes = PFNodeSet.Pop();
+                    open = PFQueueSet.Pop();
                 }
             }
             if (nodes == null)
             {
-                nodes = new PathFindNodeSet() { Nodes = new PathFindNode[512] };
+                nodes = new PathFindNodeSet() { Nodes = new PathFindNode[8192] };
+                open = new PriorityQueue<PFEntry>(8192);
             }
             int nloc = 0;
             int start = GetNode(nodes, ref nloc, startloc, 0.0, 0.0, -1);
-            PriorityQueue<PFEntry> open = new PriorityQueue<PFEntry>(2048);
             HashSet<Location> closed = new HashSet<Location>();
             HashSet<Location> openset = new HashSet<Location>();
             PFEntry pfet;
@@ -100,6 +105,8 @@ namespace Voxalia.ServerGame.WorldSystem
                     lock (PFNodeSetLock)
                     {
                         PFNodeSet.Push(nodes);
+                        open.Clear();
+                        PFQueueSet.Push(open);
                     }
                     return Reconstruct(nodes.Nodes, nextid);
                 }
@@ -108,7 +115,6 @@ namespace Voxalia.ServerGame.WorldSystem
                 {
                     Location neighb = next.Internal + neighbor;
                     if (startloc.DistanceSquared(neighb) > mrsq)
-
                     {
                         continue;
                     }
@@ -143,6 +149,8 @@ namespace Voxalia.ServerGame.WorldSystem
             lock (PFNodeSetLock)
             {
                 PFNodeSet.Push(nodes);
+                open.Clear();
+                PFQueueSet.Push(open);
             }
             return null;
         }
