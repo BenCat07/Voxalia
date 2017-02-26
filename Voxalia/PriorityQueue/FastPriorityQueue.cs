@@ -90,7 +90,6 @@ namespace Priority_Queue
             node.Priority = priority;
             _numNodes++;
             node.QueueIndex = _numNodes;
-            SysConsole.OutputCustom("Queue", "Enqueue: " + node.Priority + ", " + node.QueueIndex);
             node.InsertionIndex = _numNodesEverEnqueued++;
             _nodes[_numNodes] = node;
             CascadeUp(_numNodes);
@@ -99,7 +98,6 @@ namespace Priority_Queue
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Swap(ref T node1, ref T node2)
         {
-            SysConsole.OutputCustom("Queue", "Input Swap: " + node1.QueueIndex + ", " + node2.QueueIndex);
             int temp = node1.QueueIndex;
             node1.QueueIndex = node2.QueueIndex;
             node2.QueueIndex = temp;
@@ -109,18 +107,15 @@ namespace Priority_Queue
             
             _nodes[n2.QueueIndex] = n2;
             _nodes[n1.QueueIndex] = n1;
-            SysConsole.OutputCustom("Queue", "Swap: " + n1.QueueIndex + ", " + n2.QueueIndex);
             StringBuilder outp = new StringBuilder();
             for (int i = 1; i <= _numNodes; i++)
             {
                 outp.Append(i + "/" + _nodes[i].QueueIndex + ", ");
             }
-            SysConsole.OutputCustom("Queue Info", outp.ToString());
         }
         
         private void CascadeUp(int nodeSpot)
         {
-            SysConsole.OutputCustom("Queue", "Cascade up");
             int parent = _nodes[nodeSpot].QueueIndex / 2;
             while (parent != 0)
             {
@@ -137,55 +132,6 @@ namespace Priority_Queue
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CascadeDown(int nodeSpot)
-        {
-            SysConsole.OutputCustom("Queue", "Cascade down");
-            T newParent = _nodes[nodeSpot];
-            int finalQueueIndex = nodeSpot;
-            while (true)
-            {
-                SysConsole.OutputCustom("Queue", "Cascade down, node: " + newParent.QueueIndex);
-                int childLeftIndex = 2 * finalQueueIndex;
-                
-                if (childLeftIndex > _numNodes)
-                {
-                    _nodes[nodeSpot].QueueIndex = finalQueueIndex;
-                    _nodes[finalQueueIndex] = _nodes[nodeSpot];
-                    break;
-                }
-                
-                if (HasHigherPriority(ref _nodes[childLeftIndex], ref newParent))
-                {
-                    newParent = _nodes[childLeftIndex];
-                }
-                
-                int childRightIndex = childLeftIndex + 1;
-                if (childRightIndex <= _numNodes)
-                {
-                    if (HasHigherPriority(ref _nodes[childRightIndex], ref newParent))
-                    {
-                        newParent = _nodes[childRightIndex];
-                    }
-                }
-
-                if (!Comparer.AreEqual(newParent, _nodes[nodeSpot]))
-                {
-                    int temp = newParent.QueueIndex;
-                    newParent.QueueIndex = finalQueueIndex;
-                    _nodes[temp].QueueIndex = finalQueueIndex;
-                    finalQueueIndex = temp;
-                    _nodes[finalQueueIndex] = newParent;
-                }
-                else
-                {
-                    _nodes[nodeSpot].QueueIndex = finalQueueIndex;
-                    _nodes[finalQueueIndex] = _nodes[nodeSpot];
-                    break;
-                }
-            }
-        }
-        
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool HasHigherPriority(ref T higher, ref T lower)
         {
             return (higher.Priority < lower.Priority ||
@@ -194,8 +140,6 @@ namespace Priority_Queue
         
         public T Dequeue()
         {
-
-            SysConsole.OutputCustom("Queue", "Dequeue");
             T returnMe = _nodes[1];
             RemoveFirst();
             return returnMe;
@@ -203,8 +147,6 @@ namespace Priority_Queue
         
         public void Resize(int maxNodes)
         {
-            SysConsole.OutputCustom("Queue", "Resize: " + maxNodes);
-
             T[] newArray = new T[maxNodes + 1];
             int highestIndexToCopy = Math.Min(maxNodes, _numNodes);
             // TODO: Array.* magic?
@@ -230,22 +172,8 @@ namespace Priority_Queue
             }
         }
         
-        private void OnNodeUpdated(int nodeSpot)
-        {
-            int parentIndex = nodeSpot / 2;
-            if (parentIndex != 0 && HasHigherPriority(ref _nodes[nodeSpot], ref _nodes[parentIndex]))
-            {
-                CascadeUp(nodeSpot);
-            }
-            else
-            {
-                CascadeDown(nodeSpot);
-            }
-        }
-        
         public void RemoveFirst()
         {
-            SysConsole.OutputCustom("Queue", "RemoveFirst");
             _nodes[1] = _nodes[_numNodes];
             _nodes[1].QueueIndex = 1;
             _numNodes--;

@@ -56,8 +56,8 @@ namespace Voxalia.ServerGame.WorldSystem
         public List<Location> FindPath(Location startloc, Location endloc, double maxRadius, double goaldist)
         {
             // TODO: Improve async safety!
-            startloc = startloc.GetBlockLocation() + new Location(0.5, 0.5, 1.1);
-            endloc = endloc.GetBlockLocation() + new Location(0.5, 0.5, 1.1);
+            startloc = startloc.GetBlockLocation() + new Location(0.5, 0.5, 1.0);
+            endloc = endloc.GetBlockLocation() + new Location(0.5, 0.5, 1.0);
             double mrsq = maxRadius * maxRadius;
             double gosq = goaldist * goaldist;
             if (startloc.DistanceSquared(endloc) > mrsq)
@@ -96,7 +96,6 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 int nextid = open.Dequeue().ID;
                 PathFindNode next = nodes.Nodes[nextid];
-                SysConsole.Output(OutputType.WARNING, "Try : " + next.Internal);
                 openset.Remove(next.Internal);
                 if (next.Internal.DistanceSquared(endloc) < gosq)
                 {
