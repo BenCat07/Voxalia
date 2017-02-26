@@ -16,7 +16,6 @@ using Voxalia.Shared;
 namespace Voxalia.Shared
 {
     public class PriorityQueue<T>
-        where T : IEquatable<T>
     {
         private struct Node
         {
@@ -25,11 +24,13 @@ namespace Voxalia.Shared
             public double Priority;
         }
 
+        private int start;
         private int numNodes;
         private Node[] nodes; // TODO: Array possibly isn't the most efficient way to store a priority queue, even when working with structs? Experiment!
         
         public PriorityQueue(int capacity = 512)
         {
+            start = 0;
             numNodes = 0;
             nodes = new Node[capacity];
         }
@@ -54,24 +55,26 @@ namespace Voxalia.Shared
         public void Clear()
         {
             numNodes = 0;
+            start = 0;
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Enqueue(ref T nodeData, double priority)
         {
-            if (++numNodes >= nodes.Length)
+            if (numNodes + start + 1 >= nodes.Length)
             {
                 Resize();
             }
-            int ind = 0;
-            // TODO: Effic. Proper binary search?
-            for (ind = 0; ind < numNodes; ind++)
+            // TODO: Efficiency - Proper binary search?
+            int ind = start;
+            while (ind < start + numNodes)
             {
                 if (nodes[ind].Priority > priority)
                 {
-                    Array.Copy(nodes, ind, nodes, ind + 1, numNodes - ind);
+                    Array.Copy(nodes, ind, nodes, ind + 1, numNodes - (ind - start));
                     break;
                 }
+                ind++;
             }
             nodes[ind].Data = nodeData;
             nodes[ind].Priority = priority;
@@ -81,33 +84,46 @@ namespace Voxalia.Shared
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Dequeue()
         {
+#if DEBUG
             if (numNodes < 0)
             {
                 throw new InvalidOperationException("Cannot dequeue: the queue is empty.");
             }
-            T returnMe = nodes[0].Data;
+#endif
+            T returnMe = nodes[start].Data;
             numNodes--;
-            Array.Copy(nodes, 1, nodes, 0, numNodes);
+            start++;
             return returnMe;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Resize()
         {
-            Node[] newArray = new Node[nodes.Length * 2];
-            Array.Copy(nodes, 0, newArray, 0, nodes.Length);
-            nodes = newArray;
+            if (numNodes * 2 > nodes.Length)
+            {
+                Node[] newArray = new Node[nodes.Length * 2];
+                Array.Copy(nodes, start, newArray, 0, numNodes);
+                nodes = newArray;
+            }
+            else
+            {
+                // TODO: Circularity to reduce need for this?
+                Array.Copy(nodes, start, nodes, 0, numNodes);
+            }
+            start = 0;
         }
         
         public T First
         {
             get
             {
+#if DEBUG
                 if (numNodes < 0)
                 {
                     throw new InvalidOperationException("Cannot get first: the queue is empty.");
                 }
-                return nodes[0].Data;
+#endif
+                return nodes[start].Data;
             }
         }
     }

@@ -243,7 +243,17 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
-                    List<Location> locs = entry.Player.TheRegion.FindPath(entry.Player.GetPosition(), goal, 75, 1.5f);
+                    List<Location> locs;
+                    try
+                    {
+                        locs = entry.Player.TheRegion.FindPath(entry.Player.GetPosition(), goal, 75, 1.5f);
+                    }
+                    catch (Exception ex)
+                    {
+                        Utilities.CheckException(ex);
+                        SysConsole.Output("pathfinding", ex);
+                        locs = null;
+                    }
                     sw.Stop();
                     entry.Player.TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
                     {
