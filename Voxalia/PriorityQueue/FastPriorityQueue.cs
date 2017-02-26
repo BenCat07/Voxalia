@@ -7,25 +7,23 @@
 //
 
 using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Voxalia.Shared;
 
-// mcmonkey: Got this off https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
-// mcmonkey: original license was MIT, Copyright(c) 2013 Daniel "BlueRaja" Pflughoeft
+// Based upon: https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
+// original license was MIT, Copyright(c) 2013 Daniel "BlueRaja" Pflughoeft
 
-// mcmonkey: remove incorrect preproceesors for .NET 4.5
-// mcmonkey: fix for structs
-// mcmonkey: burn contains method
+// CHANGE LOG:
+// remove incorrect preproceesors for .NET 4.5
+// fix for structs
+// do far too many things to accurately log...
+// delete all original comments
 
 namespace Priority_Queue
 {
-    /// <summary>
-    /// An implementation of a min-Priority Queue using a heap.  Has O(1) .Contains()!
-    /// See https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp/wiki/Getting-Started for more information
-    /// </summary>
-    /// <typeparam name="T">The values in the queue.  Must extend the FastPriorityQueueNode class</typeparam>
     public sealed class FastPriorityQueue<T> : IPriorityQueue<T>
         where T : FastPriorityQueueNode
     {
@@ -34,11 +32,7 @@ namespace Priority_Queue
         private long _numNodesEverEnqueued;
 
         public NodeComparer<T> Comparer;
-
-        /// <summary>
-        /// Instantiate a new Priority Queue
-        /// </summary>
-        /// <param name="maxNodes">The max nodes ever allowed to be enqueued (going over this will cause undefined behavior)</param>
+        
         public FastPriorityQueue(int maxNodes, NodeComparer<T> comp)
         {
 #if DEBUG
@@ -52,11 +46,7 @@ namespace Priority_Queue
             _nodes = new T[maxNodes + 1];
             _numNodesEverEnqueued = 0;
         }
-
-        /// <summary>
-        /// Returns the number of nodes in the queue.
-        /// O(1)
-        /// </summary>
+        
         public int Count
         {
             get
@@ -64,11 +54,7 @@ namespace Priority_Queue
                 return _numNodes;
             }
         }
-
-        /// <summary>
-        /// Returns the maximum number of items that can be enqueued at once in this queue.  Once you hit this number (ie. once Count == MaxSize),
-        /// attempting to enqueue another item will cause undefined behavior.  O(1)
-        /// </summary>
+        
         public int MaxSize
         {
             get
@@ -76,24 +62,13 @@ namespace Priority_Queue
                 return _nodes.Length - 1;
             }
         }
-
-        /// <summary>
-        /// Removes every node from the queue.
-        /// O(n) (So, don't do this often!)
-        /// </summary>
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
-            Array.Clear(_nodes, 1, _numNodes);
             _numNodes = 0;
         }
         
-        /// <summary>
-        /// Enqueue a node to the priority queue.  Lower values are placed in front. Ties are broken by first-in-first-out.
-        /// If the queue is full, the result is undefined.
-        /// If the node is already enqueued, the result is undefined.
-        /// O(log n)
-        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Enqueue(ref T node, double priority)
         {
@@ -118,65 +93,64 @@ namespace Priority_Queue
             SysConsole.OutputCustom("Queue", "Enqueue: " + node.Priority + ", " + node.QueueIndex);
             node.InsertionIndex = _numNodesEverEnqueued++;
             _nodes[_numNodes] = node;
-            CascadeUp(ref _nodes[_numNodes]);
+            CascadeUp(_numNodes);
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Swap(ref T node1, ref T node2)
         {
             SysConsole.OutputCustom("Queue", "Input Swap: " + node1.QueueIndex + ", " + node2.QueueIndex);
-            //Swap their indices
             int temp = node1.QueueIndex;
             node1.QueueIndex = node2.QueueIndex;
             node2.QueueIndex = temp;
 
             T n1 = node1;
             T n2 = node2;
-
-            //Swap the nodes
+            
             _nodes[n2.QueueIndex] = n2;
             _nodes[n1.QueueIndex] = n1;
             SysConsole.OutputCustom("Queue", "Swap: " + n1.QueueIndex + ", " + n2.QueueIndex);
+            StringBuilder outp = new StringBuilder();
+            for (int i = 1; i <= _numNodes; i++)
+            {
+                outp.Append(i + "/" + _nodes[i].QueueIndex + ", ");
+            }
+            SysConsole.OutputCustom("Queue Info", outp.ToString());
         }
-
-        //Performance appears to be slightly better when this is NOT inlined o_O
-        private void CascadeUp(ref T node)
+        
+        private void CascadeUp(int nodeSpot)
         {
             SysConsole.OutputCustom("Queue", "Cascade up");
-            //aka Heapify-up
-            int parent = node.QueueIndex / 2;
+            int parent = _nodes[nodeSpot].QueueIndex / 2;
             while (parent != 0)
             {
-                if (HasHigherPriority(ref _nodes[parent], ref node))
+                if (HasHigherPriority(ref _nodes[parent], ref _nodes[nodeSpot]))
                 {
                     break;
                 }
+                
+                Swap(ref _nodes[nodeSpot], ref _nodes[parent]);
 
-                //Node has lower priority value, so move it up the heap
-                Swap(ref node, ref _nodes[parent]); //For some reason, this is faster with Swap() rather than (less..?) individual operations, like in CascadeDown()
-
-                parent = node.QueueIndex / 2;
+                nodeSpot = parent;
+                parent /= 2;
             }
         }
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CascadeDown(ref T node)
+        private void CascadeDown(int nodeSpot)
         {
             SysConsole.OutputCustom("Queue", "Cascade down");
-            //aka Heapify-down
-            T newParent;
-            int finalQueueIndex = node.QueueIndex;
+            T newParent = _nodes[nodeSpot];
+            int finalQueueIndex = nodeSpot;
             while (true)
             {
-                newParent = node;
+                SysConsole.OutputCustom("Queue", "Cascade down, node: " + newParent.QueueIndex);
                 int childLeftIndex = 2 * finalQueueIndex;
-
-                //Check if the left-child is higher-priority than the current node
+                
                 if (childLeftIndex > _numNodes)
                 {
-                    //This could be placed outside the loop, but then we'd have to check newParent != node twice
-                    node.QueueIndex = finalQueueIndex;
-                    _nodes[finalQueueIndex] = node;
+                    _nodes[nodeSpot].QueueIndex = finalQueueIndex;
+                    _nodes[finalQueueIndex] = _nodes[nodeSpot];
                     break;
                 }
                 
@@ -184,8 +158,7 @@ namespace Priority_Queue
                 {
                     newParent = _nodes[childLeftIndex];
                 }
-
-                //Check if the right-child is higher-priority than either the current node or the left child
+                
                 int childRightIndex = childLeftIndex + 1;
                 if (childRightIndex <= _numNodes)
                 {
@@ -195,97 +168,53 @@ namespace Priority_Queue
                     }
                 }
 
-                //If either of the children has higher (smaller) priority, swap and continue cascading
-                if (!Comparer.AreEqual(newParent, node))
+                if (!Comparer.AreEqual(newParent, _nodes[nodeSpot]))
                 {
                     int temp = newParent.QueueIndex;
                     newParent.QueueIndex = finalQueueIndex;
+                    _nodes[temp].QueueIndex = finalQueueIndex;
                     finalQueueIndex = temp;
-                    //Move new parent to its new index.  node will be moved once, at the end
-                    //Doing it this way is one less assignment operation than calling Swap()
                     _nodes[finalQueueIndex] = newParent;
                 }
                 else
                 {
-                    //See note above
-                    node.QueueIndex = finalQueueIndex;
-                    _nodes[finalQueueIndex] = node;
+                    _nodes[nodeSpot].QueueIndex = finalQueueIndex;
+                    _nodes[finalQueueIndex] = _nodes[nodeSpot];
                     break;
                 }
             }
         }
-
-        /// <summary>
-        /// Returns true if 'higher' has higher priority than 'lower', false otherwise.
-        /// Note that calling HasHigherPriority(node, node) (ie. both arguments the same node) will return false
-        /// </summary>
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool HasHigherPriority(ref T higher, ref T lower)
         {
             return (higher.Priority < lower.Priority ||
                 (higher.Priority == lower.Priority && higher.InsertionIndex < lower.InsertionIndex));
         }
-
-        /// <summary>
-        /// Removes the head of the queue (node with minimum priority; ties are broken by order of insertion), and returns it.
-        /// If queue is empty, result is undefined
-        /// O(log n)
-        /// </summary>
+        
         public T Dequeue()
         {
-#if DEBUG
-            if(_numNodes <= 0)
-            {
-                throw new InvalidOperationException("Cannot call Dequeue() on an empty queue");
-            }
-
-            if(!IsValidQueue())
-            {
-                throw new InvalidOperationException("Queue has been corrupted (Did you update a node priority manually instead of calling UpdatePriority()?" +
-                                                    "Or add the same node to two different queues?)");
-            }
-#endif
 
             SysConsole.OutputCustom("Queue", "Dequeue");
             T returnMe = _nodes[1];
-            Remove(ref _nodes[1]);
+            RemoveFirst();
             return returnMe;
         }
-
-        /// <summary>
-        /// Resize the queue so it can accept more nodes.  All currently enqueued nodes are remain.
-        /// Attempting to decrease the queue size to a size too small to hold the existing nodes results in undefined behavior
-        /// O(n)
-        /// </summary>
+        
         public void Resize(int maxNodes)
         {
-#if DEBUG
-            if (maxNodes <= 0)
-            {
-                throw new InvalidOperationException("Queue size cannot be smaller than 1");
-            }
-
-            if (maxNodes < _numNodes)
-            {
-                throw new InvalidOperationException("Called Resize(" + maxNodes + "), but current queue contains " + _numNodes + " nodes");
-            }
-#endif
             SysConsole.OutputCustom("Queue", "Resize: " + maxNodes);
 
             T[] newArray = new T[maxNodes + 1];
             int highestIndexToCopy = Math.Min(maxNodes, _numNodes);
+            // TODO: Array.* magic?
             for (int i = 1; i <= highestIndexToCopy; i++)
             {
                 newArray[i] = _nodes[i];
             }
             _nodes = newArray;
         }
-
-        /// <summary>
-        /// Returns the head of the queue, without removing it (use Dequeue() for that).
-        /// If the queue is empty, behavior is undefined.
-        /// O(1)
-        /// </summary>
+        
         public T First
         {
             get
@@ -301,67 +230,26 @@ namespace Priority_Queue
             }
         }
         
-        private void OnNodeUpdated(ref T node)
+        private void OnNodeUpdated(int nodeSpot)
         {
-            //Bubble the updated node up or down as appropriate
-            int parentIndex = node.QueueIndex / 2;
-
-            if (parentIndex != 0 && HasHigherPriority(ref node, ref _nodes[parentIndex]))
+            int parentIndex = nodeSpot / 2;
+            if (parentIndex != 0 && HasHigherPriority(ref _nodes[nodeSpot], ref _nodes[parentIndex]))
             {
-                CascadeUp(ref node);
+                CascadeUp(nodeSpot);
             }
             else
             {
-                //Note that CascadeDown will be called if parentNode == node (that is, node is the root)
-                CascadeDown(ref node);
+                CascadeDown(nodeSpot);
             }
         }
-
-        /// <summary>
-        /// Removes a node from the queue.  The node does not need to be the head of the queue.  
-        /// If the node is not in the queue, the result is undefined.  If unsure, check Contains() first
-        /// O(log n)
-        /// </summary>
-        public void Remove(ref T node)
+        
+        public void RemoveFirst()
         {
-#if DEBUG
-            if(node == null)
-            {
-                throw new ArgumentNullException("node");
-            }
-            if(!Contains(node))
-            {
-                throw new InvalidOperationException("Cannot call Remove() on a node which is not enqueued: " + node);
-            }
-#endif
-            SysConsole.OutputCustom("Queue", "Remove: " + node.QueueIndex);
-
-            //If the node is already the last node, we can remove it immediately
-            if (node.QueueIndex == _numNodes)
-            {
-                _nodes[_numNodes].Valid = false;
-                _numNodes--;
-                return;
-            }
-
-            //Swap the node with the last node
-            Swap(ref node, ref _nodes[_numNodes]);
-            _nodes[_numNodes].Valid = false;
+            SysConsole.OutputCustom("Queue", "RemoveFirst");
+            _nodes[1] = _nodes[_numNodes];
+            _nodes[1].QueueIndex = 1;
             _numNodes--;
-
-            //Now bubble formerLastNode (which is no longer the last node) up or down as appropriate
-            OnNodeUpdated(ref node);
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            for (int i = 1; i <= _numNodes; i++)
-                yield return _nodes[i];
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            Array.Copy(_nodes, 1, _nodes, 0, _numNodes);
         }
     }
 }

@@ -8,19 +8,14 @@
 
 using System.Collections.Generic;
 
-// mcmonkey: Got this off https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
+// mcmonkey: Based upon: https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
 // mcmonkey: original license was MIT, Copyright(c) 2013 Daniel "BlueRaja" Pflughoeft
 
-// mcmonkey: remove contains requirement
+// mcmonkey: do far too many things to accurately log...
 
 namespace Priority_Queue
 {
-    /// <summary>
-    /// The IPriorityQueue interface.  This is mainly here for purists, and in case I decide to add more implementations later.
-    /// For speed purposes, it is actually recommended that you *don't* access the priority queue through this interface, since the JIT can
-    /// (theoretically?) optimize method calls from concrete-types slightly better.
-    /// </summary>
-    public interface IPriorityQueue<T> : IEnumerable<T>
+    public interface IPriorityQueue<T>
     {
         /// <summary>
         /// Enqueue a node to the priority queue.  Lower values are placed in front. Ties are broken by first-in-first-out.
@@ -39,9 +34,9 @@ namespace Priority_Queue
         void Clear();
         
         /// <summary>
-        /// Removes a node from the queue.  The node does not need to be the head of the queue.  
+        /// Removes a node from the queue.
         /// </summary>
-        void Remove(ref T node);
+        void RemoveFirst();
         
         /// <summary>
         /// Returns the head of the queue, without removing it (use Dequeue() for that).

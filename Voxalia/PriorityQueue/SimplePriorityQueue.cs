@@ -10,11 +10,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-// mcmonkey: Got this off https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
+// mcmonkey: Based upon: https://github.com/BlueRaja/High-Speed-Priority-Queue-for-C-Sharp
 // mcmonkey: original license was MIT, Copyright(c) 2013 Daniel "BlueRaja" Pflughoeft
 
 // mcmonkey: remove all locks
 // mcmonkey: fix for structs
+// mcmonkey: do far too many things to accurately log...
 
 namespace Priority_Queue
 {
@@ -25,18 +26,6 @@ namespace Priority_Queue
         {
             public bool AreEqual(SimpleNode a, SimpleNode b)
             {
-                if (a.Valid == false)
-                {
-                    if (b.Valid == false)
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-                if (b.Valid == false)
-                {
-                    return false;
-                }
                 return a.Data.Equals(b.Data);
             }
         }
@@ -50,8 +39,6 @@ namespace Priority_Queue
             public long InternalInsertionIndex;
 
             public int InternalQueueIndex;
-
-            public bool InternalValid;
 
             public double Priority
             {
@@ -91,23 +78,9 @@ namespace Priority_Queue
                 }
             }
 
-            public bool Valid
-            {
-                get
-                {
-                    return InternalValid;
-                }
-
-                set
-                {
-                    InternalValid = value;
-                }
-            }
-
             public SimpleNode(T data)
             {
                 Data = data;
-                InternalValid = true;
                 InternalQueueIndex = 0;
                 InternalPriority = 0;
                 InternalInsertionIndex = 0;
@@ -125,22 +98,6 @@ namespace Priority_Queue
         public SimplePriorityQueue(int capacity) // mcmonkey: this overload
         {
             _queue = new FastPriorityQueue<SimpleNode>(capacity, new SimpleComparer());
-        }
-
-        /// <summary>
-        /// Given an item of type T, returns the exist SimpleNode in the queue
-        /// </summary>
-        private SimpleNode GetExistingNode(ref T item)
-        {
-            var comparer = EqualityComparer<T>.Default;
-            foreach (var node in _queue)
-            {
-                if (comparer.Equals(node.Data, item))
-                {
-                    return node;
-                }
-            }
-            throw new InvalidOperationException("Item cannot be found in queue: " + item);
         }
 
         /// <summary>
@@ -169,9 +126,7 @@ namespace Priority_Queue
                 {
                     throw new InvalidOperationException("Cannot call .First on an empty queue");
                 }
-
-                SimpleNode first = _queue.First;
-                return (first.Valid ? first.Data : default(T));
+                return _queue.First.Data;
             }
         }
 
@@ -183,24 +138,7 @@ namespace Priority_Queue
         {
             _queue.Clear();
         }
-
-        /// <summary>
-        /// Returns whether the given item is in the queue.
-        /// O(n)
-        /// </summary>
-        public bool Contains(ref T item)
-        {
-            var comparer = EqualityComparer<T>.Default;
-            foreach (var node in _queue)
-            {
-                if (node.Data.Equals(item))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
+        
         /// <summary>
         /// Removes the head of the queue (node with minimum priority; ties are broken by order of insertion), and returns it.
         /// If queue is empty, throws an exception
@@ -233,40 +171,9 @@ namespace Priority_Queue
             _queue.Enqueue(ref node, priority);
         }
 
-        /// <summary>
-        /// Removes an item from the queue.  The item does not need to be the head of the queue.  
-        /// If the item is not in the queue, an exception is thrown.  If unsure, check Contains() first.
-        /// If multiple copies of the item are enqueued, only the first one is removed. 
-        /// O(n)
-        /// </summary>
-        public void Remove(ref T item)
+        public void RemoveFirst()
         {
-            try
-            {
-                SimpleNode n = GetExistingNode(ref item);
-                _queue.Remove(ref n);
-            }
-            catch (InvalidOperationException ex)
-            {
-                throw new InvalidOperationException("Cannot call Remove() on a node which is not enqueued: " + item, ex);
-            }
-        }
-        
-        public IEnumerator<T> GetEnumerator()
-        {
-            List<T> queueData = new List<T>();
-            //Copy to a separate list because we don't want to 'yield return' inside a lock
-            foreach (var node in _queue)
-            {
-                queueData.Add(node.Data);
-            }
-
-            return queueData.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            _queue.RemoveFirst();
         }
     }
 }
