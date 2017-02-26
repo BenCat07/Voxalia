@@ -13,7 +13,6 @@ using System.Linq;
 using System.Text;
 using Voxalia.Shared;
 using FreneticScript;
-using Priority_Queue;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -83,7 +82,7 @@ namespace Voxalia.ServerGame.WorldSystem
             int nloc = 0;
             int start = GetNode(nodes, ref nloc, startloc, 0.0, 0.0, -1);
             // TODO: remove the 'simple' bit and replace with 'fast'? - simple causes allocations and slow down :(
-            SimplePriorityQueue<PFEntry> open = new SimplePriorityQueue<PFEntry>(512);
+            PriorityQueue<PFEntry> open = new PriorityQueue<PFEntry>(512);
             HashSet<Location> closed = new HashSet<Location>();
             HashSet<Location> openset = new HashSet<Location>();
             PFEntry pfet;

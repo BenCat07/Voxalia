@@ -24,7 +24,6 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using Voxalia.Shared.Collision;
 using System.Diagnostics;
-using Priority_Queue;
 using FreneticScript;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.OtherSystems;
