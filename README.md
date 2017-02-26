@@ -27,7 +27,7 @@ View the [FAQ](/FAQ.md) for more information!
 | Build Service | Status |
 | ------------- | ------ |
 | AppVeyor | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/inbj8vbo0fx4a8io/branch/master?svg=true)](https://ci.appveyor.com/project/mcmonkey4eva/voxalia/branch/master) |
-| Website ([Frenetic.XYZ](https://frenetic.xyz)) | [![Website](https://img.shields.io/website-up-down-green-red/https/frenetic.xyz.svg)](https://frenetic.xyz) |
+| Website ([Freneticllc.com](https://freneticllc.com)) | [![Website](https://img.shields.io/website-up-down-green-red/https/freneticllc.com.svg)](https://freneticllc.com) |
 | Issues Open | [![Issues_Open](https://img.shields.io/github/issues/FreneticLLC/Voxalia.svg)](https://github.com/FreneticLLC/Voxalia/issues) |
 | License | [![License](https://img.shields.io/badge/license-Frenetic-blue.svg)](https://github.com/FreneticLLC/Voxalia/blob/master/LICENSE.txt) |
 
