@@ -65,19 +65,32 @@ namespace Voxalia.Shared
             {
                 Resize();
             }
-            // TODO: Efficiency - Proper binary search?
-            int ind = start;
-            while (ind < start + numNodes)
+            int first = start;
+            int last = start + numNodes;
+            int middle = start;
+            while (first <= last)
             {
-                if (nodes[ind].Priority > priority)
+                middle = (first + last) / 2;
+                if (priority > nodes[middle].Priority)
                 {
-                    Array.Copy(nodes, ind, nodes, ind + 1, numNodes - (ind - start));
+                    first = middle + 1;
+                }
+                if (priority < nodes[middle].Priority)
+                {
+                    last = middle - 1;
+                }
+                else
+                {
                     break;
                 }
-                ind++;
             }
-            nodes[ind].Data = nodeData;
-            nodes[ind].Priority = priority;
+            int len = numNodes - (middle - start);
+            if (len != 0)
+            {
+                Array.Copy(nodes, middle, nodes, middle + 1, len);
+            }
+            nodes[middle].Data = nodeData;
+            nodes[middle].Priority = priority;
             numNodes++;
         }
 
