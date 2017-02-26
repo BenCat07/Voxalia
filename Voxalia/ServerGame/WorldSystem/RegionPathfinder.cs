@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using Voxalia.Shared;
 using FreneticScript;
+using Voxalia.Shared.Collision;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -43,6 +44,8 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public Stack<PriorityQueue<PFEntry>> PFQueueSet = new Stack<PriorityQueue<PFEntry>>();
 
+        public Stack<Dictionary<Vector3i, Chunk>> PFMapSet = new Stack<Dictionary<Vector3i, Chunk>>();
+
         /// <summary>
         /// Finds a path from the start to the end, if one exists.
         /// Current implementation is A-Star (A*).
@@ -67,23 +70,27 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             PathFindNodeSet nodes;
             PriorityQueue<PFEntry> open;
+            Dictionary<Vector3i, Chunk> map;
             lock (PFNodeSetLock)
             {
                 if (PFNodeSet.Count == 0)
                 {
                     nodes = null;
                     open = null;
+                    map = null;
                 }
                 else
                 {
                     nodes = PFNodeSet.Pop();
                     open = PFQueueSet.Pop();
+                    map = PFMapSet.Pop();
                 }
             }
             if (nodes == null)
             {
                 nodes = new PathFindNodeSet() { Nodes = new PathFindNode[8192] };
                 open = new PriorityQueue<PFEntry>(8192);
+                map = new Dictionary<Vector3i, Chunk>(256);
             }
             int nloc = 0;
             int start = GetNode(nodes, ref nloc, startloc, 0.0, 0.0, -1);
@@ -102,11 +109,13 @@ namespace Voxalia.ServerGame.WorldSystem
                 openset.Remove(next.Internal);
                 if (next.Internal.DistanceSquared(endloc) < gosq)
                 {
+                    open.Clear();
+                    map.Clear();
                     lock (PFNodeSetLock)
                     {
                         PFNodeSet.Push(nodes);
-                        open.Clear();
                         PFQueueSet.Push(open);
+                        PFMapSet.Push(map);
                     }
                     return Reconstruct(nodes.Nodes, nextid);
                 }
@@ -127,14 +136,14 @@ namespace Voxalia.ServerGame.WorldSystem
                         continue;
                     }
                     // TODO: Check solidity from entities too!
-                    if (GetBlockMaterial(neighb).GetSolidity() != MaterialSolidity.NONSOLID) // TODO: Better solidity check
+                    if (GetBlockMaterial(map, neighb).GetSolidity() != MaterialSolidity.NONSOLID) // TODO: Better solidity check
                     {
                         continue;
                     }
-                    if (GetBlockMaterial(neighb + new Location(0, 0, -1)).GetSolidity() == MaterialSolidity.NONSOLID
-                        && GetBlockMaterial(neighb + new Location(0, 0, -2)).GetSolidity() == MaterialSolidity.NONSOLID
-                        && GetBlockMaterial(next.Internal + new Location(0, 0, -1)).GetSolidity() == MaterialSolidity.NONSOLID
-                        && GetBlockMaterial(next.Internal + new Location(0, 0, -2)).GetSolidity() == MaterialSolidity.NONSOLID)
+                    if (GetBlockMaterial(map, neighb + new Location(0, 0, -1)).GetSolidity() == MaterialSolidity.NONSOLID
+                        && GetBlockMaterial(map, neighb + new Location(0, 0, -2)).GetSolidity() == MaterialSolidity.NONSOLID
+                        && GetBlockMaterial(map, next.Internal + new Location(0, 0, -1)).GetSolidity() == MaterialSolidity.NONSOLID
+                        && GetBlockMaterial(map, next.Internal + new Location(0, 0, -2)).GetSolidity() == MaterialSolidity.NONSOLID)
                     {
                         continue;
                     }
@@ -146,11 +155,13 @@ namespace Voxalia.ServerGame.WorldSystem
                     openset.Add(nodes.Nodes[node].Internal);
                 }
             }
+            open.Clear();
+            map.Clear();
             lock (PFNodeSetLock)
             {
                 PFNodeSet.Push(nodes);
-                open.Clear();
                 PFQueueSet.Push(open);
+                PFMapSet.Push(map);
             }
             return null;
         }

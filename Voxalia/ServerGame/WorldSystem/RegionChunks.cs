@@ -325,7 +325,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// All currently loaded chunks.
         /// </summary>
-        public Dictionary<Vector3i, Chunk> LoadedChunks = new Dictionary<Vector3i, Chunk>(5000);
+        public Dictionary<Vector3i, Chunk> LoadedChunks = new Dictionary<Vector3i, Chunk>(16384);
 
         /// <summary>
         /// Determines whether a character is allowed to break a material at a location.
@@ -358,7 +358,27 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             return mat == Material.AIR;
         }
-        
+
+        /// <summary>
+        /// Gets the material at a location.
+        /// </summary>
+        /// <param name="pos">The location.</param>
+        /// <returns>The material.</returns>
+        public Material GetBlockMaterial(Dictionary<Vector3i, Chunk> chunkmap, Location pos)
+        {
+            Vector3i cpos = ChunkLocFor(pos);
+            Chunk ch;
+            if (!chunkmap.TryGetValue(cpos, out ch))
+            {
+                ch = LoadChunk(cpos);
+                chunkmap[cpos] = ch;
+            }
+            int x = (int)Math.Floor(pos.X) - (int)cpos.X * Chunk.CHUNK_SIZE;
+            int y = (int)Math.Floor(pos.Y) - (int)cpos.Y * Chunk.CHUNK_SIZE;
+            int z = (int)Math.Floor(pos.Z) - (int)cpos.Z * Chunk.CHUNK_SIZE;
+            return (Material)ch.GetBlockAt(x, y, z).BlockMaterial;
+        }
+
         /// <summary>
         /// Gets the material at a location.
         /// </summary>
