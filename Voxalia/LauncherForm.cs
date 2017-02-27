@@ -42,7 +42,7 @@ namespace VoxaliaLauncher
             UpdateLoginDataFromFile();
             geckoWebBrowser1.DocumentCompleted += GeckoWebBrowser1_DocumentCompleted;
             GeckoPreferences.User["javascript.enabled"] = false;
-            geckoWebBrowser1.Navigate("https://github.com/FreneticXYZ/Voxalia/blob/master/README.md#voxalia");
+            geckoWebBrowser1.Navigate("https://github.com/FreneticLLC/Voxalia/blob/master/README.md#voxalia");
             geckoWebBrowser1.DomClick += GeckoWebBrowser1_DomClick;
             geckoWebBrowser1.DomDoubleClick += GeckoWebBrowser1_DomDoubleClick;
             geckoWebBrowser1.DomKeyPress += GeckoWebBrowser1_DomKeyPress;

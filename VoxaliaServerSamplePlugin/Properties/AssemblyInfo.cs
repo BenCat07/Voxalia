@@ -16,9 +16,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("VoxaliaServerSamplePlugin")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Frenetic LLC")]
 [assembly: AssemblyProduct("VoxaliaServerSamplePlugin")]
-[assembly: AssemblyCopyright("Copyright © FreneticXYZ 2015-2017")]
+[assembly: AssemblyCopyright("Copyright © Frenetic LLC 2016-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
