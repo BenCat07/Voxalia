@@ -1,6 +1,6 @@
 //
-// This file is part of the game Voxalia, created by FreneticXYZ.
-// This code is Copyright (C) 2016-2017 FreneticXYZ under the terms of a strict license.
+// This file is part of the game Voxalia, created by Frenetic LLC.
+// This code is Copyright (C) 2016-2017 Frenetic LLC under the terms of a strict license.
 // See README.md or LICENSE.txt in the source root for the contents of the license.
 // If neither of these are available, assume that neither you nor anyone other than the copyright holder
 // hold any right or permission to use this software until such time as the official license is identified.
@@ -17,9 +17,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Voxalia")]
 [assembly: AssemblyDescription("A game about blocks and such")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("FreneticXYZ")]
+[assembly: AssemblyCompany("Frenetic LLC")]
 [assembly: AssemblyProduct("Voxalia")]
-[assembly: AssemblyCopyright("Copyright © FreneticXYZ 2016-2017")]
+[assembly: AssemblyCopyright("Copyright © Frenetic LLC 2016-2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
