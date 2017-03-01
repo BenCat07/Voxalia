@@ -63,7 +63,7 @@ namespace Voxalia.ServerGame.CommandSystem
             g_maxrenderdist = Register("g_maxrenderdist", "4", CVarFlag.Numeric, "How high a client can set their render dist to.");
             // Network CVars
             n_verifyip = Register("n_verifyip", "true", CVarFlag.Boolean, "Whether to verify connecting users' IP addresses with the global server. Disabling this may help allow LAN connections.");
-            n_chunkspertick = Register("n_chunkspertick", "5", CVarFlag.Numeric, "How many chunks can be sent in a single server tick, per player.");
+            n_chunkspertick = Register("n_chunkspertick", "2", CVarFlag.Numeric, "How many chunks can be sent in a single server tick, per player.");
             n_online = Register("n_online", "true", CVarFlag.Boolean, "Whether the server with authorize connections against the global server. Disable this if you want to play singleplayer without a live internet connection.");
             // Text CVars
             t_translateurls = Register("t_translateurls", "true", CVarFlag.Boolean, "Whether to automatically translate URLs posted in chat.");
