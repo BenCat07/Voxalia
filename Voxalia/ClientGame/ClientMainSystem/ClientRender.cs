@@ -1414,6 +1414,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.UniformMatrix4(2, false, ref pos);
                 tmod.Draw();
             }
+            View3D.CheckError("Rendering - VR");
         }
 
         public int Dec_VAO = -1;
@@ -1505,6 +1506,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 tcs[i] = Decals[i].Item4;
                 ind[i] = (uint)i;
             }
+            if (pos.Length == 0)
+            {
+                return;
+            }
+            GL.BindVertexArray(Dec_VAO);
             GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Pos);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(pos.Length * OpenTK.Vector3.SizeInBytes), pos, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Nrm);
@@ -1515,7 +1521,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(col.Length * OpenTK.Vector4.SizeInBytes), col, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, Dec_VBO_Ind);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ind.Length * sizeof(uint)), ind, BufferUsageHint.StaticDraw);
-            GL.BindVertexArray(Dec_VAO);
             if (!DecalPrepped)
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Pos);
@@ -1757,11 +1762,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 return;
             }
+            SetEnts();
             Textures.White.Bind();
             Location itemSource = Player.ItemSource();
             Location mov = (CameraFinalTarget - itemSource) / CameraDistance;
             Location cpos = CameraFinalTarget - (CameraImpactNormal * 0.01f);
             Location cpos2 = CameraFinalTarget + (CameraImpactNormal * 0.91f);
+            View3D.CheckError("Rendering - 2.25");
             // TODO: 5 -> Variable length (Server controlled?)
             if (TheRegion.GetBlockMaterial(cpos) != Material.AIR && CameraDistance < 5)
             {
@@ -1779,6 +1786,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         Rendering.RenderLine(itemSource, CameraFinalTarget);
                     }
                 }
+                View3D.CheckError("Rendering - 2.5");
                 if (CVars.u_highlight_placeblock.ValueB)
                 {
                     Rendering.SetColor(Color4.Cyan);
@@ -1791,15 +1799,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 Rendering.SetMinimumLight(0f);
             }
+            View3D.CheckError("Rendering - 2.75");
             if (CVars.n_debugmovement.ValueB)
             {
                 Rendering.SetColor(Color4.Red);
                 GL.LineWidth(5);
+                int i = 0;
                 foreach (Chunk chunk in TheRegion.LoadedChunks.Values)
                 {
                     if ((chunk._VBOSolid == null || !chunk._VBOSolid.generated) && (chunk._VBOTransp == null || !chunk._VBOTransp.generated) && !chunk.IsAir)
                     {
                         Rendering.RenderLineBox(chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE, (chunk.WorldPosition.ToLocation() + Location.One) * Chunk.CHUNK_SIZE);
+                        View3D.CheckError("Rendering - 2.8: " + i++);
                     }
                 }
                 GL.LineWidth(1);

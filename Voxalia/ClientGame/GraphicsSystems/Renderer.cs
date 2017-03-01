@@ -27,9 +27,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public void Init()
         {
-            GenerateBoxVBO();
             GenerateSquareVBO();
             GenerateLineVBO();
+            GenerateBoxVBO();
         }
 
         public VBO Square;
@@ -89,9 +89,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Vector3[] norms = new Vector3[2];
             Vector3[] texs = new Vector3[2];
             Vector4[] cols = new Vector4[2];
+            Vector3[] tangs = new Vector3[2];
             for (uint u = 0; u < 2; u++)
             {
                 inds[u] = u;
+                tangs[u] = new Vector3(0f, 0f, 0f);
             }
             for (int n = 0; n < 2; n++)
             {
@@ -122,6 +124,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Line.Normals = norms.ToList();
             Line.TexCoords = texs.ToList();
             Line.Colors = cols.ToList();
+            Line.Tangents = tangs.ToList();
             Line.BoneIDs = BoneIDs.ToList();
             Line.BoneWeights = BoneWeights.ToList();
             Line.BoneIDs2 = BoneIDs2.ToList();
@@ -137,9 +140,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Vector3[] norms = new Vector3[24];
             Vector3[] texs = new Vector3[24];
             Vector4[] cols = new Vector4[24];
+            Vector3[] tangs = new Vector3[24];
             for (uint u = 0; u < 24; u++)
             {
                 inds[u] = u;
+                tangs[u] = new Vector3(1f, 0f, 0f);
             }
             for (int t = 0; t < 24; t++)
             {
@@ -153,7 +158,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 cols[c] = new Vector4(1, 1, 1, 1);
             }
-            Vector4[] BoneIDs = new Vector4[24];
+            /*Vector4[] BoneIDs = new Vector4[24];
             Vector4[] BoneWeights = new Vector4[24];
             Vector4[] BoneIDs2 = new Vector4[24];
             Vector4[] BoneWeights2 = new Vector4[24];
@@ -163,7 +168,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 BoneWeights[n] = new Vector4(0, 0, 0, 0);
                 BoneIDs2[n] = new Vector4(0, 0, 0, 0);
                 BoneWeights2[n] = new Vector4(0, 0, 0, 0);
-            }
+            }*/
             int i = 0;
             int zero = -1; // Ssh.
             vecs[i] = new Vector3(zero, zero, zero); i++;
@@ -196,10 +201,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Box.Normals = norms.ToList();
             Box.TexCoords = texs.ToList();
             Box.Colors = cols.ToList();
-            Box.BoneIDs = BoneIDs.ToList();
+            Box.Tangents = tangs.ToList();
+            /*Box.BoneIDs = BoneIDs.ToList();
             Box.BoneWeights = BoneWeights.ToList();
             Box.BoneIDs2 = BoneIDs2.ToList();
-            Box.BoneWeights2 = BoneWeights2.ToList();
+            Box.BoneWeights2 = BoneWeights2.ToList();*/
             Box.GenerateVBO();
         }
 
@@ -218,12 +224,15 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public void RenderLineBox(Location min, Location max, Matrix4d? rot = null)
         {
             Engine.White.Bind();
+            View3D.CheckError("RenderLineBox: BindTexture");
             Location halfsize = (max - min) / 2;
             Matrix4d mat = Matrix4d.Scale(ClientUtilities.ConvertD(halfsize))
                 * (rot != null && rot.HasValue ? rot.Value : Matrix4d.Identity)
                 * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(min + halfsize));
             Client.Central.MainWorldView.SetMatrix(2, mat); // TODO: Client reference!
+            View3D.CheckError("RenderLineBox: SetMatrix");
             GL.BindVertexArray(Box._VAO);
+            View3D.CheckError("RenderLineBox: Bind VAO");
             GL.DrawElements(PrimitiveType.Lines, 24, DrawElementsType.UnsignedInt, IntPtr.Zero);
         }
 
