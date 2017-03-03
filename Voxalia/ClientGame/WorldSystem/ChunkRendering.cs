@@ -274,6 +274,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                 {
                                     continue;
                                 }
+                                BlockShapeDetails cbsd = BlockShapeRegistry.BSD[shaped ? 0 : c.BlockData].Damaged[c.DamageData];
                                 BlockInternal zp = z + 1 < CSize ? GetBlockAt(x, y, z + 1) : (c_zp == null ? t_air : GetLODRelative(c_zp, x, y, z + 1 - CSize));
                                 BlockInternal zm = z > 0 ? GetBlockAt(x, y, z - 1) : (c_zm == null ? t_air : GetLODRelative(c_zm, x, y, z - 1 + CSize));
                                 BlockInternal yp = y + 1 < CSize ? GetBlockAt(x, y + 1, z) : (c_yp == null ? t_air : GetLODRelative(c_yp, x, y + 1 - CSize, z));
@@ -282,12 +283,18 @@ namespace Voxalia.ClientGame.WorldSystem
                                 BlockInternal xm = x > 0 ? GetBlockAt(x - 1, y, z) : (c_xm == null ? t_air : GetLODRelative(c_xm, x - 1 + CSize, y, z));
                                 bool rAS = !((Material)c.BlockMaterial).GetCanRenderAgainstSelf();
                                 bool pMatters = !c.IsOpaque();
-                                bool zps = (zp.DamageData == 0) && (zp.IsOpaque() || (rAS && (zp.BlockMaterial == c.BlockMaterial && (pMatters || zp.BlockPaint == c.BlockPaint)))) && BlockShapeRegistry.BSD[shaped ? 0 : zp.BlockData].OccupiesBOTTOM();
-                                bool zms = (zm.DamageData == 0) && (zm.IsOpaque() || (rAS && (zm.BlockMaterial == c.BlockMaterial && (pMatters || zm.BlockPaint == c.BlockPaint)))) && BlockShapeRegistry.BSD[shaped ? 0 : zm.BlockData].OccupiesTOP();
-                                bool xps = (xp.DamageData == 0) && (xp.IsOpaque() || (rAS && (xp.BlockMaterial == c.BlockMaterial && (pMatters || xp.BlockPaint == c.BlockPaint)))) && BlockShapeRegistry.BSD[shaped ? 0 : xp.BlockData].OccupiesXM();
-                                bool xms = (xm.DamageData == 0) && (xm.IsOpaque() || (rAS && (xm.BlockMaterial == c.BlockMaterial && (pMatters || xm.BlockPaint == c.BlockPaint)))) && BlockShapeRegistry.BSD[shaped ? 0 : xm.BlockData].OccupiesXP();
-                                bool yps = (yp.DamageData == 0) && (yp.IsOpaque() || (rAS && (yp.BlockMaterial == c.BlockMaterial && (pMatters || yp.BlockPaint == c.BlockPaint)))) && BlockShapeRegistry.BSD[shaped ? 0 : yp.BlockData].OccupiesYM();
-                                bool yms = (ym.DamageData == 0) && (ym.IsOpaque() || (rAS && (ym.BlockMaterial == c.BlockMaterial && (pMatters || ym.BlockPaint == c.BlockPaint)))) && BlockShapeRegistry.BSD[shaped ? 0 : ym.BlockData].OccupiesYP();
+                                bool zps = (zp.DamageData == 0) && (zp.IsOpaque() || (rAS && (zp.BlockMaterial == c.BlockMaterial && (pMatters || zp.BlockPaint == c.BlockPaint))))
+                                    && BlockShapeRegistry.BSD[shaped ? 0 : zp.BlockData].AbleToFill_ZM.Covers(cbsd.RequiresToFill_ZP);
+                                bool zms = (zm.DamageData == 0) && (zm.IsOpaque() || (rAS && (zm.BlockMaterial == c.BlockMaterial && (pMatters || zm.BlockPaint == c.BlockPaint))))
+                                    && BlockShapeRegistry.BSD[shaped ? 0 : zm.BlockData].AbleToFill_ZP.Covers(cbsd.RequiresToFill_ZM);
+                                bool xps = (xp.DamageData == 0) && (xp.IsOpaque() || (rAS && (xp.BlockMaterial == c.BlockMaterial && (pMatters || xp.BlockPaint == c.BlockPaint))))
+                                    && BlockShapeRegistry.BSD[shaped ? 0 : xp.BlockData].AbleToFill_XM.Covers(cbsd.RequiresToFill_XP);
+                                bool xms = (xm.DamageData == 0) && (xm.IsOpaque() || (rAS && (xm.BlockMaterial == c.BlockMaterial && (pMatters || xm.BlockPaint == c.BlockPaint))))
+                                    && BlockShapeRegistry.BSD[shaped ? 0 : xm.BlockData].AbleToFill_XP.Covers(cbsd.RequiresToFill_XM);
+                                bool yps = (yp.DamageData == 0) && (yp.IsOpaque() || (rAS && (yp.BlockMaterial == c.BlockMaterial && (pMatters || yp.BlockPaint == c.BlockPaint))))
+                                    && BlockShapeRegistry.BSD[shaped ? 0 : yp.BlockData].AbleToFill_YM.Covers(cbsd.RequiresToFill_YP);
+                                bool yms = (ym.DamageData == 0) && (ym.IsOpaque() || (rAS && (ym.BlockMaterial == c.BlockMaterial && (pMatters || ym.BlockPaint == c.BlockPaint))))
+                                    && BlockShapeRegistry.BSD[shaped ? 0 : ym.BlockData].AbleToFill_YP.Covers(cbsd.RequiresToFill_YM);
                                 if (zps && zms && xps && xms && yps && yms)
                                 {
                                     continue;

@@ -176,11 +176,49 @@ namespace Voxalia.Shared
         public Vector3[][] TCrds = new Vector3[64][];
     }
 
+    public enum BlockSideCoverage
+    {
+        NONE = 0,
+        FULL = 1,
+        BOTTOM_HALF = 2
+        // TODO: More!
+    }
+
+    public static class BlockSideCoverageExtensions
+    {
+        public static bool Covers(this BlockSideCoverage a, BlockSideCoverage b)
+        {
+            if (a == BlockSideCoverage.NONE)
+            {
+                return false;
+            }
+            else if (a == BlockSideCoverage.BOTTOM_HALF)
+            {
+                return b == BlockSideCoverage.BOTTOM_HALF;
+            }
+            else if (a == BlockSideCoverage.FULL)
+            {
+                return true;
+            }
+            throw new Exception("Unknown sides cannot be covered!");
+        }
+    }
+
     /// <summary>
     /// Represents the details of a single block shape option.
     /// </summary>
     public abstract class BlockShapeDetails
     {
+        public BlockShapeDetails()
+        {
+            AbleToFill_ZP = OccupiesTOP() ? BlockSideCoverage.FULL : BlockSideCoverage.NONE;
+            AbleToFill_ZM = OccupiesBOTTOM() ? BlockSideCoverage.FULL : BlockSideCoverage.NONE;
+            AbleToFill_YP = OccupiesYP() ? BlockSideCoverage.FULL : BlockSideCoverage.NONE;
+            AbleToFill_YM = OccupiesYM() ? BlockSideCoverage.FULL : BlockSideCoverage.NONE;
+            AbleToFill_XP = OccupiesXP() ? BlockSideCoverage.FULL : BlockSideCoverage.NONE;
+            AbleToFill_XM = OccupiesXM() ? BlockSideCoverage.FULL : BlockSideCoverage.NONE;
+        }
+
         public const double SHRINK_CONSTANT = 0.9;
 
         public double LightDamage = 1.0;
@@ -202,6 +240,20 @@ namespace Voxalia.Shared
         public abstract bool OccupiesTOP();
 
         public abstract bool OccupiesBOTTOM();
+
+        public BlockSideCoverage RequiresToFill_ZP = BlockSideCoverage.FULL;
+        public BlockSideCoverage RequiresToFill_ZM = BlockSideCoverage.FULL;
+        public BlockSideCoverage RequiresToFill_XP = BlockSideCoverage.FULL;
+        public BlockSideCoverage RequiresToFill_XM = BlockSideCoverage.FULL;
+        public BlockSideCoverage RequiresToFill_YP = BlockSideCoverage.FULL;
+        public BlockSideCoverage RequiresToFill_YM = BlockSideCoverage.FULL;
+        
+        public BlockSideCoverage AbleToFill_ZP = BlockSideCoverage.NONE;
+        public BlockSideCoverage AbleToFill_ZM = BlockSideCoverage.NONE;
+        public BlockSideCoverage AbleToFill_XP = BlockSideCoverage.NONE;
+        public BlockSideCoverage AbleToFill_XM = BlockSideCoverage.NONE;
+        public BlockSideCoverage AbleToFill_YP = BlockSideCoverage.NONE;
+        public BlockSideCoverage AbleToFill_YM = BlockSideCoverage.NONE;
 
         public BlockShapeSubDetails BSSD = new BlockShapeSubDetails();
 

@@ -23,6 +23,17 @@ namespace Voxalia.Shared.BlockShapes
             BlockShapeCache = new BoxShape(1, 1, Percent);
             ShrunkOffsetCache = new Location(SHRINK_CONSTANT * 0.5, SHRINK_CONSTANT * 0.5, Percent * SHRINK_CONSTANT * 0.5);
             ShrunkBlockShapeCache = new BoxShape(SHRINK_CONSTANT, SHRINK_CONSTANT, Percent * SHRINK_CONSTANT);
+            if (Percent >= 0.5)
+            {
+                AbleToFill_XP = BlockSideCoverage.BOTTOM_HALF;
+                AbleToFill_XM = BlockSideCoverage.BOTTOM_HALF;
+                AbleToFill_YP = BlockSideCoverage.BOTTOM_HALF;
+                AbleToFill_YM = BlockSideCoverage.BOTTOM_HALF;
+                RequiresToFill_XP = BlockSideCoverage.BOTTOM_HALF;
+                RequiresToFill_XM = BlockSideCoverage.BOTTOM_HALF;
+                RequiresToFill_YP = BlockSideCoverage.BOTTOM_HALF;
+                RequiresToFill_YM = BlockSideCoverage.BOTTOM_HALF;
+            }
         }
 
         public override List<Vector3> GetVertices(Vector3 pos, bool XP, bool XM, bool YP, bool YM, bool TOP, bool BOTTOM)
