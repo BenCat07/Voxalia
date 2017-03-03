@@ -235,10 +235,13 @@ namespace Voxalia.Shared
             Location offset;
             BEPUphysics.CollisionShapes.EntityShape es = GetShape(DamageMode, out offset, false);
             Coll = es.GetCollidableInstance();
-            Coll.LocalPosition = -offset.ToBVector();
+            Coll.LocalPosition = offset.ToBVector();
+            Vector3 zero = Vector3.Zero;
+            Quaternion ident = Quaternion.Identity;
+            Coll.UpdateWorldTransform(ref zero, ref ident);
+            RigidTransform rt = new RigidTransform(zero, ident);
+            Coll.UpdateBoundingBoxForTransform(ref rt);
             BEPUphysics.CollisionShapes.EntityShape es2 = GetShape(DamageMode, out offset, true);
-            EntityCollidable tColl = es2.GetCollidableInstance();
-            tColl.LocalPosition = -offset.ToBVector();
         }
 
         private void Damage()
@@ -361,6 +364,7 @@ namespace Voxalia.Shared
                 {
                     if (choice == -1)
                     {
+                        // TODO: 39 is probably pointlessly high here.
                         choice = new MTRandom(39, (ulong)(SimplexNoise.Generate(coord.X, coord.Y, coord.Z) * 1000 * 1000)).Next(10000);
                     }
                     temp.Z = opts[choice % opts.Length];
@@ -394,7 +398,7 @@ namespace Voxalia.Shared
             return new Tuple<List<Vector4>, List<Vector4>, List<Vector4>, List<Vector4>>(stretchvals, stretchvals, stretchvals, stretchvals);
         }
 
-        public virtual EntityShape GetShape(BlockDamage damage, out Location offset, bool shrink)
+        public EntityShape GetShape(BlockDamage damage, out Location offset, bool shrink)
         {
             if (damage != DamageMode)
             {
