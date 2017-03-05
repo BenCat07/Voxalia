@@ -23,6 +23,7 @@ using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.OtherSystems;
 using OpenTK;
+using BEPUphysics;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {
@@ -221,6 +222,19 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                     {
                         Location pos = TheClient.Player.GetPosition() + new Location(0, 0, BEPUphysics.Settings.CollisionDetectionSettings.AllowedPenetration);
                         TheClient.AddDecal(pos, new Location(0, 0, 1), Vector4.One, 1f, "white", 15);
+                        break;
+                    }
+                case "traceDecal":
+                    {
+                        Location pos = TheClient.Player.GetEyePosition();
+                        Location forw = TheClient.Player.ForwardVector();
+                        RayCastResult rcr;
+                        if (TheClient.TheRegion.SpecialCaseRayTrace(pos, forw, 50.0f, MaterialSolidity.FULLSOLID, TheClient.Player.IgnoreThis, out rcr))
+                        {
+                            Location nrm = new Location(rcr.HitData.Normal).Normalize();
+                            TheClient.AddDecal(new Location(rcr.HitData.Location) + nrm * 0.025, nrm, Vector4.One, 1f, "white", 15);
+                            entry.Info(queue, "Marked at normal " + nrm);
+                        }
                         break;
                     }
                 case "soundCount":

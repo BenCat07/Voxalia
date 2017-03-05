@@ -61,6 +61,11 @@ namespace Voxalia.ServerGame.WorldSystem
                     hA = true;
                 }
             }
+            if (considerSolid == MaterialSolidity.FULLSOLID)
+            {
+                rayHit = best;
+                return hA;
+            }
             AABB box = new AABB();
             box.Min = start;
             box.Max = start;
@@ -116,6 +121,11 @@ namespace Voxalia.ServerGame.WorldSystem
                     best = rcr;
                     hA = true;
                 }
+            }
+            if (considerSolid == MaterialSolidity.FULLSOLID)
+            {
+                rayHit = best;
+                return hA;
             }
             sweep = dir.ToBVector();
             AABB box = new AABB();

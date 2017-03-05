@@ -63,10 +63,10 @@ void main()
 	float tid = f[0].texcoord.y;
 	fi.color = f[0].color;
 	fi.size = 1.0 / scale;
-	vec3 xp = vec3(norm.z, norm.y, norm.x) * scale;
-	vec3 yp = vec3(xp.y, xp.x, xp.z) * scale * 2.0;
+	vec3 xp = vec3(norm.z, norm.x, norm.y) * scale;
+	vec3 yp = vec3(norm.y, norm.z, norm.x) * scale;
 	// First Vertex
-	gl_Position = proj_matrix * vec4(pos - (xp + yp) * scale, 1.0);
+	gl_Position = proj_matrix * vec4(pos + (-xp - yp) * scale, 1.0);
 	fi.texcoord = vec3(0.0, 1.0, tid);
 	EmitVertex();
 	// Second Vertex
@@ -74,7 +74,7 @@ void main()
 	fi.texcoord = vec3(1.0, 1.0, tid);
 	EmitVertex();
 	// Third Vertex
-	gl_Position = proj_matrix * vec4(pos - (xp - yp) * scale, 1.0);
+	gl_Position = proj_matrix * vec4(pos + (-xp + yp) * scale, 1.0);
 	fi.texcoord = vec3(0.0, 0.0, tid);
 	EmitVertex();
 	// Forth Vertex

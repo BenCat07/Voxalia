@@ -1478,9 +1478,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public void AddDecal(Location pos, Location ang, Vector4 color, float scale, string texture, double time)
         {
             Decals.Add(new Tuple<Location, Vector3, Vector4, Vector2, double>(pos, ClientUtilities.Convert(ang), color, new Vector2(scale, DecalGetTextureID(texture)), time));
+            // TODO: Actually implement the time? >= 0 fades out, < 0 is there til chunk unload!
         }
 
         public bool DecalPrepped = false;
+
+        int pDecals = 0;
 
         /// <summary>
         /// Renders the 3D world's decals upon instruction from the internal view render code.
@@ -1488,55 +1491,61 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <param name="view">The view to render.</param>
         public void RenderDecal(View3D view)
         {
+            bool isMore = pDecals != Decals.Count;
+            pDecals = Decals.Count;
+            if (Decals.Count == 0)
+            {
+                return;
+            }
+            // TODO: Expiration goes here. Set isMore true if any expired.
             //GL.PolygonOffset(-1, -2);
             GL.Disable(EnableCap.CullFace);
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2DArray, DecTextureID);
             //GL.Enable(EnableCap.PolygonOffsetFill);
-            Vector3[] pos = new Vector3[Decals.Count];
-            Vector3[] nrm = new Vector3[Decals.Count];
-            Vector4[] col = new Vector4[Decals.Count];
-            Vector2[] tcs = new Vector2[Decals.Count];
-            uint[] ind = new uint[Decals.Count];
-            for (int i = 0; i < Decals.Count; i++)
-            {
-                pos[i] = ClientUtilities.Convert(Decals[i].Item1 - view.RenderRelative);
-                nrm[i] = Decals[i].Item2;
-                col[i] = Decals[i].Item3;
-                tcs[i] = Decals[i].Item4;
-                ind[i] = (uint)i;
-            }
-            if (pos.Length == 0)
-            {
-                return;
-            }
             GL.BindVertexArray(Dec_VAO);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Pos);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(pos.Length * OpenTK.Vector3.SizeInBytes), pos, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Nrm);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(nrm.Length * OpenTK.Vector3.SizeInBytes), nrm, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Tcs);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tcs.Length * OpenTK.Vector2.SizeInBytes), tcs, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Col);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(col.Length * OpenTK.Vector4.SizeInBytes), col, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, Dec_VBO_Ind);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ind.Length * sizeof(uint)), ind, BufferUsageHint.StaticDraw);
-            if (!DecalPrepped)
+            if (isMore || !DecalPrepped)
             {
+                Vector3[] pos = new Vector3[Decals.Count];
+                Vector3[] nrm = new Vector3[Decals.Count];
+                Vector4[] col = new Vector4[Decals.Count];
+                Vector2[] tcs = new Vector2[Decals.Count];
+                uint[] ind = new uint[Decals.Count];
+                for (int i = 0; i < Decals.Count; i++)
+                {
+                    pos[i] = ClientUtilities.Convert(Decals[i].Item1 - view.RenderRelative);
+                    nrm[i] = Decals[i].Item2;
+                    col[i] = Decals[i].Item3;
+                    tcs[i] = Decals[i].Item4;
+                    ind[i] = (uint)i;
+                }
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Pos);
-                GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-                GL.EnableVertexAttribArray(0);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(pos.Length * OpenTK.Vector3.SizeInBytes), pos, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Nrm);
-                GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
-                GL.EnableVertexAttribArray(1);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(nrm.Length * OpenTK.Vector3.SizeInBytes), nrm, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Tcs);
-                GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, 0);
-                GL.EnableVertexAttribArray(2);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tcs.Length * OpenTK.Vector2.SizeInBytes), tcs, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Col);
-                GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.EnableVertexAttribArray(4);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(col.Length * OpenTK.Vector4.SizeInBytes), col, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, Dec_VBO_Ind);
-                DecalPrepped = true;
+                GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ind.Length * sizeof(uint)), ind, BufferUsageHint.StaticDraw);
+                if (!DecalPrepped)
+                {
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Pos);
+                    GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.EnableVertexAttribArray(0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Nrm);
+                    GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.EnableVertexAttribArray(1);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Tcs);
+                    GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.EnableVertexAttribArray(2);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Col);
+                    GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.EnableVertexAttribArray(4);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, Dec_VBO_Ind);
+                    DecalPrepped = true;
+                }
             }
             Matrix4 ident = Matrix4.Identity;
             GL.UniformMatrix4(2, false, ref ident);
