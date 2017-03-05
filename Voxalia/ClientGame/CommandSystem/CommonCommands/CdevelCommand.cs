@@ -232,7 +232,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         if (TheClient.TheRegion.SpecialCaseRayTrace(pos, forw, 50.0f, MaterialSolidity.FULLSOLID, TheClient.Player.IgnoreThis, out rcr))
                         {
                             Location nrm = new Location(rcr.HitData.Normal).Normalize();
-                            TheClient.AddDecal(new Location(rcr.HitData.Location) + nrm * 0.025, nrm, Vector4.One, 1f, "white", 15);
+                            TheClient.AddDecal(new Location(rcr.HitData.Location) + nrm * 0.005, nrm, Vector4.One, 1f, "white", 15);
                             entry.Info(queue, "Marked at normal " + nrm);
                         }
                         break;

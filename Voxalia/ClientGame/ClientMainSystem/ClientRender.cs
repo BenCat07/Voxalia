@@ -1504,7 +1504,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.BindTexture(TextureTarget.Texture2DArray, DecTextureID);
             //GL.Enable(EnableCap.PolygonOffsetFill);
             GL.BindVertexArray(Dec_VAO);
-            if (isMore || !DecalPrepped)
+            GL.DepthFunc(DepthFunction.Lequal);
+            // TODO: Add back and isMore check, alongside a reasonably-limited-distance render offsetter uniform var
+            //if (isMore || !DecalPrepped)
             {
                 Vector3[] pos = new Vector3[Decals.Count];
                 Vector3[] nrm = new Vector3[Decals.Count];
@@ -1551,6 +1553,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.UniformMatrix4(2, false, ref ident);
             GL.DrawElements(PrimitiveType.Points, Decals.Count, DrawElementsType.UnsignedInt, IntPtr.Zero);
             GL.BindVertexArray(0);
+            GL.DepthFunc(DepthFunction.Less);
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.Enable(EnableCap.CullFace);
             //GL.PolygonOffset(0, 0);
