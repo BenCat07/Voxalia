@@ -11,21 +11,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Voxalia.Shared;
+using Voxalia.Shared.Files;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
 {
     public class SetStatusPacketIn: AbstractPacketIn
     {
-        public override bool ParseBytesAndExecute(byte[] data)
+        public override bool ParseBytesAndExecute(DataReader data)
         {
-            if (data.Length != 2)
-            {
-                return false;
-            }
-            switch ((ClientStatus)data[0])
+            byte stat = data.ReadByte();
+            switch ((ClientStatus)stat)
             {
                 case ClientStatus.TYPING:
-                    Player.SetTypingStatus(data[1] != 0);
+                    byte typing = data.ReadByte();
+                    Player.SetTypingStatus(typing != 0);
                     return true;
                 default:
                     return false;

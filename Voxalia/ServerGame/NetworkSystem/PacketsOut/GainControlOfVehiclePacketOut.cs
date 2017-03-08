@@ -57,9 +57,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             {
                 dw.WriteLong(vehicle.SteeringMotors[i].JID);
             }
-            dw.Flush();
             Data = ds.ToArray();
-            dw.Close();
         }
 
         private void Setup(CharacterEntity character, HelicopterEntity vehicle)
@@ -69,9 +67,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             dw.WriteLong(character.EID);
             dw.WriteByte(1); // TODO: Enum?
             dw.WriteLong(vehicle.EID);
-            dw.Flush();
             Data = ds.ToArray();
-            dw.Close();
         }
 
         private void Setup(CharacterEntity character, PlaneEntity vehicle)
@@ -81,9 +77,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             dw.WriteLong(character.EID);
             dw.WriteByte(2); // TODO: Enum?
             dw.WriteLong(vehicle.EID);
-            dw.Flush();
             Data = ds.ToArray();
-            dw.Close();
         }
     }
 }

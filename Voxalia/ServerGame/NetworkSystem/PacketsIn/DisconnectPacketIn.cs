@@ -6,16 +6,16 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
+using Voxalia.Shared.Files;
+
 namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
 {
     public class DisconnectPacketIn: AbstractPacketIn
     {
-        public override bool ParseBytesAndExecute(byte[] data)
+        public override bool ParseBytesAndExecute(DataReader data)
         {
-            if (data.Length != 1 || data[0] != 0)
-            {
-                return false;
-            }
+            // TODO: reason = data.ReadByte();
             Player.Kick("Willful disconnect.");
             return true;
         }

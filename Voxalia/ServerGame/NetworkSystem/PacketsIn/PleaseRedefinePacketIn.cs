@@ -13,18 +13,15 @@ using System.Text;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.WorldSystem;
 using Voxalia.Shared;
+using Voxalia.Shared.Files;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
 {
     public class PleaseRedefinePacketIn : AbstractPacketIn
     {
-        public override bool ParseBytesAndExecute(byte[] data)
+        public override bool ParseBytesAndExecute(DataReader data)
         {
-            if (data.Length != 8)
-            {
-                return false;
-            }
-            long eid = Utilities.BytesToLong(data);
+            long eid = data.ReadLong();
             Entity e;
             if (Player.TheRegion.Entities.TryGetValue(eid, out e))
             {

@@ -34,9 +34,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
                 dw.WriteFloat((float)cloud.Sizes[i]);
                 dw.WriteFloat((float)cloud.EndSizes[i]);
             }
-            dw.Flush();
             Data = ds.ToArray();
-            dw.Close();
         }
     }
 }

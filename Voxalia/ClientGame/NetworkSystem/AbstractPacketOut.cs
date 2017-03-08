@@ -8,6 +8,7 @@
 
 using System;
 using Voxalia.Shared;
+using Voxalia.Shared.Files;
 
 namespace Voxalia.ClientGame.NetworkSystem
 {
@@ -17,7 +18,7 @@ namespace Voxalia.ClientGame.NetworkSystem
         /// The ID of this packet.
         /// </summary>
         public ClientToServerPacket ID = 0;
-
+        
         /// <summary>
         /// The binary data held in this packet.
         /// </summary>

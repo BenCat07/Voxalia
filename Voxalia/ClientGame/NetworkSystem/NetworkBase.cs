@@ -549,7 +549,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                     throw ex;
                 }
                 SysConsole.Output(OutputType.ERROR, "Forcibly disconnected from server: " + ex.GetType().Name + ": " + ex.Message);
-                SysConsole.Output(OutputType.INFO, ex.ToString()); // TODO: Make me 'debug only'!
+                SysConsole.Output(OutputType.DEBUG, ex.ToString());
                 Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
                 return false;
             }
@@ -583,6 +583,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                     throw ex;
                 }
                 SysConsole.Output(OutputType.WARNING, "Forcibly disconnected from server: " + ex.GetType().Name + ": " + ex.Message);
+                SysConsole.Output(OutputType.DEBUG, ex.ToString());
                 Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
             }
         }

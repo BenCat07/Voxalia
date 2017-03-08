@@ -8,6 +8,7 @@
 
 using System;
 using Voxalia.Shared;
+using Voxalia.Shared.Files;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using BEPUutilities;
 using BEPUphysics;
@@ -17,14 +18,10 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
 {
     class KeysPacketIn: AbstractPacketIn
     {
-        public override bool ParseBytesAndExecute(byte[] data)
+        public override bool ParseBytesAndExecute(DataReader data)
         {
-            if (data.Length != 4 + 2 + 4 + 4 + 4 + 4 + 24 + 24 + 4 + 24 + 24)
-            {
-                return false;
-            }
-            int tid = Utilities.BytesToInt(Utilities.BytesPartial(data, 0, 4));
-            KeysPacketData val = (KeysPacketData)Utilities.BytesToUshort(Utilities.BytesPartial(data, 4, 2));
+            int tid = data.ReadInt();
+            KeysPacketData val = (KeysPacketData)data.ReadUShort();
             bool upw = val.HasFlag(KeysPacketData.UPWARD);
             bool downw = val.HasFlag(KeysPacketData.DOWNWARD);
             bool click = val.HasFlag(KeysPacketData.CLICK);
@@ -34,16 +31,15 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
             bool iright = val.HasFlag(KeysPacketData.ITEMRIGHT);
             bool iup = val.HasFlag(KeysPacketData.ITEMUP);
             bool idown = val.HasFlag(KeysPacketData.ITEMDOWN);
-            double yaw = Utilities.BytesToFloat(Utilities.BytesPartial(data, 4 + 2, 4));
-            double pitch = Utilities.BytesToFloat(Utilities.BytesPartial(data, 4 + 2 + 4, 4));
-            double x = Utilities.BytesToFloat(Utilities.BytesPartial(data, 4 + 2 + 4 + 4, 4));
-            double y = Utilities.BytesToFloat(Utilities.BytesPartial(data, 4 + 2 + 4 + 4 + 4, 4));
-            int s = 4 + 2 + 4 + 4 + 4 + 4;
-            Location pos = Location.FromDoubleBytes(data, s);
-            Location vel = Location.FromDoubleBytes(data, s + 24);
-            double sow = Utilities.BytesToFloat(Utilities.BytesPartial(data, s + 24 + 24, 4));
-            Location itemdir = Location.FromDoubleBytes(data, s + 24 + 24 + 4);
-            Location isRel = Location.FromDoubleBytes(data, s + 24 + 24 + 4 + 24);
+            double yaw = data.ReadFloat();
+            double pitch = data.ReadFloat();
+            double x = data.ReadFloat();
+            double y = data.ReadFloat();
+            Location pos = data.ReadLocation();
+            Location vel = data.ReadLocation();
+            double sow = data.ReadFloat();
+            Location itemdir = data.ReadLocation();
+            Location isRel = data.ReadLocation();
             Vector2 tmove = new Vector2(x, y);
             if (tmove.LengthSquared() > 1.0)
             {

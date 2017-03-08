@@ -201,7 +201,6 @@ namespace Voxalia.Shared
             {
                 dw.WriteFullBytes(itb.ToBytes());
             }
-            dw.Flush();
             return ds.ToArray();
         }
 

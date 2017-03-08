@@ -30,7 +30,6 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             }
             dw.WriteBytes(dat);
             dw.WriteBytes(paints);
-            dw.Flush();
             Data = outp.ToArray();
         }
     }

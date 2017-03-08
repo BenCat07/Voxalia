@@ -6,7 +6,9 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.Shared;
+using Voxalia.Shared.Files;
 using Voxalia.ServerGame.ItemSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 
@@ -14,19 +16,15 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
 {
     public class HoldItemPacketIn: AbstractPacketIn
     {
-        public override bool ParseBytesAndExecute(byte[] data)
+        public override bool ParseBytesAndExecute(DataReader data)
         {
-            if (data.Length != 4)
-            {
-                return false;
-            }
             if (Player.Flags.HasFlag(YourStatusFlags.RELOADING))
             {
                 Player.Network.SendPacket(new SetHeldItemPacketOut(Player.Items.cItem));
                 return true; // Permit but ignore
             }
             Player.NoteDidAction();
-            int dat = Utilities.BytesToInt(data);
+            int dat = data.ReadInt();
             dat = dat % (Player.Items.Items.Count + 1);
             while (dat < 0)
             {

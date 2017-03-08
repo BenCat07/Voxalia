@@ -15,10 +15,10 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
 {
     public class CommandPacketIn: AbstractPacketIn
     {
-        public override bool ParseBytesAndExecute(byte[] data)
+        public override bool ParseBytesAndExecute(DataReader data)
         {
             Player.NoteDidAction();
-            string[] datums = FileHandler.encoding.GetString(data).SplitFast('\n');
+            string[] datums = data.ReadString(data.Available).SplitFast('\n');
             List<string> args =  datums.ToList();
             string cmd = args[0];
             args.RemoveAt(0);

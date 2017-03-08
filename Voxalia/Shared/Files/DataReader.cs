@@ -47,9 +47,19 @@ namespace Voxalia.Shared.Files
             return b;
         }
 
+        public Location ReadLocation()
+        {
+            return Location.FromDoubleBytes(ReadBytes(24), 0);
+        }
+
         public short ReadShort()
         {
             return Utilities.BytesToShort(ReadBytes(2));
+        }
+
+        public ushort ReadUShort()
+        {
+            return Utilities.BytesToUshort(ReadBytes(2));
         }
 
         public int ReadInt()

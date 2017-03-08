@@ -135,7 +135,6 @@ namespace Voxalia.ServerGame.ItemSystem
             {
                 dw.WriteFullBytes(itb.ServerBytes());
             }
-            dw.Flush();
             return data.ToArray();
         }
 

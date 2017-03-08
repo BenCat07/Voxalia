@@ -6,7 +6,9 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.ServerGame.EntitySystem;
+using Voxalia.Shared.Files;
 
 namespace Voxalia.ServerGame.NetworkSystem
 {
@@ -22,7 +24,7 @@ namespace Voxalia.ServerGame.NetworkSystem
         /// </summary>
         /// <param name="data">The byte array received from a client.</param>
         /// <returns>False if the array is invalid, true if it parses successfully.</returns>
-        public abstract bool ParseBytesAndExecute(byte[] data);
+        public abstract bool ParseBytesAndExecute(DataReader data);
 
         public bool Chunk = false;
     }

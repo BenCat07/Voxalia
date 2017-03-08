@@ -6,24 +6,22 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.Shared;
+using Voxalia.Shared.Files;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
 {
     public class PingPacketIn: AbstractPacketIn
     {
-        public override bool ParseBytesAndExecute(byte[] data)
+        public override bool ParseBytesAndExecute(DataReader data)
         {
-            if (data.Length != 1)
-            {
-                SysConsole.Output(OutputType.WARNING, "Ping length != 1");
-                return false;
-            }
             byte expect = (Chunk ? Player.LastCPingByte: Player.LastPingByte);
-            if (data[0] != expect)
+            byte got = data.ReadByte();
+            if (got != expect)
             {
-                SysConsole.Output(OutputType.WARNING, "Chunk=" + Chunk + ", d0 bad, expecting " + (int)expect + ", got " + data[0]);
+                SysConsole.Output(OutputType.WARNING, "Chunk=" + Chunk + ", d0 bad, expecting " + (int)expect + ", got " + got);
                 return false;
             }
             if (Chunk)

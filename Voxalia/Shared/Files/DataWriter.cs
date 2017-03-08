@@ -10,41 +10,53 @@ using System.IO;
 
 namespace Voxalia.Shared.Files
 {
-    public class DataWriter: BinaryWriter
+    public class DataWriter
     {
+        public Stream Internal;
+
         public DataWriter(Stream stream)
-            : base(stream, FileHandler.encoding)
         {
+            Internal = stream;
+        }
+        
+        public void WriteLocation(Location loc)
+        {
+            Internal.Write(loc.ToDoubleBytes(), 0, 24);
         }
 
         public void WriteByte(byte x)
         {
-            base.Write(x);
+            Internal.WriteByte(x);
+        }
+        
+        public void WriteUShort(ushort x)
+        {
+            Internal.Write(Utilities.UshortToBytes(x), 0, 2);
         }
 
         public void WriteInt(int x)
         {
-            base.Write(Utilities.IntToBytes(x), 0, 4);
+            Internal.Write(Utilities.IntToBytes(x), 0, 4);
         }
 
         public void WriteFloat(float x)
         {
-            base.Write(Utilities.FloatToBytes(x), 0, 4);
+            Internal.Write(Utilities.FloatToBytes(x), 0, 4);
         }
 
         public void WriteDouble(double x)
         {
-            base.Write(Utilities.DoubleToBytes(x), 0, 8);
+            Internal.Write(Utilities.DoubleToBytes(x), 0, 8);
         }
 
         public void WriteLong(long x)
         {
-            base.Write(Utilities.LongToBytes(x), 0, 8);
+            Internal.Write(Utilities.LongToBytes(x), 0, 8);
         }
 
         public void WriteBytes(byte[] bits)
         {
-            base.Write(bits, 0, bits.Length);
+            Internal.Write(bits, 0, bits.Length);
         }
 
         public void WriteFullBytes(byte[] data)

@@ -19,9 +19,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsOut
         public SetStatusPacketOut(ClientStatus opt, byte status)
         {
             ID = ClientToServerPacket.SET_STATUS;
-            Data = new byte[2];
-            Data[0] = (byte)opt;
-            Data[1] = status;
+            Data = new byte[] { (byte)opt, status };
         }
     }
 }

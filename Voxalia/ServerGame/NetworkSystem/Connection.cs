@@ -259,9 +259,10 @@ namespace Voxalia.ServerGame.NetworkSystem
                         }
                         packet.Chunk = PE.ChunkNetwork == this;
                         packet.Player = PE;
+                        DataReader dr = new DataReader(new DataStream(data));
                         PE.TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
                         {
-                            if (!packet.ParseBytesAndExecute(data))
+                            if (!packet.ParseBytesAndExecute(dr))
                             {
                                 throw new Exception("Imperfect packet data for " + packetID);
                             }

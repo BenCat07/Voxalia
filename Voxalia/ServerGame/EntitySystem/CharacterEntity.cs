@@ -145,11 +145,9 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 dtx |= 32;
             }
-            dr.Write(dtx);
+            dr.WriteByte(dtx);
             dr.WriteInt(TheServer.Networking.Strings.IndexForString(model));
-            dr.Flush();
             byte[] Data = ds.ToArray();
-            dr.Close();
             return Data;
         }
 

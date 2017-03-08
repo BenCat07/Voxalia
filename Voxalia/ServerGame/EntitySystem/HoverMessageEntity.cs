@@ -50,9 +50,7 @@ namespace Voxalia.ServerGame.EntitySystem
             dw.WriteBytes(b);
             dw.WriteInt(BackColor.ToArgb());
             dw.WriteFullString(Text);
-            dw.Flush();
             byte[] res = ds.ToArray();
-            dw.Dispose();
             return res;
         }
 
