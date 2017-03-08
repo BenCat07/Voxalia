@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
-using Voxalia.Shared.LockedLinkedList;
 
 namespace Voxalia.Shared
 {
@@ -32,7 +31,7 @@ namespace Voxalia.Shared
 
         public void RunAllSyncTasks(double time)
         {
-            LockedLinkedListNode<SyncScheduleItem> node = Tasks.First;
+            LockedLinkedList<SyncScheduleItem>.Node node = Tasks.First;
             while (node != null)
             {
                 node.Data.Time -= time;
@@ -53,7 +52,7 @@ namespace Voxalia.Shared
                     }
                     SysConsole.Output("Handling sync task", ex);
                 }
-                LockedLinkedListNode<SyncScheduleItem> torem = node;
+                LockedLinkedList<SyncScheduleItem>.Node torem = node;
                 node = node.Next;
                 Tasks.Remove(torem);
             }

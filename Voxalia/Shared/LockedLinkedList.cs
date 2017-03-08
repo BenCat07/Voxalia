@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Voxalia.Shared.LockedLinkedList
+namespace Voxalia.Shared
 {
     /// <summary>
     /// This class isn't actually entirely locked/thread-safe, or even entirely functional as a linked-list, only done sufficiently for its first immediate use-case.
@@ -21,16 +21,25 @@ namespace Voxalia.Shared.LockedLinkedList
     /// </summary>
     public class LockedLinkedList<T>
     {
-        public LockedLinkedListNode<T> First;
+        public class Node
+        {
+            public Node Previous;
 
-        public LockedLinkedListNode<T> Last;
+            public Node Next;
+
+            public T Data;
+        }
+
+        public Node First;
+
+        public Node Last;
 
         private Object lastLock = new Object();
 
         /// <summary>
         /// Do NOT input null. There is no safety check, and that will produce unexpected results!
         /// </summary>
-        public void Remove(LockedLinkedListNode<T> itm)
+        public void Remove(Node itm)
         {
             // If the item or its follower is the last one, lock. Otherwise, execute as normal.
             // TODO: Evaluate this better. Is this actually guaranteed to not bork out on too much sudden usage?
@@ -72,7 +81,7 @@ namespace Voxalia.Shared.LockedLinkedList
             // This always modifies the last entry, so lock on the last entry.
             lock (lastLock)
             {
-                LockedLinkedListNode<T> temp = new LockedLinkedListNode<T>();
+                Node temp = new Node();
                 temp.Data = data;
                 temp.Previous = Last;
                 if (Last != null)
