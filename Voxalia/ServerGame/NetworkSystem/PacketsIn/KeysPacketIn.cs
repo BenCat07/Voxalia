@@ -19,12 +19,12 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
     {
         public override bool ParseBytesAndExecute(byte[] data)
         {
-            if (data.Length != 8 + 2 + 4 + 4 + 4 + 4 + 24 + 24 + 4 + 24 + 24)
+            if (data.Length != 4 + 2 + 4 + 4 + 4 + 4 + 24 + 24 + 4 + 24 + 24)
             {
                 return false;
             }
-            long tid = Utilities.BytesToLong(Utilities.BytesPartial(data, 0, 8));
-            KeysPacketData val = (KeysPacketData)Utilities.BytesToUshort(Utilities.BytesPartial(data, 8, 2));
+            int tid = Utilities.BytesToInt(Utilities.BytesPartial(data, 0, 4));
+            KeysPacketData val = (KeysPacketData)Utilities.BytesToUshort(Utilities.BytesPartial(data, 4, 2));
             bool upw = val.HasFlag(KeysPacketData.UPWARD);
             bool downw = val.HasFlag(KeysPacketData.DOWNWARD);
             bool click = val.HasFlag(KeysPacketData.CLICK);
@@ -34,11 +34,11 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
             bool iright = val.HasFlag(KeysPacketData.ITEMRIGHT);
             bool iup = val.HasFlag(KeysPacketData.ITEMUP);
             bool idown = val.HasFlag(KeysPacketData.ITEMDOWN);
-            double yaw = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 2, 4));
-            double pitch = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 2 + 4, 4));
-            double x = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 2 + 4 + 4, 4));
-            double y = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 2 + 4 + 4 + 4, 4));
-            int s = 8 + 2 + 4 + 4 + 4 + 4;
+            double yaw = Utilities.BytesToFloat(Utilities.BytesPartial(data, 4 + 2, 4));
+            double pitch = Utilities.BytesToFloat(Utilities.BytesPartial(data, 4 + 2 + 4, 4));
+            double x = Utilities.BytesToFloat(Utilities.BytesPartial(data, 4 + 2 + 4 + 4, 4));
+            double y = Utilities.BytesToFloat(Utilities.BytesPartial(data, 4 + 2 + 4 + 4 + 4, 4));
+            int s = 4 + 2 + 4 + 4 + 4 + 4;
             Location pos = Location.FromDoubleBytes(data, s);
             Location vel = Location.FromDoubleBytes(data, s + 24);
             double sow = Utilities.BytesToFloat(Utilities.BytesPartial(data, s + 24 + 24, 4));

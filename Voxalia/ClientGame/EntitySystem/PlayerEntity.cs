@@ -54,9 +54,7 @@ namespace Voxalia.ClientGame.EntitySystem
             PreFlyMass = GetMass();
             //PreFlyOrient = GetOrientation();
             SetMass(0);
-            NMTWOCBody.Body.Mass = 0;
             CBody.Body.AngularVelocity = Vector3.Zero;
-            NMTWOCBody.Body.AngularVelocity = Vector3.Zero;
         }
 
         public void Unfly()
@@ -68,12 +66,8 @@ namespace Voxalia.ClientGame.EntitySystem
             IsFlying = false;
             SetMass(PreFlyMass);
             CBody.Body.LocalInertiaTensorInverse = new Matrix3x3();
-            NMTWOCBody.Body.LocalInertiaTensorInverse = new Matrix3x3();
-            NMTWOCBody.Body.Mass = PreFlyMass;
             CBody.Body.Orientation = PreFlyOrient;
             CBody.Body.AngularVelocity = Vector3.Zero;
-            NMTWOCBody.Body.Orientation = PreFlyOrient;
-            NMTWOCBody.Body.AngularVelocity = Vector3.Zero;
         }
 
         public Location ServerLocation = new Location(0, 0, 0);
@@ -94,9 +88,20 @@ namespace Voxalia.ClientGame.EntitySystem
             model = TheClient.Models.GetModel("players/human_male_004");
             model.LoadSkin(TheClient.Textures);
             CGroup = CollisionUtil.Player;
-            NMTWOWorld.ForceUpdater.Gravity = TheRegion.PhysicsWorld.ForceUpdater.Gravity;
-            NMTWOWorld.TimeStepSettings.MaximumTimeStepsPerFrame = 10;
             SetPosition(new Location(0, 0, 1000));
+            for (int i = 0; i < PACKET_CAP; i++)
+            {
+                GTTs[i] = -1.0;
+            }
+        }
+
+        public override void SpawnBody()
+        {
+            base.SpawnBody();
+            for (int i = 0; i < PACKET_CAP; i++)
+            {
+                GTTs[i] = -1.0;
+            }
         }
 
         public override ItemStack GetHeldItem()
@@ -113,35 +118,25 @@ namespace Voxalia.ClientGame.EntitySystem
             return TheRegion.Collision.ShouldCollide(entry);
         }
 
-        UserInputSet lUIS = null;
+        public bool InVehicle = false;
 
-        public ListQueue<UserInputSet> Input = new ListQueue<UserInputSet>();
+        public Entity Vehicle = null;
 
-        double lPT;
+        public int CurrentMovePacketID = 0;
 
-        public Space NMTWOWorld = new Space(null);
+        public const int PACKET_CAP = 256;
 
-        Dictionary<Vector3i, FullChunkObject> NMTWOMeshes = new Dictionary<Vector3i, FullChunkObject>();
+        public Location[] Positions = new Location[PACKET_CAP];
 
-        double lGTT = 0;
+        public Location[] Velocities = new Location[PACKET_CAP];
 
-        double _gtt;
-        long _id = -1;
-        Location _pos;
-        Location _vel;
-        bool __pup;
+        public double[] GTTs = new double[PACKET_CAP];
 
-        public void PacketFromServer(double gtt, long ID, Location pos, Location vel, bool _pup)
+        public double CurrentRemoteGTT = 1.0;
+
+        public void PacketFromServer(double gtt, int ID, Location pos, Location vel, bool _pup)
         {
-            _gtt = gtt;
-            _id = ID;
-            _pos = pos;
-            _vel = vel;
-            __pup = _pup;
-        }
-        
-        public void UpdateForPacketFromServer(double gtt, long ID, Location pos, Location vel, bool _pup)
-        {
+            CurrentRemoteGTT = gtt;
             ServerLocation = pos;
             if (ServerFlags.HasFlag(YourStatusFlags.INSECURE_MOVEMENT))
             {
@@ -151,159 +146,76 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
-            // TODO: big solid entities!
-            double now = TheRegion.GlobalTickTimeLocal;
-            if (TheClient.CVars.n_movemode.ValueI == 2)
+            Location cur_pos = GetPosition();
+            Location cur_vel = GetVelocity();
+            Location old_pos = Positions[ID];
+            Location old_vel = Velocities[ID];
+            Location off_pos = pos - old_pos;
+            Location off_vel = vel - old_vel;
+            double off_gtt = MathHelper.Clamp(gtt - GTTs[ID], 0.001, 0.3) * 2.0;
+            if ((cur_pos - pos).LengthSquared() > 20.0 * 20.0)
             {
-                // TODO: Remove outsider chunks!
-                for (int x = -1; x <= 1; x++)
-                {
-                    for (int y = -1; y <= 1; y++)
-                    {
-                        for (int z = -1; z <= 1; z++)
-                        {
-                            Vector3i ch = TheRegion.ChunkLocFor(pos) + new Vector3i(x, y, z);
-                            Chunk chunk = TheRegion.GetChunk(ch);
-                            if (chunk == null)
-                            {
-                                continue;
-                            }
-                            if (!NMTWOMeshes.ContainsKey(ch))
-                            {
-                                if (chunk.FCO != null)
-                                {
-                                    FullChunkObject im = new FullChunkObject(chunk.FCO.Position, chunk.FCO.ChunkShape);
-                                    NMTWOWorld.Add(im);
-                                    NMTWOMeshes[ch] = im;
-                                }
-                            }
-                        }
-                    }
-                }
-                AddUIS();
-                int xf = 0;
-                double jumpback = gtt - lGTT;
-                if (jumpback < 0)
-                {
-                    return;
-                }
-                double target = TheRegion.GlobalTickTimeLocal - jumpback;
-                UserInputSet past = null;
-                while (xf < Input.Length)
-                {
-                    UserInputSet uis = Input[xf];
-                    if (uis.GlobalTimeLocal < target)
-                    {
-                        past = uis;
-                        Input.Pop();
-                        continue;
-                    }
-                    else if (xf == 0)
-                    {
-                        double mult = Math.Max(Math.Min(jumpback / TheClient.CVars.n_movement_adjustment.ValueD, 1.0), 0.01);
-                        NMTWOSetPosition(uis.Position + (pos - uis.Position) * mult);
-                        NMTWOSetVelocity(uis.Velocity + (vel - uis.Velocity) * mult);
-                    }
-                    xf++;
-                    double delta;
-                    if (xf < 2)
-                    {
-                        if (past == null)
-                        {
-                            continue;
-                        }
-                        delta = uis.GlobalTimeLocal - target;
-                        SetBodyMovement(NMTWOCBody, past);
-                    }
-                    else
-                    {
-                        UserInputSet prev = Input[xf - 2];
-                        delta = uis.GlobalTimeLocal - prev.GlobalTimeLocal;
-                        SetBodyMovement(NMTWOCBody, prev);
-                    }
-                    SetMoveSpeed(NMTWOCBody, uis);
-                    if (!_pup)
-                    {
-                        NMTWOTryToJump(uis);
-                    }
-                    lPT = uis.GlobalTimeLocal;
-                    NMTWOWorld.Update((float)delta);
-                    FlyForth(NMTWOCBody, uis, delta); // TODO: Entirely disregard NWTWOWorld if flying?
-                }
-                AddUIS();
-                SetPosition(NMTWOGetPosition());
-                SetVelocity(new Location(NMTWOCBody.Body.LinearVelocity));
-                pup = _pup;
-                lGTT = gtt;
+                SetPosition(pos);
+                SetVelocity(vel);
             }
             else
             {
-                double delta = lPT - now;
-                Location dir = pos - GetPosition();
-                if (dir.LengthSquared() < TheClient.CVars.n_movement_maxdistance.ValueF * TheClient.CVars.n_movement_maxdistance.ValueF)
-                {
-                    SetPosition(GetPosition() + dir / Math.Max(TheClient.CVars.n_movement_adjustment.ValueF / delta, 1));
-                    Location veldir = vel - GetVelocity();
-                    SetVelocity(GetVelocity() + veldir / Math.Max(TheClient.CVars.n_movement_adjustment.ValueF / delta, 1));
-                }
-                else
-                {
-                    SetPosition(pos);
-                    SetVelocity(vel);
-                }
-                lPT = now;
+                SetPosition(cur_pos + off_pos * off_gtt);
+                SetVelocity(cur_vel + off_vel * off_gtt);
             }
+            GTTs[ID] = -1.0;
+            // TODO: match this movement logic for vehicles too (pos + vel + direction)
         }
 
-        long cPacketID = 0;
+        public double MoveTransmitWaiting = 0.0;
 
-        public bool InVehicle = false;
+        public const double MoveTransmitTime = 0.016;
 
-        public Entity Vehicle = null;
-
-        public void AddUIS()
-        {
-            UserInputSet uis = new UserInputSet()
-            {
-                ID = cPacketID++,
-                Upward = Upward,
-                XMove = XMove,
-                YMove = YMove,
-                Direction = Direction,
-                Position = GetPosition(),
-                Velocity = GetVelocity(),
-                Downward = Downward,
-                GlobalTimeRemote = lGTT,
-                pup = pup,
-                SprintOrWalk = SprintOrWalk,
-                GlobalTimeLocal = TheRegion.GlobalTickTimeLocal
-            };
-            Input.Push(uis);
-            lUIS = uis;
-        }
+        double LagRateLimit = 0.0;
 
         public void UpdateLocalMovement()
         {
-            AddUIS();
+            if (!TheClient.Network.IsAlive)
+            {
+                return;
+            }
+            if (ServerFlags.HasFlag(YourStatusFlags.NO_ROTATE))
+            {
+                Direction.Yaw = tyaw;
+                Direction.Pitch = tpitch;
+            }
+            MoveTransmitWaiting += TheClient.Delta;
+            if (MoveTransmitWaiting < MoveTransmitTime)
+            {
+                return;
+            }
+            MoveTransmitWaiting = 0.0;
             KeysPacketData kpd = (Upward ? KeysPacketData.UPWARD : 0)
-                  | (Click ? KeysPacketData.CLICK : 0) | (AltClick ? KeysPacketData.ALTCLICK : 0)
+                  | (Click ? KeysPacketData.CLICK : 0)
+                  | (AltClick ? KeysPacketData.ALTCLICK : 0)
                   | (Downward ? KeysPacketData.DOWNWARD : 0)
                   | (Use ? KeysPacketData.USE : 0)
                   | (ItemLeft ? KeysPacketData.ITEMLEFT : 0)
                   | (ItemRight ? KeysPacketData.ITEMRIGHT : 0)
                   | (ItemUp ? KeysPacketData.ITEMUP : 0)
                   | (ItemDown ? KeysPacketData.ITEMDOWN : 0);
-            if (ServerFlags.HasFlag(YourStatusFlags.NO_ROTATE))
+            if (GTTs[CurrentMovePacketID] >= 0.0)
             {
-                Location loc = new Location();
-                loc.Yaw = tyaw;
-                loc.Pitch = tpitch;
-                TheClient.Network.SendPacket(new KeysPacketOut(lUIS.ID, kpd, loc, lUIS.XMove, lUIS.YMove, GetPosition(), GetVelocity(), lUIS.SprintOrWalk, ItemDir(), ItemSourceRelative()));
+                LagRateLimit += TheClient.Delta;
+                if (LagRateLimit > 2.5)
+                {
+                    LagRateLimit = 0.0;
+                    SysConsole.Output(OutputType.WARNING, "Lagging: Movement tracker full (" + CurrentMovePacketID + ", " + GTTs[CurrentMovePacketID] + ")"); // TODO: Rate-limit this
+                }
+                return;
             }
-            else
-            {
-                TheClient.Network.SendPacket(new KeysPacketOut(lUIS.ID, kpd, Direction, lUIS.XMove, lUIS.YMove, GetPosition(), GetVelocity(), lUIS.SprintOrWalk, ItemDir(), ItemSourceRelative()));
-            }
+            Location p = GetPosition();
+            Location v = GetVelocity();
+            TheClient.Network.SendPacket(new KeysPacketOut(CurrentMovePacketID, kpd, Direction, XMove, YMove, p, v, SprintOrWalk, ItemDir(), ItemSourceRelative()));
+            Positions[CurrentMovePacketID] = p;
+            Velocities[CurrentMovePacketID] = v;
+            GTTs[CurrentMovePacketID] = CurrentRemoteGTT;
+            CurrentMovePacketID = (CurrentMovePacketID + 1) % PACKET_CAP;
         }
 
         public Location ItemDir()
@@ -321,16 +233,16 @@ namespace Voxalia.ClientGame.EntitySystem
             return (TheClient.VR == null || TheClient.VR.Right == null) ? GetEyePosition() : GetPosition() + ClientUtilities.Convert(TheClient.VR.Right.Position.ExtractTranslation());
         }
 
-        public void SetBodyMovement(CharacterController cc, UserInputSet uis)
+        public void SetBodyMovement(CharacterController cc)
         {
-            Vector2 movement = InVehicle ? Vector2.Zero : new Vector2(uis.XMove, uis.YMove);
+            Vector2 movement = InVehicle ? Vector2.Zero : new Vector2(XMove, YMove);
             if (movement.LengthSquared() > 0)
             {
                 movement.Normalize();
             }
-            cc.ViewDirection = Utilities.ForwardVector_Deg(uis.Direction.Yaw, uis.Direction.Pitch).ToBVector();
+            cc.ViewDirection = Utilities.ForwardVector_Deg(Direction.Yaw, Direction.Pitch).ToBVector();
             cc.HorizontalMotionConstraint.MovementDirection = movement;
-            if (uis.Downward)
+            if (Downward)
             {
                 cc.StanceManager.DesiredStance = Stance.Crouching;
             }
@@ -340,23 +252,23 @@ namespace Voxalia.ClientGame.EntitySystem
             }
         }
 
-        public void FlyForth(CharacterController cc, UserInputSet uis, double delta)
+        public void FlyForth(CharacterController cc, double delta)
         {
             if (IsFlying)
             {
                 Location move = new Location(-cc.HorizontalMotionConstraint.MovementDirection.Y, cc.HorizontalMotionConstraint.MovementDirection.X, 0);
-                if (uis.Upward)
+                if (Upward)
                 {
                     move.Z = 1;
                     move = move.Normalize();
                 }
-                else if (uis.Downward)
+                else if (Downward)
                 {
                     move.Z = -1;
                     move = move.Normalize();
                 }
                 Location forw = Utilities.RotateVector(move, Direction.Yaw * Utilities.PI180, Direction.Pitch * Utilities.PI180);
-                cc.Body.Position += (forw * delta * CBStandSpeed * 4 * (new Vector2(uis.XMove, uis.YMove).Length())).ToBVector();
+                cc.Body.Position += (forw * delta * CBStandSpeed * 4 * (new Vector2(XMove, YMove).Length())).ToBVector();
                 cc.HorizontalMotionConstraint.MovementDirection = Vector2.Zero;
                 cc.Body.LinearVelocity = new Vector3(0, 0, 0);
             }
@@ -374,20 +286,11 @@ namespace Voxalia.ClientGame.EntitySystem
                 pup = false;
             }
         }
-
-        public void NMTWOTryToJump(UserInputSet uis)
+        
+        public void SetMoveSpeed(CharacterController cc)
         {
-            if (!InVehicle && uis.Upward && !uis.pup && !IsFlying && NMTWOCBody.SupportFinder.HasSupport)
-            {
-                NMTWOCBody.Jump();
-                uis.pup = true;
-            }
-        }
-
-        public void SetMoveSpeed(CharacterController cc, UserInputSet uis)
-        {
-            float speedmod = (float)new Vector2(uis.XMove, uis.YMove).Length() * 2;
-            speedmod *= (1f + uis.SprintOrWalk * 0.5f);
+            float speedmod = (float)new Vector2(XMove, YMove).Length() * 2;
+            speedmod *= (1f + SprintOrWalk * 0.5f);
             if (Click)
             {
                 ItemStack item = TheClient.GetItemForSlot(TheClient.QuickBarPos);
@@ -802,9 +705,9 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             TryToJump();
             UpdateLocalMovement();
-            SetMoveSpeed(CBody, lUIS);
-            FlyForth(CBody, lUIS, TheRegion.Delta);
-            SetBodyMovement(CBody, lUIS);
+            SetMoveSpeed(CBody);
+            FlyForth(CBody, TheRegion.Delta);
+            SetBodyMovement(CBody);
             PlayRelevantSounds();
             MoveVehicle();
             if (Flashlight != null)
@@ -867,30 +770,10 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public void PostTick()
         {
-            if (CBody != null && _id >= 0)
-            {
-                UpdateForPacketFromServer(_gtt, _id, _pos, _vel, __pup);
-                _id = -1;
-            }
         }
 
         public JointWeld Welded = null;
-
-        public CharacterController NMTWOCBody = null;
-
-        public override void SpawnBody()
-        {
-            base.SpawnBody();
-            NMTWOCBody = GenCharCon();
-            NMTWOWorld.Add(NMTWOCBody);
-        }
-
-        public override void DestroyBody()
-        {
-            base.DestroyBody();
-            NMTWOWorld.Remove(NMTWOCBody);
-        }
-
+        
         public Location UpDir()
         {
             return Location.UnitZ;
@@ -919,27 +802,6 @@ namespace Voxalia.ClientGame.EntitySystem
             return Quaternion.Identity;
         }
 
-        Location NMTWOGetPosition()
-        {
-            RigidTransform transf = new RigidTransform(Vector3.Zero, NMTWOCBody.Body.Orientation);
-            BoundingBox box;
-            NMTWOCBody.Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out box);
-            return new Location(NMTWOCBody.Body.Position) + new Location(0, 0, box.Min.Z);
-        }
-
-        void NMTWOSetPosition(Location pos)
-        {
-            RigidTransform transf = new RigidTransform(Vector3.Zero, NMTWOCBody.Body.Orientation);
-            BoundingBox box;
-            NMTWOCBody.Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out box);
-            NMTWOCBody.Body.Position = (pos + new Location(0, 0, -box.Min.Z)).ToBVector();
-        }
-
-        void NMTWOSetVelocity(Location vel)
-        {
-            NMTWOCBody.Body.LinearVelocity = vel.ToBVector();
-        }
-        
         public float Health;
 
         public float MaxHealth;
@@ -1082,32 +944,5 @@ namespace Voxalia.ClientGame.EntitySystem
             Location vpos = Vehicle.GetPosition();
             return vpos;
         }
-    }
-
-    public class UserInputSet
-    {
-        public long ID;
-
-        public double GlobalTimeLocal;
-
-        public double GlobalTimeRemote;
-
-        public Location Direction;
-
-        public bool Upward;
-
-        public bool pup;
-        
-        public float XMove;
-
-        public float YMove;
-
-        public bool Downward;
-
-        public Location Position;
-
-        public Location Velocity;
-
-        public float SprintOrWalk;
     }
 }

@@ -31,7 +31,7 @@ namespace Voxalia.ClientGame.CommandSystem
         public CVar g_timescale, g_firstperson, g_weathermode;
 
         // Network CVars
-        public CVar n_first, n_debugmovement, n_movement_maxdistance, n_movement_adjustment, n_movemode, n_ourvehiclelerp, n_online;
+        public CVar n_first, n_debugmovement, n_ourvehiclelerp, n_online;
 
         // Renderer CVars
         public CVar r_fullscreen, r_width, r_height, r_vsync, r_lighting, r_renderwireframe, r_brighttransp,  r_decals,
@@ -71,9 +71,6 @@ namespace Voxalia.ClientGame.CommandSystem
             // Network CVars
             n_first = Register("n_first", "ipv4", CVarFlag.Textual, "Whether to prefer IPv4 or IPv6.");
             n_debugmovement = Register("n_debugmovement", "false", CVarFlag.Boolean, "Whether to debug movement networking.");
-            n_movement_maxdistance = Register("n_movement_maxdistance", "20", CVarFlag.Numeric, "How far apart the client can move from the serverside player before snapping to the correct location.");
-            n_movement_adjustment = Register("n_movement_adjustment", "0.1", CVarFlag.Numeric, "How rapidly to adjust the player's position to better match the server. Smaller numbers yield quicker results.");
-            n_movemode = Register("n_movemode", "2", CVarFlag.Numeric, "Which movement mode to use. 1 = run-and-adjust, 2 = back-trace.");
             n_ourvehiclelerp = Register("n_ourvehiclelerp", "0.1", CVarFlag.Numeric, "How strongly to lerp our own vehicle's movement.");
             n_online = Register("n_online", "true", CVarFlag.Boolean, "Whether to only connect to servers with a valid login key. Disable this to play singleplayer without internet.");
             // Renderer CVars
