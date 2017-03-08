@@ -56,7 +56,7 @@ View the [FAQ](/FAQ.md) for more information!
 
 ## Compiling
 
-- Open the `Voxalia.sln` file in Microsoft Visual Studio 2015
+- Open the `Voxalia.sln` file in Microsoft Visual Studio 2017
 - Switch the configuration to `Release|x64`
 - Build -> Build Solution!
 
