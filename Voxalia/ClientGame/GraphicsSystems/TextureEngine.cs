@@ -119,6 +119,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// Gets the texture object for a specific texture name.
         /// </summary>
         /// <param name="texturename">The name of the texture.</param>
+        /// <param name="twidth">The texture width, if any.</param>
         /// <returns>A valid texture object.</returns>
         public Texture GetTexture(string texturename, int twidth = 0)
         {
@@ -160,6 +161,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// Loads a texture from file.
         /// </summary>
         /// <param name="filename">The name of the file to use.</param>
+        /// <param name="twidth">The texture width, if any.</param>
         /// <returns>The loaded texture, or null if it does not exist.</returns>
         public Texture LoadTexture(string filename, int twidth = 0)
         {
@@ -270,6 +272,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// Locks a bitmap file's data to a GL texture.
         /// </summary>
         /// <param name="bmp">The bitmap to use.</param>
+        /// <param name="linear">Whether to use linear filtering for the texture (otherwise, "Nearest" filtering mode).</param>
         public void LockBitmapToTexture(Bitmap bmp, bool linear)
         {
             BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -286,6 +289,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// Locks a bitmap file's data to a GL texture array.
         /// </summary>
         /// <param name="bmp">The bitmap to use.</param>
+        /// <param name="depth">The depth in a 3D texture.</param>
         public void LockBitmapToTexture(Bitmap bmp, int depth)
         {
             BitmapData bmp_data = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),

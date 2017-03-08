@@ -537,6 +537,7 @@ namespace Voxalia.ClientGame.UISystem
         /// </summary>
         /// <param name="key">The key to bind.</param>
         /// <param name="bind">The command to bind to it (null to unbind).</param>
+        /// <param name="adj">adjustment location for the script.</param>
         public static void BindKey(Key key, List<CommandEntry> bind, int adj)
         {
             Binds.Remove(key);

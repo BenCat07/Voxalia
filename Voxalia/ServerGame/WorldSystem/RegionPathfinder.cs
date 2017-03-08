@@ -90,7 +90,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 nodes = new PathFindNodeSet() { Nodes = new PathFindNode[8192] };
                 open = new PriorityQueue<PFEntry>(8192);
-                map = new Dictionary<Vector3i, Chunk>(256);
+                map = new Dictionary<Vector3i, Chunk>(1024);
             }
             int nloc = 0;
             int start = GetNode(nodes, ref nloc, startloc, 0.0, 0.0, -1);
@@ -169,6 +169,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// Reconstructs the path from a single node.
         /// </summary>
+        /// <param name="nodes">All the available nodes.</param>
         /// <param name="node">The end node.</param>
         /// <returns>The full path.</returns>
         List<Location> Reconstruct(PathFindNode[] nodes, int node)

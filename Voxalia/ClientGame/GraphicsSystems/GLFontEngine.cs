@@ -433,6 +433,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="symbol">The symbol to draw..</param>
         /// <param name="X">The X location to draw it at.</param>
         /// <param name="Y">The Y location to draw it at.</param>
+        /// <param name="vbo">The VBO to render with.</param>
+        /// <param name="color">The color of the character.</param>
         /// <returns>The length of the character in pixels.</returns>
         public float DrawSingleCharacter(string symbol, float X, float Y, TextVBO vbo, Vector4 color)
         {
@@ -448,6 +450,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="symbol">The symbol to draw..</param>
         /// <param name="X">The X location to draw it at.</param>
         /// <param name="Y">The Y location to draw it at.</param>
+        /// <param name="vbo">The VBO to render with.</param>
+        /// <param name="color">The color.</param>
         /// <returns>The length of the character in pixels.</returns>
         public float DrawSingleCharacterFlipped(string symbol, float X, float Y, TextVBO vbo, Vector4 color)
         {
@@ -463,6 +467,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="str">The string to draw..</param>
         /// <param name="X">The X location to draw it at.</param>
         /// <param name="Y">The Y location to draw it at.</param>
+        /// <param name="color">The color.</param>
+        /// <param name="vbo">The VBO to render with.</param>
+        /// <param name="flip">Whether to flip text upside-down.</param>
         /// <returns>The length of the string in pixels.</returns>
         public float DrawString(string str, float X, float Y, Vector4 color, TextVBO vbo, bool flip = false)
         {

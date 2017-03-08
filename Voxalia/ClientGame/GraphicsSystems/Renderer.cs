@@ -260,6 +260,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         /// <param name="start">The initial point.</param>
         /// <param name="end">The ending point.</param>
+        /// <param name="width">The width of the cylinder.</param>
         public void RenderCylinder(Location start, Location end, float width)
         {
             float len = (float)(end - start).Length();
@@ -352,6 +353,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="ymin">The lower bounds of the the rectangle: Y coordinate.</param>
         /// <param name="xmax">The upper bounds of the the rectangle: X coordinate.</param>
         /// <param name="ymax">The upper bounds of the the rectangle: Y coordinate.</param>
+        /// <param name="rot">The rotation matrix, if any.</param>
         public void RenderRectangle(float xmin, float ymin, float xmax, float ymax, Matrix4? rot = null)
         {
             Matrix4 mat = Matrix4.CreateScale(xmax - xmin, ymax - ymin, 1) * (rot != null && rot.HasValue ? rot.Value : Matrix4.Identity) * Matrix4.CreateTranslation(xmin, ymin, 0);
@@ -368,6 +370,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="ymin">The lower bounds of the the rectangle: Y coordinate.</param>
         /// <param name="xmax">The upper bounds of the the rectangle: X coordinate.</param>
         /// <param name="ymax">The upper bounds of the the rectangle: Y coordinate.</param>
+        /// <param name="cx">The rotation offset X.</param>
+        /// <param name="cy">The rotation offset Y.</param>
+        /// <param name="rot">The rotation matrix.</param>
         public void RenderRectangleCentered(float xmin, float ymin, float xmax, float ymax, float cx, float cy, Matrix4 rot)
         {
             Matrix4 mat = Matrix4.CreateScale(xmax - xmin, ymax - ymin, 1) * Matrix4.CreateTranslation(-cx, -cy, 0) * rot * Matrix4.CreateTranslation(xmin + cx, ymin + cy, 0);

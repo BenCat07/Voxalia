@@ -335,6 +335,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// <summary>
         /// Starts up and run the server.
         /// </summary>
+        /// <param name="game">The game name.</param>
         /// <param name="loaded">The action to fire when the server is loaded.</param>
         public void StartUp(string game, Action loaded = null)
         {

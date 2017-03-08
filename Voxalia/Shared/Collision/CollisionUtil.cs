@@ -104,6 +104,7 @@ namespace Voxalia.Shared.Collision
         /// <summary>
         /// Returns information on what a cuboid-shaped line trace would collide with, if anything.
         /// </summary>
+        /// <param name="shape">The shape to trace with.</param>
         /// <param name="start">The start of the line.</param>
         /// <param name="end">The end of the line.</param>
         /// <param name="filter">The collision filter, input a BEPU BroadPhaseEntry and output whether collision should be allowed.</param>

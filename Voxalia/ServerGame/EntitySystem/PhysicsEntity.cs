@@ -672,6 +672,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// Note: this is a force, not a velocity. Mass is relevant.
         /// This will activate the entity.
         /// </summary>
+        /// <param name="origin">Where to apply the force at.</param>
         /// <param name="force">The force to apply.</param>
         public void ApplyForce(Location origin, Location force)
         {

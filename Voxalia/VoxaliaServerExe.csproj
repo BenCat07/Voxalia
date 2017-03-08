@@ -37,8 +37,10 @@
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <Optimize>true</Optimize>
     <DocumentationFile>bin\Release\Voxalia.XML</DocumentationFile>
-    <WarningLevel>3</WarningLevel>
+    <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <NoWarn>
+    </NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release(Linux)|x64' ">
     <Optimize>false</Optimize>

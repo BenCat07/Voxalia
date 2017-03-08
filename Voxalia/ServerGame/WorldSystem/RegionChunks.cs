@@ -360,8 +360,9 @@ namespace Voxalia.ServerGame.WorldSystem
         }
 
         /// <summary>
-        /// Gets the material at a location.
+        /// Gets the material at a location, searching a specific map of chunks first (prior to searching globally).
         /// </summary>
+        /// <param name="chunkmap">A map of chunks to search first.</param>
         /// <param name="pos">The location.</param>
         /// <returns>The material.</returns>
         public Material GetBlockMaterial(Dictionary<Vector3i, Chunk> chunkmap, Location pos)

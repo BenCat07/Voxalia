@@ -186,13 +186,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         }
 
         /// <summary>
-        /// Fully renders colorful/fancy text (unless the text is not marked as fancy, or fancy rendering is disabled)
+        /// Fully renders colorful/fancy text (unless the text is not marked as fancy, or fancy rendering is disabled).
+        /// Specify: The text render, where to render it, etc.
         /// </summary>
-        /// <param name="Text">The text to render.</param>
-        /// <param name="Position">Where to render the text at.</param>
-        /// <param name="MaxY">The maximum Y location to render text at.</param>
-        /// <param name="transmod">Transparency modifier (EG, 0.5 = half opacity) (0.0 - 1.0).</param>
-        /// <param name="extrashadow">Whether to always have a mini drop-shadow.</param>
         public void DrawColoredText(string Text, Location Position, int MaxY = int.MaxValue, float transmod = 1, bool extrashadow = false, string bcolor = "^r^7",
             int _color = DefaultColor, bool _bold = false, bool _italic = false, bool _underline = false, bool _strike = false, bool _overline = false, bool _highlight = false, bool _emphasis = false,
             int _ucolor = DefaultColor, int _scolor = DefaultColor, int _ocolor = DefaultColor, int _hcolor = DefaultColor, int _ecolor = DefaultColor,
@@ -616,6 +612,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <summary>
         /// Semi-internal rendering of text strings.
         /// </summary>
+        /// <param name="vbo">The VBO to render with.</param>
         /// <param name="X">The X location to render at.</param>
         /// <param name="Y">The Y location to render at.</param>
         /// <param name="text">The text to render.</param>
@@ -627,6 +624,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="random">Whether to use real-random color.</param>
         /// <param name="jello">Whether to use a jello effect.</param>
         /// <param name="obfu">Whether to randomize letters.</param>
+        /// <param name="ccolor">The current color.</param>
         /// <returns>The length of the rendered text in pixels.</returns>
         public float RenderBaseText(TextVBO vbo, float X, float Y, string text, GLFont font, int color,
             int trans = 255, bool flip = false, bool pseudo = false, bool random = false, bool jello = false, bool obfu = false, Color ccolor = default(Color))
@@ -705,6 +703,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// Note: Do not include newlines!
         /// </summary>
         /// <param name="line">The text to measure.</param>
+        /// <param name="bcolor">The base color.</param>
+        /// <param name="pushStr">Whether to push the string's contents to the render set.</param>
         /// <returns>the X-width of the text.</returns>
         public float MeasureFancyText(string line, string bcolor = "^r^7", bool pushStr = false)
         {
@@ -937,6 +937,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="width">The width.</param>
         /// <param name="height">The height.</param>
         /// <param name="c">The color to use.</param>
+        /// <param name="font">The font to render with.</param>
+        /// <param name="vbo">The VBO to render with.</param>
         public void DrawRectangle(float X, float Y, float width, float height, GLFont font, Color c, TextVBO vbo)
         {
             vbo.AddQuad(X, Y,X + width, Y + height, 2f / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH, 2f / Engine.GLFonts.CurrentHeight, 4f / GLFontEngine.DEFAULT_TEXTURE_SIZE_WIDTH, 4f / Engine.GLFonts.CurrentHeight,

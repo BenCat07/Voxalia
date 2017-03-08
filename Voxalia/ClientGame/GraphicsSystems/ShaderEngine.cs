@@ -155,6 +155,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="FS">The input FragmentShader code.</param>
         /// <param name="name">The name of the shader.</param>
         /// <param name="vars">The variables to use.</param>
+        /// <param name="geom">The geometry shader, if any.</param>
         /// <returns>A valid Shader object.</returns>
         public Shader CreateShader(string VS, string FS, string name, string[] vars, string geom)
         {
@@ -204,6 +205,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <param name="VS">The input VertexShader code.</param>
         /// <param name="FS">The input FragmentShader code.</param>
         /// <param name="vars">All variables to include.</param>
+        /// <param name="geom">The input GeometryShader code, if any.</param>
         /// <returns>The internal OpenGL program ID.</returns>
         public int CompileToProgram(string VS, string FS, string[] vars, string geom)
         {

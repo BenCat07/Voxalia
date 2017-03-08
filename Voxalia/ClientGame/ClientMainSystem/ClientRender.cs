@@ -2213,6 +2213,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <param name="item">The item to render.</param>
         /// <param name="pos">Where to render it.</param>
         /// <param name="size">How big to render it, in pixels.</param>
+        /// <param name="sub3d">Whether to render in 3D (true) or 2D (false).</param>
         public void RenderItem(ItemStack item, Location pos, int size, bool sub3d)
         {
             if (sub3d)
