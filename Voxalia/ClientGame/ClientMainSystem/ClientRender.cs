@@ -124,6 +124,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public View3D MainWorldView = new View3D();
 
         /// <summary>
+        /// The rendering subsystem for the item bar.
+        /// </summary>
+        public View3D ItemBarView = new View3D();
+
+        /// <summary>
         /// Early startup call to preparing some rendering systems.
         /// </summary>
         void InitRendering()
@@ -144,6 +149,26 @@ namespace Voxalia.ClientGame.ClientMainSystem
             View3D.CheckError("Load - Rendering - Settings");
             MainWorldView.Generate(this, Window.Width, Window.Height);
             View3D.CheckError("Load - Rendering - ViewGen");
+            ItemBarView.FastOnly = true;
+            ItemBarView.ClearColor = new float[] { 1f, 1f, 1f, 1f };
+            ItemBarView.Render3D = RenderItemBar;
+            foreach (LightObject light in ItemBarView.Lights)
+            {
+                foreach (Light li in light.InternalLights)
+                {
+                    li.Destroy();
+                }
+            }
+            ItemBarView.Lights.Clear();
+            ItemBarView.RenderClearAlpha = 0f;
+            SkyLight tlight = new SkyLight(new Location(0, 0, 10), 64, Location.One, new Location(0, -1, -1).Normalize(), 64, false, 64);
+            ItemBarView.Lights.Add(tlight);
+            ItemBarView.Width = 1024;
+            ItemBarView.Height = 256;
+            ItemBarView.GenerateFBO();
+            ItemBarView.Generate(this, 1024, 256);
+            // TODO: Use the item bar in VR mode.
+            View3D.CheckError("Load - Rendering - Item Bar");
             skybox = new VBO[6];
             for (int i = 0; i < 6; i++)
             {
@@ -172,6 +197,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, TWOD_FBO);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, TWOD_FBO_Tex, 0);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+        }
+
+        public void RenderItemBar(View3D renderer)
+        {
+            Render2D(true);
+            // TODO: Render2D(false) as well in here! Item bar only though!
         }
 
         public int TWOD_CFrame = 0;
@@ -733,6 +764,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         TWOD_CFrame++;
                         if (CScreen != TheGameScreen || TWOD_CFrame > CVars.u_rate.ValueI)
                         {
+                            ItemBarView.CameraPos = -Forw * 10;
+                            ItemBarView.ForwardVec = Forw;
+                            ItemBarView.CameraUp = () => Location.UnitY; // TODO: Should this really be Y? Probably not...
+                            View3D temp = MainWorldView;
+                            MainWorldView = ItemBarView;
+                            ItemBarView.Render();
+                            MainWorldView = temp;
+                            View3D.CheckError("ItemBarRender");
                             TWOD_CFrame = 0;
                             Establish2D();
                             View3D.CheckError("RenderFrame - Establish");
@@ -1134,6 +1173,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Shaders.ColorMultShader.Bind();
             Ortho = Matrix4.CreateOrthographicOffCenter(0, Window.Width, Window.Height, 0, -1, 1);
             GL.UniformMatrix4(1, false, ref Ortho);
+            GL.Viewport(0, 0, Window.Width, Window.Height);
         }
 
         /// <summary>
@@ -1505,7 +1545,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             //GL.Enable(EnableCap.PolygonOffsetFill);
             GL.BindVertexArray(Dec_VAO);
             GL.DepthFunc(DepthFunction.Lequal);
-            // TODO: Add back and isMore check, alongside a reasonably-limited-distance render offsetter uniform var
+            // TODO: Add back the isMore check, alongside a reasonably-limited-distance render offsetter uniform var
             //if (isMore || !DecalPrepped)
             {
                 Vector3[] pos = new Vector3[Decals.Count];
@@ -1910,7 +1950,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.ActiveTexture(TextureUnit.Texture1);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
                 GL.ActiveTexture(TextureUnit.Texture0);
-                Render2D(true);
+                //Render2D(true);
             }
             View3D.CheckError("Rendering - 5");
         }
@@ -2004,7 +2044,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (sub3d)
             {
                 //GL.Disable(EnableCap.DepthTest);
-                FixPersp = Matrix4.CreateOrthographicOffCenter(0, Window.Width, Window.Height, 0, -(itemScale * 2), 1000);
+                FixPersp = Matrix4.CreateOrthographicOffCenter(0, 1024, 256, 0, -(itemScale * 2f), (itemScale * 2f));
                 isVox = false;
                 SetVox();
             }
@@ -2178,7 +2218,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (sub3d)
             {
                 IsOrtho = true;
-                item.Render3D(pos + new Location(size * 0.5f), (float)GlobalTickTimeLocal * 0.5f, new Location(size * 0.75));
+                pos.X += 512f - (Window.Width * 0.5f);
+                pos.Y += 256f - (Window.Height);// - bottomup;
+                item.Render3D(pos+ new Location(size * 0.5f, size * 0.5f, 0f), (float)GlobalTickTimeLocal * 0.5f, new Location(size * 0.75f));
                 IsOrtho = false;
                 return;
             }

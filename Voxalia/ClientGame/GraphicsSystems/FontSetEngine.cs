@@ -208,7 +208,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             Text = Text.Replace("^B", bcolor);
             string[] lines = Text.Replace('\r', ' ').Replace(' ', (char)0x00A0).Replace("^q", "\"").SplitFast('\n');
-            Action<string, float, TextVBO> render = (line, Y, vbo) =>
+            Action<string, float, TextVBO> render;
+            render = (line, Y, vbo) =>
             {
                 int color = _color;
                 bool bold = _bold;
@@ -395,9 +396,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                         else
                                         {
                                             float widt = MeasureFancyText(ttext);
-                                            DrawColoredText(ttext, new Location(X, Y, 0), MaxY, transmod, extrashadow, bcolor,
+                                            /* TODO: DrawColoredText(ttext, new Location(X, Y, 0), MaxY, transmod, extrashadow, bcolor,
                                                 color, bold, italic, underline, strike, overline, highlight, emphasis, ucolor, scolor, ocolor, hcolor, ecolor, super,
-                                                sub, flip, pseudo, jello, obfu, random, shadow, font);
+                                                sub, flip, pseudo, jello, obfu, random, shadow, font);*/
                                             X += widt;
                                         }
                                         start = x + 1;

@@ -21,6 +21,10 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
     {
         public Vector4 Color;
 
+        public Func<int> GetTexture;
+
+        public bool Flip = false;
+
         public UIColoredBox(Vector4 color, UIAnchor anchor, Func<float> width, Func<float> height, Func<int> xOff, Func<int> yOff)
             : base(anchor, width, height, xOff, yOff)
         {
@@ -35,12 +39,22 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             int h = (int)GetHeight();
             Client TheClient = GetClient();
             TheClient.Shaders.ColorMultShader.Bind();
-            TheClient.Rendering.SetColor(Color);
-            TheClient.Textures.White.Bind();
-            TheClient.Rendering.RenderRectangle(x, y, x + w, y + h);
+            if (Color.W > 0.0f)
+            {
+                TheClient.Rendering.SetColor(Color);
+                TheClient.Textures.White.Bind();
+                TheClient.Rendering.RenderRectangle(x, y, x + w, y + h);
+            }
             TheClient.Rendering.SetColor(Vector4.One);
-            GL.BindTexture(TextureTarget.Texture2D, TheClient.MainItemView.CurrentFBOTexture);
-            TheClient.Rendering.RenderRectangle(x, y, x + w, y + h);
+            GL.BindTexture(TextureTarget.Texture2D, GetTexture());
+            if (Flip)
+            {
+                TheClient.Rendering.RenderRectangle(x, y + h, x + w, y);
+            }
+            else
+            {
+                TheClient.Rendering.RenderRectangle(x, y, x + w, y + h);
+            }
             TheClient.Textures.White.Bind();
         }
     }

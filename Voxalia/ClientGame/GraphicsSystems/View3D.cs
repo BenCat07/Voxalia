@@ -541,7 +541,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public static void CheckError(string loc)
         {
-#if DEBUG
+#if !DEBUG
             ErrorCode ec = GL.GetError();
             while (ec != ErrorCode.NoError)
             {
@@ -610,22 +610,22 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     GL.DeleteTexture(FB_Tex);
                     FB_Tex = -1;
                 }
+                if (pfbo != 0)
+                {
+                    GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                    GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, pfbo);
+                    GL.BindFramebuffer(FramebufferTarget.Framebuffer, NF_FBO);
+                    GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Width, Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+                    GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+                    GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
+                }
+                GL.DeleteFramebuffer(NF_FBO);
+                GL.DeleteTexture(NF_DTx);
+                CurrentFBO = pfbo;
+                NF_FBO = -1;
+                NF_DTx = -1;
+                NF_Tex = -1;
             }
-            if (pfbo != 0)
-            {
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-                GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, pfbo);
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, NF_FBO);
-                GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Width, Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-                GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
-            }
-            GL.DeleteFramebuffer(NF_FBO);
-            GL.DeleteTexture(NF_DTx);
-            CurrentFBO = pfbo;
-            NF_FBO = -1;
-            NF_DTx = -1;
-            NF_Tex = -1;
         }
 
         public void Render()

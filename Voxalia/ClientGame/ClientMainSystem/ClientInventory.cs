@@ -44,7 +44,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         UIColoredBox InventoryBackground()
         {
-            return new UIColoredBox(new Vector4(0.5f, 0.5f, 0.5f, 0.7f), UIAnchor.TOP_LEFT, TheGameScreen.GetWidth, TheGameScreen.GetHeight, () => 0, () => 0);
+            return new UIColoredBox(new Vector4(0.5f, 0.5f, 0.5f, 0.7f), UIAnchor.TOP_LEFT, TheGameScreen.GetWidth, TheGameScreen.GetHeight, () => 0, () => 0) { GetTexture = () => MainItemView.CurrentFBOTexture };
         }
 
         public void RenderMainItem(View3D view)
@@ -65,12 +65,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     li.Destroy();
                 }
             }
+            MainItemView.FastOnly = true;
             MainItemView.Lights.Clear();
             MainItemView.RenderClearAlpha = 0f;
             SkyLight tlight = new SkyLight(new Location(0, 0, 10), 64, Location.One, new Location(0, -1, -1).Normalize(), 64, false, 64);
             MainItemView.Lights.Add(tlight);
+            MainItemView.Width = Window.Width;
+            MainItemView.Height = Window.Height;
             MainItemView.GenerateFBO();
-            MainItemView.Generate(this, Window.Width, Window.Height); // TODO: Change Width/Height here - to actual viewed size?
+            MainItemView.Generate(this, Window.Width, Window.Height); // TODO: Change Width/Height here and above to actual viewed size?
         }
 
         public void InitInventory()
