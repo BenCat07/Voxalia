@@ -87,12 +87,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Shader Loaded = LoadShader(shadername);
             if (Loaded == null)
             {
-                Loaded = new Shader();
-                Loaded.Name = shadername;
-                Loaded.Internal_Program = ColorMultShader.Original_Program;
-                Loaded.Original_Program = ColorMultShader.Original_Program;
-                Loaded.LoadedProperly = false;
-                Loaded.Engine = this;
+                Loaded = new Shader()
+                {
+                    Name = shadername,
+                    Internal_Program = ColorMultShader.Original_Program,
+                    Original_Program = ColorMultShader.Original_Program,
+                    LoadedProperly = false,
+                    Engine = this
+                };
             }
             LoadedShaders.Add(Loaded);
             return Loaded;
@@ -160,14 +162,15 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public Shader CreateShader(string VS, string FS, string name, string[] vars, string geom)
         {
             int Program = CompileToProgram(VS, FS, vars, geom);
-            Shader generic = new Shader();
-            generic.Name = name;
-            generic.LoadedProperly = true;
-            generic.Internal_Program = Program;
-            generic.Original_Program = Program;
-            generic.Vars = vars;
-            generic.Engine = this;
-            return generic;
+            return new Shader()
+            {
+                Name = name,
+                LoadedProperly = true,
+                Internal_Program = Program,
+                Original_Program = Program,
+                Vars = vars,
+                Engine = this
+            };
         }
 
         public string Includes(string str)
@@ -231,8 +234,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.ShaderSource(gObj, geom);
                 GL.CompileShader(gObj);
                 string GS_Info = GL.GetShaderInfoLog(gObj);
-                int GS_Status = 0;
-                GL.GetShader(gObj, ShaderParameter.CompileStatus, out GS_Status);
+                GL.GetShader(gObj, ShaderParameter.CompileStatus, out int GS_Status);
                 if (GS_Status != 1)
                 {
                     throw new Exception("Error creating GeometryShader. Error status: " + GS_Status + ", info: " + GS_Info);
@@ -242,8 +244,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.ShaderSource(VertexObject, VS);
             GL.CompileShader(VertexObject);
             string VS_Info = GL.GetShaderInfoLog(VertexObject);
-            int VS_Status = 0;
-            GL.GetShader(VertexObject, ShaderParameter.CompileStatus, out VS_Status);
+            GL.GetShader(VertexObject, ShaderParameter.CompileStatus, out int VS_Status);
             if (VS_Status != 1)
             {
                 throw new Exception("Error creating VertexShader. Error status: " + VS_Status + ", info: " + VS_Info);
@@ -252,8 +253,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.ShaderSource(FragmentObject, FS);
             GL.CompileShader(FragmentObject);
             string FS_Info = GL.GetShaderInfoLog(FragmentObject);
-            int FS_Status = 0;
-            GL.GetShader(FragmentObject, ShaderParameter.CompileStatus, out FS_Status);
+            GL.GetShader(FragmentObject, ShaderParameter.CompileStatus, out int FS_Status);
             if (FS_Status != 1)
             {
                 throw new Exception("Error creating FragmentShader. Error status: " + FS_Status + ", info: " + FS_Info);

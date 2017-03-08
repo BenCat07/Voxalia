@@ -134,12 +134,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Texture Loaded = LoadTexture(texturename, twidth);
             if (Loaded == null && twidth == 0)
             {
-                Loaded = new Texture();
-                Loaded.Engine = this;
-                Loaded.Name = texturename;
-                Loaded.Internal_Texture = White.Original_InternalID;
-                Loaded.Original_InternalID = White.Original_InternalID;
-                Loaded.LoadedProperly = false;
+                Loaded = new Texture()
+                {
+                    Engine = this,
+                    Name = texturename,
+                    Internal_Texture = White.Original_InternalID,
+                    Original_InternalID = White.Original_InternalID,
+                    LoadedProperly = false
+                };
             }
             if (Loaded == null)
             {
@@ -148,10 +150,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Loaded.LoadedProperly = false;
             }
             LoadedTextures.Add(Loaded);
-            if (OnTextureLoaded != null)
-            {
-                OnTextureLoaded(this, new TextureLoadedEventArgs(Loaded));
-            }
+            OnTextureLoaded?.Invoke(this, new TextureLoadedEventArgs(Loaded));
             return Loaded;
         }
 
@@ -184,15 +183,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     return null;
                 }
                 Bitmap bmp2 = twidth <= 0 ? bmp : new Bitmap(bmp, new Size(twidth, twidth));
-                Texture texture = new Texture();
-                texture.Engine = this;
-                texture.Name = filename;
+                Texture texture = new Texture()
+                {
+                    Engine = this,
+                    Name = filename,
+                    Width = bmp2.Width,
+                    Height = bmp2.Height
+                };
                 GL.GenTextures(1, out texture.Original_InternalID);
                 texture.Internal_Texture = texture.Original_InternalID;
                 texture.Bind();
                 LockBitmapToTexture(bmp2, true);
-                texture.Width = bmp2.Width;
-                texture.Height = bmp2.Height;
                 if (bmp2 != bmp)
                 {
                     bmp2.Dispose();
@@ -249,14 +250,16 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <returns>The generated texture.</returns>
         public Texture GenerateForColor(Color c, string name)
         {
-            Texture texture = new Texture();
-            texture.Engine = this;
-            texture.Name = name;
+            Texture texture = new Texture()
+            {
+                Engine = this,
+                Name = name,
+                Width = 2,
+                Height = 2
+            };
             GL.GenTextures(1, out texture.Original_InternalID);
             texture.Internal_Texture = texture.Original_InternalID;
             texture.Bind();
-            texture.Width = 2;
-            texture.Height = 2;
             Bitmap bmp = new Bitmap(2, 2);
             bmp.SetPixel(0, 0, c);
             bmp.SetPixel(0, 1, c);

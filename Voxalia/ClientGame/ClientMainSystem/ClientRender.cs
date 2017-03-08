@@ -136,7 +136,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             MainWorldView.CameraModifier = () => Player.GetRelativeQuaternion();
             ShadersCheck();
             View3D.CheckError("Load - Rendering - Shaders");
-            generateMapHelpers();
+            GenerateMapHelpers();
             GenerateGrassHelpers();
             PrepDecals();
             View3D.CheckError("Load - Rendering - Map/Grass");
@@ -310,7 +310,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Prepare the FBO and associated helpers for the in-game map.
         /// </summary>
-        public void generateMapHelpers()
+        public void GenerateMapHelpers()
         {
             // TODO: Helper class!
             map_fbo_texture = GL.GenTexture();
@@ -401,8 +401,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public int GetGrassTextureID(string f)
         {
-            int temp;
-            if (GrassTextureLocations.TryGetValue(f, out temp))
+            if (GrassTextureLocations.TryGetValue(f, out int temp))
             {
                 return temp;
             }
@@ -690,7 +689,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// Sorts all entities by distance to camera.
         /// TODO: Speed analysis? Probably doesn't matter with an average of 'a few hundred' entities...
         /// </summary>
-        public void sortEntities()
+        public void SortEntities()
         {
             TheRegion.Entities = TheRegion.Entities.OrderBy((o) => o.GetPosition().DistanceSquared(MainWorldView.RenderRelative)).ToList();
         }
@@ -759,7 +758,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     {
                         if (CScreen != TheLoadScreen)
                         {
-                            renderGame();
+                            RenderGame();
                         }
                         TWOD_CFrame++;
                         if (CScreen != TheGameScreen || TWOD_CFrame > CVars.u_rate.ValueI)
@@ -948,7 +947,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Renders the entire game.
         /// </summary>
-        public void renderGame()
+        public void RenderGame()
         {
             Stopwatch totalt = new Stopwatch();
             totalt.Start();
@@ -1030,7 +1029,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     GL.BindTexture(TextureTarget.Texture2DArray, 0);
                     GL.DrawBuffer(DrawBufferMode.Back);
                 }
-                sortEntities();
+                SortEntities();
                 Particles.Sort();
                 Material headMat = TheRegion.GetBlockMaterial(VR == null ? MainWorldView.CameraPos : Player.GetBasicEyePos());
                 MainWorldView.FogCol = headMat.GetFogColor();
@@ -1492,8 +1491,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         public int DecalGetTextureID(string f)
         {
-            int temp;
-            if (DecalTextureLocations.TryGetValue(f, out temp))
+            if (DecalTextureLocations.TryGetValue(f, out int temp))
             {
                 return temp;
             }
@@ -1922,8 +1920,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                                 const int curves = 5;
                                 BEPUutilities.Vector3 bvec = new BEPUutilities.Vector3(0, 0, 1);
                                 BEPUutilities.Vector3 bvec2 = new BEPUutilities.Vector3(1, 0, 0);
-                                BEPUutilities.Quaternion bquat;
-                                BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref bvec2, ref bvec, out bquat);
+                                BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref bvec2, ref bvec, out BEPUutilities.Quaternion bquat);
                                 BEPUutilities.Vector3 forwvec = forw.ToBVector();
                                 GL.LineWidth(6);
                                 DrawCurve(one, two, spos, ((ConnectorBeam)TheRegion.Joints[i]).color);

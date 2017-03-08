@@ -123,8 +123,10 @@ namespace Voxalia.Shared.Collision
             {
                 hit = World.ConvexCast(shape, ref rt, ref e, filter, out rcr);
             }
-            CollisionResult cr = new CollisionResult();
-            cr.Hit = hit;
+            CollisionResult cr = new CollisionResult()
+            {
+                Hit = hit
+            };
             if (hit)
             {
                 cr.Normal = new Location(rcr.HitData.Normal);
@@ -168,8 +170,7 @@ namespace Voxalia.Shared.Collision
             {
                 hit = World.RayCast(ray, (double)len, filter, out rcr);
             }
-            CollisionResult cr = new CollisionResult();
-            cr.Hit = hit;
+            CollisionResult cr = new CollisionResult() { Hit = hit };
             if (hit)
             {
                 cr.Normal = new Location(rcr.HitData.Normal);

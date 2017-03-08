@@ -419,8 +419,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 return ASCIILocs[symbol[0]];
             }
-            RectangleF rect;
-            if (CharacterLocations.TryGetValue(symbol, out rect))
+            if (CharacterLocations.TryGetValue(symbol, out RectangleF rect))
             {
                 return rect;
             }

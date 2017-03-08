@@ -69,16 +69,18 @@ namespace Voxalia.ClientGame.GraphicsSystems
             texs[4] = new Vector3(0, 1, 0);
             vecs[5] = new Vector3(0, 0, 0);
             texs[5] = new Vector3(0, 0, 0);
-            Square = new VBO();
-            Square.Vertices = vecs.ToList();
-            Square.Indices = inds.ToList();
-            Square.Normals = norms.ToList();
-            Square.TexCoords = texs.ToList();
-            Square.Colors = cols.ToList();
-            Square.BoneIDs = BoneIDs.ToList();
-            Square.BoneWeights = BoneWeights.ToList();
-            Square.BoneIDs2 = BoneIDs2.ToList();
-            Square.BoneWeights2 = BoneWeights2.ToList();
+            Square = new VBO()
+            {
+                Vertices = vecs.ToList(),
+                Indices = inds.ToList(),
+                Normals = norms.ToList(),
+                TexCoords = texs.ToList(),
+                Colors = cols.ToList(),
+                BoneIDs = BoneIDs.ToList(),
+                BoneWeights = BoneWeights.ToList(),
+                BoneIDs2 = BoneIDs2.ToList(),
+                BoneWeights2 = BoneWeights2.ToList()
+            };
             Square.GenerateVBO();
         }
         
@@ -118,17 +120,18 @@ namespace Voxalia.ClientGame.GraphicsSystems
             texs[0] = new Vector3(0, 0, 0);
             vecs[1] = new Vector3(1, 0, 0);
             texs[1] = new Vector3(1, 0, 0);
-            Line = new VBO();
-            Line.Vertices = vecs.ToList();
-            Line.Indices = inds.ToList();
-            Line.Normals = norms.ToList();
-            Line.TexCoords = texs.ToList();
-            Line.Colors = cols.ToList();
-            Line.Tangents = tangs.ToList();
-            Line.BoneIDs = BoneIDs.ToList();
-            Line.BoneWeights = BoneWeights.ToList();
-            Line.BoneIDs2 = BoneIDs2.ToList();
-            Line.BoneWeights2 = BoneWeights2.ToList();
+            Line = new VBO()
+            {
+                Vertices = vecs.ToList(),
+                Indices = inds.ToList(),
+                Normals = norms.ToList(),
+                TexCoords = texs.ToList(),
+                Colors = cols.ToList(),
+                BoneIDs = BoneIDs.ToList(),
+                BoneWeights = BoneWeights.ToList(),
+                BoneIDs2 = BoneIDs2.ToList(),
+                BoneWeights2 = BoneWeights2.ToList()
+            };
             Line.GenerateVBO();
         }
 
@@ -195,17 +198,18 @@ namespace Voxalia.ClientGame.GraphicsSystems
             vecs[i] = new Vector3(1, 1, 1); i++;
             vecs[i] = new Vector3(zero, 1, zero); i++;
             vecs[i] = new Vector3(zero, 1, 1); i++;
-            Box = new VBO();
-            Box.Vertices = vecs.ToList();
-            Box.Indices = inds.ToList();
-            Box.Normals = norms.ToList();
-            Box.TexCoords = texs.ToList();
-            Box.Colors = cols.ToList();
-            Box.Tangents = tangs.ToList();
-            Box.BoneIDs = BoneIDs.ToList();
-            Box.BoneWeights = BoneWeights.ToList();
-            Box.BoneIDs2 = BoneIDs2.ToList();
-            Box.BoneWeights2 = BoneWeights2.ToList();
+            Box = new VBO()
+            {
+                Vertices = vecs.ToList(),
+                Indices = inds.ToList(),
+                Normals = norms.ToList(),
+                TexCoords = texs.ToList(),
+                Colors = cols.ToList(),
+                BoneIDs = BoneIDs.ToList(),
+                BoneWeights = BoneWeights.ToList(),
+                BoneIDs2 = BoneIDs2.ToList(),
+                BoneWeights2 = BoneWeights2.ToList()
+            };
             Box.GenerateVBO();
         }
 

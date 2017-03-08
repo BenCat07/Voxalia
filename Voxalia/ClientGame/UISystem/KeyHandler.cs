@@ -474,8 +474,7 @@ namespace Voxalia.ClientGame.UISystem
                 while (KeyPresses.Count > 0)
                 {
                     Key key = KeyPresses.Dequeue();
-                    CommandScript script;
-                    if (Binds.TryGetValue(key, out script))
+                    if (Binds.TryGetValue(key, out CommandScript script))
                     {
                         CommandQueue queue = script.ToQueue(Client.Central.Commands.CommandSystem);
                         queue.CommandStack.Peek().Debug = DebugMode.MINIMAL;
@@ -486,8 +485,7 @@ namespace Voxalia.ClientGame.UISystem
                 while (KeyUps.Count > 0)
                 {
                     Key key = KeyUps.Dequeue();
-                    CommandScript script;
-                    if (InverseBinds.TryGetValue(key, out script))
+                    if (InverseBinds.TryGetValue(key, out CommandScript script))
                     {
                         CommandQueue queue = script.ToQueue(Client.Central.Commands.CommandSystem);
                         queue.CommandStack.Peek().Debug = DebugMode.MINIMAL;
@@ -499,8 +497,7 @@ namespace Voxalia.ClientGame.UISystem
 
         public static Key GetKeyForName(string name)
         {
-            Key key;
-            if (namestokeys.TryGetValue(name.ToLowerFast(), out key))
+            if (namestokeys.TryGetValue(name.ToLowerFast(), out Key key))
             {
                 return key;
             }
@@ -544,8 +541,10 @@ namespace Voxalia.ClientGame.UISystem
             InverseBinds.Remove(key);
             if (bind != null)
             {
-                CommandScript script = new CommandScript("_bind_for_" + keystonames[key], bind, adj);
-                script.Debug = DebugMode.MINIMAL;
+                CommandScript script = new CommandScript("_bind_for_" + keystonames[key], bind, adj)
+                {
+                    Debug = DebugMode.MINIMAL
+                };
                 Binds[key] = script;
                 if (script.Created.Entries.Length == 1 && script.Created.Entries[0].Marker == 1)
                 {
@@ -584,8 +583,7 @@ namespace Voxalia.ClientGame.UISystem
         /// <returns>A script, or null.</returns>
         public static CommandScript GetBind(Key key)
         {
-            CommandScript script;
-            if (Binds.TryGetValue(key, out script))
+            if (Binds.TryGetValue(key, out CommandScript script))
             {
                 return script;
             }

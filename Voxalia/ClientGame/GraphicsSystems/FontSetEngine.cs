@@ -344,7 +344,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                             if (sbl.StartsWith("lang="))
                                             {
                                                 string langinfo = sbl.After("lang=");
-                                                string[] subdats = csplit(langinfo).ToArray();
+                                                string[] subdats = CSplit(langinfo).ToArray();
                                                 ttext = Client.Central.Languages.GetText(Engine.TheClient.Files, subdats);
                                                 highl = false;
                                             }
@@ -708,11 +708,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// <returns>the X-width of the text.</returns>
         public float MeasureFancyText(string line, string bcolor = "^r^7", bool pushStr = false)
         {
-            List<KeyValuePair<string, Rectangle2F>> links;
-            return MeasureFancyText(line, out links, bcolor, pushStr: pushStr);
+            return MeasureFancyText(line, out List<KeyValuePair<string, Rectangle2F>> links, bcolor, pushStr: pushStr);
         }
         
-        public List<string> csplit(string input)
+        public List<string> CSplit(string input)
         {
             List<string> temp = new List<string>();
             int start = 0;
@@ -814,7 +813,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                         if (sbl.StartsWith("lang="))
                                         {
                                             string langinfo = sbl.After("lang=");
-                                            string[] subdats = csplit(langinfo).ToArray();
+                                            string[] subdats = CSplit(langinfo).ToArray();
                                             ttext = Client.Central.Languages.GetText(Engine.TheClient.Files, subdats);
                                             highl = false;
                                         }
@@ -850,8 +849,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     }
                                     else
                                     {
-                                        List<KeyValuePair<string, Rectangle2F>> ttlinks;
-                                        float widt = MeasureFancyText(ttext, out ttlinks, bcolor, bold, italic, sub, font);
+                                        float widt = MeasureFancyText(ttext, out List<KeyValuePair<string, Rectangle2F>> ttlinks, bcolor, bold, italic, sub, font);
                                         MeasWidth += widt;
                                     }
                                     start = x + 1;
