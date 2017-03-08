@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
@@ -124,7 +125,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             cFBO = fbo;
         }
 
-        public void SetMatrix(int mat_loc, Matrix4d mat)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Matrix4 GetMat4f(Matrix4d mat)
         {
             Matrix4d temp = mat;
             if (!TheClient.IsOrtho)
@@ -133,6 +135,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             Matrix4 mat4f = new Matrix4((float)temp.M11, (float)temp.M12, (float)temp.M13, (float)temp.M14, (float)temp.M21, (float)temp.M22, (float)temp.M23, (float)temp.M24,
                 (float)temp.M31, (float)temp.M32, (float)temp.M33, (float)temp.M34, (float)temp.M41, (float)temp.M42, (float)temp.M43, (float)temp.M44);
+            return mat4f;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetMatrix(int mat_loc, Matrix4d mat)
+        {
+            Matrix4 mat4f = GetMat4f(mat);
             GL.UniformMatrix4(mat_loc, false, ref mat4f);
         }
 

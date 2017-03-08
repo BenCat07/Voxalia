@@ -158,7 +158,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 cols[c] = new Vector4(1, 1, 1, 1);
             }
-            /*Vector4[] BoneIDs = new Vector4[24];
+            Vector4[] BoneIDs = new Vector4[24];
             Vector4[] BoneWeights = new Vector4[24];
             Vector4[] BoneIDs2 = new Vector4[24];
             Vector4[] BoneWeights2 = new Vector4[24];
@@ -168,7 +168,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 BoneWeights[n] = new Vector4(0, 0, 0, 0);
                 BoneIDs2[n] = new Vector4(0, 0, 0, 0);
                 BoneWeights2[n] = new Vector4(0, 0, 0, 0);
-            }*/
+            }
             int i = 0;
             int zero = -1; // Ssh.
             vecs[i] = new Vector3(zero, zero, zero); i++;
@@ -202,10 +202,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Box.TexCoords = texs.ToList();
             Box.Colors = cols.ToList();
             Box.Tangents = tangs.ToList();
-            /*Box.BoneIDs = BoneIDs.ToList();
+            Box.BoneIDs = BoneIDs.ToList();
             Box.BoneWeights = BoneWeights.ToList();
             Box.BoneIDs2 = BoneIDs2.ToList();
-            Box.BoneWeights2 = BoneWeights2.ToList();*/
+            Box.BoneWeights2 = BoneWeights2.ToList();
             Box.GenerateVBO();
         }
 
