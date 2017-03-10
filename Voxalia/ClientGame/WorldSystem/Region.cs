@@ -984,7 +984,9 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     NeedsRendering.Sort((a, b) => (a.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition()).CompareTo(
                         (b.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition())));
-                    while (NeedsRendering.Count > removed && RenderingNow.Count < TheClient.CVars.r_chunksatonce.ValueI)
+                    int cap = TheClient.CVars.r_chunksatonce.ValueI;
+                    int done = 0;
+                    while (NeedsRendering.Count > removed && done < cap && RenderingNow.Count < 50)
                     {
                         Vector3i temp = NeedsRendering[removed++];
                         try
@@ -992,6 +994,10 @@ namespace Voxalia.ClientGame.WorldSystem
                             Chunk ch = GetChunk(temp);
                             if (ch != null)
                             {
+                                if (NeedsRendering.Count < 50 || ch.PosMultiplier != 15)
+                                {
+                                    done++;
+                                }
                                 ch.MakeVBONow();
                                 RenderingNow.Add(temp);
                             }
@@ -1015,11 +1021,18 @@ namespace Voxalia.ClientGame.WorldSystem
                     PrepChunks.Sort((a, b) => (a.Key.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition()).CompareTo(
                         (b.Key.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition())));
                     int removed = 0;
-                    while (PrepChunks.Count > removed && PreppingNow.Count < TheClient.CVars.r_chunksatonce.ValueI)
+                    int done = 0;
+                    int help = 0;
+                    while (PrepChunks.Count > removed && done < TheClient.CVars.r_chunksatonce.ValueI)
                     {
                         Action temp = PrepChunks[removed++].Value;
                         try
                         {
+                            help++;
+                            if (help > 5 || PrepChunks.Count < 50)
+                            {
+                                done++;
+                            }
                             temp.Invoke();
                         }
                         catch (Exception ex)

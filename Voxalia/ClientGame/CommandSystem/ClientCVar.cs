@@ -126,7 +126,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_exposure = Register("r_exposure", "1.5", CVarFlag.Numeric, "What value to scale the lighting by.");
             r_grayscale = Register("r_grayscale", "false", CVarFlag.Boolean, "Whether to grayscale the view.");
             r_vrscale = Register("r_vrscale", "1", CVarFlag.Numeric, "What scale to put everything at in VR mode.");
-            r_fog = Register("r_fog", "true", CVarFlag.Boolean, "Whether render fog should be defaultly enabled at distance.");
+            r_fog = Register("r_fog", "false", CVarFlag.Boolean, "Whether render fog should be defaultly enabled at distance.");
             // Audio CVars
             a_musicvolume = Register("a_musicvolume", "0.5", CVarFlag.Numeric, "What volume the music should be.");
             a_musicpitch = Register("a_musicpitch", "1", CVarFlag.Numeric, "What pitch the music should be.");

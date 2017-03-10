@@ -908,12 +908,12 @@ namespace Voxalia.ServerGame.EntitySystem
             HashSet<Vector3i> seen = new HashSet<Vector3i>();
             Queue<Vector3i> toSee = new Queue<Vector3i>();
             toSee.Enqueue(start);
-            const int MAX_DIST = 3000 / Chunk.CHUNK_SIZE;
+            const int MAX_DIST = 1000 / Chunk.CHUNK_SIZE; // TODO: MAX_DIST -> Constants file
             while (toSee.Count > 0)
             {
                 Vector3i cur = toSee.Dequeue();
                 seen.Add(cur);
-                if (Math.Abs(cur.X - start.X) > MAX_DIST // TODO: MAX_DIST -> Constants file
+                if (Math.Abs(cur.X - start.X) > MAX_DIST
                     || Math.Abs(cur.Y - start.Y) > MAX_DIST
                     || Math.Abs(cur.Z - start.Z) > MAX_DIST)
                 {
@@ -1379,7 +1379,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             if (pkick)
             {
-                return false;
+                return true;
             }
             if (!ChunksAwareOf.ContainsKey(cworldPos) || ChunksAwareOf[cworldPos].LOD > posMult) // TODO: Efficiency - TryGetValue?
             {
