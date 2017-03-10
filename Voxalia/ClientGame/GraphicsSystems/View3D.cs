@@ -510,7 +510,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public Vector3 DesaturationColor = new Vector3(0.95f, 0.77f, 0.55f);
 
-        public void oSetViewport()
+        public void OSetViewport()
         {
             Viewport(0, 0, Width, Height);
         }
@@ -734,7 +734,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 cameraAdjust = Location.Zero;
             }
             RenderRelative = CameraPos;
-            oSetViewport();
+            OSetViewport();
             CameraTarget = CameraPos + camforward;
             OffsetWorld = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos));
             if (TheClient.VR != null)
@@ -911,10 +911,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
             GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
-            if (PostFirstRender != null)
-            {
-                PostFirstRender();
-            }
+            PostFirstRender?.Invoke();
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
             {
                 Viewport(Width / 2, 0, Width / 2, Height);
@@ -1012,8 +1009,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 Lights[i].InternalLights[x].SetProj();
                                 DrawBuffer(DrawBufferMode.ColorAttachment0);
                                 GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
-                                SkyLight sky = Lights[i] as SkyLight;
-                                if (sky != null)
+                                if (Lights[i] is SkyLight sky)
                                 {
                                     if (redraw || sky.InternalLights[0].NeedsUpdate)
                                     {
@@ -1055,7 +1051,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                 }
                 complete:
-                oSetViewport();
+                OSetViewport();
                 CFrust = tcf;
                 BindFramebuffer(FramebufferTarget.Framebuffer, CurrentFBO);
                 DrawBuffer(CurrentFBO == 0 ? DrawBufferMode.Back : DrawBufferMode.ColorAttachment0);
@@ -1090,7 +1086,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            oSetViewport();
+            OSetViewport();
             TheClient.s_fbodecal = TheClient.s_fbodecal.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
@@ -1545,10 +1541,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
             GL.Enable(EnableCap.CullFace);
             CheckError("AfterFirstRender");
-            if (PostFirstRender != null)
-            {
-                PostFirstRender();
-            }
+            PostFirstRender?.Invoke();
             CheckError("AfterPostFirstRender");
         }
 
@@ -1875,7 +1868,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 //Matrix4 view = Matrix4.LookAt(CamPos, CamGoal, Vector3.UnitZ);
                 //Matrix4 combined = view * proj;
                 //GL.UniformMatrix4(1, false, ref combined);
-                renderTranspInt(ref lightc, frustumToUse);
+                RenderTranspInt(ref lightc, frustumToUse);
                 GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
                 TheClient.s_ll_fpass.Bind();
                 GL.Uniform2(4, new Vector2(Width, Height));
@@ -1886,13 +1879,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             else
             {
-                renderTranspInt(ref lightc, frustumToUse);
+                RenderTranspInt(ref lightc, frustumToUse);
             }
         }
 
         public bool RenderLights = false;
 
-        void renderTranspInt(ref int lightc, Frustum frustumToUse)
+        void RenderTranspInt(ref int lightc, Frustum frustumToUse)
         {
             if (frustumToUse == null)
             {

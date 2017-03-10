@@ -159,8 +159,7 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             bool plants = PosMultiplier == 1 && OwningRegion.TheClient.CVars.r_plants.ValueB;
             bool shaped = OwningRegion.TheClient.CVars.r_noblockshapes.ValueB;
-            BlockUpperArea bua;
-            if (!OwningRegion.UpperAreas.TryGetValue(new Vector2i(WorldPosition.X, WorldPosition.Y), out bua))
+            if (!OwningRegion.UpperAreas.TryGetValue(new Vector2i(WorldPosition.X, WorldPosition.Y), out BlockUpperArea bua))
             {
                 bua = null;
             }
@@ -457,8 +456,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                                 rxx += rand.NextDouble() * modder;
                                                 ryy += rand.NextDouble() * modder;
                                             }
-                                            BEPUutilities.RayHit rayhit;
-                                            if (!BlockShapeRegistry.BSD[c.BlockData].Coll.RayCast(new BEPUutilities.Ray(new BEPUutilities.Vector3(rxx, ryy, 3), new BEPUutilities.Vector3(0, 0, -1)), 5, out rayhit))
+                                            if (!BlockShapeRegistry.BSD[c.BlockData].Coll.RayCast(new BEPUutilities.Ray(new BEPUutilities.Vector3(rxx, ryy, 3), new BEPUutilities.Vector3(0, 0, -1)), 5, out BEPUutilities.RayHit rayhit))
                                             {
                                                 rayhit.Location = new BEPUutilities.Vector3(rxx, ryy, 1.0);
                                             }
@@ -525,8 +523,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     inds[i] = i;
                 }
-                VBO tVBO;
-                if (!OwningRegion.TheClient.vbos.TryPop(out tVBO))
+                if (!OwningRegion.TheClient.vbos.TryPop(out VBO tVBO))
                 {
                     tVBO = new VBO();
                 }

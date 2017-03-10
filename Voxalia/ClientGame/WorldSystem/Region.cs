@@ -93,8 +93,7 @@ namespace Voxalia.ClientGame.WorldSystem
             bool hA = false;
             if (considerSolid.HasFlag(MaterialSolidity.FULLSOLID))
             {
-                RayCastResult rcr;
-                if (PhysicsWorld.RayCast(ray, len, filter, out rcr))
+                if (PhysicsWorld.RayCast(ray, len, filter, out RayCastResult rcr))
                 {
                     best = rcr;
                     hA = true;
@@ -105,9 +104,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 rayHit = best;
                 return hA;
             }
-            AABB box = new AABB();
-            box.Min = start;
-            box.Max = start;
+            AABB box = new AABB() { Min = start, Max = start };
             box.Include(start + dir * len);
             foreach (KeyValuePair<Vector3i, Chunk> chunk in LoadedChunks)
             {
@@ -119,8 +116,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     continue;
                 }
-                RayHit temp;
-                if (chunk.Value.FCO.RayCast(ray, len, null, considerSolid, out temp))
+                if (chunk.Value.FCO.RayCast(ray, len, null, considerSolid, out RayHit temp))
                 {
                     hA = true;
                     //temp.T *= len;
@@ -143,8 +139,7 @@ namespace Voxalia.ClientGame.WorldSystem
             bool hA = false;
             if (considerSolid.HasFlag(MaterialSolidity.FULLSOLID))
             {
-                RayCastResult rcr;
-                if (PhysicsWorld.ConvexCast(shape, ref rt, ref sweep, filter, out rcr))
+                if (PhysicsWorld.ConvexCast(shape, ref rt, ref sweep, filter, out RayCastResult rcr))
                 {
                     best = rcr;
                     hA = true;
@@ -156,9 +151,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 return hA;
             }
             sweep = dir.ToBVector();
-            AABB box = new AABB();
-            box.Min = start;
-            box.Max = start;
+            AABB box = new AABB() { Min = start, Max = start };
             box.Include(start + dir * len);
             foreach (KeyValuePair<Vector3i, Chunk> chunk in LoadedChunks)
             {
@@ -170,8 +163,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     continue;
                 }
-                RayHit temp;
-                if (chunk.Value.FCO.ConvexCast(shape, ref rt, ref sweep, len, considerSolid, out temp))
+                if (chunk.Value.FCO.ConvexCast(shape, ref rt, ref sweep, len, considerSolid, out RayHit temp))
                 {
                     hA = true;
                     //temp.T *= len;
@@ -350,8 +342,7 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public Chunk LoadChunk(Vector3i pos, int posMult)
         {
-            Chunk chunk;
-            if (LoadedChunks.TryGetValue(pos, out chunk))
+            if (LoadedChunks.TryGetValue(pos, out Chunk chunk))
             {
                 while (chunk.SucceededBy != null)
                 {
@@ -361,13 +352,15 @@ namespace Voxalia.ClientGame.WorldSystem
                 if (chunk.PosMultiplier != posMult)
                 {
                     Chunk ch = chunk;
-                    chunk = new Chunk(posMult);
-                    chunk.OwningRegion = this;
-                    chunk.adding = ch.adding;
-                    chunk.rendering = ch.rendering;
-                    chunk._VBOSolid = null;
-                    chunk._VBOTransp = null;
-                    chunk.WorldPosition = pos;
+                    chunk = new Chunk(posMult)
+                    {
+                        OwningRegion = this,
+                        adding = ch.adding,
+                        rendering = ch.rendering,
+                        _VBOSolid = null,
+                        _VBOTransp = null,
+                        WorldPosition = pos,
+                    };
                     chunk.OnRendered = () =>
                     {
                         LoadedChunks.Remove(pos);
@@ -379,9 +372,11 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             else
             {
-                chunk = new Chunk(posMult);
-                chunk.OwningRegion = this;
-                chunk.WorldPosition = pos;
+                chunk = new Chunk(posMult)
+                {
+                    OwningRegion = this,
+                    WorldPosition = pos
+                };
                 LoadedChunks.Add(pos, chunk);
             }
             return chunk;
@@ -389,8 +384,7 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public Chunk GetChunk(Vector3i pos)
         {
-            Chunk chunk;
-            if (LoadedChunks.TryGetValue(pos, out chunk))
+            if (LoadedChunks.TryGetValue(pos, out Chunk chunk))
             {
                 return chunk;
             }
@@ -780,9 +774,8 @@ namespace Voxalia.ClientGame.WorldSystem
             joint.One.Joints.Add(joint);
             joint.Two.Joints.Add(joint);
             joint.Enable();
-            if (joint is BaseJoint)
+            if (joint is BaseJoint pjoint)
             {
-                BaseJoint pjoint = (BaseJoint)joint;
                 pjoint.CurrentJoint = pjoint.GetBaseJoint();
                 PhysicsWorld.Add(pjoint.CurrentJoint);
             }
@@ -797,9 +790,8 @@ namespace Voxalia.ClientGame.WorldSystem
             joint.One.Joints.Remove(joint);
             joint.Two.Joints.Remove(joint);
             joint.Disable();
-            if (joint is BaseJoint)
+            if (joint is BaseJoint pjoint)
             {
-                BaseJoint pjoint = (BaseJoint)joint;
                 PhysicsWorld.Remove(pjoint.CurrentJoint);
             }
         }
@@ -808,8 +800,7 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public void ForgetChunk(Vector3i cpos)
         {
-            Chunk ch;
-            if (LoadedChunks.TryGetValue(cpos, out ch))
+            if (LoadedChunks.TryGetValue(cpos, out Chunk ch))
             {
                 ch.Destroy();
                 LoadedChunks.Remove(cpos);
@@ -1000,8 +991,7 @@ namespace Voxalia.ClientGame.WorldSystem
             Location amb = GetAmbient();
             Location sky = SkyMod(pos, norm, skyPrecalc);
             Location blk = GetBlockLight(pos, norm, potentials);
-            Location res;
-            Location.AddThree(ref amb, ref sky, ref blk, out res);
+            Location.AddThree(ref amb, ref sky, ref blk, out Location res);
             return res;
         }
 
