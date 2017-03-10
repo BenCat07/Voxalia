@@ -281,18 +281,18 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
         }
 
-        public void oldvert()
+        public void Oldvert()
         {
             verts = Vertices.ToArray();
             normals = Normals.ToArray();
             texts = TexCoords.ToArray();
             tangents = Tangents != null ? Tangents.ToArray() : TangentsFor(verts, normals, texts);
-            v4_colors = Colors != null ? Colors.ToArray() : null;
-            v4_tcolors = TCOLs != null ? TCOLs.ToArray() : null;
-            v4_thvs = THVs != null ? THVs.ToArray() : null;
-            v4_thws = THWs != null ? THWs.ToArray() : null;
-            v4_thvs2 = THVs2 != null ? THVs2.ToArray() : null;
-            v4_thws2 = THWs2 != null ? THWs2.ToArray() : null;
+            v4_colors = Colors?.ToArray();
+            v4_tcolors = TCOLs?.ToArray();
+            v4_thvs = THVs?.ToArray();
+            v4_thws = THWs?.ToArray();
+            v4_thvs2 = THVs2?.ToArray();
+            v4_thws2 = THWs2?.ToArray();
             Vertices = null;
             Normals = null;
             TexCoords = null;
@@ -330,11 +330,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 return;
             }
             LastVRAM = 0;
-            Vector3[] vecs = verts == null ? Vertices.ToArray() : verts;
-            uint[] inds = indices == null ? Indices.ToArray() : indices;
-            Vector3[] norms = normals == null ? Normals.ToArray() : normals;
-            Vector3[] texs = texts == null ? TexCoords.ToArray() : texts;
-            Vector3[] tangs = Tangents != null ? Tangents.ToArray() : (tangents != null ? tangents : TangentsFor(vecs, norms, texs));
+            Vector3[] vecs = verts ?? Vertices.ToArray();
+            uint[] inds = indices ?? Indices.ToArray();
+            Vector3[] norms = normals ?? Normals.ToArray();
+            Vector3[] texs = texts ?? TexCoords.ToArray();
+            Vector3[] tangs = Tangents != null ? Tangents.ToArray() : (tangents ?? TangentsFor(vecs, norms, texs));
             Vector4[] cols = Colors != null ? Colors.ToArray() : v4_colors;
             Vector4[] tcols = TCOLs != null ? TCOLs.ToArray() : v4_tcolors;
             Vector4[] thvs = THVs != null ? THVs.ToArray() : v4_thvs;
@@ -476,16 +476,16 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 SysConsole.Output(OutputType.ERROR, "Failed to render VBO, null vertices!");
                 return;
             }
-            Vector3[] vecs = verts == null ? Vertices.ToArray() : verts;
+            Vector3[] vecs = verts ?? Vertices.ToArray();
             if (vecs.Length == 0)
             {
                 return;
             }
             LastVRAM = 0;
-            uint[] inds = indices == null ? Indices.ToArray() : indices;
-            Vector3[] norms = normals == null ? Normals.ToArray() : normals;
-            Vector3[] texs = texts == null ? TexCoords.ToArray() : texts;
-            Vector3[] tangs = Tangents != null ? Tangents.ToArray() : (tangents != null ? tangents : TangentsFor(vecs, norms, texs));
+            uint[] inds = indices ?? Indices.ToArray();
+            Vector3[] norms = normals ?? Normals.ToArray();
+            Vector3[] texs = texts ?? TexCoords.ToArray();
+            Vector3[] tangs = Tangents != null ? Tangents.ToArray() : (tangents ?? TangentsFor(vecs, norms, texs));
             Vector4[] cols = Colors != null ? Colors.ToArray() : v4_colors;
             Vector4[] tcols = TCOLs != null ? TCOLs.ToArray() : v4_tcolors;
             Vector4[] thvs = THVs != null ? THVs.ToArray() : v4_thvs;

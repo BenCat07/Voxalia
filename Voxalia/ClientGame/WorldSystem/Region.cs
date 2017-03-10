@@ -329,6 +329,19 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public Dictionary<Vector3i, Chunk> LoadedChunks = new Dictionary<Vector3i, Chunk>();
 
+        public Dictionary<Vector3i, ChunkSLODHelper> SLODs = new Dictionary<Vector3i, ChunkSLODHelper>();
+
+        public ChunkSLODHelper GetSLODHelp(Vector3i chunk_pos)
+        {
+            // TODO: 5 -> constants
+            Vector3i slodpos = new Vector3i(chunk_pos.X / 5, chunk_pos.Y / 5, chunk_pos.Z / 5);
+            if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
+            {
+                return slod;
+            }
+            return SLODs[slodpos] = new ChunkSLODHelper() { Coordinate = slodpos, OwningRegion = this };
+        }
+
         public Client TheClient;
 
         public Vector3i ChunkLocFor(Location pos)
@@ -986,7 +999,7 @@ namespace Voxalia.ClientGame.WorldSystem
                         (b.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition())));
                     int cap = TheClient.CVars.r_chunksatonce.ValueI;
                     int done = 0;
-                    while (NeedsRendering.Count > removed && done < cap && RenderingNow.Count < 50)
+                    while (NeedsRendering.Count > removed && done < cap && RenderingNow.Count < 200)
                     {
                         Vector3i temp = NeedsRendering[removed++];
                         try
@@ -1032,6 +1045,7 @@ namespace Voxalia.ClientGame.WorldSystem
                             if (help > 5 || PrepChunks.Count < 50)
                             {
                                 done++;
+                                help = 0;
                             }
                             temp.Invoke();
                         }

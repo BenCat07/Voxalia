@@ -69,9 +69,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public void BuildWorld()
         {
             // TODO: DESTROY OLD REGION!?
+            if (TheRegion != null)
+            {
+                foreach (ChunkSLODHelper sloddy in TheRegion.SLODs.Values)
+                {
+                    if (sloddy._VBO != null)
+                    {
+                        sloddy._VBO.Destroy();
+                    }
+                }
+            }
             BuildLightsForWorld();
-            TheRegion = new Region();
-            TheRegion.TheClient = this;
+            TheRegion = new Region() { TheClient = this };
             TheRegion.BuildWorld();
             Player = new PlayerEntity(TheRegion);
             TheRegion.SpawnEntity(Player);
@@ -106,14 +115,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             ThePlanet = new SkyLight(Location.Zero, MaximumStraightBlockDistance() * 2, PlanetLightDef, new Location(0, 0, -1), MaximumStraightBlockDistance() * 2 + Chunk.CHUNK_SIZE * 2, false, wid);
             MainWorldView.Lights.Add(ThePlanet);
             View3D.CheckError("Load - World - Planet");
-            onCloudShadowChanged(null, null);
+            OnCloudShadowChanged(null, null);
             View3D.CheckError("Load - World - Changed");
         }
 
         /// <summary>
         /// Called automatically when the cloud shadow CVar is changed to update that.
         /// </summary>
-        public void onCloudShadowChanged(object obj, EventArgs e)
+        public void OnCloudShadowChanged(object obj, EventArgs e)
         {
             bool cloudsready = MainWorldView.Lights.Contains(TheSunClouds);
             if (cloudsready && !CVars.r_cloudshadows.ValueB)
@@ -200,10 +209,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     PlanetDir = Utilities.ForwardVector_Deg(PlanetAngle.Yaw, PlanetAngle.Pitch);
                     ThePlanet.Direction = PlanetDir;
                     ThePlanet.Reposition(corPos - ThePlanet.Direction * 30 * 6);
-                    Quaternion diff;
                     Vector3 tsd = TheSun.Direction.ToBVector();
                     Vector3 tpd = PlanetDir.ToBVector();
-                    Quaternion.GetQuaternionBetweenNormalizedVectors(ref tsd, ref tpd, out diff);
+                    Quaternion.GetQuaternionBetweenNormalizedVectors(ref tsd, ref tpd, out Quaternion diff);
                     PlanetSunDist = (float)Quaternion.GetAngleFromQuaternion(ref diff) / (float)Utilities.PI180;
                     if (PlanetSunDist < 75)
                     {

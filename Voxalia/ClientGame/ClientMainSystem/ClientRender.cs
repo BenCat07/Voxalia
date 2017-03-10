@@ -1165,12 +1165,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             SetVox();
             GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
-            foreach (Chunk ch in TheRegion.LoadedChunks.Values)
+            foreach (ChunkSLODHelper ch in TheRegion.SLODs.Values)
             {
-                BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
-                if (ch.PosMultiplier == 15 && (MainWorldView.CFrust == null || MainWorldView.LongFrustum == null || MainWorldView.LongFrustum.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
+                // TODO: 5 -> constants
+                BEPUutilities.Vector3 min = ch.Coordinate.ToVector3() * Chunk.CHUNK_SIZE * 5;
+                BEPUutilities.Vector3 helpervec = new BEPUutilities.Vector3(Chunk.CHUNK_SIZE * 5, Chunk.CHUNK_SIZE * 5, Chunk.CHUNK_SIZE * 5) * 2;
+                if ((MainWorldView.CFrust == null || MainWorldView.LongFrustum == null || MainWorldView.LongFrustum.ContainsBox(min - helpervec, min + helpervec)))
                 {
-                    // TODO: Group-prerender LOD-15 chunks. Rather than rendering one by one!
                     ch.Render();
                 }
             }
@@ -2081,7 +2082,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         + ", FBO: " + MainWorldView.FBOSpikeTime.ToString(timeformat) + ", Lights: " + MainWorldView.LightsSpikeTime.ToString(timeformat) + ", 2D: " + TWODSpikeTime.ToString(timeformat)
                         + ", Tick: " + TickSpikeTime.ToString(timeformat) + ", Finish: " + FinishSpikeTime.ToString(timeformat) + ", Total: " + TotalSpikeTime.ToString(timeformat)
                         + "\nChunks loaded: " + TheRegion.LoadedChunks.Count + ", Chunks rendering currently: " + TheRegion.RenderingNow.Count + ", chunks waiting: " + TheRegion.NeedsRendering.Count + ", Entities loaded: " + TheRegion.Entities.Count
-                        + "\nChunks prepping currently: " + TheRegion.PreppingNow.Count + ", chunks waiting for prep: " + TheRegion.PrepChunks.Count
+                        + "\nChunks prepping currently: " + TheRegion.PreppingNow.Count + ", chunks waiting for prep: " + TheRegion.PrepChunks.Count + ", SLOD chunk sets loaded: " + TheRegion.SLODs.Count
                         + "\nPosition: " + Player.GetPosition().ToBasicString() + ", velocity: " + Player.GetVelocity().ToBasicString() + ", direction: " + Player.Direction.ToBasicString()
                         + "\nExposure: " + MainWorldView.MainEXP,
                         Window.Width - 10), new Location(0, 0, 0), Window.Height, 1, false, "^r^!^e^7");

@@ -163,16 +163,24 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 bua = null;
             }
+            ChunkSLODHelper crh = null;
+            if (PosMultiplier == 15)
+            {
+                crh = OwningRegion.GetSLODHelp(WorldPosition);
+            }
             Action a = () =>
             {
                 CancelTokenSource = new CancellationTokenSource();
                 CancelToken = CancelTokenSource.Token;
-                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, false, bua);
+                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, false, bua, crh);
                 if (CancelToken.IsCancellationRequested)
                 {
                     return;
                 }
-                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, false, shaped, true, bua);
+                if (PosMultiplier != 15)
+                {
+                    VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, false, shaped, true, bua, null);
+                }
                 if (CancelToken.IsCancellationRequested)
                 {
                     return;
@@ -188,7 +196,7 @@ namespace Voxalia.ClientGame.WorldSystem
             };
             if (rendering != null)
             {
-                ASyncScheduleItem item = OwningRegion.TheClient.Schedule.AddASyncTask(a);
+                ASyncScheduleItem item = OwningRegion.TheClient.Schedule.AddAsyncTask(a);
                 CancelTokenSource?.Cancel();
                 rendering = rendering.ReplaceOrFollowWith(item);
             }
@@ -239,12 +247,11 @@ namespace Voxalia.ClientGame.WorldSystem
         }
         
         void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym,
-            Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym, List<Chunk> potentials, bool plants, bool shaped, bool transp, BlockUpperArea bua)
+            Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym, List<Chunk> potentials, bool plants, bool shaped, bool transp, BlockUpperArea bua, ChunkSLODHelper crh)
         {
             try
             {
-                ChunkRenderHelper rh;
-                rh = new ChunkRenderHelper();
+                ChunkRenderHelper rh = new ChunkRenderHelper();
                 BlockInternal t_air = new BlockInternal((ushort)Material.AIR, 0, 0, 255);
                 List<Vector3> poses = new List<Vector3>();
                 List<Vector4> colorses = new List<Vector4>();
@@ -355,7 +362,12 @@ namespace Voxalia.ClientGame.WorldSystem
                                 for (int i = 0; i < vecsi.Count; i++)
                                 {
                                     Vector3 vt = new Vector3((float)(x + vecsi[i].X) * PosMultiplier, (float)(y + vecsi[i].Y) * PosMultiplier, (float)(z + vecsi[i].Z) * PosMultiplier);
-                                    rh.Vertices.Add(vt);
+                                    Vector3 vti_use = vt;
+                                    if (crh != null)
+                                    {
+                                        vti_use += new Vector3(WorldPosition.X - (WorldPosition.X / 5) * 5, WorldPosition.Y - (WorldPosition.Y / 5) * 5, WorldPosition.Z - (WorldPosition.Z / 5) * 5) * CHUNK_SIZE;
+                                    }
+                                    rh.Vertices.Add(vti_use);
                                     Vector3 nt = new Vector3((float)normsi[i].X, (float)normsi[i].Y, (float)normsi[i].Z);
                                     rh.Norms.Add(nt);
                                     rh.TCoords.Add(new Vector3((float)tci[i].X, (float)tci[i].Y, (float)tci[i].Z));
@@ -413,6 +425,10 @@ namespace Voxalia.ClientGame.WorldSystem
                                     for (int i = vecsi.Count - 1; i >= 0; i--)
                                     {
                                         Vector3 vt = new Vector3((float)(x + vecsi[i].X) * PosMultiplier, (float)(y + vecsi[i].Y) * PosMultiplier, (float)(z + vecsi[i].Z) * PosMultiplier);
+                                        if (crh != null)
+                                        {
+                                            vt += new Vector3(WorldPosition.X - (WorldPosition.X / 5) * 5, WorldPosition.Y - (WorldPosition.Y / 5) * 5, WorldPosition.Z - (WorldPosition.Z / 5) * 5);
+                                        }
                                         rh.Vertices.Add(vt);
                                         int tx = tf + i;
                                         rh.Cols.Add(rh.Cols[tx]);
@@ -522,6 +538,36 @@ namespace Voxalia.ClientGame.WorldSystem
                     OwningRegion.DoneRendering(this);
                     return;
                 }
+                if (crh != null)
+                {
+                    OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
+                    {
+                        crh.FullBlock.Vertices.AddRange(rh.Vertices);
+                        crh.FullBlock.Norms.AddRange(rh.Norms);
+                        crh.FullBlock.TCoords.AddRange(rh.TCoords);
+                        crh.FullBlock.Cols.AddRange(rh.Cols);
+                        crh.FullBlock.TCols.AddRange(rh.TCols);
+                        crh.FullBlock.THVs.AddRange(rh.THVs);
+                        crh.FullBlock.THWs.AddRange(rh.THWs);
+                        crh.FullBlock.THVs2.AddRange(rh.THVs2);
+                        crh.FullBlock.THWs2.AddRange(rh.THWs2);
+                        crh.FullBlock.Tangs.AddRange(rh.Tangs);
+                        Action tst = () =>
+                        {
+                            crh.Compile();
+                        };
+                        if (crh.Loading != null)
+                        {
+                            crh.Loading.ReplaceOrFollowWith(new ASyncScheduleItem() { OwningEngine = OwningRegion.TheClient.Schedule, MyAction = tst });
+                        }
+                        else
+                        {
+                            crh.Loading = OwningRegion.TheClient.Schedule.StartAsyncTask(tst);
+                        }
+                    });
+                    OwningRegion.DoneRendering(this);
+                    return;
+                }
                 uint[] inds = new uint[rh.Vertices.Count];
                 for (uint i = 0; i < rh.Vertices.Count; i++)
                 {
@@ -546,7 +592,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 tVBO.BoneIDs = null;
                 tVBO.BoneWeights2 = null;
                 tVBO.BoneIDs2 = null;
-                tVBO.oldvert();
+                tVBO.Oldvert();
                 Vector3[] posset = poses.ToArray();
                 Vector4[] colorset = colorses.ToArray();
                 Vector2[] texcoordsset = tcses.ToArray();
@@ -683,5 +729,84 @@ namespace Voxalia.ClientGame.WorldSystem
         public List<Vector4> THVs2;
         public List<Vector4> THWs2;
         public List<Vector3> Tangs;
+    }
+
+    public class ChunkSLODHelper
+    {
+        public Vector3i Coordinate;
+
+        public ChunkRenderHelper FullBlock = new ChunkRenderHelper();
+
+        public Region OwningRegion;
+
+        public VBO _VBO;
+
+        public ASyncScheduleItem Loading = null;
+
+        public void Render()
+        {
+            if (!OwningRegion.TheClient.CVars.r_drawchunks.ValueB)
+            {
+                return;
+            }
+            if (_VBO != null && _VBO.generated)
+            {
+                // TODO: 5 -> constants
+                Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(Coordinate.ToLocation() * Constants.CHUNK_WIDTH * 5));
+                OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
+                _VBO.Render(false);
+            }
+        }
+
+        public void Compile()
+        {
+            if (FullBlock.Vertices.Count == 0)
+            {
+                if (_VBO != null)
+                {
+                    OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
+                    {
+                        if (_VBO != null)
+                        {
+                            _VBO.Destroy();
+                            _VBO = null;
+                        }
+                    });
+                }
+                return;
+            }
+            VBO tVBO = new VBO();
+            uint[] inds = new uint[FullBlock.Vertices.Count];
+            for (uint i = 0; i < FullBlock.Vertices.Count; i++)
+            {
+                inds[i] = i;
+            }
+            tVBO.indices = inds;
+            tVBO.Vertices = FullBlock.Vertices;
+            tVBO.Normals = FullBlock.Norms;
+            tVBO.TexCoords = FullBlock.TCoords;
+            tVBO.Colors = FullBlock.Cols;
+            tVBO.TCOLs = FullBlock.TCols;
+            tVBO.THVs = FullBlock.THVs;
+            tVBO.THWs = FullBlock.THWs;
+            tVBO.THVs2 = FullBlock.THVs2;
+            tVBO.THWs2 = FullBlock.THWs2;
+            tVBO.Tangents = FullBlock.Tangs;
+            tVBO.BoneWeights = null;
+            tVBO.BoneIDs = null;
+            tVBO.BoneWeights2 = null;
+            tVBO.BoneIDs2 = null;
+            tVBO.Oldvert();
+            OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
+            {
+                if (_VBO != null)
+                {
+                    _VBO.Destroy();
+                }
+                _VBO = tVBO;
+                tVBO.GenerateOrUpdate();
+                tVBO.CleanLists();
+            });
+        }
     }
 }

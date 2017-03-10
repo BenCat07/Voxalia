@@ -798,9 +798,13 @@ namespace Voxalia.ServerGame.EntitySystem
                     }
                 }
             }
-            ChunkMarchAndSend();
+            if (!DoneReadingChunks)
+            {
+                DoneReadingChunks = ChunkMarchAndSend();
+            }
             if (cpos != pChunkLoc)
             {
+                DoneReadingChunks = false;
                 foreach (ChunkAwarenessInfo ch in ChunksAwareOf.Values)
                 {
                     if (!ShouldLoadChunk(ch.ChunkPos))
@@ -887,18 +891,22 @@ namespace Voxalia.ServerGame.EntitySystem
         /// Maximum field-of-view for a player.
         /// </summary>
         const double Max_FOV = 100.0;
-        
+
+        bool DoneReadingChunks = false;
+
         /// <summary>
         /// Runs through the chunks near the player and sends them in a reasonable order.
+        /// TODO: is this the most efficient it can be?
         /// </summary>
-        void ChunkMarchAndSend()
+        bool ChunkMarchAndSend()
         {
-            // TODO: is this the most efficient it can be?
-            int maxChunks = TheServer.CVars.n_chunkspertick.ValueI * 15;
+            const int MULTIPLIER = 15;
+            // TODO: Player configurable multiplier!
+            int maxChunks = TheServer.CVars.n_chunkspertick.ValueI * MULTIPLIER;
             int chunksFound = 0;
             if (LoadRelPos.IsNaN() || LoadRelDir.IsNaN() || LoadRelDir.LengthSquared() < 0.1f)
             {
-                return;
+                return false;
             }
             Matrix proj = Matrix.CreatePerspectiveFieldOfViewRH(Max_FOV * Utilities.PI180, 1, 1f, 5000f);
             Matrix view = Matrix.CreateLookAtRH((LoadRelPos - LoadRelDir * 8).ToBVector(), (LoadRelPos + LoadRelDir * 8).ToBVector(), new Vector3(0, 0, 1));
@@ -908,7 +916,8 @@ namespace Voxalia.ServerGame.EntitySystem
             HashSet<Vector3i> seen = new HashSet<Vector3i>();
             Queue<Vector3i> toSee = new Queue<Vector3i>();
             toSee.Enqueue(start);
-            const int MAX_DIST = 1000 / Chunk.CHUNK_SIZE; // TODO: MAX_DIST -> Constants file
+            const int MAX_DIST = 500 / Chunk.CHUNK_SIZE; // TODO: MAX_DIST -> Constants file
+            // TODO: Player configurable distance too actually. Not everyone can afford that much distance view!
             while (toSee.Count > 0)
             {
                 Vector3i cur = toSee.Dequeue();
@@ -928,7 +937,7 @@ namespace Voxalia.ServerGame.EntitySystem
                         chunksFound++;
                         if (chunksFound > maxChunks)
                         {
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -938,10 +947,10 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     if (TryChunk(cur, 1))
                     {
-                        chunksFound += 15;
+                        chunksFound += MULTIPLIER;
                         if (chunksFound > maxChunks)
                         {
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -951,10 +960,10 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     if (TryChunk(cur, 2))
                     {
-                        chunksFound += 15;
+                        chunksFound += MULTIPLIER;
                         if (chunksFound > maxChunks)
                         {
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -962,10 +971,10 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     if (TryChunk(cur, 5))
                     {
-                        chunksFound += 15;
+                        chunksFound += MULTIPLIER;
                         if (chunksFound > maxChunks)
                         {
-                            return;
+                            return false;
                         }
                     }
                 }
@@ -1146,6 +1155,7 @@ namespace Voxalia.ServerGame.EntitySystem
                     }
                 }
             }
+            return chunksFound == 0;
         }
 
         /// <summary>

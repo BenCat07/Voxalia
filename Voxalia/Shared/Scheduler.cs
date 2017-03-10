@@ -60,17 +60,14 @@ namespace Voxalia.Shared
 
         public ASyncScheduleItem StartAsyncTask(Action a)
         {
-            ASyncScheduleItem asyncer = new ASyncScheduleItem();
-            asyncer.MyAction = a;
+            ASyncScheduleItem asyncer = new ASyncScheduleItem() { OwningEngine = this, MyAction = a };
             asyncer.RunMe();
             return asyncer;
         }
 
-        public ASyncScheduleItem AddASyncTask(Action a, ASyncScheduleItem followUp = null)
+        public ASyncScheduleItem AddAsyncTask(Action a, ASyncScheduleItem followUp = null)
         {
-            ASyncScheduleItem asyncer = new ASyncScheduleItem();
-            asyncer.MyAction = a;
-            asyncer.FollowUp = followUp;
+            ASyncScheduleItem asyncer = new ASyncScheduleItem() { OwningEngine = this, MyAction = a, FollowUp = followUp };
             return asyncer;
         }
     }
@@ -178,10 +175,10 @@ namespace Voxalia.Shared
                 Started = true;
                 Done = false;
             }
-            Task.Factory.StartNew(runInternal);
+            Task.Factory.StartNew(RunInternal);
         }
 
-        private void runInternal()
+        private void RunInternal()
         {
             MyAction.Invoke();
             lock (Locker)
