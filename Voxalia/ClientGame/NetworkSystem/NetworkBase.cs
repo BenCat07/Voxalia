@@ -74,9 +74,9 @@ namespace Voxalia.ClientGame.NetworkSystem
             {
                 return "NO_SESSION";
             }
+            NameValueCollection data = new NameValueCollection();
             using (ShortWebClient wb = new ShortWebClient())
             {
-                NameValueCollection data = new NameValueCollection();
                 data["formtype"] = "getsess";
                 data["username"] = Username;
                 data["session"] = Key;
@@ -291,7 +291,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                 AbstractPacketIn packet;
                 bool asyncable = false;
                 NetUsageType usage;
-                switch (packetID) // TODO: Packet registry?
+                switch (packetID) // TODO: Packet registry!
                 {
                     case ServerToClientPacket.PING:
                         packet = new PingPacketIn();
@@ -698,8 +698,7 @@ namespace Voxalia.ClientGame.NetworkSystem
 
         IPAddress GetAddress(string IP)
         {
-            IPAddress address;
-            if (!IPAddress.TryParse(IP, out address))
+            if (!IPAddress.TryParse(IP, out IPAddress address))
             {
                 IPHostEntry entry = Dns.GetHostEntry(IP);
                 if (entry.AddressList.Length == 0)

@@ -30,6 +30,8 @@ namespace Voxalia.ServerGame.WorldSystem
 
         LiteCollection<BsonDocument> DBLODs;
 
+        LiteCollection<BsonDocument> DBSuperLOD;
+
         LiteDatabase EntsDatabase;
 
         LiteCollection<BsonDocument> DBEnts;
@@ -52,6 +54,7 @@ namespace Voxalia.ServerGame.WorldSystem
             DBChunks = Database.GetCollection<BsonDocument>("chunks");
             LODsDatabase = new LiteDatabase("filename=" + dir + "lod_chunks.ldb");
             DBLODs = LODsDatabase.GetCollection<BsonDocument>("lodchunks");
+            DBSuperLOD = LODsDatabase.GetCollection<BsonDocument>("superlod");
             EntsDatabase = new LiteDatabase("filename=" + dir + "ents.ldb");
             DBEnts = EntsDatabase.GetCollection<BsonDocument>("ents");
             TopsDatabase = new LiteDatabase("filename=" + dir + "tops.ldb");
@@ -75,6 +78,27 @@ namespace Voxalia.ServerGame.WorldSystem
             Utilities.IntToBytes(y).CopyTo(array, 4);
             Utilities.IntToBytes(z).CopyTo(array, 8);
             return new BsonValue(array);
+        }
+
+        public byte[] GetSuperLODChunkDetails(int x, int y, int z)
+        {
+            BsonDocument doc;
+            doc = DBSuperLOD.FindById(GetIDFor(x, y, z));
+            if (doc == null)
+            {
+                return null;
+            }
+            return FileHandler.Uncompress(doc["blocks"].AsBinary);
+        }
+
+        public void WriteSuperLODChunkDetails(int x, int y, int z, byte[] SLOD)
+        {
+            BsonValue id = GetIDFor(x, y, z);
+            BsonDocument newdoc = new BsonDocument();
+            Dictionary<string, BsonValue> tbs = newdoc.RawValue;
+            tbs["_id"] = id;
+            tbs["blocks"] = new BsonValue(FileHandler.Compress(SLOD));
+            DBSuperLOD.Upsert(newdoc);
         }
 
         public byte[] GetLODChunkDetails(int x, int y, int z)
@@ -106,10 +130,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return null;
             }
-            ChunkDetails det = new ChunkDetails();
-            det.X = x;
-            det.Y = y;
-            det.Z = z;
+            ChunkDetails det = new ChunkDetails() { X = x, Y = y, Z = z };
             det.Version = doc["version"].AsInt32;
             det.Blocks = /*FileHandler.UnGZip(*/doc["entities"].AsBinary/*)*/;
             return det;
@@ -134,10 +155,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return null;
             }
-            ChunkDetails det = new ChunkDetails();
-            det.X = x;
-            det.Y = y;
-            det.Z = z;
+            ChunkDetails det = new ChunkDetails() { X = x, Y = y, Z = z };
             det.Version = doc["version"].AsInt32;
             det.Flags = (ChunkFlags)doc["flags"].AsInt32;
             det.Blocks = FileHandler.Uncompress(doc["blocks"].AsBinary);
@@ -220,8 +238,7 @@ namespace Voxalia.ServerGame.WorldSystem
         public int GetMins(int x, int y)
         {
             Vector2i input = new Vector2i(x, y);
-            int output;
-            if (Mins.TryGetValue(input, out output))
+            if (Mins.TryGetValue(input, out int output))
             {
                 return output;
             }

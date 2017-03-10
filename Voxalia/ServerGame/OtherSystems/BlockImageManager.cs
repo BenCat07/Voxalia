@@ -266,9 +266,8 @@ namespace Voxalia.ServerGame.OtherSystems
             {
                 for (int y = 0; y < wid; y++)
                 {
-                    Biome b;
                     double h = tregion.Generator.GetHeight(tregion.TheWorld.Seed, tregion.TheWorld.Seed2, tregion.TheWorld.Seed3,
-                        tregion.TheWorld.Seed4, tregion.TheWorld.Seed5, minx + (maxx - minx) * x * one_div_wid, miny + (maxy - miny) * y * one_div_wid, 0, out b);
+                        tregion.TheWorld.Seed4, tregion.TheWorld.Seed5, minx + (maxx - minx) * x * one_div_wid, miny + (maxy - miny) * y * one_div_wid, 0, out Biome b);
                     Material renderme;
                     if (h > 0)
                     {
@@ -333,10 +332,7 @@ namespace Voxalia.ServerGame.OtherSystems
                     // TODO: Resize options/control?
                     Bitmap bmp2 = new Bitmap(bmp1, new Size(TexWidth, TexWidth));
                     bmp1.Dispose();
-                    MaterialImage img = new MaterialImage();
-                    img.Width = TexWidth;
-                    img.Height = TexWidth;
-                    img.Colors = new FastColor[TexWidth * TexWidth];
+                    MaterialImage img = new MaterialImage() { Width = TexWidth, Height = TexWidth, Colors = new FastColor[TexWidth * TexWidth] };
                     for (int x = 0; x < TexWidth; x++)
                     {
                         for (int y = 0; y < TexWidth; y++)

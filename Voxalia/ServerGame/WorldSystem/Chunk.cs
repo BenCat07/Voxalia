@@ -291,7 +291,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// Removes all entities that the chunk contains.
         /// </summary>
-        void clearentities()
+        void Clearentities()
         {
             // TODO: Efficiency
             foreach (Entity ent in OwningRegion.Entities.Values)
@@ -310,7 +310,7 @@ namespace Voxalia.ServerGame.WorldSystem
         public void UnloadSafely(Action callback = null)
         {
             SaveAsNeeded(callback);
-            clearentities();
+            Clearentities();
             if (FCO != null)
             {
                 OwningRegion.RemoveChunkQuiet(FCO);
@@ -454,14 +454,16 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             try
             {
-                ChunkDetails det = new ChunkDetails();
-                det.Version = 2;
-                det.X = (int)WorldPosition.X;
-                det.Y = (int)WorldPosition.Y;
-                det.Z = (int)WorldPosition.Z;
-                det.Flags = Flags;
-                det.Blocks = blks;
-                det.Reachables = new byte[(int)ChunkReachability.COUNT];
+                ChunkDetails det = new ChunkDetails()
+                {
+                    Version = 2,
+                    X = WorldPosition.X,
+                    Y = WorldPosition.Y,
+                    Z = WorldPosition.Z,
+                    Flags = Flags,
+                    Blocks = blks,
+                    Reachables = new byte[(int)ChunkReachability.COUNT]
+                };
                 for (int i = 0; i < det.Reachables.Length; i++)
                 {
                     det.Reachables[i] = (byte)(Reachability[i] ? 1 : 0);
@@ -487,12 +489,7 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             try
             {
-                ChunkDetails det = new ChunkDetails();
-                det.Version = 2;
-                det.X = (int)WorldPosition.X;
-                det.Y = (int)WorldPosition.Y;
-                det.Z = (int)WorldPosition.Z;
-                det.Blocks = BsonSerializer.Serialize(ents);
+                ChunkDetails det = new ChunkDetails() { Version = 2, X = WorldPosition.X, Y = WorldPosition.Y, Z = WorldPosition.Z, Blocks = BsonSerializer.Serialize(ents) };
                 lock (GetLocker())
                 {
                     OwningRegion.ChunkManager.WriteChunkEntities(det);

@@ -181,7 +181,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             skybox[3].AddSide(Location.UnitX, new TextureCoordinates());
             skybox[4].AddSide(-Location.UnitY, new TextureCoordinates());
             skybox[5].AddSide(Location.UnitY, new TextureCoordinates());
-            View3D.CheckError("Load - Rendering - VBO Prep");
+            View3D.CheckError("Load - Rendering - Sky Prep");
             for (int i = 0; i < 6; i++)
             {
                 skybox[i].GenerateVBO();
@@ -198,7 +198,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, TWOD_FBO_Tex, 0);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
-
+        
         public void RenderItemBar(View3D renderer)
         {
             Render2D(true);
