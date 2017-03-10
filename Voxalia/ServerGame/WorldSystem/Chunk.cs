@@ -152,6 +152,19 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>
         /// <param name="z">The Z coordinate.</param>
+        /// <param name="lod">The level of detail value.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int ApproxBlockIndex(int x, int y, int z, int lod)
+        {
+            return z * (lod * lod) + y * lod + x;
+        }
+
+        /// <summary>
+        /// Calculates the index of a block for given coordinates.
+        /// </summary>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        /// <param name="z">The Z coordinate.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int BlockIndex(int x, int y, int z)
         {
@@ -469,16 +482,59 @@ namespace Voxalia.ServerGame.WorldSystem
                     det.Reachables[i] = (byte)(Reachability[i] ? 1 : 0);
                 }
                 byte[] lod = LODBytes(5);
+                byte[] slod = SLODBytes(lod);
                 lock (GetLocker())
                 {
                     OwningRegion.ChunkManager.WriteChunkDetails(det);
                     OwningRegion.ChunkManager.WriteLODChunkDetails(det.X, det.Y, det.Z, lod);
+                    OwningRegion.ChunkManager.WriteSuperLODChunkDetails(det.X, det.Y, det.Z, slod);
                 }
             }
             catch (Exception ex)
             {
                 SysConsole.Output(OutputType.ERROR, "Saving chunk " + WorldPosition.ToString() + " to file: " + ex.ToString());
             }
+        }
+        
+        public byte[] SLODBytes(byte[] b)
+        {
+            byte[] res = new byte[2 * 2 * 2 * 2];
+            for (int x = 0; x < 2; x++)
+            {
+                for (int y = 0; y < 2; y++)
+                {
+                    for (int z = 0; z < 2; z++)
+                    {
+                        int rcoord = ApproxBlockIndex(x, y, z, 2) * 2;
+                        Material strongest = Material.AIR;
+                        for (int sx = 0; sx < 3; sx++)
+                        {
+                            for (int sy = 0; sy < 3; sy++)
+                            {
+                                for (int sz = 0; sz < 3; sz++)
+                                {
+                                    int bcoord = ApproxBlockIndex(x * 3 + sx, y * 3 + sy, z * 3 + sz, 5) * 2;
+                                    Material mat = (Material)(b[bcoord] | (b[bcoord + 1] << 8));
+                                    if (mat.IsOpaque())
+                                    {
+                                        strongest = mat;
+                                        goto gotem;
+                                    }
+                                    else if (mat.RendersAtAll() && !strongest.RendersAtAll())
+                                    {
+                                        strongest = mat;
+                                    }
+                                }
+                            }
+                        }
+                        gotem:
+                        ushort m = (ushort)strongest;
+                        res[rcoord] = (byte)(m & 0xFF);
+                        res[rcoord + 1] = (byte)((m >> 8) & 0xFF);
+                    }
+                }
+            }
+            return res;
         }
 
         /// <summary>

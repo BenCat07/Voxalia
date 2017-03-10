@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using Voxalia.Shared.Collision;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -16,6 +17,8 @@ namespace Voxalia.ServerGame.WorldSystem
         public abstract double GetHeight(int seed, int seed2, int seed3, int seed4, int seed5, double x, double y, double z, out Biome biome);
 
         public abstract void Populate(int seed, int seed2, int seed3, int seed4, int seed5, Chunk chunk);
+
+        public abstract byte[] GetSuperLOD(int seed, int seed2, int seed3, int seed4, int seed5, Vector3i cpos);
 
         public abstract List<Tuple<string, double>> GetTimings();
 

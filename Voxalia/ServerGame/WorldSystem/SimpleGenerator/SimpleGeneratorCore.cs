@@ -16,6 +16,68 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 {
     public class SimpleGeneratorCore: BlockPopulator
     {
+        public override byte[] GetSuperLOD(int seed, int seed2, int seed3, int seed4, int seed5, Vector3i cpos)
+        {
+            byte[] b = new byte[2 * 2 * 2 * 2];
+            if (cpos.Z > MaxNonAirHeight)
+            {
+                // AIR
+                return b;
+            }
+            else if (cpos.Z < 0)
+            {
+                // STONE
+                Material enf = Material.STONE;
+                ushort enfu = (ushort)enf;
+                for (int i = 0; i < b.Length; i += 2)
+                {
+                    b[i] = (byte)(enfu & 0xFF);
+                    b[i + 1] = (byte)((enfu >> 8) & 0xFF);
+                }
+                return b;
+            }
+            for (int x = 0; x < 2; x++)
+            {
+                for (int y = 0; y < 2; y++)
+                {
+                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, out Biome biomeOrig);
+                    SimpleBiome biome = biomeOrig as SimpleBiome;
+                    if (hheight > cpos.Z * Chunk.CHUNK_SIZE)
+                    {
+                        if (hheight > (cpos.Z + 1) * Chunk.CHUNK_SIZE)
+                        {
+                            ushort lowType = (ushort)biome.BaseBlock();
+                            for (int z = 0; z < 2; z++)
+                            {
+                                int loc = Chunk.ApproxBlockIndex(x, y, z, 2) * 2;
+                                b[loc] = (byte)(lowType & 0xFF);
+                                b[loc + 1] = (byte)((lowType >> 8) & 0xFF);
+                            }
+                        }
+                        else if (hheight > (cpos.Z + 0.5) * Chunk.CHUNK_SIZE)
+                        {
+                            ushort lowTypeA = (ushort)biome.BaseBlock();
+                            int locA = Chunk.ApproxBlockIndex(x, y, 0, 2) * 2;
+                            b[locA] = (byte)(lowTypeA & 0xFF);
+                            b[locA + 1] = (byte)((lowTypeA >> 8) & 0xFF);
+                            ushort lowTypeB = (ushort)biome.SurfaceBlock();
+                            int locB = Chunk.ApproxBlockIndex(x, y, 1, 2) * 2;
+                            b[locB] = (byte)(lowTypeB & 0xFF);
+                            b[locB + 1] = (byte)((lowTypeB >> 8) & 0xFF);
+                        }
+                        else
+                        {
+                            ushort lowTypeB = (ushort)biome.SurfaceBlock();
+                            int locB = Chunk.ApproxBlockIndex(x, y, 0, 2) * 2;
+                            b[locB] = (byte)(lowTypeB & 0xFF);
+                            b[locB + 1] = (byte)((lowTypeB >> 8) & 0xFF);
+                        }
+                    }
+                }
+            }
+            return b;
+        }
+
         public SimpleBiomeGenerator Biomes = new SimpleBiomeGenerator();
 
         public override BiomeGenerator GetBiomeGen()
@@ -263,9 +325,8 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                     // Prepare basics
                     int cx = (int)cpos.X + x;
                     int cy = (int)cpos.Y + y;
-                    Biome biomeOrig;
-                    double hheight = GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy, (double)cpos.Z, out biomeOrig);
-                    SimpleBiome biome = (SimpleBiome)biomeOrig;
+                    double hheight = GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy, cpos.Z, out Biome biomeOrig);
+                    SimpleBiome biome = biomeOrig as SimpleBiome;
                     //Biome biomeOrig2;
                     /*double hheight2 = */
                     /*GetHeight(Seed, seed2, seed3, seed4, seed5, cx + 7, cy + 7, (double)cpos.Z + 7, out biomeOrig2);
@@ -317,8 +378,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                         chunk.BlocksInternal[chunk.BlockIndex(x, y, z)] = new BlockInternal((ushort)(/*choice ? surf2 : */surf), 0, 0, 0);
                     }
                     // Smooth terrain cap
-                    Biome tempb;
-                    double heightfxp = GetHeight(Seed, seed2, seed3, seed4, seed5, cx + 1, cy, (double)cpos.Z, out tempb);
+                    double heightfxp = GetHeight(Seed, seed2, seed3, seed4, seed5, cx + 1, cy, (double)cpos.Z, out Biome tempb);
                     double heightfxm = GetHeight(Seed, seed2, seed3, seed4, seed5, cx - 1, cy, (double)cpos.Z, out tempb);
                     double heightfyp = GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy + 1, (double)cpos.Z, out tempb);
                     double heightfym = GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy - 1, (double)cpos.Z, out tempb);

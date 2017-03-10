@@ -195,11 +195,8 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
-            Region rg = new Region();
-            rg.TheServer = TheServer;
-            rg.TheWorld = this;
-            rg.BuildRegion();
-            MainRegion = rg;
+            MainRegion = new Region() { TheServer = TheServer, TheWorld = this };
+            MainRegion.BuildRegion();
         }
 
         /// <summary>

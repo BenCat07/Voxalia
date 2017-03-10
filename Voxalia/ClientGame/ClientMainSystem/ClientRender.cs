@@ -1162,8 +1162,20 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.UniformMatrix4(2, false, ref ident);
             Rendering.SetColor(Color4.White);
             Rendering.SetMinimumLight(0);
-            GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
+            SetVox();
+            GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
+            foreach (Chunk ch in TheRegion.LoadedChunks.Values)
+            {
+                BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
+                if (ch.PosMultiplier == 15 && (MainWorldView.CFrust == null || MainWorldView.LongFrustum == null || MainWorldView.LongFrustum.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
+                {
+                    // TODO: Group-prerender LOD-15 chunks. Rather than rendering one by one!
+                    ch.Render();
+                }
+            }
+            GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
+            GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
         }
 
         /// <summary>

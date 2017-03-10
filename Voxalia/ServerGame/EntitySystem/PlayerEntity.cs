@@ -874,20 +874,19 @@ namespace Voxalia.ServerGame.EntitySystem
             }
             if (!CanReach(GetPosition()))
             {
-                Teleport(posClamp(GetPosition()));
+                Teleport(PosClamp(GetPosition()));
             }
         }
 
         /// <summary>
         /// Valid chunkmarch movement dirs.
         /// </summary>
-        static Vector3i[] MoveDirs = new Vector3i[] { new Vector3i(-1, 0, 0), new Vector3i(1, 0, 0),
-            new Vector3i(0, -1, 0), new Vector3i(0, 1, 0), new Vector3i(0, 0, -1), new Vector3i(0, 0, 1) };
+        static Vector3i[] MoveDirs = new Vector3i[] { new Vector3i(-1, 0, 0), new Vector3i(1, 0, 0), new Vector3i(0, -1, 0), new Vector3i(0, 1, 0), new Vector3i(0, 0, -1), new Vector3i(0, 0, 1) };
 
         /// <summary>
         /// Maximum field-of-view for a player.
         /// </summary>
-        const double Max_FOV = 100f;
+        const double Max_FOV = 100.0;
         
         /// <summary>
         /// Runs through the chunks near the player and sends them in a reasonable order.
@@ -895,13 +894,13 @@ namespace Voxalia.ServerGame.EntitySystem
         void ChunkMarchAndSend()
         {
             // TODO: is this the most efficient it can be?
-            int maxChunks = TheServer.CVars.n_chunkspertick.ValueI;
+            int maxChunks = TheServer.CVars.n_chunkspertick.ValueI * 15;
             int chunksFound = 0;
             if (LoadRelPos.IsNaN() || LoadRelDir.IsNaN() || LoadRelDir.LengthSquared() < 0.1f)
             {
                 return;
             }
-            Matrix proj = Matrix.CreatePerspectiveFieldOfViewRH(Max_FOV * (double)Utilities.PI180, 1, 0.5f, 3000f);
+            Matrix proj = Matrix.CreatePerspectiveFieldOfViewRH(Max_FOV * Utilities.PI180, 1, 1f, 5000f);
             Matrix view = Matrix.CreateLookAtRH((LoadRelPos - LoadRelDir * 8).ToBVector(), (LoadRelPos + LoadRelDir * 8).ToBVector(), new Vector3(0, 0, 1));
             Matrix combined = view * proj;
             BFrustum bfs = TheServer.IsMenu ? null : new BFrustum(combined);
@@ -909,23 +908,37 @@ namespace Voxalia.ServerGame.EntitySystem
             HashSet<Vector3i> seen = new HashSet<Vector3i>();
             Queue<Vector3i> toSee = new Queue<Vector3i>();
             toSee.Enqueue(start);
+            const int MAX_DIST = 3000 / Chunk.CHUNK_SIZE;
             while (toSee.Count > 0)
             {
                 Vector3i cur = toSee.Dequeue();
                 seen.Add(cur);
+                if (Math.Abs(cur.X - start.X) > MAX_DIST // TODO: MAX_DIST -> Constants file
+                    || Math.Abs(cur.Y - start.Y) > MAX_DIST
+                    || Math.Abs(cur.Z - start.Z) > MAX_DIST)
+                {
+                    continue;
+                }
                 if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5)
                     || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5)
                     || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height))
                 {
-                    continue;
+                    if (TryChunk(cur, 15))
+                    {
+                        chunksFound++;
+                        if (chunksFound > maxChunks)
+                        {
+                            return;
+                        }
+                    }
                 }
-                if (Math.Abs(cur.X - start.X) <= ViewRadiusInChunks
+                else if (Math.Abs(cur.X - start.X) <= ViewRadiusInChunks
                     && Math.Abs(cur.Y - start.Y) <= ViewRadiusInChunks
                     && Math.Abs(cur.Z - start.Z) <= ViewRadiusInChunks)
                 {
                     if (TryChunk(cur, 1))
                     {
-                        chunksFound++;
+                        chunksFound += 15;
                         if (chunksFound > maxChunks)
                         {
                             return;
@@ -938,7 +951,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     if (TryChunk(cur, 2))
                     {
-                        chunksFound++;
+                        chunksFound += 15;
                         if (chunksFound > maxChunks)
                         {
                             return;
@@ -949,7 +962,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     if (TryChunk(cur, 5))
                     {
-                        chunksFound++;
+                        chunksFound += 15;
                         if (chunksFound > maxChunks)
                         {
                             return;
@@ -1140,7 +1153,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// </summary>
         /// <param name="pos">The position.</param>
         /// <returns>The clamped position.</returns>
-        public Location posClamp(Location pos)
+        public Location PosClamp(Location pos)
         {
             double maxdist = Math.Abs(TheServer.CVars.g_maxdist.ValueD);
             pos.X = Clamp(pos.X, -maxdist, maxdist);
@@ -1374,7 +1387,11 @@ namespace Voxalia.ServerGame.EntitySystem
                 bool async = chi == null && dist > (Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE * 2 * 2);
                 Vector2i topcoord = new Vector2i(cworldPos.X, cworldPos.Y);
                 bool sendTop = TopsAwareof.Add(topcoord);
-                if (async)
+                if (posMult == 15)
+                {
+                    ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, TheRegion.GetSuperLODChunkData(cworldPos)));
+                }
+                else if (async)
                 {
                     TheRegion.LoadChunk_Background(cworldPos, (chn) =>
                     {
@@ -1390,7 +1407,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 }
                 else
                 {
-                    Chunk chk = chi != null ? chi : TheRegion.LoadChunk(cworldPos);
+                    Chunk chk = chi ?? TheRegion.LoadChunk(cworldPos);
                     if (sendTop)
                     {
                         SendTops(topcoord);
@@ -1406,8 +1423,7 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public void SendTops(Vector2i tops)
         {
-            BlockUpperArea bua;
-            if (!TheRegion.UpperAreas.TryGetValue(tops, out bua))
+            if (!TheRegion.UpperAreas.TryGetValue(tops, out BlockUpperArea bua))
             {
                 TopsAwareof.Remove(tops);
                 return;
@@ -1434,8 +1450,7 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public bool CanSeeChunk(Vector3i cpos, out int lod)
         {
-            ChunkAwarenessInfo cai;
-            if (ChunksAwareOf.TryGetValue(cpos, out cai))
+            if (ChunksAwareOf.TryGetValue(cpos, out ChunkAwarenessInfo cai))
             {
                 lod = cai.LOD;
                 return true;
@@ -1483,6 +1498,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 List<long> delMe = new List<long>();
                 foreach (long visibleEnt in Known)
                 {
+                    // TODO: TryGetValue stuff here.
                     if (!TheRegion.Entities.ContainsKey(visibleEnt) || ch.Contains(TheRegion.Entities[visibleEnt].GetPosition()))
                     {
                         Network.SendPacket(new DespawnEntityPacketOut(visibleEnt));
@@ -1521,7 +1537,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <param name="pos">The position.</param>
         public override void SetPosition(Location pos)
         {
-            Location l = posClamp(pos);
+            Location l = PosClamp(pos);
             if (UpdateLoadPos)
             {
                 LoadRelPos = l;

@@ -218,13 +218,16 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
             }
-            for (int bx = 0; bx < PosMultiplier; bx++)
+            return BlockInternal.AIR;
+            // TODO: Fix logic!
+            /*
+            for (int bx = 0; bx < c.PosMultiplier; bx++)
             {
-                for (int by = 0; by < PosMultiplier; by++)
+                for (int by = 0; by < c.PosMultiplier; by++)
                 {
-                    for (int bz = 0; bz < PosMultiplier; bz++)
+                    for (int bz = 0; bz < c.PosMultiplier; bz++)
                     {
-                        if (!c.GetBlockAt(x * PosMultiplier + bx, y * PosMultiplier + bx, z * PosMultiplier + bz).IsOpaque())
+                        if (!c.GetBlockAt(x * c.PosMultiplier + bx, y * c.PosMultiplier + bx, z * c.PosMultiplier + bz).IsOpaque())
                         {
                             return BlockInternal.AIR;
                         }
@@ -232,6 +235,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 }
             }
             return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
+            */
         }
         
         void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym,

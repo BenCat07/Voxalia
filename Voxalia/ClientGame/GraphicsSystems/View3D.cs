@@ -544,6 +544,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public Frustum CFrust;
 
+        public Frustum LongFrustum;
+
         public int LightsC = 0;
 
         public float[] ClearColor = new float[] { 0f, 1f, 1f, 1f };
@@ -739,6 +741,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             OSetViewport();
             CameraTarget = CameraPos + camforward;
             OffsetWorld = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos));
+            Matrix4d outviewD;
             if (TheClient.VR != null)
             {
                 Matrix4 proj = TheClient.VR.GetProjection(true, TheClient.CVars.r_znear.ValueF, TheClient.ZFar());
@@ -749,7 +752,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 PrimaryMatrix_OffsetFor3D = view2 * proj2;
                 PrimaryMatrixd = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view) * ClientUtilities.ConvertToD(proj);
                 PrimaryMatrix_OffsetFor3Dd = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view2) * ClientUtilities.ConvertToD(proj2);
-                OutViewMatrix = TheClient.VR.GetProjection(true, 1f, 5000f);
+                Matrix4 projo = TheClient.VR.GetProjection(true, 1f, 5000f);
+                OutViewMatrix = view * projo;
+                outviewD = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view) * ClientUtilities.ConvertToD(projo);
                 // TODO: Transform VR by cammod?
             }
             else
@@ -770,6 +775,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Location bxd = TheClient.CVars.r_3d_enable.ValueB ? (CameraPos + cameraAdjust) : CameraPos;
                 Matrix4d viewd = Matrix4d.LookAt(ClientUtilities.ConvertD(bxd), ClientUtilities.ConvertD(bxd + camforward), ClientUtilities.ConvertD(camup));
                 PrimaryMatrixd = viewd * projd;
+                Matrix4d proj_outd = Matrix4d.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF), (float)Width / (float)Height, 1, 5000f); // TODO: View3D-level vars?
+                outviewD = viewd * proj_outd;
                 PrimaryMatrix_OffsetFor3Dd = Matrix4d.Identity;
                 if (TheClient.CVars.r_3d_enable.ValueB)
                 {
@@ -777,6 +784,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     PrimaryMatrix_OffsetFor3Dd = view2d * projd;
                 }
             }
+            LongFrustum = new Frustum(outviewD);
             camFrust = new Frustum(PrimaryMatrixd);
             cf2 = new Frustum(PrimaryMatrix_OffsetFor3Dd);
             CFrust = camFrust;

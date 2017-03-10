@@ -20,7 +20,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
     public class Frustum
     {
         public Plane[] Planes = new Plane[6];
-
+        
         public Frustum(OpenTK.Matrix4d matrix)
         {
             Planes[0] = new Plane(new Vector3(-matrix.M14 - matrix.M11, -matrix.M24 - matrix.M21, -matrix.M34 - matrix.M31), -matrix.M44 - matrix.M41);

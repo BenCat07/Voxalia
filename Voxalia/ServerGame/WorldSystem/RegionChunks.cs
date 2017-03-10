@@ -34,6 +34,16 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public partial class Region
     {
+        public byte[] GetSuperLODChunkData(Vector3i cpos)
+        {
+            byte[] b = ChunkManager.GetSuperLODChunkDetails(cpos.X, cpos.Y, cpos.Z);
+            if (b != null)
+            {
+                return b;
+            }
+            return Generator.GetSuperLOD(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
+        }
+
         /// <summary>
         /// Adds a chunk object to the physics environment.
         /// </summary>

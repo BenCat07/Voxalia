@@ -662,20 +662,13 @@ namespace Voxalia.ClientGame.WorldSystem
             if (TheClient.MainWorldView.FBOid == FBOID.MAIN || TheClient.MainWorldView.FBOid == FBOID.NONE || TheClient.MainWorldView.FBOid == FBOID.FORWARD_SOLID)
             {
                 chToRender.Clear();
-                if (TheClient.CVars.r_chunkmarch.ValueB)
+                foreach (Chunk ch in LoadedChunks.Values)
                 {
-                    ChunkMarchAndDraw();
-                }
-                else
-                {
-                    foreach (Chunk ch in LoadedChunks.Values)
+                    BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
+                    if (ch.PosMultiplier != 15 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
                     {
-                        BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
-                        if (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE)))
-                        {
-                            ch.Render();
-                            chToRender.Add(ch);
-                        }
+                        ch.Render();
+                        chToRender.Add(ch);
                     }
                 }
             }
@@ -684,7 +677,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 foreach (Chunk ch in LoadedChunks.Values)
                 {
                     BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
-                    if (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE)))
+                    if (ch.PosMultiplier != 15 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
                     {
                         ch.Render();
                     }
@@ -705,67 +698,7 @@ namespace Voxalia.ClientGame.WorldSystem
         }
 
         public List<Chunk> chToRender = new List<Chunk>();
-
-        static Vector3i[] MoveDirs = new Vector3i[] { new Vector3i(-1, 0, 0), new Vector3i(1, 0, 0),
-            new Vector3i(0, -1, 0), new Vector3i(0, 1, 0), new Vector3i(0, 0, -1), new Vector3i(0, 0, 1) };
-
-        public int MaxRenderDistanceChunks = 10;
-
-        public void ChunkMarchAndDraw()
-        {
-            Vector3i start = ChunkLocFor(TheClient.MainWorldView.CameraPos);
-            HashSet<Vector3i> seen = new HashSet<Vector3i>();
-            Queue<Vector3i> toSee = new Queue<Vector3i>();
-            HashSet<Vector3i> toSeeSet = new HashSet<Vector3i>();
-            toSee.Enqueue(start);
-            toSeeSet.Add(start);
-            while (toSee.Count > 0)
-            {
-                Vector3i cur = toSee.Dequeue();
-                toSeeSet.Remove(cur);
-                if ((Math.Abs(cur.X - start.X) > MaxRenderDistanceChunks)
-                    || (Math.Abs(cur.Y - start.Y) > MaxRenderDistanceChunks)
-                    || (Math.Abs(cur.Z - start.Z) > MaxRenderDistanceChunks))
-                {
-                    continue;
-                }
-                seen.Add(cur);
-                Chunk chcur = GetChunk(cur);
-                if (chcur != null)
-                {
-                    chToRender.Add(chcur);
-                }
-                for (int i = 0; i < MoveDirs.Length; i++)
-                {
-                    Vector3i t = cur + MoveDirs[i];
-                    if (!seen.Contains(t) && !toSeeSet.Contains(t))
-                    {
-                        for (int j = 0; j < MoveDirs.Length; j++)
-                        {
-                            if (BEPUutilities.Vector3.Dot(MoveDirs[j].ToVector3(), (TheClient.MainWorldView.CameraTarget - TheClient.MainWorldView.CameraPos).ToBVector()) < -0.8f) // TODO: what is this? Is it needed?
-                            {
-                                continue;
-                            }
-                            Vector3i nt = cur + MoveDirs[j];
-                            if (!seen.Contains(nt) && !toSeeSet.Contains(nt))
-                            {
-                                BEPUutilities.Vector3 min = nt.ToVector3() * Chunk.CHUNK_SIZE;
-                                if (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE)))
-                                {
-                                    toSee.Enqueue(nt);
-                                    toSeeSet.Add(nt);
-                                }
-                                else
-                                {
-                                    seen.Add(nt);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
+        
         public List<InternalBaseJoint> Joints = new List<InternalBaseJoint>();
 
         public void AddJoint(InternalBaseJoint joint)

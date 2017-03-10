@@ -30,7 +30,7 @@ namespace Voxalia.ServerGame.WorldSystem
 
         LiteCollection<BsonDocument> DBLODs;
 
-        LiteCollection<BsonDocument> DBSuperLOD;
+        LiteCollection<BsonDocument> DBSuperLOD; // TODO: Optimize SuperLOD to contain many chunks at once?
 
         LiteDatabase EntsDatabase;
 

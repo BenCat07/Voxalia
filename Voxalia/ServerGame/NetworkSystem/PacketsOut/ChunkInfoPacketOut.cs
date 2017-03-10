@@ -9,20 +9,36 @@
 using System;
 using Voxalia.ServerGame.WorldSystem;
 using Voxalia.Shared;
+using Voxalia.Shared.Collision;
 using Voxalia.Shared.Files;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {
     public class ChunkInfoPacketOut: AbstractPacketOut
     {
+        public ChunkInfoPacketOut(Vector3i cpos, byte[] slod)
+        {
+            UsageType = NetUsageType.CHUNKS;
+            ID = ServerToClientPacket.CHUNK_INFO;
+            Data = slod;
+            DataStream ds = new DataStream(slod.Length + 16);
+            DataWriter dw = new DataWriter(ds);
+            dw.WriteInt(cpos.X);
+            dw.WriteInt(cpos.Y);
+            dw.WriteInt(cpos.Z);
+            dw.WriteInt(15);
+            dw.WriteBytes(slod);
+            Data = ds.ToArray();
+        }
+
         public ChunkInfoPacketOut(Chunk chunk, int lod)
         {
             UsageType = NetUsageType.CHUNKS;
+            ID = ServerToClientPacket.CHUNK_INFO;
             if (chunk.Flags.HasFlag(ChunkFlags.POPULATING) && (lod != 5 || chunk.LOD == null))
             {
                 throw new Exception("Trying to transmit chunk while it's still loading! For chunk at " + chunk.WorldPosition);
             }
-            ID = ServerToClientPacket.CHUNK_INFO;
             byte[] data_orig;
             if (lod == 1)
             {
@@ -60,17 +76,17 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
                 Data = new byte[12];
                 // TODO: This is a bit hackish
                 ID = ServerToClientPacket.CHUNK_FORGET;
-                Utilities.IntToBytes((int)chunk.WorldPosition.X).CopyTo(Data, 0);
-                Utilities.IntToBytes((int)chunk.WorldPosition.Y).CopyTo(Data, 4);
-                Utilities.IntToBytes((int)chunk.WorldPosition.Z).CopyTo(Data, 8);
+                Utilities.IntToBytes(chunk.WorldPosition.X).CopyTo(Data, 0);
+                Utilities.IntToBytes(chunk.WorldPosition.Y).CopyTo(Data, 4);
+                Utilities.IntToBytes(chunk.WorldPosition.Z).CopyTo(Data, 8);
                 return;
             }
             byte[] gdata = FileHandler.Compress(data_orig);
             DataStream ds = new DataStream(gdata.Length + 16);
             DataWriter dw = new DataWriter(ds);
-            dw.WriteInt((int)chunk.WorldPosition.X);
-            dw.WriteInt((int)chunk.WorldPosition.Y);
-            dw.WriteInt((int)chunk.WorldPosition.Z);
+            dw.WriteInt(chunk.WorldPosition.X);
+            dw.WriteInt(chunk.WorldPosition.Y);
+            dw.WriteInt(chunk.WorldPosition.Z);
             dw.WriteInt(lod);
             byte[] reach = new byte[chunk.Reachability.Length];
             for (int i = 0; i < reach.Length; i++)
