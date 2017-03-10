@@ -1071,7 +1071,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public float GetSecondSkyDistance()
         {
-            return MaximumStraightBlockDistance() * 1.1f;
+            return 2500f;
         }
 
         /// <summary>
@@ -1079,7 +1079,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public float GetSkyDistance()
         {
-            return MaximumStraightBlockDistance();
+            return 2000f;
         }
 
         /// <summary>
@@ -1087,7 +1087,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public Location GetSunLocation()
         {
-            return MainWorldView.CameraPos + TheSun.Direction * -(GetSkyDistance() * 0.96f);
+            return MainWorldView.CameraPos + TheSun.Direction * -(GetSkyDistance() * 0.9f);
         }
 
         /// <summary>
@@ -1095,6 +1095,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void RenderSkybox()
         {
+            GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
             float skyAlpha = (float)Math.Max(Math.Min((SunAngle.Pitch - 70.0) / (-90.0), 1.0), 0.06);
             GL.ActiveTexture(TextureUnit.Texture3);
             Textures.Black.Bind();
@@ -1140,7 +1141,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             skybox[5].Render(false);
             Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * SunLightModDirect), 1));
             float zf = ZFar();
-            float spf = zf * 0.17f;
+            float spf = 600f;
             Textures.GetTexture("skies/sun").Bind(); // TODO: Store var!
             Matrix4 rot = Matrix4.CreateTranslation(-spf * 0.5f, -spf * 0.5f, 0f)
                 * Matrix4.CreateRotationY((float)((-SunAngle.Pitch - 90f) * Utilities.PI180))
@@ -1148,7 +1149,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 * Matrix4.CreateTranslation(ClientUtilities.Convert(TheSun.Direction * -(GetSkyDistance() * 0.96f)));
             Rendering.RenderRectangle(0, 0, spf, spf, rot); // TODO: Adjust scale based on view rad
             Textures.GetTexture("skies/planet").Bind(); // TODO: Store var!
-            float ppf = zf * 0.40f;
+            float ppf = 1000f;
             Rendering.SetColor(new Color4(PlanetLight, PlanetLight, PlanetLight, 1));
             rot = Matrix4.CreateTranslation(-ppf * 0.5f, -ppf * 0.5f, 0f)
                 * Matrix4.CreateRotationY((float)((-PlanetAngle.Pitch - 90f) * Utilities.PI180))
@@ -1161,6 +1162,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.UniformMatrix4(2, false, ref ident);
             Rendering.SetColor(Color4.White);
             Rendering.SetMinimumLight(0);
+            GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+            GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
         }
 
         /// <summary>
@@ -1560,13 +1563,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ind[i] = (uint)i;
                 }
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Pos);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(pos.Length * OpenTK.Vector3.SizeInBytes), pos, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(pos.Length * Vector3.SizeInBytes), pos, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Nrm);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(nrm.Length * OpenTK.Vector3.SizeInBytes), nrm, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(nrm.Length * Vector3.SizeInBytes), nrm, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Tcs);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tcs.Length * OpenTK.Vector2.SizeInBytes), tcs, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tcs.Length * Vector2.SizeInBytes), tcs, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Col);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(col.Length * OpenTK.Vector4.SizeInBytes), col, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(col.Length * Vector4.SizeInBytes), col, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, Dec_VBO_Ind);
                 GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(ind.Length * sizeof(uint)), ind, BufferUsageHint.StaticDraw);
                 if (!DecalPrepped)

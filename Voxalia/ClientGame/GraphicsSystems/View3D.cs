@@ -710,6 +710,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             return camforward;
         }
 
+        public Matrix4 OutViewMatrix = Matrix4.Identity;
+
         /// <summary>
         /// Set up the rendering engine.
         /// </summary>
@@ -747,12 +749,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 PrimaryMatrix_OffsetFor3D = view2 * proj2;
                 PrimaryMatrixd = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view) * ClientUtilities.ConvertToD(proj);
                 PrimaryMatrix_OffsetFor3Dd = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view2) * ClientUtilities.ConvertToD(proj2);
+                OutViewMatrix = TheClient.VR.GetProjection(true, 1f, 5000f);
                 // TODO: Transform VR by cammod?
             }
             else
             {
-                Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF),
-                    (float)Width / (float)Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()); // TODO: View3D-level vars?
+                Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF), (float)Width / (float)Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()); // TODO: View3D-level vars?
                 Location bx = TheClient.CVars.r_3d_enable.ValueB ? (cameraAdjust) : Location.Zero;
                 Matrix4 view = Matrix4.LookAt(ClientUtilities.Convert(bx), ClientUtilities.Convert(bx + camforward), ClientUtilities.Convert(camup));
                 PrimaryMatrix = view * proj;
@@ -761,6 +763,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     Matrix4 view2 = Matrix4.LookAt(ClientUtilities.Convert(-cameraAdjust), ClientUtilities.Convert(-cameraAdjust + camforward), ClientUtilities.Convert(camup));
                     PrimaryMatrix_OffsetFor3D = view2 * proj;
                 }
+                Matrix4 proj_out = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF), (float)Width / (float)Height, 1, 5000f); // TODO: View3D-level vars?
+                OutViewMatrix = view * proj_out;
                 Matrix4d projd = Matrix4d.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF),
                     (float)Width / (float)Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()); // TODO: View3D-level vars?
                 Location bxd = TheClient.CVars.r_3d_enable.ValueB ? (CameraPos + cameraAdjust) : CameraPos;
