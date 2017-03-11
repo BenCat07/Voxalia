@@ -16,7 +16,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {
     public class ChunkInfoPacketOut: AbstractPacketOut
     {
-        public ChunkInfoPacketOut(Vector3i cpos, byte[] slod)
+        public ChunkInfoPacketOut(Vector3i cpos, byte[] slod, int posMult)
         {
             UsageType = NetUsageType.CHUNKS;
             bool is_air = true;
@@ -46,7 +46,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             dw.WriteInt(cpos.X);
             dw.WriteInt(cpos.Y);
             dw.WriteInt(cpos.Z);
-            dw.WriteInt(15);
+            dw.WriteInt(posMult);
             dw.WriteBytes(slod);
             Data = ds.ToArray();
         }

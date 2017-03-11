@@ -941,13 +941,27 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     continue;
                 }
-                if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5)
-                    || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5)
-                    || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height))
+                // TODO: Configurable LODSix render cap
+                else if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5) * 2
+                    || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5) * 2
+                    || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height) * 2)
                 {
                     if (TryChunk(cur, 15))
                     {
                         chunksFound++;
+                        if (chunksFound > maxChunks)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5)
+                    || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5)
+                    || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height))
+                {
+                    if (TryChunk(cur, 6))
+                    {
+                        chunksFound += 3;
                         if (chunksFound > maxChunks)
                         {
                             return false;
@@ -997,16 +1011,31 @@ namespace Voxalia.ServerGame.EntitySystem
                     return false;
                 }
                 bool nullRep = true;
-                if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5)
-                    || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5)
-                    || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height))
+                if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5) * 2
+                    || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5) * 2
+                    || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height) * 2)
                 {
-                    // TODO: Store a temporary map of SLODs that's cleared regularly? Should accelerate this calc!
                     byte[] slod = TheRegion.GetSuperLODChunkData(cur);
                     nullRep = false;
                     for (int sd = 0; sd < slod.Length; sd += 2)
                     {
                         Material mat = (Material)(slod[sd] | (slod[sd + 1] << 8));
+                        if (!mat.IsOpaque())
+                        {
+                            nullRep = true;
+                            break;
+                        }
+                    }
+                }
+                else if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5)
+                    || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5)
+                    || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height))
+                {
+                    byte[] lodsix = TheRegion.GetLODSixChunkData(cur);
+                    nullRep = false;
+                    for (int sd = 0; sd < lodsix.Length; sd += 2)
+                    {
+                        Material mat = (Material)(lodsix[sd] | (lodsix[sd + 1] << 8));
                         if (!mat.IsOpaque())
                         {
                             nullRep = true;
@@ -1435,7 +1464,11 @@ namespace Voxalia.ServerGame.EntitySystem
                 bool sendTop = TopsAwareof.Add(topcoord);
                 if (posMult == 15)
                 {
-                    ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, TheRegion.GetSuperLODChunkData(cworldPos)));
+                    ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, TheRegion.GetSuperLODChunkData(cworldPos), 15));
+                }
+                else if (posMult == 6)
+                {
+                    ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, TheRegion.GetLODSixChunkData(cworldPos), 6));
                 }
                 else if (async)
                 {

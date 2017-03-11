@@ -482,12 +482,14 @@ namespace Voxalia.ServerGame.WorldSystem
                     det.Reachables[i] = (byte)(Reachability[i] ? 1 : 0);
                 }
                 byte[] lod = LODBytes(5);
+                byte[] lodsix = LODBytes(6);
                 byte[] slod = SLODBytes(lod);
                 lock (GetLocker())
                 {
                     OwningRegion.ChunkManager.WriteChunkDetails(det);
                     OwningRegion.ChunkManager.WriteLODChunkDetails(det.X, det.Y, det.Z, lod);
                     OwningRegion.ChunkManager.WriteSuperLODChunkDetails(det.X, det.Y, det.Z, slod);
+                    OwningRegion.ChunkManager.WriteLODSixChunkDetails(det.X, det.Y, det.Z, lodsix);
                 }
             }
             catch (Exception ex)

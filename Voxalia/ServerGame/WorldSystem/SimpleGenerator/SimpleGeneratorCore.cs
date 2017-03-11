@@ -78,6 +78,60 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return b;
         }
 
+        public override byte[] GetLODSix(int seed, int seed2, int seed3, int seed4, int seed5, Vector3i cpos)
+        {
+            byte[] b = new byte[5 * 5 * 5 * 2];
+            if (cpos.Z > MaxNonAirHeight)
+            {
+                // AIR
+                return b;
+            }
+            else if (cpos.Z < 0)
+            {
+                // STONE
+                Material enf = Material.STONE;
+                ushort enfu = (ushort)enf;
+                for (int i = 0; i < b.Length; i += 2)
+                {
+                    b[i] = (byte)(enfu & 0xFF);
+                    b[i + 1] = (byte)((enfu >> 8) & 0xFF);
+                }
+                return b;
+            }
+            for (int x = 0; x < 5; x++)
+            {
+                for (int y = 0; y < 5; y++)
+                {
+                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, out Biome biomeOrig);
+                    SimpleBiome biome = biomeOrig as SimpleBiome;
+                    double topf = (hheight - cpos.Z * Chunk.CHUNK_SIZE) / 5.0;
+                    int top = (int)Math.Round(topf);
+                    for (int z = 0; z < Math.Min(top - 5, 5); z++)
+                    {
+                        ushort lowType = (ushort)biome.BaseBlock();
+                        int loc = Chunk.ApproxBlockIndex(x, y, z, 5) * 2;
+                        b[loc] = (byte)(lowType & 0xFF);
+                        b[loc + 1] = (byte)((lowType >> 8) & 0xFF);
+                    }
+                    for (int z = Math.Max(top - 5, 0); z < Math.Min(top - 1, 5); z++)
+                    {
+                        ushort lowType = (ushort)biome.SecondLayerBlock();
+                        int loc = Chunk.ApproxBlockIndex(x, y, z, 5) * 2;
+                        b[loc] = (byte)(lowType & 0xFF);
+                        b[loc + 1] = (byte)((lowType >> 8) & 0xFF);
+                    }
+                    for (int z = Math.Max(top - 1, 0); z < Math.Min(top, 5); z++)
+                    {
+                        ushort lowType = (ushort)biome.SurfaceBlock();
+                        int loc = Chunk.ApproxBlockIndex(x, y, z, 5) * 2;
+                        b[loc] = (byte)(lowType & 0xFF);
+                        b[loc + 1] = (byte)((lowType >> 8) & 0xFF);
+                    }
+                }
+            }
+            return b;
+        }
+
         public SimpleBiomeGenerator Biomes = new SimpleBiomeGenerator();
 
         public override BiomeGenerator GetBiomeGen()

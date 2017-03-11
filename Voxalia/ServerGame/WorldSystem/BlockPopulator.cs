@@ -20,6 +20,8 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public abstract byte[] GetSuperLOD(int seed, int seed2, int seed3, int seed4, int seed5, Vector3i cpos);
 
+        public abstract byte[] GetLODSix(int seed, int seed2, int seed3, int seed4, int seed5, Vector3i cpos);
+
         public abstract List<Tuple<string, double>> GetTimings();
 
         public abstract void ClearTimings();

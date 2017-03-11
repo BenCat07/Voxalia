@@ -87,8 +87,8 @@ namespace Voxalia.ClientGame.CommandSystem
             r_renderdist = Register("r_renderdist", "3", CVarFlag.Numeric, "The maximum distance, in chunks, a chunk can be from you for it to render.");
             r_renderdist_2 = Register("r_renderdist_2", "1", CVarFlag.Numeric, "Base RenderDist + this = how far a LOD2 chunk can be from you.");
             r_renderdist_2h = Register("r_renderdist_2h", "1", CVarFlag.Numeric, "Base RenderDist + this = how far (Height-wise) a LOD2 chunk can be from you.");
-            r_renderdist_5 = Register("r_renderdist_5", "1", CVarFlag.Numeric, "Base RenderDist + this = how far a LOD5 chunk can be from you.");
-            r_renderdist_5h = Register("r_renderdist_5h", "1", CVarFlag.Numeric, "Base RenderDist + this = how far (Height-wise) a LOD5 chunk can be from you.");
+            r_renderdist_5 = Register("r_renderdist_5", "2", CVarFlag.Numeric, "Base RenderDist + this = how far a LOD5 chunk can be from you.");
+            r_renderdist_5h = Register("r_renderdist_5h", "2", CVarFlag.Numeric, "Base RenderDist + this = how far (Height-wise) a LOD5 chunk can be from you.");
             r_dof_strength = Register("r_dof_strength", "4", CVarFlag.Numeric, "How strong the Depth Of Field effect should be.");
             r_maxfps = Register("r_maxfps", "600", CVarFlag.Numeric | CVarFlag.Delayed, "What the FPS cap should be.");
             r_drawself = Register("r_drawself", "true", CVarFlag.Boolean, "Whether the player entity should be visible.");

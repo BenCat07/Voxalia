@@ -296,7 +296,6 @@
     <Compile Include="ClientGame\UISystem\MouseHandler.cs" />
     <Compile Include="ClientGame\UISystem\RawGamePad.cs" />
     <Compile Include="ClientGame\UISystem\UIConsole.cs" />
-    <Compile Include="ClientGame\WorldSystem\BackgroundChunk.cs" />
     <Compile Include="ClientGame\WorldSystem\Chunk.cs" />
     <Compile Include="ClientGame\WorldSystem\ChunkRendering.cs" />
     <Compile Include="ClientGame\WorldSystem\Cloud.cs" />

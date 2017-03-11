@@ -64,10 +64,10 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 
         void ParseData(byte[] data, DataReader dr, int x, int y, int z, int posMult)
         {
-            byte[] reach = posMult == 15 ? new byte[(int)ChunkReachability.COUNT] : dr.ReadBytes((int)ChunkReachability.COUNT);
+            byte[] reach = posMult >= 6 ? new byte[(int)ChunkReachability.COUNT] : dr.ReadBytes((int)ChunkReachability.COUNT);
             int csize = Chunk.CHUNK_SIZE / posMult;
             byte[] data_unzipped = dr.ReadBytes(dr.Available);
-            byte[] data_orig = posMult == 15 ? data_unzipped : FileHandler.Uncompress(data_unzipped);
+            byte[] data_orig = posMult >= 6 ? data_unzipped : FileHandler.Uncompress(data_unzipped);
             if (posMult == 1)
             {
                 if (data_orig.Length != Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE * 4)

@@ -333,8 +333,8 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public ChunkSLODHelper GetSLODHelp(Vector3i chunk_pos)
         {
-            // TODO: 5 -> constants
-            Vector3i slodpos = new Vector3i(chunk_pos.X / 5, chunk_pos.Y / 5, chunk_pos.Z / 5);
+            // TODO: 3 -> constants
+            Vector3i slodpos = new Vector3i(chunk_pos.X / 3, chunk_pos.Y / 3, chunk_pos.Z / 3);
             if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
                 return slod;
@@ -678,7 +678,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 foreach (Chunk ch in LoadedChunks.Values)
                 {
                     BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
-                    if (ch.PosMultiplier != 15 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
+                    if (ch.PosMultiplier < 5 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
                     {
                         ch.Render();
                         chToRender.Add(ch);
@@ -690,7 +690,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 foreach (Chunk ch in LoadedChunks.Values)
                 {
                     BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
-                    if (ch.PosMultiplier != 15 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
+                    if (ch.PosMultiplier < 5 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
                     {
                         ch.Render();
                     }

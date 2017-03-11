@@ -24,6 +24,12 @@ namespace Voxalia.ServerGame.WorldSystem.SphereGenerator
             return new byte[2 * 2 * 2 * 2];
         }
 
+        public override byte[] GetLODSix(int seed, int seed2, int seed3, int seed4, int seed5, Vector3i cpos)
+        {
+            // Probably implement this at some point?
+            return new byte[5 * 5 * 5 * 2];
+        }
+
         public override void ClearTimings()
         {
             // Nothing needed.

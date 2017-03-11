@@ -164,7 +164,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 bua = null;
             }
             ChunkSLODHelper crh = null;
-            if (PosMultiplier == 15)
+            if (PosMultiplier >= 5)
             {
                 crh = OwningRegion.GetSLODHelp(WorldPosition);
             }
@@ -177,7 +177,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     return;
                 }
-                if (PosMultiplier != 15)
+                if (crh == null)
                 {
                     VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, false, shaped, true, bua, null);
                 }
@@ -222,7 +222,7 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 return c.GetBlockAt(x, y, z);
             }
-            if (c.PosMultiplier > PosMultiplier)
+            if (c.PosMultiplier > PosMultiplier && PosMultiplier < 5)
             {
                 return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
             }
@@ -365,7 +365,8 @@ namespace Voxalia.ClientGame.WorldSystem
                                     Vector3 vti_use = vt;
                                     if (crh != null)
                                     {
-                                        vti_use += new Vector3(WorldPosition.X - (WorldPosition.X / 5) * 5, WorldPosition.Y - (WorldPosition.Y / 5) * 5, WorldPosition.Z - (WorldPosition.Z / 5) * 5) * CHUNK_SIZE;
+                                        // TODO: 3 -> constants
+                                        vti_use += new Vector3(WorldPosition.X - (WorldPosition.X / 3) * 3, WorldPosition.Y - (WorldPosition.Y / 3) * 3, WorldPosition.Z - (WorldPosition.Z / 3) * 3) * CHUNK_SIZE;
                                     }
                                     rh.Vertices.Add(vti_use);
                                     Vector3 nt = new Vector3((float)normsi[i].X, (float)normsi[i].Y, (float)normsi[i].Z);
@@ -427,7 +428,8 @@ namespace Voxalia.ClientGame.WorldSystem
                                         Vector3 vt = new Vector3((float)(x + vecsi[i].X) * PosMultiplier, (float)(y + vecsi[i].Y) * PosMultiplier, (float)(z + vecsi[i].Z) * PosMultiplier);
                                         if (crh != null)
                                         {
-                                            vt += new Vector3(WorldPosition.X - (WorldPosition.X / 5) * 5, WorldPosition.Y - (WorldPosition.Y / 5) * 5, WorldPosition.Z - (WorldPosition.Z / 5) * 5);
+                                            // TODO: 3 -> constants
+                                            vt += new Vector3(WorldPosition.X - (WorldPosition.X / 3) * 3, WorldPosition.Y - (WorldPosition.Y / 3) * 3, WorldPosition.Z - (WorldPosition.Z / 3) * 3);
                                         }
                                         rh.Vertices.Add(vt);
                                         int tx = tf + i;
@@ -558,7 +560,7 @@ namespace Voxalia.ClientGame.WorldSystem
                         };
                         if (crh.Loading != null)
                         {
-                            crh.Loading.ReplaceOrFollowWith(new ASyncScheduleItem() { OwningEngine = OwningRegion.TheClient.Schedule, MyAction = tst });
+                            crh.Loading = crh.Loading.ReplaceOrFollowWith(new ASyncScheduleItem() { OwningEngine = OwningRegion.TheClient.Schedule, MyAction = tst });
                         }
                         else
                         {
@@ -736,6 +738,7 @@ namespace Voxalia.ClientGame.WorldSystem
     {
         public Vector3i Coordinate;
 
+        // TODO: Clear and replace this if any chunks within its section get edited!
         public ChunkRenderHelper FullBlock = new ChunkRenderHelper();
 
         public Region OwningRegion;
@@ -752,8 +755,8 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             if (_VBO != null && _VBO.generated)
             {
-                // TODO: 5 -> constants
-                Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(Coordinate.ToLocation() * Constants.CHUNK_WIDTH * 5));
+                // TODO: 3 -> constants
+                Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(Coordinate.ToLocation() * Constants.CHUNK_WIDTH * 3));
                 OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
                 _VBO.Render(false);
             }

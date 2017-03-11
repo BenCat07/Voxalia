@@ -32,6 +32,8 @@ namespace Voxalia.ServerGame.WorldSystem
 
         LiteCollection<BsonDocument> DBSuperLOD; // TODO: Optimize SuperLOD to contain many chunks at once?
 
+        LiteCollection<BsonDocument> DBLODSix; // TODO: Optimize LOD6 to contain many chunks at once?
+
         LiteDatabase EntsDatabase;
 
         LiteCollection<BsonDocument> DBEnts;
@@ -55,6 +57,7 @@ namespace Voxalia.ServerGame.WorldSystem
             LODsDatabase = new LiteDatabase("filename=" + dir + "lod_chunks.ldb");
             DBLODs = LODsDatabase.GetCollection<BsonDocument>("lodchunks");
             DBSuperLOD = LODsDatabase.GetCollection<BsonDocument>("superlod");
+            DBLODSix = LODsDatabase.GetCollection<BsonDocument>("lodsix");
             EntsDatabase = new LiteDatabase("filename=" + dir + "ents.ldb");
             DBEnts = EntsDatabase.GetCollection<BsonDocument>("ents");
             TopsDatabase = new LiteDatabase("filename=" + dir + "tops.ldb");
@@ -78,6 +81,41 @@ namespace Voxalia.ServerGame.WorldSystem
             Utilities.IntToBytes(y).CopyTo(array, 4);
             Utilities.IntToBytes(z).CopyTo(array, 8);
             return new BsonValue(array);
+        }
+
+        /// <summary>
+        /// TODO: Probably clear this occasionally!
+        /// </summary>
+        public ConcurrentDictionary<Vector3i, byte[]> LODSixes = new ConcurrentDictionary<Vector3i, byte[]>();
+
+        public byte[] GetLODSixChunkDetails(int x, int y, int z)
+        {
+            Vector3i vec = new Vector3i(x, y, z);
+            if (LODSixes.TryGetValue(vec, out byte[] res))
+            {
+                return res;
+            }
+            BsonDocument doc;
+            doc = DBLODSix.FindById(GetIDFor(x, y, z));
+            if (doc == null)
+            {
+                return null;
+            }
+            byte[] blocks = doc["blocks"].AsBinary;
+            SLODders[vec] = blocks;
+            return blocks;
+        }
+
+        public void WriteLODSixChunkDetails(int x, int y, int z, byte[] SLOD)
+        {
+            Vector3i vec = new Vector3i(x, y, z);
+            BsonValue id = GetIDFor(x, y, z);
+            BsonDocument newdoc = new BsonDocument();
+            Dictionary<string, BsonValue> tbs = newdoc.RawValue;
+            tbs["_id"] = id;
+            tbs["blocks"] = new BsonValue(SLOD);
+            LODSixes[vec] = SLOD;
+            DBLODSix.Upsert(newdoc);
         }
 
         /// <summary>
