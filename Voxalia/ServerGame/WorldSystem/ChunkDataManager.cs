@@ -80,24 +80,38 @@ namespace Voxalia.ServerGame.WorldSystem
             return new BsonValue(array);
         }
 
+        /// <summary>
+        /// TODO: Probably clear this occasionally!
+        /// </summary>
+        public ConcurrentDictionary<Vector3i, byte[]> SLODders = new ConcurrentDictionary<Vector3i, byte[]>();
+
         public byte[] GetSuperLODChunkDetails(int x, int y, int z)
         {
+            Vector3i vec = new Vector3i(x, y, z);
+            if (SLODders.TryGetValue(vec, out byte[] res))
+            {
+                return res;
+            }
             BsonDocument doc;
             doc = DBSuperLOD.FindById(GetIDFor(x, y, z));
             if (doc == null)
             {
                 return null;
             }
-            return FileHandler.Uncompress(doc["blocks"].AsBinary);
+            byte[] blocks = doc["blocks"].AsBinary;
+            SLODders[vec] = blocks;
+            return blocks;
         }
 
         public void WriteSuperLODChunkDetails(int x, int y, int z, byte[] SLOD)
         {
+            Vector3i vec = new Vector3i(x, y, z);
             BsonValue id = GetIDFor(x, y, z);
             BsonDocument newdoc = new BsonDocument();
             Dictionary<string, BsonValue> tbs = newdoc.RawValue;
             tbs["_id"] = id;
-            tbs["blocks"] = new BsonValue(FileHandler.Compress(SLOD));
+            tbs["blocks"] = new BsonValue(SLOD);
+            SLODders[vec] = SLOD;
             DBSuperLOD.Upsert(newdoc);
         }
 
