@@ -19,6 +19,26 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
         public ChunkInfoPacketOut(Vector3i cpos, byte[] slod)
         {
             UsageType = NetUsageType.CHUNKS;
+            bool is_air = true;
+            for (int i = 0; i < slod.Length; i += 2)
+            {
+                Material mat = (Material)(slod[i] | (slod[i + 1] << 8));
+                if (mat != Material.AIR)
+                {
+                    is_air = false;
+                    break;
+                }
+            }
+            if (is_air)
+            {
+                Data = new byte[12];
+                // TODO: This is a bit hackish
+                ID = ServerToClientPacket.CHUNK_FORGET;
+                Utilities.IntToBytes(cpos.X).CopyTo(Data, 0);
+                Utilities.IntToBytes(cpos.Y).CopyTo(Data, 4);
+                Utilities.IntToBytes(cpos.Z).CopyTo(Data, 8);
+                return;
+            }
             ID = ServerToClientPacket.CHUNK_INFO;
             Data = slod;
             DataStream ds = new DataStream(slod.Length + 16);

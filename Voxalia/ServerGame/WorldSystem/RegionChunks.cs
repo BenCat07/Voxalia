@@ -41,6 +41,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return b;
             }
+            // TODO: Maybe save this value to the ChunkManager?
             return Generator.GetSuperLOD(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
         }
 

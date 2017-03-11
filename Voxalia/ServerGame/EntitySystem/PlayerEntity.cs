@@ -800,7 +800,7 @@ namespace Voxalia.ServerGame.EntitySystem
             }
             if (!DoneReadingChunks)
             {
-                DoneReadingChunks = ChunkMarchAndSend();
+                /*DoneReadingChunks = */ChunkMarchAndSend();
             }
             if (cpos != pChunkLoc)
             {
@@ -978,11 +978,31 @@ namespace Voxalia.ServerGame.EntitySystem
                         }
                     }
                 }
+
+                bool nullRep = true;
+                if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5)
+                    || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5)
+                    || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height))
+                {
+                    // TODO: Store a temporary map of SLODs that's cleared regularly? Should accelerate this calc!
+                    byte[] slod = TheRegion.GetSuperLODChunkData(cur);
+                    nullRep = false;
+                    for (int sd = 0; sd < slod.Length; sd += 2)
+                    {
+                        Material mat = (Material)(slod[sd] | (slod[sd + 1] << 8));
+                        if (!mat.IsOpaque())
+                        {
+                            nullRep = true;
+                            break;
+                        }
+                    }
+                }
                 for (int i = 0; i < MoveDirs.Length; i++)
                 {
                     Vector3i t = cur + MoveDirs[i];
                     if (!seen.Contains(t) && !toSee.Contains(t))
                     {
+                        Chunk ch = TheRegion.GetChunk(t);
                         //toSee.Enqueue(t);
                         for (int j = 0; j < MoveDirs.Length; j++)
                         {
@@ -994,10 +1014,9 @@ namespace Voxalia.ServerGame.EntitySystem
                             if (!seen.Contains(nt) && !toSee.Contains(nt))
                             {
                                 bool val = false;
-                                Chunk ch = TheRegion.GetChunk(t);
                                 if (ch == null)
                                 {
-                                    val = true;
+                                    val = nullRep;
                                 }
                                 // TODO: Oh, come on!
                                 else if (MoveDirs[i].X == -1)

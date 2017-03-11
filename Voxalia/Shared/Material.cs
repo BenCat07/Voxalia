@@ -82,8 +82,7 @@ namespace Voxalia.Shared
             foreach (string file in fileList)
             {
                 string f = file.ToLowerFast().After("/blocks/").Before(".blk");
-                Material mat;
-                if (TryGetFromNameOrNumber(allmats, f, out mat))
+                if (TryGetFromNameOrNumber(allmats, f, out Material mat))
                 {
                     continue;
                 }
@@ -465,8 +464,7 @@ namespace Voxalia.Shared
 
         public static bool TryGetFromNameOrNumber(List<MaterialInfo> matlist, string input, out Material mat)
         {
-            ushort t;
-            if (ushort.TryParse(input, out t))
+            if (ushort.TryParse(input, out ushort t))
             {
                 if (t >= matlist.Count || matlist[t] == null)
                 {
@@ -492,8 +490,7 @@ namespace Voxalia.Shared
 
         public static Material FromNameOrNumber(string input)
         {
-            Material mat;
-            if (TryGetFromNameOrNumber(ALL_MATS, input, out mat))
+            if (TryGetFromNameOrNumber(ALL_MATS, input, out Material mat))
             {
                 return mat;
             }

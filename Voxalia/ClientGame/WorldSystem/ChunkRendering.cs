@@ -564,6 +564,7 @@ namespace Voxalia.ClientGame.WorldSystem
                         {
                             crh.Loading = OwningRegion.TheClient.Schedule.StartAsyncTask(tst);
                         }
+                        IsAir = true;
                     });
                     OwningRegion.DoneRendering(this);
                     return;

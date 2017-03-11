@@ -146,13 +146,11 @@ namespace Voxalia.Shared
 
         public static int GetBSDFor(string name)
         {
-            byte ret;
-            if (byte.TryParse(name, out ret))
+            if (byte.TryParse(name, out byte ret))
             {
                 return ret;
             }
-            int iret;
-            if (BSD_Names.TryGetValue(name.ToLowerFast(), out iret))
+            if (BSD_Names.TryGetValue(name.ToLowerFast(), out int iret))
             {
                 return iret;
             }
@@ -284,8 +282,7 @@ namespace Voxalia.Shared
 
         public void FinishParse()
         {
-            Location offset;
-            BEPUphysics.CollisionShapes.EntityShape es = GetShape(DamageMode, out offset, false);
+            EntityShape es = GetShape(DamageMode, out Location offset, false);
             Coll = es.GetCollidableInstance();
             Coll.LocalPosition = offset.ToBVector();
             Vector3 zero = Vector3.Zero;
@@ -293,7 +290,7 @@ namespace Voxalia.Shared
             Coll.UpdateWorldTransform(ref zero, ref ident);
             RigidTransform rt = new RigidTransform(zero, ident);
             Coll.UpdateBoundingBoxForTransform(ref rt);
-            BEPUphysics.CollisionShapes.EntityShape es2 = GetShape(DamageMode, out offset, true);
+            EntityShape es2 = GetShape(DamageMode, out offset, true);
         }
 
         private void Damage()
@@ -464,7 +461,6 @@ namespace Voxalia.Shared
                 return es;
             }
             List<Vector3> vecs = GetVertices(new Vector3(0, 0, 0), false, false, false, false, false, false);
-            Vector3 offs;
             if (vecs.Count == 0)
             {
                 throw new Exception("No vertices for shape " + this);
@@ -476,7 +472,7 @@ namespace Voxalia.Shared
                     vecs[i] = (vecs[i] - new Vector3(0.5f, 0.5f, 0.5f)) * SHRINK_CONSTANT + new Vector3(0.5f, 0.5f, 0.5f);
                 }
             }
-            ConvexHullShape shape = new ConvexHullShape(vecs, out offs) { CollisionMargin = 0 };
+            ConvexHullShape shape = new ConvexHullShape(vecs, out Vector3 offs) { CollisionMargin = 0 };
             offset = new Location(offs);
             if (shrink)
             {
