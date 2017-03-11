@@ -894,6 +894,10 @@ namespace Voxalia.ServerGame.EntitySystem
 
         bool DoneReadingChunks = false;
 
+        HashSet<Vector3i> seen;
+
+        Queue<Vector3i> toSee;
+        
         /// <summary>
         /// Runs through the chunks near the player and sends them in a reasonable order.
         /// TODO: is this the most efficient it can be?
@@ -913,11 +917,20 @@ namespace Voxalia.ServerGame.EntitySystem
             Matrix combined = view * proj;
             BFrustum bfs = TheServer.IsMenu ? null : new BFrustum(combined);
             Vector3i start = TheRegion.ChunkLocFor(LoadRelPos);
-            HashSet<Vector3i> seen = new HashSet<Vector3i>();
-            Queue<Vector3i> toSee = new Queue<Vector3i>();
-            toSee.Enqueue(start);
+            if (toSee == null)
+            {
+                seen = new HashSet<Vector3i>();
+                toSee = new Queue<Vector3i>();
+            }
+            if (toSee.Count == 0)
+            {
+                toSee.Enqueue(start);
+                seen.Clear();
+            }
             const int MAX_DIST = 500 / Chunk.CHUNK_SIZE; // TODO: MAX_DIST -> Constants file
             // TODO: Player configurable distance too actually. Not everyone can afford that much distance view!
+            const int MAX_AT_ONCE = 250;
+            int tried = 0;
             while (toSee.Count > 0)
             {
                 Vector3i cur = toSee.Dequeue();
@@ -978,7 +991,11 @@ namespace Voxalia.ServerGame.EntitySystem
                         }
                     }
                 }
-
+                tried++;
+                if (tried > MAX_AT_ONCE)
+                {
+                    return false;
+                }
                 bool nullRep = true;
                 if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5)
                     || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5)
