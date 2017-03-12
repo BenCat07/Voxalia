@@ -348,23 +348,29 @@ namespace Voxalia.ClientGame.WorldSystem
             Vector3i slodpos = new Vector3i(chunk_pos.X / 3, chunk_pos.Y / 3, chunk_pos.Z / 3);
             if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
-                if (slod._VBO != null && slod._VBO.generated)
-                {
-                    slod._VBO.Destroy();
-                }
-                slod._VBO = null;
+                slod.FullBlock = new ChunkRenderHelper();
             }
+            int count = 0;
             foreach (KeyValuePair<Vector3i, Chunk> entry in LoadedChunks)
             {
                 if (entry.Value.PosMultiplier < 5)
                 {
                     continue;
                 }
+                count++;
                 Vector3i slodposser = new Vector3i(entry.Key.X / 3, entry.Key.Y / 3, entry.Key.Z / 3);
                 if (slodposser == slodpos)
                 {
                     entry.Value.CreateVBO();
                 }
+            }
+            if (count == 0)
+            {
+                if (slod._VBO != null && slod._VBO.generated)
+                {
+                    slod._VBO.Destroy();
+                }
+                slod._VBO = null;
             }
         }
 
@@ -774,7 +780,7 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             if (LoadedChunks.TryGetValue(cpos, out Chunk ch))
             {
-                ch.Destroy();
+                ch.Destroy(true);
                 LoadedChunks.Remove(cpos);
             }
         }

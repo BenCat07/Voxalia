@@ -831,7 +831,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 try
                 {
                     timer.Start();
-                    tick(e.Time);
+                    Tick(e.Time);
                     View3D.CheckError("Tick");
                     timer.Stop();
                     TickTime = (double)timer.ElapsedMilliseconds / 1000f;

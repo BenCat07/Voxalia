@@ -26,6 +26,7 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using Voxalia.ClientGame.NetworkSystem;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
+using Voxalia.ClientGame.WorldSystem;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -210,6 +211,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Network.UsagesLastSecond[i] = Network.UsagesThisSecond[i];
                 Network.UsagesThisSecond[i] = 0;
             }
+            foreach (ChunkSLODHelper slod in TheRegion.SLODs.Values)
+            {
+                if (slod.NeedsComp)
+                {
+                    slod.CompileInternal();
+                }
+            }
         }
 
         /// <summary>
@@ -260,7 +268,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// Handles the full main tick.
         /// </summary>
         /// <param name="delt">The current delta timings (See Delta).</param>
-        void tick (double delt)
+        void Tick (double delt)
         {
             lock (TickLock)
             {
@@ -309,9 +317,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     SysConsole.Output(OutputType.ERROR, "Ticking: " + ex.ToString());
                 }
                 PlayerEyePosition = Player.ItemSource();
-                RayCastResult rcr;
                 Location forw = Player.ItemDir();
-                bool h = TheRegion.SpecialCaseRayTrace(PlayerEyePosition, forw, 100, MaterialSolidity.ANY, IgnorePlayer, out rcr);
+                bool h = TheRegion.SpecialCaseRayTrace(PlayerEyePosition, forw, 100, MaterialSolidity.ANY, IgnorePlayer, out RayCastResult rcr);
                 CameraFinalTarget = h ? new Location(rcr.HitData.Location) - new Location(rcr.HitData.Normal).Normalize() * 0.01: PlayerEyePosition + forw * 100;
                 CameraImpactNormal = h ? new Location(rcr.HitData.Normal).Normalize() : Location.Zero;
                 CameraDistance = h ? rcr.HitData.T: 100;

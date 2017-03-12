@@ -538,6 +538,11 @@ namespace Voxalia.ClientGame.WorldSystem
                         _VBOSolid = null;
                     }
                     OwningRegion.DoneRendering(this);
+                    if (crh != null)
+                    {
+                        IsAir = true;
+                        crh.Compile();
+                    }
                     return;
                 }
                 if (crh != null)
@@ -554,18 +559,7 @@ namespace Voxalia.ClientGame.WorldSystem
                         crh.FullBlock.THVs2.AddRange(rh.THVs2);
                         crh.FullBlock.THWs2.AddRange(rh.THWs2);
                         crh.FullBlock.Tangs.AddRange(rh.Tangs);
-                        Action tst = () =>
-                        {
-                            crh.Compile();
-                        };
-                        if (crh.Loading != null)
-                        {
-                            crh.Loading = crh.Loading.ReplaceOrFollowWith(new ASyncScheduleItem() { OwningEngine = OwningRegion.TheClient.Schedule, MyAction = tst });
-                        }
-                        else
-                        {
-                            crh.Loading = OwningRegion.TheClient.Schedule.StartAsyncTask(tst);
-                        }
+                        crh.Compile();
                         IsAir = true;
                     });
                     OwningRegion.DoneRendering(this);
@@ -744,9 +738,7 @@ namespace Voxalia.ClientGame.WorldSystem
         public Region OwningRegion;
 
         public VBO _VBO;
-
-        public ASyncScheduleItem Loading = null;
-
+        
         public void Render()
         {
             if (!OwningRegion.TheClient.CVars.r_drawchunks.ValueB)
@@ -762,20 +754,25 @@ namespace Voxalia.ClientGame.WorldSystem
             }
         }
 
+        public bool NeedsComp = false;
+
         public void Compile()
         {
+            NeedsComp = true;
+        }
+
+        public void CompileInternal()
+        {
+            NeedsComp = false;
             if (FullBlock.Vertices.Count == 0)
             {
                 if (_VBO != null)
                 {
-                    OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
+                    if (_VBO != null)
                     {
-                        if (_VBO != null)
-                        {
-                            _VBO.Destroy();
-                            _VBO = null;
-                        }
-                    });
+                        _VBO.Destroy();
+                        _VBO = null;
+                    }
                 }
                 return;
             }
@@ -800,17 +797,10 @@ namespace Voxalia.ClientGame.WorldSystem
             tVBO.BoneIDs = null;
             tVBO.BoneWeights2 = null;
             tVBO.BoneIDs2 = null;
-            tVBO.Oldvert();
-            OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
-            {
-                if (_VBO != null)
-                {
-                    _VBO.Destroy();
-                }
-                _VBO = tVBO;
-                tVBO.GenerateOrUpdate();
-                tVBO.CleanLists();
-            });
+            tVBO.Oldvert(); // This is the only call safely asyncable really
+            _VBO = tVBO;
+            tVBO.GenerateOrUpdate();
+            tVBO.CleanLists();
         }
     }
 }
