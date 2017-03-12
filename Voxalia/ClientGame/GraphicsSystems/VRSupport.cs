@@ -42,7 +42,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             FBO = GL.GenFramebuffer();
             Texture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Texture);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 512, 512, 0, OpenTK.Graphics.OpenGL4.PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, 512, 512, 0, PixelFormat.Bgra, PixelType.UnsignedByte, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
@@ -119,9 +119,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 return null;
             }
             EVRInitError err = EVRInitError.None;
-            VRSupport vrs = new VRSupport();
-            vrs.TheClient = tclient;
-            vrs.VR = OpenVR.Init(ref err);
+            VRSupport vrs = new VRSupport() { TheClient = tclient, VR = OpenVR.Init(ref err) };
             if (err != EVRInitError.None)
             {
                 SysConsole.Output(OutputType.INFO, "VR error: " + err + ": " + OpenVR.GetStringForHmdError(err));
@@ -140,9 +138,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 throw new Exception("Failed to start VR: Invalid render target size!");
             }
+            w *= 2;
             TheClient.MainWorldView.Generate(TheClient, (int)w, (int)h);
             TheClient.MainWorldView.GenerateFBO();
-            SysConsole.Output(OutputType.INFO, "Switching to VR mode!");
+            SysConsole.Output(OutputType.INFO, "Switching to VR mode: " + w + "/" + h);
             Compositor = OpenVR.Compositor;
             Compositor.SetTrackingSpace(ETrackingUniverseOrigin.TrackingUniverseStanding);
             Compositor.CompositorBringToFront();
@@ -186,7 +185,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             VRControllerState_t vrcont = new VRControllerState_t();
             TrackedDevicePose_t vrpose = new TrackedDevicePose_t();
-            
+
             bool valid = VR.GetControllerStateWithPose(ETrackingUniverseOrigin.TrackingUniverseStanding, VR.GetTrackedDeviceIndexForControllerRole(left ? ETrackedControllerRole.LeftHand : ETrackedControllerRole.RightHand), ref vrcont, ref vrpose);
             if (!valid || !vrpose.bPoseIsValid)
             {
@@ -197,15 +196,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
             resp.Transpose();
             resp = resp.ClearTranslation() * Matrix4.CreateTranslation(resp.ExtractTranslation() * (1.5f * TheClient.CVars.r_vrscale.ValueF));
             resp = resp * Matrix4.CreateRotationX((float)(Math.PI * 0.5));
-            VRController res = new VRController();
-            res.Position = resp;
+            VRController res = new VRController()
+            {
+                Position = resp,
+                Touched = (VRButtons)vrcont.ulButtonTouched,
+                Pressed = (VRButtons)vrcont.ulButtonPressed
+            };
             res.Axes[0] = new Vector2(vrcont.rAxis0.x, vrcont.rAxis0.y);
             res.Axes[1] = new Vector2(vrcont.rAxis1.x, vrcont.rAxis1.y);
             res.Axes[2] = new Vector2(vrcont.rAxis2.x, vrcont.rAxis2.y);
             res.Axes[3] = new Vector2(vrcont.rAxis3.x, vrcont.rAxis3.y);
             res.Axes[4] = new Vector2(vrcont.rAxis4.x, vrcont.rAxis4.y);
-            res.Touched = (VRButtons)vrcont.ulButtonTouched;
-            res.Pressed = (VRButtons)vrcont.ulButtonPressed;
             return res;
         }
 
@@ -247,29 +248,37 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 SysConsole.Output(OutputType.WARNING, "Can't render VR scene!");
             }
-            Texture_t left = new Texture_t();
-            left.eColorSpace = EColorSpace.Auto;
-            left.eType = EGraphicsAPIConvention.API_OpenGL;
-            left.handle = new IntPtr(TheClient.MainWorldView.CurrentFBOTexture);
-            VRTextureBounds_t bounds = new VRTextureBounds_t();
-            bounds.uMin = 0f;
-            bounds.uMax = 0.5f;
-            bounds.vMin = 0f;
-            bounds.vMax = 1f;
+            Texture_t left = new Texture_t()
+            {
+                eColorSpace = EColorSpace.Auto,
+                eType = EGraphicsAPIConvention.API_OpenGL,
+                handle = new IntPtr(TheClient.MainWorldView.CurrentFBOTexture)
+            };
+            VRTextureBounds_t bounds = new VRTextureBounds_t()
+            {
+                uMin = 0f,
+                uMax = 0.5f,
+                vMin = 0f,
+                vMax = 1f
+            };
             EVRCompositorError lerr = Compositor.Submit(EVREye.Eye_Left, ref left, ref bounds, EVRSubmitFlags.Submit_Default);
             if (lerr != EVRCompositorError.None)
             {
                 SysConsole.Output(OutputType.WARNING, "Left eye error: " + lerr);
             }
-            Texture_t right = new Texture_t();
-            right.eColorSpace = EColorSpace.Auto;
-            right.eType = EGraphicsAPIConvention.API_OpenGL;
-            right.handle = new IntPtr(TheClient.MainWorldView.CurrentFBOTexture);
-            VRTextureBounds_t rbounds = new VRTextureBounds_t();
-            rbounds.uMin = 0.5f;
-            rbounds.uMax = 1f;
-            rbounds.vMin = 0f;
-            rbounds.vMax = 1f;
+            Texture_t right = new Texture_t()
+            {
+                eColorSpace = EColorSpace.Auto,
+                eType = EGraphicsAPIConvention.API_OpenGL,
+                handle = new IntPtr(TheClient.MainWorldView.CurrentFBOTexture)
+            };
+            VRTextureBounds_t rbounds = new VRTextureBounds_t()
+            {
+                uMin = 0.5f,
+                uMax = 1f,
+                vMin = 0f,
+                vMax = 1f
+            };
             EVRCompositorError rerr = Compositor.Submit(EVREye.Eye_Right, ref right, ref rbounds, EVRSubmitFlags.Submit_Default);
             if (rerr != EVRCompositorError.None)
             {
