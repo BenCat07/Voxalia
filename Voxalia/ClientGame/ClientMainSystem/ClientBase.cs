@@ -140,8 +140,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             DisplayDevice dd = DisplayDevice.Default;
             Window = new GameWindow(CVars.r_width.ValueI, CVars.r_height.ValueI, new GraphicsMode(24, 24, 0, 0),
                 Program.GameName + " v" + Program.GameVersion + " (" + Program.GameVersionDescription + ")", GameWindowFlags.Default, dd, 4, 3, GraphicsContextFlags.ForwardCompatible);
-            Window.Location = new Point(0, 0);
-            Window.WindowState = CVars.r_fullscreen.ValueB ? WindowState.Fullscreen : WindowState.Normal;
             Window.Load += new EventHandler<EventArgs>(Window_Load);
             Window.RenderFrame += new EventHandler<FrameEventArgs>(Window_RenderFrame);
             Window.Mouse.Move += new EventHandler<MouseMoveEventArgs>(MouseHandler.Window_MouseMove);
@@ -151,10 +149,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Window.Mouse.WheelChanged += new EventHandler<MouseWheelEventArgs>(KeyHandler.Mouse_Wheel);
             Window.Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(KeyHandler.Mouse_ButtonDown);
             Window.Mouse.ButtonUp += new EventHandler<MouseButtonEventArgs>(KeyHandler.Mouse_ButtonUp);
+            Window.Location = new Point(0, 0);
+            Window.WindowState = CVars.r_fullscreen.ValueB ? WindowState.Fullscreen : WindowState.Normal;
             Window.Resize += Window_Resize;
             Window.Closed += Window_Closed;
             Window.ReduceCPUWaste = true;
-            onVsyncChanged(CVars.r_vsync, null);
+            OnVsyncChanged(CVars.r_vsync, null);
             if (CVars.r_maxfps.ValueD < 1.0)
             {
                 CVars.r_maxfps.Set("60");
@@ -266,6 +266,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The system that manages block textures on the client.
         /// </summary>
         public TextureBlock TBlock;
+
+        /// <summary>
+        /// Helps with Model Level-of-Detail calculations.
+        /// </summary>
+        public ModelLODHelper LODHelp;
 
         /// <summary>
         /// The current PlayerEntity in the game.
@@ -388,9 +393,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.CLIENTINIT, "Loading model engine...");
             Models = new ModelEngine();
             Models.Init(Animations, this);
+            LODHelp = new ModelLODHelper(this);
             SysConsole.Output(OutputType.CLIENTINIT, "Loading general graphics settings...");
-            CVars.r_vsync.OnChanged += onVsyncChanged;
-            onVsyncChanged(CVars.r_vsync, null);
+            CVars.r_vsync.OnChanged += OnVsyncChanged;
+            OnVsyncChanged(CVars.r_vsync, null);
             CVars.r_cloudshadows.OnChanged += OnCloudShadowChanged;
             View3D.CheckError("Load - General Graphics");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading UI engine...");
@@ -423,9 +429,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             PassLoadScreen();
             SysConsole.Output(OutputType.CLIENTINIT, "Playing background music...");
             BackgroundMusic();
-            CVars.a_musicvolume.OnChanged += onMusicVolumeChanged;
-            CVars.a_musicpitch.OnChanged += onMusicPitchChanged;
-            CVars.a_music.OnChanged += onMusicChanged;
+            CVars.a_musicvolume.OnChanged += OnMusicVolumeChanged;
+            CVars.a_musicpitch.OnChanged += OnMusicPitchChanged;
+            CVars.a_music.OnChanged += OnMusicChanged;
             CVars.a_echovolume.OnChanged += OnEchoVolumeChanged;
             OnEchoVolumeChanged(null, null);
             PassLoadScreen();
@@ -449,8 +455,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             PassLoadScreen();
             SysConsole.Output(OutputType.CLIENTINIT, "Requesting a menu server...");
             LocalServer?.ShutDown();
-            LocalServer = new Server(28009); // TODO: Grab first free port?
-            LocalServer.IsMenu = true;
+            LocalServer = new Server(28009) { IsMenu = true }; // TODO: Grab first free port?
             Object locky = new Object();
             bool ready = false;
             Schedule.StartAsyncTask(() =>
@@ -521,7 +526,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         /// <param name="obj">.</param>
         /// <param name="e">.</param>
-        public void onVsyncChanged(object obj, EventArgs e)
+        public void OnVsyncChanged(object obj, EventArgs e)
         {
             Window.VSync = CVars.r_vsync.ValueB ? VSyncMode.Adaptive : VSyncMode.Off;
         }
@@ -642,7 +647,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Called when the music value CVar is changed, used to adapt that immediately.
         /// </summary>
-        public void onMusicChanged(object obj, EventArgs e)
+        public void OnMusicChanged(object obj, EventArgs e)
         {
             BackgroundMusic();
         }
@@ -650,7 +655,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Called when the music pitch CVar is changed, used to adapt that immediately.
         /// </summary>
-        public void onMusicPitchChanged(object obj, EventArgs e)
+        public void OnMusicPitchChanged(object obj, EventArgs e)
         {
             if (CurrentMusic != null)
             {
@@ -663,7 +668,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Called when the music volume CVar is changed, used to adapt that immediately.
         /// </summary>
-        public void onMusicVolumeChanged(object obj, EventArgs e)
+        public void OnMusicVolumeChanged(object obj, EventArgs e)
         {
             if (CurrentMusic != null)
             {
@@ -702,7 +707,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             CVars.r_height.Set(((int)(Window.ClientSize.Height / DPIScale)).ToString());
             if (!tryingUpdate)
             {
-                Schedule.ScheduleSyncTask(windowupdatehandle);
+                Schedule.ScheduleSyncTask(Windowupdatehandle);
                 tryingUpdate = true;
             }
             if (ChatBottomLastTick)
@@ -728,7 +733,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             Window.ClientSize = new Size(CVars.r_width.ValueI, CVars.r_height.ValueI);
             Window.WindowState = CVars.r_fullscreen.ValueB ? WindowState.Fullscreen : WindowState.Normal;
-            Schedule.ScheduleSyncTask(windowupdatehandle);
+            Schedule.ScheduleSyncTask(Windowupdatehandle);
             if (ChatBottomLastTick)
             {
                 ChatScrollToBottom();
@@ -738,7 +743,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Called internally to update the window GL settings and regenerate anything needed.
         /// </summary>
-        void windowupdatehandle()
+        void Windowupdatehandle()
         {
             tryingUpdate = false;
             if (Window.Width < 10 || Window.Height < 10)

@@ -306,8 +306,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 }
             }
             RigidTransform transf = new RigidTransform(Vector3.Zero, Body.Orientation);
-            BoundingBox box;
-            cc.Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out box);
+            cc.Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out BoundingBox box);
             Location pos = new Location(cc.Body.Position) + new Location(0, 0, box.Min.Z);
             Material mat = TheRegion.GetBlockMaterial(pos + new Location(0, 0, -0.05f));
             speedmod *= (float)mat.GetSpeedMod();
@@ -795,8 +794,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 Vector3 up = Vector3.UnitZ;
                 Vector3 antigrav = -Body.Gravity.Value;
                 antigrav.Normalize();
-                Quaternion q;
-                Quaternion.GetQuaternionBetweenNormalizedVectors(ref antigrav, ref up, out q);
+                Quaternion.GetQuaternionBetweenNormalizedVectors(ref antigrav, ref up, out Quaternion q);
                 return q;
             }
             return Quaternion.Identity;
@@ -824,8 +822,7 @@ namespace Voxalia.ClientGame.EntitySystem
                     start = new RigidTransform(Welded.Ent2.Body.Position, Welded.Ent2.Body.Orientation);
                     relative = Welded.Relative;
                 }
-                RigidTransform res;
-                RigidTransform.Multiply(ref start, ref relative, out res);
+                RigidTransform.Multiply(ref start, ref relative, out RigidTransform res);
                 return new Location(res.Position);
             }
             return GetPosition();
@@ -861,9 +858,11 @@ namespace Voxalia.ClientGame.EntitySystem
                 * OpenTK.Matrix4d.CreateTranslation(ClientUtilities.ConvertD(renderrelpos));
             TheClient.MainWorldView.SetMatrix(2, mat);
             TheClient.Rendering.SetMinimumLight(0.0f);
-            model.CustomAnimationAdjustments = new Dictionary<string, OpenTK.Matrix4>(SavedAdjustmentsOTK);
-            // TODO: safe (no-collision) rotation check?
-            model.CustomAnimationAdjustments["spine04"] = GetAdjustmentOTK("spine04") * OpenTK.Matrix4.CreateRotationX(-(float)(Direction.Pitch / 2f * Utilities.PI180));
+            model.CustomAnimationAdjustments = new Dictionary<string, OpenTK.Matrix4>(SavedAdjustmentsOTK)
+            {
+                // TODO: safe (no-collision) rotation check?
+                { "spine04", GetAdjustmentOTK("spine04") * OpenTK.Matrix4.CreateRotationX(-(float)(Direction.Pitch / 2f * Utilities.PI180)) }
+            };
             if (!TheClient.MainWorldView.RenderingShadows && TheClient.CVars.g_firstperson.ValueB)
             {
                 model.CustomAnimationAdjustments["neck01"] = GetAdjustmentOTK("neck01") * OpenTK.Matrix4.CreateRotationX(-(float)(160f * Utilities.PI180));
@@ -880,6 +879,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 mat = OpenTK.Matrix4d.CreateTranslation(ClientUtilities.ConvertD(renderrelpos));
                 TheClient.MainWorldView.SetMatrix(2, mat);
                 Dictionary<string, Matrix> adjs = new Dictionary<string, Matrix>(SavedAdjustments);
+                // TODO: Logic of this rotation math?
                 Matrix rotforw = Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitX, ((float)(Direction.Pitch / 2f * Utilities.PI180) % 360f)));
                 adjs["spine04"] = GetAdjustment("spine04") * rotforw;
                 SingleAnimationNode hand = tAnim.GetNode("metacarpal2.r");

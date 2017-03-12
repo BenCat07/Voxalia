@@ -127,7 +127,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The rendering subsystem for the item bar.
         /// </summary>
         public View3D ItemBarView = new View3D();
-
+        
         /// <summary>
         /// Early startup call to preparing some rendering systems.
         /// </summary>

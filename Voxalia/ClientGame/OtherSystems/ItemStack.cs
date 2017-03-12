@@ -84,8 +84,10 @@ namespace Voxalia.ClientGame.OtherSystems
                     {
                         model = GetModelName();
                     }
-                    RenderedModel = new ModelEntity(model, TheClient.TheRegion);
-                    RenderedModel.Visible = true;
+                    RenderedModel = new ModelEntity(model, TheClient.TheRegion)
+                    {
+                        Visible = true
+                    };
                     RenderedModel.PreHandleSpawn();
                     Tex = null;
                 }
@@ -106,14 +108,14 @@ namespace Voxalia.ClientGame.OtherSystems
             {
                 return "render_model:" + RenderedModel.model.Name;
             }
-            return Tex == null ? null: Tex.Name;
+            return Tex?.Name;
         }
 
         public Model Mod;
 
         public override string GetModelName()
         {
-            return Mod == null ? null: Mod.Name;
+            return Mod?.Name;
         }
 
         public override void SetModelName(string name)
@@ -150,8 +152,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 TheClient.SetEnts();
                 TheClient.Rendering.SetMinimumLight(0.9f);
                 BEPUutilities.RigidTransform rt = BEPUutilities.RigidTransform.Identity;
-                BEPUutilities.BoundingBox bb;
-                RenderedModel.Shape.GetBoundingBox(ref rt, out bb);
+                RenderedModel.Shape.GetBoundingBox(ref rt, out BEPUutilities.BoundingBox bb);
                 BEPUutilities.Vector3 scale = BEPUutilities.Vector3.Max(bb.Max, -bb.Min);
                 float len = (float)scale.Length();
                 RenderedModel.WorldTransform = BEPUutilities.Matrix.CreateScale(size.ToBVector() * len)

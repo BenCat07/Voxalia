@@ -370,9 +370,17 @@ namespace Voxalia.ClientGame.EntitySystem
                 ShadowCastShape = tempCast.BoundingBox;
                 BEPUutilities.Vector3 size = ShadowCastShape.Max - ShadowCastShape.Min;
                 ShadowRadiusSquaredXY = size.X * size.X + size.Y * size.Y;
+                if (model.LODHelper == null)
+                {
+                    model.LODBox = new AABB() { Min = new Location(ModelMin), Max = new Location(ModelMax) };
+                    TheClient.LODHelp.PreRender(model, model.LODBox);
+                }
             }
         }
 
+        /// <summary>
+        /// Map overview render.
+        /// </summary>
         public override void RenderForMap()
         {
             if (GenBlockShadows)
@@ -381,16 +389,13 @@ namespace Voxalia.ClientGame.EntitySystem
                 {
                     return;
                 }
-                Matrix4d mat = GetTransformationMatrix();
-                TheClient.MainWorldView.SetMatrix(2, mat);
-                if (model.Meshes[0].vbo.Tex == null)
-                {
-                    TheClient.Textures.White.Bind();
-                }
-                model.Draw();
+                model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()));
             }
         }
 
+        /// <summary>
+        /// Used for item rendering.
+        /// </summary>
         public void RenderSimpler()
         {
             if (!Visible || model.Meshes.Count == 0)
@@ -407,6 +412,9 @@ namespace Voxalia.ClientGame.EntitySystem
             model.Draw(); // TODO: Animation?
         }
 
+        /// <summary>
+        /// General entity render.
+        /// </summary>
         public override void Render()
         {
             if (!Visible || model.Meshes.Count == 0)
@@ -415,16 +423,21 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             TheClient.SetEnts();
             RigidTransform rt = new RigidTransform(Body.Position, Body.Orientation);
-            BEPUutilities.Vector3 bmin;
-            BEPUutilities.Vector3 bmax;
-            RigidTransform.Transform(ref ModelMin, ref rt, out bmin);
-            RigidTransform.Transform(ref ModelMax, ref rt, out bmax);
+            RigidTransform.Transform(ref ModelMin, ref rt, out BEPUutilities.Vector3 bmin);
+            RigidTransform.Transform(ref ModelMax, ref rt, out BEPUutilities.Vector3 bmax);
             if (TheClient.MainWorldView.CFrust != null && !TheClient.MainWorldView.CFrust.ContainsBox(bmin, bmax))
             {
                 return;
             }
+            // TODO: Make optional: based on distance!
+            bool b = true;
+            if (b)
+            {
+                model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()));
+                return;
+            }
             Matrix4d orient = GetOrientationMatrix();
-            Matrix4d mat = transform * (Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * orient * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition())));
+            Matrix4d mat = (Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * orient * transform * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition())));
             TheClient.MainWorldView.SetMatrix(2, mat);
             TheClient.Rendering.SetMinimumLight(0.0f);
             if (model.Meshes[0].vbo.Tex == null)

@@ -17,6 +17,7 @@ using Voxalia.Shared.Files;
 using System.Linq;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.OtherSystems;
+using Voxalia.Shared.Collision;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {
@@ -149,10 +150,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 throw new Exception("Scene has no meshes! (" + name + ")");
             }
-            Model model = new Model(name);
-            model.Engine = this;
-            model.Original = scene;
-            model.Root = convert(scene.MatrixA);
+            Model model = new Model(name)
+            {
+                Engine = this,
+                Original = scene,
+                Root = Convert(scene.MatrixA)
+            };
             foreach (Model3DMesh mesh in scene.Meshes)
             {
                 if (mesh.Name.ToLowerFast().Contains("collision") || mesh.Name.ToLowerFast().Contains("norender"))
@@ -251,7 +254,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             break;
                         }
                     }
-                    ModelBone mb = new ModelBone() { Offset = convert(scene.Meshes[i].Bones[x].MatrixA) };
+                    ModelBone mb = new ModelBone() { Offset = Convert(scene.Meshes[i].Bones[x].MatrixA) };
                     nodet.Bones.Add(mb);
                     model.Meshes[i].Bones.Add(mb);
                 }
@@ -259,7 +262,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             return model;
         }
 
-        Matrix4 convert(BEPUutilities.Matrix mat)
+        Matrix4 Convert(BEPUutilities.Matrix mat)
         {
             return ClientUtilities.Convert(mat);
         }
@@ -316,6 +319,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public string Name;
 
+        public int[] LODHelper = null;
+
+        public AABB LODBox = null;
+
         /// <summary>
         /// All the meshes this model has.
         /// </summary>
@@ -366,20 +373,16 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             string nodename = pNode.Name;
             Matrix4 nodeTransf = Matrix4.Identity;
-            double time;
-            SingleAnimationNode pNodeAnim = FindNodeAnim(nodename, pNode.Mode, out time);
+            SingleAnimationNode pNodeAnim = FindNodeAnim(nodename, pNode.Mode, out double time);
             if (pNodeAnim != null)
             {
                 BEPUutilities.Vector3 vec = pNodeAnim.lerpPos(time);
                 BEPUutilities.Quaternion quat = pNodeAnim.lerpRotate(time);
                 Quaternion oquat = new Quaternion((float)quat.X, (float)quat.Y, (float)quat.Z, (float)quat.W);
-                Matrix4 trans;
-                Matrix4.CreateTranslation((float)vec.X, (float)vec.Y, (float)vec.Z, out trans);
+                Matrix4.CreateTranslation((float)vec.X, (float)vec.Y, (float)vec.Z, out Matrix4 trans);
                 trans.Transpose();
-                Matrix4 rot;
-                Matrix4.CreateFromQuaternion(ref oquat, out rot);
-                Matrix4 r2;
-                if (CustomAnimationAdjustments.TryGetValue(nodename, out r2))
+                Matrix4.CreateFromQuaternion(ref oquat, out Matrix4 rot);
+                if (CustomAnimationAdjustments.TryGetValue(nodename, out Matrix4 r2))
                 {
                     rot *= r2;
                 }
@@ -388,15 +391,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             else
             {
-                Matrix4 temp;
-                if (CustomAnimationAdjustments.TryGetValue(nodename, out temp))
+                if (CustomAnimationAdjustments.TryGetValue(nodename, out Matrix4 temp))
                 {
                     temp.Transpose();
                     nodeTransf = temp;
                 }
             }
-            Matrix4 global;
-            Matrix4.Mult(ref transf, ref nodeTransf, out global);
+            Matrix4.Mult(ref transf, ref nodeTransf, out Matrix4 global);
             for (int i = 0; i < pNode.Bones.Count; i++)
             {
                 if (ForceBoneNoOffset)
@@ -449,6 +450,32 @@ namespace Voxalia.ClientGame.GraphicsSystems
         double aTLegs;
 
         public double LastDrawTime;
+
+        public void DrawLOD(Location pos)
+        {
+            if (LODHelper == null)
+            {
+                return;
+            }
+            Vector3 vpos = ClientUtilities.Convert(pos - Engine.TheClient.MainWorldView.RenderRelative);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[0]);
+            Vector3 wid = ClientUtilities.Convert(LODBox.Max - LODBox.Min);
+            Vector3 offs = new Vector3(-0.5f, -0.5f, 0f);
+            Matrix4 off1 = Matrix4.CreateTranslation(offs);
+            //Matrix4 off2 = Matrix4.CreateTranslation(-offs);
+            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.X, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * 0.25f) * Matrix4.CreateTranslation(vpos));
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[1]);
+            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.X, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * 0.75f) * Matrix4.CreateTranslation(vpos));
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[2]);
+            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Y, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * -0.25f) * Matrix4.CreateTranslation(vpos));
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[3]);
+            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Y, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * -0.75f) * Matrix4.CreateTranslation(vpos));
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[4]);
+            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Z, wid.X, 1f) * Matrix4.CreateTranslation(vpos + new Vector3(0, 0, (float)LODBox.Max.Z)));
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[5]);
+            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Z, wid.X, 1f) * Matrix4.CreateRotationX((float)Math.PI) * Matrix4.CreateTranslation(vpos + new Vector3(0, 0, (float)LODBox.Max.Z)));
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+        }
         
         /// <summary>
         /// Draws the model.
@@ -506,8 +533,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         {
                             Texture tex = texs.GetTexture(datums[1]);
                             bool success = false;
-                            string typer;
-                            string datic = datums[0].BeforeAndAfter(":::", out typer);
+                            string datic = datums[0].BeforeAndAfter(":::", out string typer);
                             typer = typer.ToLowerFast();
                             for (int i = 0; i < Meshes.Count; i++)
                             {

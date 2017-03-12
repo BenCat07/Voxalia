@@ -349,7 +349,19 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.DepthMask(true);
             GL.Uniform1(8, 0.0f);
         }
-        
+
+        /// <summary>
+        /// Renders a 3D rectangle.
+        /// </summary>
+        /// <param name="mat">The matrix.</param>
+        public void RenderRectangle3D(Matrix4 mat)
+        {
+            GL.UniformMatrix4(2, false, ref mat);
+            GL.BindVertexArray(Square._VAO);
+            GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            GL.BindVertexArray(0);
+        }
+
         /// <summary>
         /// Renders a 2D rectangle.
         /// </summary>
