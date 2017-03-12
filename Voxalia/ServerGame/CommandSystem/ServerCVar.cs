@@ -32,7 +32,7 @@ namespace Voxalia.ServerGame.CommandSystem
         /// <summary>
         /// Game CVars
         /// </summary>
-        public CVar g_fps, g_maxheight, g_minheight, g_maxdist, g_maxrenderdist;
+        public CVar g_fps, g_maxheight, g_minheight, g_maxdist, g_maxrenderdist, g_maxlodrenderdist;
 
         /// <summary>
         /// Network CVars
@@ -60,7 +60,8 @@ namespace Voxalia.ServerGame.CommandSystem
             g_maxheight = Register("g_maxheight", "5000", CVarFlag.Numeric, "What the highest possible Z coordinate should be (for building)."); // TODO: Also per-world?
             g_minheight = Register("g_minheight", "-5000", CVarFlag.Numeric, "What the lowest possible Z coordinate should be (for building)."); // TODO: Also per-world?
             g_maxdist = Register("g_maxdist", "100000000", CVarFlag.Numeric, "How far on the X or Y axis a player may travel from the origin."); // TODO: Also per-world?
-            g_maxrenderdist = Register("g_maxrenderdist", "4", CVarFlag.Numeric, "How high a client can set their render dist to.");
+            g_maxrenderdist = Register("g_maxrenderdist", "6", CVarFlag.Numeric, "How high a client can set their render dist to.");
+            g_maxlodrenderdist = Register("g_maxlodrenderdist", "20", CVarFlag.Numeric, "How high a client can set their LOD render dist to.");
             // Network CVars
             n_verifyip = Register("n_verifyip", "true", CVarFlag.Boolean, "Whether to verify connecting users' IP addresses with the global server. Disabling this may help allow LAN connections.");
             n_chunkspertick = Register("n_chunkspertick", "2", CVarFlag.Numeric, "How many chunks can be sent in a single server tick, per player.");

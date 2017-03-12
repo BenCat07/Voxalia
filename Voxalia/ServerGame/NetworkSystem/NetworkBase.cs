@@ -77,8 +77,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                 ListenSocket.Bind(new IPEndPoint(IPAddress.Any, TheServer.Port));
             }
             ListenSocket.Listen(100);
-            ListenThread = new Thread(new ThreadStart(ListenLoop));
-            ListenThread.Name = Program.GameName + "_v" + Program.GameVersion + "_NetworkListenThread";
+            ListenThread = new Thread(new ThreadStart(ListenLoop)) { Name = Program.GameName + "_v" + Program.GameVersion + "_NetworkListenThread" };
             ListenThread.Start();
         }
 

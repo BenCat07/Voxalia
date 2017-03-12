@@ -630,10 +630,11 @@ namespace Voxalia.ClientGame.NetworkSystem
                 ConnectionSocket.SendBufferSize = 5 * 1024 * 1024;
                 int tport = Utilities.StringToInt(LastPort);
                 ConnectionSocket.Connect(new IPEndPoint(address, tport));
-                string renderd = shortrender ? "2,0,0,0,0"
+                string renderd = shortrender ? "2,0,0,0,0,2,0"
                     : TheClient.CVars.r_renderdist.ValueI + "," + TheClient.CVars.r_renderdist_2.ValueI + ","
                     + TheClient.CVars.r_renderdist_2h.ValueI + "," + TheClient.CVars.r_renderdist_5.ValueI + ","
-                    + TheClient.CVars.r_renderdist_5h.ValueI;
+                    + TheClient.CVars.r_renderdist_5h.ValueI + "," + TheClient.CVars.r_renderdist_6.ValueI + ","
+                    + TheClient.CVars.r_renderdist_15.ValueI;
                 ConnectionSocket.Send(FileHandler.encoding.GetBytes("VOX__\r" + Username
                      + "\r" + key + "\r" + LastIP + "\r" + LastPort + "\r" + renderd + "\n"));
                 byte[] resp = ReceiveUntil(ConnectionSocket, 150, (byte)'\n');

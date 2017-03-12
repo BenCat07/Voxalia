@@ -327,7 +327,17 @@ namespace Voxalia.ServerGame.EntitySystem
         /// How much to add to <see cref="ViewRadiusInChunks"/> in LOD:5 chunk data, vertically.
         /// </summary>
         public int ViewRadExtra5Height = 1;
-        
+
+        /// <summary>
+        /// How much to add to <see cref="ViewRadiusInChunks"/> in LOD:6 chunk data.
+        /// </summary>
+        public int ViewRadExtra6 = 5;
+
+        /// <summary>
+        /// How much to add to <see cref="ViewRadiusInChunks"/> in LOD:15 chunk data.
+        /// </summary>
+        public int ViewRadExtra15 = 10;
+
         /// <summary>
         /// The lowest LOD the player is allowed to see.
         /// </summary>
@@ -905,7 +915,7 @@ namespace Voxalia.ServerGame.EntitySystem
         bool ChunkMarchAndSend()
         {
             const int MULTIPLIER = 15;
-            // TODO: Player configurable multiplier!
+            // TODO: Player configurable multiplier (with server limiter)!
             int maxChunks = TheServer.CVars.n_chunkspertick.ValueI * MULTIPLIER;
             int chunksFound = 0;
             if (LoadRelPos.IsNaN() || LoadRelDir.IsNaN() || LoadRelDir.LengthSquared() < 0.1f)
@@ -927,8 +937,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 toSee.Enqueue(start);
                 seen.Clear();
             }
-            const int MAX_DIST = 500 / Chunk.CHUNK_SIZE; // TODO: MAX_DIST -> Constants file
-            // TODO: Player configurable distance too actually. Not everyone can afford that much distance view!
+            int MAX_DIST = ViewRadiusInChunks + ViewRadExtra15;
             const int MAX_AT_ONCE = 250;
             int tried = 0;
             while (toSee.Count > 0)
@@ -941,10 +950,9 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     continue;
                 }
-                // TODO: Configurable LODSix render cap
-                else if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5) * 2
-                    || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5) * 2
-                    || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height) * 2)
+                else if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra6)
+                    || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra6)
+                    || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra6))
                 {
                     if (TryChunk(cur, 15))
                     {

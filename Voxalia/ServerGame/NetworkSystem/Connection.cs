@@ -126,6 +126,7 @@ namespace Voxalia.ServerGame.NetworkSystem
 
         public bool IsLocalIP(string rip)
         {
+            // TODO: Better check here?
             return rip.Contains("127.0.0.1")
                         || rip.Contains("[::1]")
                         || rip.Contains("192.168.0.")
@@ -151,10 +152,12 @@ namespace Voxalia.ServerGame.NetworkSystem
             }
             using (ShortWebClient wb = new ShortWebClient())
             {
-                NameValueCollection data = new NameValueCollection();
-                data["formtype"] = "confirm";
-                data["username"] = username;
-                data["session"] = key;
+                NameValueCollection data = new NameValueCollection()
+                {
+                    { "formtype", "confirm" },
+                    { "username", username },
+                    { "session", key }
+                };
                 byte[] response = wb.UploadValues(Program.GlobalServerAddress + "account/microconfirm", "POST", data);
                 string resp = FileHandler.encoding.GetString(response).Trim(' ', '\n', '\r', '\t');
                 if (resp.StartsWith("ACCEPT=") && resp.EndsWith(";"))
@@ -327,7 +330,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                             string port = datums[3];
                             string rdist = datums[4];
                             string[] rds = rdist.SplitFast(',');
-                            if (rds.Length != 5)
+                            if (rds.Length != 7)
                             {
                                 throw new Exception("Invalid VOX__ connection details: RenderDist!");
                             }
@@ -345,17 +348,22 @@ namespace Voxalia.ServerGame.NetworkSystem
                                     {
                                         // TODO: Additional details?
                                         // TODO: Choose a world smarter.
-                                        PlayerEntity player = new PlayerEntity(TheServer.LoadedWorlds[0].MainRegion, this, name);
-                                        player.SessionKey = key;
+                                        PlayerEntity player = new PlayerEntity(TheServer.LoadedWorlds[0].MainRegion, this, name)
+                                        {
+                                            SessionKey = key,
+                                            Host = host,
+                                            Port = port,
+                                            IP = PrimarySocket.RemoteEndPoint.ToString(),
+                                            ViewRadiusInChunks = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[0]))),
+                                            ViewRadExtra2 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[1]))),
+                                            ViewRadExtra2Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[2]))),
+                                            ViewRadExtra5 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[3]))),
+                                            ViewRadExtra5Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[4]))),
+                                            ViewRadExtra6 = Math.Min(TheServer.CVars.g_maxlodrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[5]))),
+                                            ViewRadExtra15 = Math.Min(TheServer.CVars.g_maxlodrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[6])))
+                                        };
                                         PE = player;
                                         player.Host = host;
-                                        player.Port = port;
-                                        player.IP = PrimarySocket.RemoteEndPoint.ToString();
-                                        player.ViewRadiusInChunks = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[0])));
-                                        player.ViewRadExtra2 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[1])));
-                                        player.ViewRadExtra2Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[2])));
-                                        player.ViewRadExtra5 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[3])));
-                                        player.ViewRadExtra5Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[4])));
                                         TheServer.Schedule.ScheduleSyncTask(() =>
                                         {
                                             TheServer.PlayersWaiting.Add(player);
@@ -419,11 +427,8 @@ namespace Voxalia.ServerGame.NetworkSystem
                                         break;
                                     }
                                 }
-                                if (player == null)
-                                {
-                                    throw new Exception("Can't find player for VOXc_:" + name + ", " + host + ", " + port + ", " + key.Length);
-                                }
-                                PE = player;
+
+                                PE = player ?? throw new Exception("Can't find player for VOXc_:" + name + ", " + host + ", " + port + ", " + key.Length);
                                 player.ChunkNetwork = this;
                                 PrimarySocket.Send(FileHandler.encoding.GetBytes("ACCEPT\n"));
                                 // TODO: What if the world disappears during connect sequence?
