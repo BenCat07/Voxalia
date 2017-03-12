@@ -342,6 +342,28 @@ namespace Voxalia.ClientGame.WorldSystem
             return SLODs[slodpos] = new ChunkSLODHelper() { Coordinate = slodpos, OwningRegion = this };
         }
 
+        public void RecalculatSLOD(Vector3i chunk_pos)
+        {
+            // TODO: 3 -> constants
+            Vector3i slodpos = new Vector3i(chunk_pos.X / 3, chunk_pos.Y / 3, chunk_pos.Z / 3);
+            if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
+            {
+                if (slod._VBO != null && slod._VBO.generated)
+                {
+                    slod._VBO.Destroy();
+                }
+                slod._VBO = null;
+            }
+            foreach (KeyValuePair<Vector3i, Chunk> entry in LoadedChunks)
+            {
+                Vector3i slodposser = new Vector3i(entry.Key.X / 3, entry.Key.Y / 3, entry.Key.Z / 3);
+                if (slodposser == slodpos)
+                {
+                    entry.Value.CreateVBO();
+                }
+            }
+        }
+
         public Client TheClient;
 
         public Vector3i ChunkLocFor(Location pos)

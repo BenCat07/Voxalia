@@ -92,6 +92,10 @@ namespace Voxalia.ClientGame.WorldSystem
         /// </summary>
         public void Destroy()
         {
+            if (PosMultiplier >= 5)
+            {
+                OwningRegion.RecalculatSLOD(WorldPosition);
+            }
             if (FCO != null && IsAdded)
             {
                 OwningRegion.RemoveChunkQuiet(FCO);
