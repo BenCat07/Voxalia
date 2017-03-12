@@ -356,6 +356,10 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             foreach (KeyValuePair<Vector3i, Chunk> entry in LoadedChunks)
             {
+                if (entry.Value.PosMultiplier < 5)
+                {
+                    continue;
+                }
                 Vector3i slodposser = new Vector3i(entry.Key.X / 3, entry.Key.Y / 3, entry.Key.Z / 3);
                 if (slodposser == slodpos)
                 {
