@@ -89,8 +89,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 int i = ia;
                 Action a = () =>
                 {
-                    MaterialTextureInfo tex = new MaterialTextureInfo();
-                    tex.Mat = (Material)i;
+                    MaterialTextureInfo tex = new MaterialTextureInfo()
+                    {
+                        Mat = (Material)i
+                    };
                     string[] refrornot = MaterialHelpers.Textures[i].SplitFast('@');
                     if (refrornot.Length > 1)
                     {
@@ -282,14 +284,16 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public void SetAnimated(int ID, double rate, Bitmap[] textures, int tid)
         {
-            AnimatedTexture anim = new AnimatedTexture();
-            anim.Block = this;
-            anim.Level = ID;
-            anim.Time = 0;
-            anim.Rate = rate;
-            anim.Textures = new int[textures.Length];
-            anim.FBOs = new int[textures.Length];
-            anim.OwnsTheTextures = true;
+            AnimatedTexture anim = new AnimatedTexture()
+            {
+                Block = this,
+                Level = ID,
+                Time = 0,
+                Rate = rate,
+                Textures = new int[textures.Length],
+                FBOs = new int[textures.Length],
+                OwnsTheTextures = true
+            };
             for (int i = 0; i < textures.Length; i++)
             {
                 anim.Textures[i] = GL.GenTexture();
@@ -311,14 +315,16 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public void SetAnimated(int ID, double rate, string[] textures, int tid)
         {
-            AnimatedTexture anim = new AnimatedTexture();
-            anim.Block = this;
-            anim.Level = ID;
-            anim.Time = 0;
-            anim.Rate = rate;
-            anim.Textures = new int[textures.Length];
-            anim.FBOs = new int[textures.Length];
-            anim.OwnsTheTextures = false;
+            AnimatedTexture anim = new AnimatedTexture()
+            {
+                Block = this,
+                Level = ID,
+                Time = 0,
+                Rate = rate,
+                Textures = new int[textures.Length],
+                FBOs = new int[textures.Length],
+                OwnsTheTextures = false
+            };
             for (int i = 0; i < textures.Length; i++)
             {
                 anim.Textures[i] = TEngine.GetTexture(textures[i], TWidth).Original_InternalID;
