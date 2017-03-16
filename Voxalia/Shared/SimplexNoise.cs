@@ -83,11 +83,11 @@ namespace Voxalia.Shared // mcmonkey - namespace change
 
             double t0 = 1.0f - x0 * x0;
             t0 *= t0;
-            n0 = t0 * t0 * grad(perm[i0 & 0xff], x0);
+            n0 = t0 * t0 * Grad(perm[i0 & 0xff], x0);
 
             double t1 = 1.0f - x1 * x1;
             t1 *= t1;
-            n1 = t1 * t1 * grad(perm[i1 & 0xff], x1);
+            n1 = t1 * t1 * Grad(perm[i1 & 0xff], x1);
             // The maximum value of this noise is 8*(3/4)^4 = 2.53125
             // A factor of 0.395 scales to fit exactly within [-1,1]
             return 0.395f * (n0 + n1);
@@ -144,7 +144,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             else
             {
                 t0 *= t0;
-                n0 = t0 * t0 * grad(perm[ii + perm[jj]], x0, y0);
+                n0 = t0 * t0 * Grad(perm[ii + perm[jj]], x0, y0);
             }
 
             double t1 = 0.5f - x1 * x1 - y1 * y1;
@@ -152,7 +152,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             else
             {
                 t1 *= t1;
-                n1 = t1 * t1 * grad(perm[ii + i1 + perm[jj + j1]], x1, y1);
+                n1 = t1 * t1 * Grad(perm[ii + i1 + perm[jj + j1]], x1, y1);
             }
 
             double t2 = 0.5f - x2 * x2 - y2 * y2;
@@ -160,7 +160,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             else
             {
                 t2 *= t2;
-                n2 = t2 * t2 * grad(perm[ii + 1 + perm[jj + 1]], x2, y2);
+                n2 = t2 * t2 * Grad(perm[ii + 1 + perm[jj + 1]], x2, y2);
             }
 
             // Add contributions from each corner to get the final noise value.
@@ -240,7 +240,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             else
             {
                 t0 *= t0;
-                n0 = t0 * t0 * grad(perm[ii + perm[jj + perm[kk]]], x0, y0, z0);
+                n0 = t0 * t0 * Grad(perm[ii + perm[jj + perm[kk]]], x0, y0, z0);
             }
 
             double t1 = 0.6f - x1 * x1 - y1 * y1 - z1 * z1;
@@ -248,7 +248,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             else
             {
                 t1 *= t1;
-                n1 = t1 * t1 * grad(perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]], x1, y1, z1);
+                n1 = t1 * t1 * Grad(perm[ii + i1 + perm[jj + j1 + perm[kk + k1]]], x1, y1, z1);
             }
 
             double t2 = 0.6f - x2 * x2 - y2 * y2 - z2 * z2;
@@ -256,7 +256,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             else
             {
                 t2 *= t2;
-                n2 = t2 * t2 * grad(perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]], x2, y2, z2);
+                n2 = t2 * t2 * Grad(perm[ii + i2 + perm[jj + j2 + perm[kk + k2]]], x2, y2, z2);
             }
 
             double t3 = 0.6f - x3 * x3 - y3 * y3 - z3 * z3;
@@ -264,7 +264,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             else
             {
                 t3 *= t3;
-                n3 = t3 * t3 * grad(perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]], x3, y3, z3);
+                n3 = t3 * t3 * Grad(perm[ii + 1 + perm[jj + 1 + perm[kk + 1]]], x3, y3, z3);
             }
 
             // Add contributions from each corner to get the final noise value.
@@ -311,7 +311,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             return a < 0 ? a + m : a;
         }
 
-        private static double grad(long hash, double x)
+        private static double Grad(long hash, double x) // mcmonkey - Name fix
         {
             long h = hash & 15;
             double grad = 1.0f + (h & 7);   // Gradient value 1.0, 2.0, ..., 8.0
@@ -319,7 +319,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             return (grad * x);           // Multiply the gradient with the distance
         }
 
-        private static double grad(long hash, double x, double y)
+        private static double Grad(long hash, double x, double y) // mcmonkey - Name fix
         {
             long h = hash & 7;      // Convert low 3 bits of hash code
             double u = h < 4 ? x : y;  // into 8 simple gradient directions,
@@ -327,7 +327,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -2.0f * v : 2.0f * v);
         }
 
-        private static double grad(long hash, double x, double y, double z)
+        private static double Grad(long hash, double x, double y, double z) // mcmonkey - Name fix
         {
             long h = hash & 15;     // Convert low 4 bits of hash code into 12 simple
             double u = h < 8 ? x : y; // gradient directions, and compute dot product.
@@ -335,7 +335,7 @@ namespace Voxalia.Shared // mcmonkey - namespace change
             return ((h & 1) != 0 ? -u : u) + ((h & 2) != 0 ? -v : v);
         }
 
-        private static double grad(long hash, double x, double y, double z, double t)
+        private static double Grad(long hash, double x, double y, double z, double t) // mcmonkey - Name fix
         {
             long h = hash & 31;      // Convert low 5 bits of hash code into 32 simple
             double u = h < 24 ? x : y; // gradient directions, and compute dot product.
