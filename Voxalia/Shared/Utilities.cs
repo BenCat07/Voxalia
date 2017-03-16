@@ -263,8 +263,7 @@ namespace Voxalia.Shared
         /// <returns>The converted double.</returns>
         public static float StringToFloat(string input)
         {
-            float output;
-            if (float.TryParse(input, out output))
+            if (float.TryParse(input, out float output))
             {
                 return output;
             }
@@ -281,8 +280,7 @@ namespace Voxalia.Shared
         /// <returns>The converted double.</returns>
         public static double StringToDouble(string input)
         {
-            double output;
-            if (double.TryParse(input, out output))
+            if (double.TryParse(input, out double output))
             {
                 return output;
             }
@@ -299,8 +297,7 @@ namespace Voxalia.Shared
         /// <returns>The converted ushort.</returns>
         public static ushort StringToUShort(string input)
         {
-            ushort output;
-            if (ushort.TryParse(input, out output))
+            if (ushort.TryParse(input, out ushort output))
             {
                 return output;
             }
@@ -317,8 +314,7 @@ namespace Voxalia.Shared
         /// <returns>The converted int.</returns>
         public static int StringToInt(string input)
         {
-            int output;
-            if (int.TryParse(input, out output))
+            if (int.TryParse(input, out int output))
             {
                 return output;
             }
@@ -335,8 +331,7 @@ namespace Voxalia.Shared
         /// <returns>The converted long.</returns>
         public static long StringToLong(string input)
         {
-            long output;
-            if (long.TryParse(input, out output))
+            if (long.TryParse(input, out long output))
             {
                 return output;
             }
@@ -690,9 +685,11 @@ namespace Voxalia.Shared
                 {
                     yaw -= 360;
                 }
-                Location loc = new Location();
-                loc.Yaw = yaw;
-                loc.Pitch = pitch;
+                Location loc = new Location()
+                {
+                    Yaw = yaw,
+                    Pitch = pitch
+                };
                 return loc;
             }
         }

@@ -42,8 +42,7 @@ namespace Voxalia.Shared
                 confs = LanguageDocuments;
             }
             string idlow = id.ToLowerFast();
-            FDSSection doc;
-            if (LanguageDocuments.TryGetValue(idlow, out doc))
+            if (LanguageDocuments.TryGetValue(idlow, out FDSSection doc))
             {
                 return doc;
             }
