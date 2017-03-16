@@ -90,9 +90,9 @@ namespace Voxalia.ClientGame.WorldSystem
         /// <summary>
         /// Sync only.
         /// </summary>
-        public void Destroy(bool resetSLOD = false)
+        public void Destroy()
         {
-            if (resetSLOD && PosMultiplier >= 5)
+            if (PosMultiplier >= 5)
             {
                 OwningRegion.RecalculatSLOD(WorldPosition);
             }

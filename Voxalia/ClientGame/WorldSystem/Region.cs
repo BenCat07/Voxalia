@@ -780,7 +780,7 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             if (LoadedChunks.TryGetValue(cpos, out Chunk ch))
             {
-                ch.Destroy(true);
+                ch.Destroy();
                 LoadedChunks.Remove(cpos);
             }
         }
