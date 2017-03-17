@@ -1,0 +1,3 @@
+[submodule "FreneticGameEngine"]
+	path = FreneticGameEngine
+	url = https://github.com/FreneticLLC/FreneticGameEngine
