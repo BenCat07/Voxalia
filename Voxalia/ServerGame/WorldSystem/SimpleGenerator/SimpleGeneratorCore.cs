@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 {

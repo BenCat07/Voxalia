@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using BEPUutilities;
 using Voxalia.Shared.Files;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.Shared
 {

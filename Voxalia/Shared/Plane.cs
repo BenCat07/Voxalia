@@ -7,7 +7,7 @@
 //
 
 using System;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.Shared
 {

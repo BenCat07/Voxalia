@@ -17,7 +17,7 @@ using System.Threading;
 using FreneticDataSyntax;
 using Voxalia.Shared;
 using System.Diagnostics;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.WorldSystem
 {

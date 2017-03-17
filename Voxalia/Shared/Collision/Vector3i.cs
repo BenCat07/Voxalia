@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUutilities;
+using FreneticGameCore;
 
 namespace Voxalia.Shared.Collision
 {

@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using Voxalia.Shared.Files;
+using FreneticGameCore;
 
 namespace Voxalia.Shared
 {

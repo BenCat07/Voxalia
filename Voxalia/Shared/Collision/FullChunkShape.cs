@@ -14,6 +14,7 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUutilities.DataStructures;
+using FreneticGameCore;
 
 namespace Voxalia.Shared.Collision
 {
@@ -164,18 +165,16 @@ namespace Voxalia.Shared.Collision
                 offs = new Vector3(double.NaN, double.NaN, double.NaN);
                 return null;
             }
-            Location loffs;
             BlockInternal bi = Blocks[BlockIndex(x, y, z)];
-            ConvexShape shape = (ConvexShape)BlockShapeRegistry.BSD[bi.BlockData].GetShape(bi.Damage, out loffs, false);
+            ConvexShape shape = (ConvexShape)BlockShapeRegistry.BSD[bi.BlockData].GetShape(bi.Damage, out Location loffs, false);
             offs = loffs.ToBVector();
             return shape;
         }
         
         public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweepnorm, double slen, MaterialSolidity solidness, out RayHit hit)
         {
-            BoundingBox bb;
             RigidTransform rot = new RigidTransform(Vector3.Zero, startingTransform.Orientation);
-            castShape.GetBoundingBox(ref rot, out bb);
+            castShape.GetBoundingBox(ref rot, out BoundingBox bb);
             double adv = 0.1f;
             double max = slen + adv;
             bool gotOne = false;
@@ -208,8 +207,7 @@ namespace Voxalia.Shared.Collision
                             BlockInternal bi = Blocks[BlockIndex(x, y, z)];
                             if (solidness.HasFlag(((Material)bi.BlockMaterial).GetSolidity()))
                             {
-                                Location offs;
-                                EntityShape es = BlockShapeRegistry.BSD[bi.BlockData].GetShape(bi.Damage, out offs, false);
+                                EntityShape es = BlockShapeRegistry.BSD[bi.BlockData].GetShape(bi.Damage, out Location offs, false);
                                 if (es == null)
                                 {
                                     continue;
@@ -221,9 +219,8 @@ namespace Voxalia.Shared.Collision
                                 coll.LocalPosition = Vector3.Zero;
                                 coll.WorldTransform = rt;
                                 coll.UpdateBoundingBoxForTransform(ref rt);
-                                RayHit rhit;
                                 RigidTransform adjusted = new RigidTransform(startingTransform.Position - adj, startingTransform.Orientation);
-                                bool b = coll.ConvexCast(castShape, ref adjusted, ref sweep, out rhit);
+                                bool b = coll.ConvexCast(castShape, ref adjusted, ref sweep, out RayHit rhit);
                                 if (b && (!gotOne || rhit.T * slen < BestRH.T) && rhit.T >= 0)
                                 {
                                     gotOne = true;

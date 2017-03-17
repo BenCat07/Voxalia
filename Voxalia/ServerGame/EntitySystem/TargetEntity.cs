@@ -15,6 +15,7 @@ using Voxalia.Shared;
 using Voxalia.ServerGame.ItemSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using LiteDB;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -77,8 +78,7 @@ namespace Voxalia.ServerGame.EntitySystem
             NextAttack -= TheRegion.Delta;
             if (NextAttack <= 0)
             {
-                double distsq;
-                PlayerEntity player = NearestPlayer(out distsq);
+                PlayerEntity player = NearestPlayer(out double distsq);
                 if (distsq < 10 * 10)
                 {
                     Location target = player.GetCenter();

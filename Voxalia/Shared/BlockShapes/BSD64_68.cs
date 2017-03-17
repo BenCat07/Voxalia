@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using BEPUutilities;
 using BEPUphysics.CollisionShapes;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using FreneticGameCore;
 
 namespace Voxalia.Shared.BlockShapes
 {

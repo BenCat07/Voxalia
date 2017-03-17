@@ -9,6 +9,7 @@
 using System.Collections.Generic;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUutilities;
+using FreneticGameCore;
 
 namespace Voxalia.Shared.BlockShapes
 {
@@ -36,9 +37,15 @@ namespace Voxalia.Shared.BlockShapes
             }
         }
 
+        public void NoOp()
+        {
+            // This exists to shut up the compiler about imperfections.
+        }
+
         public override List<Vector3> GetVertices(Vector3 pos, bool XP, bool XM, bool YP, bool YM, bool TOP, bool BOTTOM)
         {
-            List<Vector3> Vertices = new List<Vector3>();
+            List<Vector3> Vertices = new List<Vector3>(6);
+            NoOp();
             Vertices.Add(new Vector3(pos.X, pos.Y + 1, pos.Z + Percent));
             Vertices.Add(new Vector3(pos.X + 1, pos.Y + 1, pos.Z + Percent));
             Vertices.Add(new Vector3(pos.X, pos.Y, pos.Z + Percent));
@@ -93,9 +100,9 @@ namespace Voxalia.Shared.BlockShapes
             return Vertices;
         }
 
-        public override List<BEPUutilities.Vector3> GetNormals(Vector3 blockPos, bool XP, bool XM, bool YP, bool YM, bool TOP, bool BOTTOM)
+        public override List<Vector3> GetNormals(Vector3 blockPos, bool XP, bool XM, bool YP, bool YM, bool TOP, bool BOTTOM)
         {
-            List<Vector3> Norms = new List<Vector3>();
+            List<Vector3> Norms = new List<Vector3>(6);
             for (int i = 0; i < 6; i++)
             {
                 Norms.Add(new Vector3(0, 0, 1));
@@ -140,7 +147,7 @@ namespace Voxalia.Shared.BlockShapes
 
         public override List<Vector3> GetTCoords(Vector3 blockPos, Material mat, bool XP, bool XM, bool YP, bool YM, bool TOP, bool BOTTOM)
         {
-            List<Vector3> TCoords = new List<Vector3>();
+            List<Vector3> TCoords = new List<Vector3>(6);
             int tID_TOP = mat.TextureID(MaterialSide.TOP);
             TCoords.Add(new Vector3(0, 1, tID_TOP));
             TCoords.Add(new Vector3(1, 1, tID_TOP));

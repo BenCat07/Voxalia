@@ -12,8 +12,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Voxalia.Shared.Files;
-using FreneticScript;
 using FreneticDataSyntax;
+using FreneticGameCore;
 
 namespace Voxalia.Shared
 {

@@ -135,10 +135,8 @@
     <Compile Include="Shared\ConsoleHandler.cs" />
     <Compile Include="Shared\Files\DataStream.cs" />
     <Compile Include="Shared\Files\FileHandler.cs" />
-    <Compile Include="Shared\Location.cs" />
     <Compile Include="Shared\Material.cs" />
     <Compile Include="Shared\ModelHandler.cs" />
-    <Compile Include="Shared\MTRandom.cs" />
     <Compile Include="Shared\PingInfo.cs" />
     <Compile Include="Shared\Plane.cs" />
     <Compile Include="Shared\Program.cs" />
@@ -147,8 +145,6 @@
     <Compile Include="Shared\NetworkEnums.cs" />
     <Compile Include="Shared\SysConsole.cs" />
     <Compile Include="Shared\Files\UnknownFileException.cs" />
-    <Compile Include="Shared\SystemExtensions.cs" />
-    <Compile Include="Shared\Utilities.cs" />
     <Compile Include="Shared\Files\ZipStorer.cs" />
     <Compile Include="Shared\ModelManagement\Simplify.cs" />
   </ItemGroup>
@@ -176,6 +172,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FreneticGameEngine\FreneticGameCore\FreneticGameCore.csproj">
+      <Project>{c608fd6d-fb74-4a0b-affe-d24ac7deb3e3}</Project>
+      <Name>FreneticGameCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

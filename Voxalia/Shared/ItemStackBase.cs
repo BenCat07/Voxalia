@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Voxalia.Shared.Files;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Objects;
+using FreneticGameCore;
 
 namespace Voxalia.Shared
 {
@@ -149,7 +150,7 @@ namespace Voxalia.Shared
             dw.WriteFloat((float)Temperature);
             dw.WriteInt(DrawColor.ToArgb());
             dw.WriteFullString(Name);
-            dw.WriteFullString(SecondaryName == null ? "" : SecondaryName);
+            dw.WriteFullString(SecondaryName ?? "");
             dw.WriteFullString(DisplayName);
             dw.WriteFullString(Description);
             dw.WriteFullString(GetTextureName());
@@ -310,7 +311,7 @@ namespace Voxalia.Shared
 
         public override string ToString()
         {
-            return Name + "[secondary=" + (SecondaryName == null ? "{NULL}" : SecondaryName) + ";display=" + DisplayName + ";count=" + Count + ";renderascomponent=" + RenderAsComponent + ";componentrenderoffset=" + ComponentRenderOffset.ToSimpleString()
+            return Name + "[secondary=" + (SecondaryName ?? "{NULL}") + ";display=" + DisplayName + ";count=" + Count + ";renderascomponent=" + RenderAsComponent + ";componentrenderoffset=" + ComponentRenderOffset.ToSimpleString()
                 + ";description=" + Description + ";texture=" + GetTextureName() + ";model=" + GetModelName() + ";weight=" + Weight + ";volume=" + Volume + ";temperature=" + Temperature
                 + ";drawcolor=" + DrawColor.R / 255f + "," + DrawColor.G / 255f + "," + DrawColor.B / 255f + "," + DrawColor.A / 255f + ";datum=" + Datum + ";shared=" + SharedStr() + ";components=" + ComponentString() + "]";
             // TODO: Shared color tag?

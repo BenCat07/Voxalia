@@ -9,7 +9,7 @@
 using System;
 using System.Collections.Generic;
 using Voxalia.Shared.Files;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.Shared
 {

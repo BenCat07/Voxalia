@@ -377,6 +377,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FreneticGameEngine\FreneticGameCore\FreneticGameCore.csproj">
+      <Project>{c608fd6d-fb74-4a0b-affe-d24ac7deb3e3}</Project>
+      <Name>FreneticGameCore</Name>
+    </ProjectReference>
     <ProjectReference Include="VoxaliaShared.csproj">
       <Project>{EE5A02F5-5105-4B5F-8580-1E8F6E091776}</Project>
       <Name>VoxaliaShared</Name>
