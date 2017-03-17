@@ -18,7 +18,6 @@ using Voxalia.ClientGame.CommandSystem;
 using Voxalia.Shared.Files;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.ClientGame.ClientMainSystem;
-using FreneticScript;
 using System.Threading;
 using Voxalia.ClientGame.AudioSystem.Enforcer;
 using FreneticGameCore;
@@ -388,12 +387,14 @@ namespace Voxalia.ClientGame.AudioSystem
                     //SysConsole.Output(OutputType.DEBUG, "Audio / clip");
                     return;
                 }
-                ActiveSound actsfx = new ActiveSound(sfx);
-                actsfx.Engine = this;
-                actsfx.Position = pos;
-                actsfx.Pitch = pitch * CVars.a_globalpitch.ValueF;
-                actsfx.Gain = volume;
-                actsfx.Loop = loop;
+                ActiveSound actsfx = new ActiveSound(sfx)
+                {
+                    Engine = this,
+                    Position = pos,
+                    Pitch = pitch * CVars.a_globalpitch.ValueF,
+                    Gain = volume,
+                    Loop = loop
+                };
                 actsfx.Create();
                 if (actsfx.AudioInternal == null && actsfx.Src < 0)
                 {
@@ -443,12 +444,14 @@ namespace Voxalia.ClientGame.AudioSystem
         {
             Func<ActiveSound> playSound = () =>
             {
-                ActiveSound actsfx = new ActiveSound(sfx);
-                actsfx.Engine = this;
-                actsfx.Position = Location.NaN;
-                actsfx.Pitch = 1.0f;
-                actsfx.Gain = 1.0f;
-                actsfx.Loop = loop;
+                ActiveSound actsfx = new ActiveSound(sfx)
+                {
+                    Engine = this,
+                    Position = Location.NaN,
+                    Pitch = 1.0f,
+                    Gain = 1.0f,
+                    Loop = loop
+                };
                 actsfx.Create();
                 actsfx.Play();
                 return actsfx;
@@ -466,8 +469,7 @@ namespace Voxalia.ClientGame.AudioSystem
         public SoundEffect GetSound(string name)
         {
             string namelow = name.ToLowerFast();
-            SoundEffect sfx;
-            if (Effects.TryGetValue(namelow, out sfx))
+            if (Effects.TryGetValue(namelow, out SoundEffect sfx))
             {
                 return sfx;
             }
@@ -477,10 +479,12 @@ namespace Voxalia.ClientGame.AudioSystem
                 Effects.Add(namelow, sfx);
                 return sfx;
             }
-            sfx = new SoundEffect();
-            sfx.Name = namelow;
-            sfx.Internal = -1;
-            sfx.LastUse = TheClient.GlobalTickTimeLocal;
+            sfx = new SoundEffect()
+            {
+                Name = namelow,
+                Internal = -1,
+                LastUse = TheClient.GlobalTickTimeLocal
+            };
             Effects.Add(namelow, sfx);
             return sfx;
         }
@@ -506,10 +510,12 @@ namespace Voxalia.ClientGame.AudioSystem
                     //SysConsole.Output(OutputType.DEBUG, "Audio / nullsource");
                     return null;
                 }
-                SoundEffect tsfx = new SoundEffect();
-                tsfx.Name = name;
-                tsfx.Internal = -1;
-                tsfx.LastUse = TheClient.GlobalTickTimeLocal;
+                SoundEffect tsfx = new SoundEffect()
+                {
+                    Name = name,
+                    Internal = -1,
+                    LastUse = TheClient.GlobalTickTimeLocal
+                };
                 TheClient.Schedule.StartAsyncTask(() =>
                 {
                     try
@@ -568,17 +574,18 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public SoundEffect LoadSound(DataStream stream, string name)
         {
-            SoundEffect sfx = new SoundEffect();
-            sfx.Name = name;
-            sfx.LastUse = TheClient.GlobalTickTimeLocal;
-            int channels;
-            int bits;
-            int rate;
-            byte[] data = LoadWAVE(stream, out channels, out bits, out rate);
+            SoundEffect sfx = new SoundEffect()
+            {
+                Name = name,
+                LastUse = TheClient.GlobalTickTimeLocal
+            };
+            byte[] data = LoadWAVE(stream, out int channels, out int bits, out int rate);
             if (AudioInternal != null)
             {
-                LiveAudioClip clip = new LiveAudioClip();
-                clip.Data = data;
+                LiveAudioClip clip = new LiveAudioClip()
+                {
+                    Data = data
+                };
                 if (bits == 1)
                 {
                     clip.Data = new byte[data.Length * 2];

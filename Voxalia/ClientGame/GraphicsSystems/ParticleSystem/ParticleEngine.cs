@@ -70,8 +70,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         public int GetTextureID(string f)
         {
-            int temp;
-            if (TextureLocations.TryGetValue(f, out temp))
+            if (TextureLocations.TryGetValue(f, out int temp))
             {
                 return temp;
             }

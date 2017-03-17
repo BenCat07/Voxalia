@@ -7,18 +7,10 @@
 //
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Voxalia.ClientGame.UISystem;
 using Voxalia.ClientGame.UISystem.MenuSystem;
 using Voxalia.ClientGame.GraphicsSystems;
 using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL4;
-using FreneticScript;
 using Voxalia.ClientGame.OtherSystems;
-using Voxalia.Shared;
 using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
 using FreneticGameCore;
 
@@ -189,8 +181,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     string name = Items[i].DisplayName;
                     UITextLink p = prev;
                     int x = i;
-                    UITextLink neo = new UITextLink(Items[i].Tex, name, pref1 + name, pref2 + name, FontSets.Standard, () => InventorySelectItem(x + 1), UIAnchor.TOP_LEFT, p.GetX, () => (int)(p.GetY() + p.GetHeight()));
-                    neo.IconColor = Items[i].DrawColor;
+                    UITextLink neo = new UITextLink(Items[i].Tex, name, pref1 + name, pref2 + name, FontSets.Standard, () => InventorySelectItem(x + 1), UIAnchor.TOP_LEFT, p.GetX, () => (int)(p.GetY() + p.GetHeight()))
+                    {
+                        IconColor = Items[i].DrawColor
+                    };
                     UI_Inv_Items.AddChild(neo);
                     prev = neo;
                 }

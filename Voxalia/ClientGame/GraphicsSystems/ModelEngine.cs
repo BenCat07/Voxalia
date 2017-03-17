@@ -67,7 +67,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 if (!TheClient.Files.Exists("models/" + filename + ".vmd"))
                 {
                     SysConsole.Output(OutputType.WARNING, "Cannot load model, file '" +
-                        TextStyle.Color_Standout + "models/" + filename + ".vmd" + TextStyle.Color_Warning +
+                        FreneticScript.TextStyle.Color_Standout + "models/" + filename + ".vmd" + FreneticScript.TextStyle.Color_Warning +
                         "' does not exist.");
                     return null;
                 }
@@ -76,7 +76,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             catch (Exception ex)
             {
                 SysConsole.Output(OutputType.ERROR, "Failed to load model from filename '" +
-                    TextStyle.Color_Standout + "models/" + filename + ".vmd" + TextStyle.Color_Error + "': " + ex.ToString());
+                    FreneticScript.TextStyle.Color_Standout + "models/" + filename + ".vmd" + FreneticScript.TextStyle.Color_Error + "': " + ex.ToString());
                 return null;
             }
         }

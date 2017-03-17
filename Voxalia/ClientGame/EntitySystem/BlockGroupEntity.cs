@@ -53,8 +53,7 @@ namespace Voxalia.ClientGame.EntitySystem
             TraceMode = mode;
             if (TraceMode == BGETraceMode.PERFECT)
             {
-                Vector3 shoffs;
-                Shape = new MobileChunkShape(new Vector3i(xwidth, ywidth, zwidth), blocks, out shoffs);
+                Shape = new MobileChunkShape(new Vector3i(xwidth, ywidth, zwidth), blocks, out Vector3 shoffs);
             }
             else
             {
@@ -124,8 +123,7 @@ namespace Voxalia.ClientGame.EntitySystem
                     }
                 }
             }
-            Vector3 center;
-            ConvexHullShape chs = new ConvexHullShape(Vertices, out center);
+            ConvexHullShape chs = new ConvexHullShape(Vertices, out Vector3 center);
             offs = new Location(center);
             return chs;
         }
@@ -246,11 +244,13 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
-            vbo = new VBO();
-            vbo.THVs = new List<OpenTK.Vector4>();
-            vbo.THWs = new List<OpenTK.Vector4>();
-            vbo.THVs2 = new List<OpenTK.Vector4>();
-            vbo.THWs2 = new List<OpenTK.Vector4>();
+            vbo = new VBO()
+            {
+                THVs = new List<OpenTK.Vector4>(),
+                THWs = new List<OpenTK.Vector4>(),
+                THVs2 = new List<OpenTK.Vector4>(),
+                THWs2 = new List<OpenTK.Vector4>()
+            };
             List<uint> Indices = new List<uint>(Vertices.Count);
             for (uint i = 0; i < Vertices.Count; i++)
             {
@@ -287,9 +287,11 @@ namespace Voxalia.ClientGame.EntitySystem
                 bi[i].BlockPaint = data[PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 3 + i];
             }
             BGETraceMode tm = (BGETraceMode)data[PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 4];
-            BlockGroupEntity bge = new BlockGroupEntity(tregion, tm, bi, xwidth, ywidth, zwidth, Location.FromDoubleBytes(data, PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 4 + 1 + 4));
-            bge.Color = System.Drawing.Color.FromArgb(Utilities.BytesToInt(Utilities.BytesPartial(data, PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 4 + 1, 4)));
-            bge.scale = Location.FromDoubleBytes(data, PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 4 + 1 + 4 + 24);
+            BlockGroupEntity bge = new BlockGroupEntity(tregion, tm, bi, xwidth, ywidth, zwidth, Location.FromDoubleBytes(data, PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 4 + 1 + 4))
+            {
+                Color = System.Drawing.Color.FromArgb(Utilities.BytesToInt(Utilities.BytesPartial(data, PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 4 + 1, 4))),
+                scale = Location.FromDoubleBytes(data, PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 4 + 1 + 4 + 24)
+            };
             bge.ApplyPhysicsNetworkData(data);
             return bge;
         }

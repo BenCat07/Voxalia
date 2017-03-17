@@ -63,8 +63,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 }
                 while (cdelt > 0.04)
                 {
-                    float heightmod;
-                    Location rel = RelSpot(out heightmod);
+                    Location rel = RelSpot(out float heightmod);
                     TheClient.Particles.Fire(rel, size * heightmod * 0.2f);
                     cdelt -= 0.04;
                 }

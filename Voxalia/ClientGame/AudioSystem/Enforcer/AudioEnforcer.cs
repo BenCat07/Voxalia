@@ -80,8 +80,10 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
         {
             Context = acontext;
             Run = true;
-            AudioForcer = new Thread(new ThreadStart(ForceAudioLoop));
-            AudioForcer.Name = "Audio_" + Interlocked.Increment(ref AudioID);
+            AudioForcer = new Thread(new ThreadStart(ForceAudioLoop))
+            {
+                Name = "Audio_" + Interlocked.Increment(ref AudioID)
+            };
             AudioForcer.Start();
         }
 
@@ -115,16 +117,14 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                     double elSec = sw.ElapsedTicks / (double)Stopwatch.Frequency;
                     sw.Reset();
                     sw.Start();
-                    int proc;
-                    AL.GetSource(src, ALGetSourcei.BuffersProcessed, out proc);
+                    AL.GetSource(src, ALGetSourcei.BuffersProcessed, out int proc);
                     while (proc > 0)
                     {
                         int buf = AL.SourceUnqueueBuffer(src);
                         usable.Enqueue(buf);
                         proc--;
                     }
-                    int waiting;
-                    AL.GetSource(src, ALGetSourcei.BuffersQueued, out waiting);
+                    AL.GetSource(src, ALGetSourcei.BuffersQueued, out int waiting);
                     BEPUutilities.Vector3 bforw = ForwardDirection.ToBVector();
                     BEPUutilities.Vector3 bup = UpDirection.ToBVector();
                     if (waiting < BUFFERS_AT_ONCE)
@@ -148,8 +148,7 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                     {
                                         float tempvol = 1.0f / Math.Max(1.0f, (float)toAdd.Position.DistanceSquared(Position));
                                         BEPUutilities.Vector3 rel = ((toAdd.Position - Position).Normalize().ToBVector());
-                                        BEPUutilities.Quaternion quat;
-                                        BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref rel, ref bforw, out quat);
+                                        BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref rel, ref bforw, out BEPUutilities.Quaternion quat);
                                         float angle = (float)quat.AxisAngleFor(bup);
 
                                         if (angle > (float)Math.PI)

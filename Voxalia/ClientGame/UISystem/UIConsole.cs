@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using Voxalia.Shared;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.ClientMainSystem;
-using FreneticScript;
 using OpenTK.Graphics;
 using System.Linq;
 using FreneticGameCore;
@@ -126,7 +125,7 @@ namespace Voxalia.ClientGame.UISystem
         /// <param name="text">The text to be written.</param>
         public static void WriteLine(string text)
         {
-            Write(TextStyle.Default + text + "\n");
+            Write(FreneticScript.TextStyle.Default + text + "\n");
             SysConsole.Output(OutputType.CLIENTINFO, text);
         }
 

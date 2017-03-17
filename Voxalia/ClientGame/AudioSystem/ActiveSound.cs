@@ -51,15 +51,17 @@ namespace Voxalia.ClientGame.AudioSystem
             {
                 if (Engine.AudioInternal != null)
                 {
-                    AudioInternal = new LiveAudioInstance();
-                    AudioInternal.Clip = Effect.Clip;
-                    AudioInternal.Gain = Gain;
-                    AudioInternal.Loop = Loop;
-                    AudioInternal.Pitch = Pitch;
-                    AudioInternal.Position = Position;
-                    AudioInternal.Velocity = Location.Zero; // TODO: Velocity!
-                    // TODO: Direction?
-                    AudioInternal.UsePosition = !Position.IsNaN();
+                    AudioInternal = new LiveAudioInstance()
+                    {
+                        Clip = Effect.Clip,
+                        Gain = Gain,
+                        Loop = Loop,
+                        Pitch = Pitch,
+                        Position = Position,
+                        Velocity = Location.Zero, // TODO: Velocity!
+                        // TODO: Direction?
+                        UsePosition = !Position.IsNaN()
+                    };
                 }
                 else
                 {

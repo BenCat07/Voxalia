@@ -137,9 +137,8 @@ namespace Voxalia.ClientGame.EntitySystem
             TheRegion.PhysicsWorld.Add(Body);
             for (int i = 0; i < Joints.Count; i++)
             {
-                if (Joints[i] is BaseJoint)
+                if (Joints[i] is BaseJoint joint)
                 {
-                    BaseJoint joint = (BaseJoint)Joints[i];
                     joint.CurrentJoint = joint.GetBaseJoint();
                     TheRegion.PhysicsWorld.Add(joint.CurrentJoint);
                 }
@@ -169,9 +168,8 @@ namespace Voxalia.ClientGame.EntitySystem
             WorldTransform = Body.WorldTransform;
             for (int i = 0; i < Joints.Count; i++)
             {
-                if (Joints[i] is BaseJoint)
+                if (Joints[i] is BaseJoint joint)
                 {
-                    BaseJoint joint = (BaseJoint)Joints[i];
                     TheRegion.PhysicsWorld.Remove(joint.CurrentJoint);
                 }
             }

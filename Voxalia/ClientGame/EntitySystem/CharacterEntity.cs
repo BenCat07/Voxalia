@@ -270,8 +270,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public Matrix GetAdjustment(string str)
         {
-            Matrix mat;
-            if (SavedAdjustments.TryGetValue(str, out mat))
+            if (SavedAdjustments.TryGetValue(str, out Matrix mat))
             {
                 return mat;
             }
@@ -280,8 +279,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public OpenTK.Matrix4 GetAdjustmentOTK(string str)
         {
-            OpenTK.Matrix4 mat;
-            if (SavedAdjustmentsOTK.TryGetValue(str, out mat))
+            if (SavedAdjustmentsOTK.TryGetValue(str, out OpenTK.Matrix4 mat))
             {
                 return mat;
             }
@@ -330,8 +328,7 @@ namespace Voxalia.ClientGame.EntitySystem
             if (Body != null)
             {
                 RigidTransform transf = new RigidTransform(Vector3.Zero, Body.Orientation);
-                BoundingBox box;
-                Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out box);
+                Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out BoundingBox box);
                 return base.GetPosition() + new Location(0, 0, box.Min.Z);
             }
             return base.GetPosition() - new Location(0, 0, CBHHeight);
@@ -342,8 +339,7 @@ namespace Voxalia.ClientGame.EntitySystem
             if (Body != null)
             {
                 RigidTransform transf = new RigidTransform(Vector3.Zero, Body.Orientation);
-                BoundingBox box;
-                Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out box);
+                Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out BoundingBox box);
                 base.SetPosition(pos + new Location(0, 0, -box.Min.Z));
             }
             else
@@ -377,8 +373,7 @@ namespace Voxalia.ClientGame.EntitySystem
             const float baseMax = 2000.0f;
             max = baseMax; // TODO: Own mod
             ItemStack its = GetHeldItem();
-            TemplateObject mod;
-            if (its.SharedAttributes.TryGetValue("jetpack_boostmod", out mod))
+            if (its.SharedAttributes.TryGetValue("jetpack_boostmod", out TemplateObject mod))
             {
                 NumberTag nt = NumberTag.TryFor(mod);
                 if (nt != null)
@@ -393,8 +388,7 @@ namespace Voxalia.ClientGame.EntitySystem
         {
             double baseHover = GetMass();
             ItemStack its = GetHeldItem();
-            TemplateObject mod;
-            if (its.SharedAttributes.TryGetValue("jetpack_hovermod", out mod))
+            if (its.SharedAttributes.TryGetValue("jetpack_hovermod", out TemplateObject mod))
             {
                 NumberTag nt = NumberTag.TryFor(mod);
                 if (nt != null)
@@ -446,11 +440,9 @@ namespace Voxalia.ClientGame.EntitySystem
                 {
                     if (Character.JPBoost)
                     {
-                        float max;
-                        double boost = Character.JetpackBoostRate(out max);
-                        double glen;
-                        Vector3 move = GetMoveVector(out glen);
-                        Vector3 vec = -(move * (float)boost) * Delta;
+                        double boost = Character.JetpackBoostRate(out float max);
+                        Vector3 move = GetMoveVector(out double glen);
+                        Vector3 vec = -(move * boost) * Delta;
                         Character.CBody.Jump();
                         Entity.ApplyLinearImpulse(ref vec);
                         if (Entity.LinearVelocity.LengthSquared() > max * max)
@@ -464,9 +456,8 @@ namespace Voxalia.ClientGame.EntitySystem
                     else if (Character.JPHover)
                     {
                         double hover = Character.JetpackHoverStrength();
-                        double glen;
-                        Vector3 move = GetMoveVector(out glen);
-                        Vector3 vec = -(move * (float)glen * (float)hover) * Delta;
+                        Vector3 move = GetMoveVector(out double glen);
+                        Vector3 vec = -(move * glen * hover) * Delta;
                         Entity.ApplyLinearImpulse(ref vec);
                         entity.ModifyLinearDamping(0.6f);
                         Character.DoJetpackEffect(3);

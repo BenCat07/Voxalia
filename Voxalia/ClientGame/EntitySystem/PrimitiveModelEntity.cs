@@ -66,10 +66,8 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             TheClient.SetEnts();
             BEPUutilities.RigidTransform rt = new BEPUutilities.RigidTransform(GetPosition().ToBVector(), GetOrientation());
-            BEPUutilities.Vector3 bmin;
-            BEPUutilities.Vector3 bmax;
-            BEPUutilities.RigidTransform.Transform(ref ModelMin, ref rt, out bmin);
-            BEPUutilities.RigidTransform.Transform(ref ModelMax, ref rt, out bmax);
+            BEPUutilities.RigidTransform.Transform(ref ModelMin, ref rt, out BEPUutilities.Vector3 bmin);
+            BEPUutilities.RigidTransform.Transform(ref ModelMax, ref rt, out BEPUutilities.Vector3 bmax);
             if (TheClient.MainWorldView.CFrust != null && !TheClient.MainWorldView.CFrust.ContainsBox(bmin, bmax))
             {
                 return;

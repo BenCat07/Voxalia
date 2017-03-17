@@ -46,10 +46,8 @@ namespace Voxalia.ClientGame.EntitySystem
             else if (model.Name == "projectiles/arrow.dae") // TODO: More dynamic option for this
             {
                 float offs = 0.1f;
-                BEPUutilities.Vector3 offz;
-                BEPUutilities.Quaternion.TransformZ(offs, ref Angles, out offz);
-                BEPUutilities.Vector3 offx;
-                BEPUutilities.Quaternion.TransformX(offs, ref Angles, out offx);
+                BEPUutilities.Quaternion.TransformZ(offs, ref Angles, out BEPUutilities.Vector3 offz);
+                BEPUutilities.Quaternion.TransformX(offs, ref Angles, out BEPUutilities.Vector3 offx);
                 Location tpp = ppos;
                 Location tp = Position;
                 TheClient.Particles.Engine.AddEffect(ParticleEffectType.LINE, (o) => tpp + new Location(offz),
@@ -108,8 +106,10 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return null;
             }
-            BasicPrimitiveEntity bpe = new BasicPrimitiveEntity(tregion, false);
-            bpe.Scale = new Location(Utilities.BytesToFloat(Utilities.BytesPartial(e, 0, 4)));
+            BasicPrimitiveEntity bpe = new BasicPrimitiveEntity(tregion, false)
+            {
+                Scale = new Location(Utilities.BytesToFloat(Utilities.BytesPartial(e, 0, 4)))
+            };
             bpe.SetPosition(Location.FromDoubleBytes(e, 4));
             bpe.SetVelocity(Location.FromDoubleBytes(e, 4 + 24));
             return bpe;
@@ -124,13 +124,15 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return null;
             }
-            BasicPrimitiveEntity bpe = new BasicPrimitiveEntity(tregion, false);
-            bpe.Position = Location.FromDoubleBytes(e, 0);
-            bpe.Velocity = Location.FromDoubleBytes(e, 24);
-            bpe.Angles = Utilities.BytesToQuaternion(e, 24 + 24);
-            bpe.Scale = Location.FromDoubleBytes(e, 24 + 24 + 16);
-            bpe.Gravity = Location.FromDoubleBytes(e, 24 + 24 + 16 + 24);
-            bpe.model = tregion.TheClient.Models.GetModel(tregion.TheClient.Network.Strings.StringForIndex(Utilities.BytesToInt(Utilities.BytesPartial(e, 24 + 24 + 16 + 24 + 24, 4))));
+            BasicPrimitiveEntity bpe = new BasicPrimitiveEntity(tregion, false)
+            {
+                Position = Location.FromDoubleBytes(e, 0),
+                Velocity = Location.FromDoubleBytes(e, 24),
+                Angles = Utilities.BytesToQuaternion(e, 24 + 24),
+                Scale = Location.FromDoubleBytes(e, 24 + 24 + 16),
+                Gravity = Location.FromDoubleBytes(e, 24 + 24 + 16 + 24),
+                model = tregion.TheClient.Models.GetModel(tregion.TheClient.Network.Strings.StringForIndex(Utilities.BytesToInt(Utilities.BytesPartial(e, 24 + 24 + 16 + 24 + 24, 4))))
+            };
             return bpe;
         }
     }

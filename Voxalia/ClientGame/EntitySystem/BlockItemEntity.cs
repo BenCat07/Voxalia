@@ -20,6 +20,7 @@ using BEPUphysics.NarrowPhaseSystems.Pairs;
 using BEPUphysics.CollisionTests;
 using Voxalia.ClientGame.NetworkSystem.PacketsIn;
 using Voxalia.Shared.Collision;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {
@@ -115,8 +116,7 @@ namespace Voxalia.ClientGame.EntitySystem
             lastSoundTime = TheRegion.GlobalTickTimeLocal;
             if (other is FullChunkObject)
             {
-                ContactInformation info;
-                ((ConvexFCOPairHandler)pair).ContactInfo(/*contact.Id*/0, out info);
+                ((ConvexFCOPairHandler)pair).ContactInfo(/*contact.Id*/0, out ContactInformation info);
                 float vellen = (float)(Math.Abs(info.RelativeVelocity.X) + Math.Abs(info.RelativeVelocity.Y) + Math.Abs(info.RelativeVelocity.Z));
                 float mod = vellen / 5;
                 if (mod > 2)
