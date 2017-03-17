@@ -10,31 +10,18 @@ using System;
 using System.Collections.Generic;
 using Voxalia.Shared;
 using Voxalia.ClientGame.UISystem;
-using Voxalia.ClientGame.NetworkSystem.PacketsIn;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
 using BEPUutilities;
-using BEPUphysics;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.OtherSpaceStages;
-using BEPUphysics.UpdateableSystems;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.PositionUpdating;
-using BEPUphysics.NarrowPhaseSystems;
 using Voxalia.ClientGame.GraphicsSystems;
-using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared.Collision;
 using BEPUphysics.Character;
 using OpenTK.Graphics.OpenGL4;
-using FreneticScript;
-using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.JointSystem;
-using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Objects;
-using BEPUphysics.Constraints.SolverGroups;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

@@ -18,7 +18,6 @@ using Voxalia.ClientGame.NetworkSystem.PacketsIn;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared.Files;
 using System.Threading.Tasks;
-using FreneticScript;
 using System.Web;
 using Voxalia.ClientGame.UISystem;
 using System.Diagnostics;

@@ -12,7 +12,7 @@ using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
 using Voxalia.ClientGame.OtherSystems;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

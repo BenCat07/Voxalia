@@ -15,6 +15,7 @@ using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.GraphicsSystems.ParticleSystem;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.OtherSystems;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

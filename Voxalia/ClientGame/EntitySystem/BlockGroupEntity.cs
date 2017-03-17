@@ -21,6 +21,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared.Collision;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

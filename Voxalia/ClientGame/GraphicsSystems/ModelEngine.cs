@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Voxalia.Shared;
-using FreneticScript;
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared.Files;
@@ -18,6 +17,7 @@ using System.Linq;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared.Collision;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

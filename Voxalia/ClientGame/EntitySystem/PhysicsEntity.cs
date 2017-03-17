@@ -6,18 +6,16 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
-using Voxalia.Shared;
+using System;
 using BEPUutilities;
 using BEPUphysics.CollisionShapes;
 using Voxalia.ClientGame.JointSystem;
-using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared.Collision;
-using BEPUphysics;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

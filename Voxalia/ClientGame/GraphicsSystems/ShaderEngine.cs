@@ -11,7 +11,6 @@ using System.Text;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
-using FreneticScript;
 using Voxalia.Shared.Files;
 using Voxalia.ClientGame.ClientMainSystem;
 using FreneticGameCore;
@@ -123,14 +122,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 if (!TheClient.Files.Exists("shaders/" + filename + ".vs"))
                 {
                     SysConsole.Output(OutputType.ERROR, "Cannot load shader, file '" +
-                        TextStyle.Color_Standout + "shaders/" + filename + ".vs" + TextStyle.Color_Error +
+                        FreneticScript.TextStyle.Color_Standout + "shaders/" + filename + ".vs" + FreneticScript.TextStyle.Color_Error +
                         "' does not exist.");
                     return null;
                 }
                 if (!TheClient.Files.Exists("shaders/" + filename + ".fs"))
                 {
                     SysConsole.Output(OutputType.ERROR, "Cannot load shader, file '" +
-                        TextStyle.Color_Standout + "shaders/" + filename + ".fs" + TextStyle.Color_Error +
+                        FreneticScript.TextStyle.Color_Standout + "shaders/" + filename + ".fs" + FreneticScript.TextStyle.Color_Error +
                         "' does not exist.");
                     return null;
                 }
@@ -146,7 +145,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             catch (Exception ex)
             {
                 SysConsole.Output(OutputType.ERROR, "Failed to load shader from filename '" +
-                    TextStyle.Color_Standout + "shaders/" + filename + ".fs or .vs" + TextStyle.Color_Error + "': " + ex.ToString());
+                    FreneticScript.TextStyle.Color_Standout + "shaders/" + filename + ".fs or .vs" + FreneticScript.TextStyle.Color_Error + "': " + ex.ToString());
                 return null;
             }
         }

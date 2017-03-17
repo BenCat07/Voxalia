@@ -20,6 +20,7 @@ using FreneticScript;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared;
 using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {

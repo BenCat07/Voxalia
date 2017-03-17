@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using OpenTK;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.OtherSystems
 {

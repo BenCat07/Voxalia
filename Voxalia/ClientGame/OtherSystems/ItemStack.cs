@@ -13,10 +13,8 @@ using Voxalia.Shared.Files;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.GraphicsSystems;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL4;
 using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.OtherSystems
 {

@@ -6,10 +6,12 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using OpenTK;
 using OpenTK.Audio.OpenAL;
 using Voxalia.Shared;
 using Voxalia.ClientGame.OtherSystems;
+using FreneticGameCore;
 using Voxalia.ClientGame.AudioSystem.Enforcer;
 
 namespace Voxalia.ClientGame.AudioSystem

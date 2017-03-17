@@ -16,9 +16,9 @@ using System.Drawing;
 using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
 using FreneticScript;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Globalization;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

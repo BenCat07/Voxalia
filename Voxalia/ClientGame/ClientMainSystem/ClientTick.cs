@@ -27,6 +27,7 @@ using Voxalia.ClientGame.NetworkSystem;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
 using Voxalia.ClientGame.WorldSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {

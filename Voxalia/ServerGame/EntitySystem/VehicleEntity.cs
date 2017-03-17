@@ -16,7 +16,6 @@ using Voxalia.Shared;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.ServerGame.JointSystem;
 using BEPUutilities;
-using FreneticScript;
 using Voxalia.ServerGame.OtherSystems;
 using FreneticGameCore;
 
@@ -34,8 +33,10 @@ namespace Voxalia.ServerGame.EntitySystem
 
         List<Model3DNode> GetNodes(Model3DNode node)
         {
-            List<Model3DNode> nodes = new List<Model3DNode>();
-            nodes.Add(node);
+            List<Model3DNode> nodes = new List<Model3DNode>()
+            {
+                node
+            };
             if (node.Children.Count > 0)
             {
                 for (int i = 0; i < node.Children.Count; i++)
@@ -52,8 +53,10 @@ namespace Voxalia.ServerGame.EntitySystem
             vehName = vehicle;
             SetMass(1500);
             DriverSeat = new Seat(this, Location.UnitZ * 2);
-            Seats = new List<Seat>();
-            Seats.Add(DriverSeat);
+            Seats = new List<Seat>()
+            {
+                DriverSeat
+            };
         }
 
         public double UseRelease = 0;

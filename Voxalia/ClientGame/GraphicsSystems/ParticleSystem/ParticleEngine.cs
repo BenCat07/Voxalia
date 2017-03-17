@@ -19,6 +19,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading.Tasks;
 using Voxalia.ClientGame.WorldSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 {

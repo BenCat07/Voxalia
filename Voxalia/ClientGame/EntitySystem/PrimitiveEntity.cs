@@ -6,12 +6,13 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using System.Collections.Generic;
 using Voxalia.Shared;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.Shared.Collision;
 using OpenTK;
-using System;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

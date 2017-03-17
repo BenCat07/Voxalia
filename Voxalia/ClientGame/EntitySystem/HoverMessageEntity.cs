@@ -18,6 +18,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.ClientGame.GraphicsSystems;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

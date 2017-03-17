@@ -13,6 +13,7 @@ using Voxalia.ClientGame.ClientMainSystem;
 using FreneticScript;
 using OpenTK.Graphics;
 using System.Linq;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.UISystem
 {

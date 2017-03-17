@@ -15,6 +15,7 @@ using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared.Collision;
 using Voxalia.ClientGame.GraphicsSystems;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {

@@ -16,7 +16,6 @@ using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.NetworkSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using System.Threading;
-using FreneticScript;
 using FreneticScript.TagHandlers.Common;
 using System.Linq;
 using FreneticGameCore;
@@ -176,9 +175,9 @@ namespace Voxalia.ServerGame.ServerMainSystem
                 cvarsave.Append("debug minimal;\n");
                 for (int i = 0; i < CVars.system.CVarList.Count; i++)
                 {
-                    if (!CVars.system.CVarList[i].Flags.HasFlag(CVarFlag.ServerControl)
-                        && !CVars.system.CVarList[i].Flags.HasFlag(CVarFlag.ReadOnly)
-                        && !CVars.system.CVarList[i].Flags.HasFlag(CVarFlag.DoNotSave))
+                    if (!CVars.system.CVarList[i].Flags.HasFlag(FreneticScript.CVarFlag.ServerControl)
+                        && !CVars.system.CVarList[i].Flags.HasFlag(FreneticScript.CVarFlag.ReadOnly)
+                        && !CVars.system.CVarList[i].Flags.HasFlag(FreneticScript.CVarFlag.DoNotSave))
                     {
                         string val = CVars.system.CVarList[i].Value;
                         if (val.Contains('\"'))

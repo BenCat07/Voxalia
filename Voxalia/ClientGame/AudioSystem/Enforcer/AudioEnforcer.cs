@@ -17,6 +17,7 @@ using System.Threading;
 using OpenTK.Audio;
 using OpenTK.Audio.OpenAL;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.AudioSystem.Enforcer
 {

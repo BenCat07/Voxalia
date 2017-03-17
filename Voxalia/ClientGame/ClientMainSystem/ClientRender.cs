@@ -21,10 +21,10 @@ using Voxalia.ClientGame.OtherSystems;
 using Voxalia.ClientGame.JointSystem;
 using Voxalia.Shared.Collision;
 using System.Diagnostics;
-using FreneticScript;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.Shared.Files;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {

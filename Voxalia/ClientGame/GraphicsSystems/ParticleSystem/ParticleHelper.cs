@@ -13,6 +13,7 @@ using System.Text;
 using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
 using BEPUutilities;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 {

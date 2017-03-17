@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using Voxalia.Shared;
 using Voxalia.Shared.Files;
-using FreneticScript;
 using Voxalia.ServerGame.ServerMainSystem;
 using FreneticGameCore;
 
@@ -32,8 +31,7 @@ namespace Voxalia.ServerGame.OtherSystems
         public Model GetModel(string name)
         {
             string nl = name.ToLowerFast();
-            Model temp;
-            if (Models.TryGetValue(nl, out temp))
+            if (Models.TryGetValue(nl, out Model temp))
             {
                 return temp;
             }

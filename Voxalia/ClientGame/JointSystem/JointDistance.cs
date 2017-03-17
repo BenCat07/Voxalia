@@ -6,11 +6,13 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.Shared;
 using BEPUphysics.Constraints.TwoEntity;
 using BEPUphysics.Constraints.TwoEntity.JointLimits;
 using BEPUphysics.Constraints;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.JointSystem
 {

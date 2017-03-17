@@ -21,6 +21,7 @@ using Voxalia.ClientGame.ClientMainSystem;
 using FreneticScript;
 using System.Threading;
 using Voxalia.ClientGame.AudioSystem.Enforcer;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.AudioSystem
 {
@@ -421,10 +422,7 @@ namespace Voxalia.ClientGame.AudioSystem
                 CheckError("Play:" + sfx.Name);
                 //SysConsole.Output(OutputType.DEBUG, "Audio / sucess");
                 PlayingNow.Add(actsfx);
-                if (callback != null)
-                {
-                    callback(actsfx);
-                }
+                callback?.Invoke(actsfx);
             };
             lock (sfx)
             {

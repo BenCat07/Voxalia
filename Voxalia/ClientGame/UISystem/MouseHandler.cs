@@ -11,7 +11,7 @@ using Voxalia.Shared;
 using OpenTK.Input;
 using Voxalia.ClientGame.ClientMainSystem;
 using System.Drawing;
-
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.UISystem
 {

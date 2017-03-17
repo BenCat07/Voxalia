@@ -24,10 +24,9 @@ using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using Voxalia.Shared.Collision;
 using System.Diagnostics;
-using FreneticScript;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.OtherSystems;
-using System.Threading.Tasks;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.WorldSystem
 {

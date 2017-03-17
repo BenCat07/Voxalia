@@ -12,6 +12,7 @@ using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.JointSystem;
 using Voxalia.ClientGame.WorldSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

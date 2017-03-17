@@ -9,6 +9,7 @@
 using System;
 using Voxalia.Shared;
 using Voxalia.Shared.Files;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsOut
 {
