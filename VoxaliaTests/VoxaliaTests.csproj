@@ -89,6 +89,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FreneticGameEngine\FreneticGameCore\FreneticGameCore.csproj">
+      <Project>{c608fd6d-fb74-4a0b-affe-d24ac7deb3e3}</Project>
+      <Name>FreneticGameCore</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Voxalia\VoxaliaClient.csproj">
       <Project>{ee5a02f5-5105-4b5f-8580-1e8f6e091774}</Project>
       <Name>VoxaliaClient</Name>

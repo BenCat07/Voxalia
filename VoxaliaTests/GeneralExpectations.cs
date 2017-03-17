@@ -13,9 +13,12 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace VoxaliaTests
 {
+    // TODO: Move to FreneticGameCore!
+
     /// <summary>
     /// Tests general expectations of the C# language.
     /// </summary>
