@@ -133,7 +133,7 @@ namespace VoxaliaLauncher
             }
         }
 
-        private void changeLogin_Click(object sender, EventArgs e)
+        private void ChangeLogin_Click(object sender, EventArgs e)
         {
             GlobalLoginAttempt(usernameBox.Text, passwordBox.Text, tfaBox.Text);
         }
@@ -157,9 +157,9 @@ namespace VoxaliaLauncher
             {
                 using (ShortWebClient wb = new ShortWebClient())
                 {
+                    NameValueCollection data = new NameValueCollection();
                     try
                     {
-                        NameValueCollection data = new NameValueCollection();
                         data["formtype"] = "login";
                         data["username"] = user;
                         data["password"] = pass;
@@ -210,20 +210,23 @@ namespace VoxaliaLauncher
             });
         }
 
-        private void playButton_Click(object sender, EventArgs e)
+        private void PlayButton_Click(object sender, EventArgs e)
         {
             playButton.Enabled = false;
-            ProcessStartInfo psi = new ProcessStartInfo("Voxalia.exe", "{{Launcher}}");
-            psi.RedirectStandardOutput = true;
+            ProcessStartInfo psi = new ProcessStartInfo("Voxalia.exe", "{{Launcher}}")
+            {
+                RedirectStandardOutput = true,
+                UseShellExecute = false
+            };
             // TODO: psi.RedirectStandardInput = true;
-            psi.UseShellExecute = false;
             Process p = Process.Start(psi);
             LauncherLog log = new LauncherLog(this, p.StandardOutput);
             log.Show();
+            log.Location = Location;
             Hide();
         }
 
-        private void logoutButton_Click(object sender, EventArgs e)
+        private void LogoutButton_Click(object sender, EventArgs e)
         {
             if (UserName == null)
             {

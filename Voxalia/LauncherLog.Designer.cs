@@ -51,7 +51,6 @@ namespace VoxaliaLauncher
             this.richTextBox1.Size = new System.Drawing.Size(449, 390);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
-            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
             // 
             // checkBox1
             // 
@@ -74,6 +73,7 @@ namespace VoxaliaLauncher
             this.Controls.Add(this.richTextBox1);
             this.Name = "LauncherLog";
             this.RightToLeftLayout = true;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Voxalia Log";
             this.Load += new System.EventHandler(this.LauncherLog_Load);
             this.ResumeLayout(false);

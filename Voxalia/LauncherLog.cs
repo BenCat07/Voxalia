@@ -155,8 +155,7 @@ namespace VoxaliaLauncher
             InitializeComponent();
             OutputReader = input;
             OwnerForm = form;
-            Timer t = new Timer();
-            t.Interval = 500;
+            Timer t = new Timer() { Interval = 500 };
             t.Tick += T_Tick;
             t.Start();
         }
@@ -325,11 +324,6 @@ namespace VoxaliaLauncher
                     WriteInternal(read);
                 }));
             }
-        }
-
-        private void richTextBox1_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

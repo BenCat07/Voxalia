@@ -100,7 +100,7 @@ namespace VoxaliaLauncher
             this.playButton.TabIndex = 6;
             this.playButton.Text = "Play Voxalia";
             this.playButton.UseVisualStyleBackColor = true;
-            this.playButton.Click += new System.EventHandler(this.playButton_Click);
+            this.playButton.Click += new System.EventHandler(this.PlayButton_Click);
             // 
             // logoutButton
             // 
@@ -110,7 +110,7 @@ namespace VoxaliaLauncher
             this.logoutButton.TabIndex = 7;
             this.logoutButton.Text = "Log In";
             this.logoutButton.UseVisualStyleBackColor = true;
-            this.logoutButton.Click += new System.EventHandler(this.logoutButton_Click);
+            this.logoutButton.Click += new System.EventHandler(this.LogoutButton_Click);
             // 
             // progressBar1
             // 
@@ -166,6 +166,7 @@ namespace VoxaliaLauncher
             this.Controls.Add(this.loggedAs);
             this.MaximizeBox = false;
             this.Name = "LauncherForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Voxalia Launcher";
             this.Load += new System.EventHandler(this.LauncherForm_Load);
             this.ResumeLayout(false);
