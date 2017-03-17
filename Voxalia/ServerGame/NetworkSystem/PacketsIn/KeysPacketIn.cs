@@ -13,6 +13,7 @@ using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using BEPUutilities;
 using BEPUphysics;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
 {

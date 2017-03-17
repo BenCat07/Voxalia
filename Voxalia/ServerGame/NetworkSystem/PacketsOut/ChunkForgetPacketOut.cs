@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {

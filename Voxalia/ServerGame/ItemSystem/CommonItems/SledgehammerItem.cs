@@ -18,6 +18,7 @@ using BEPUphysics;
 using BEPUutilities;
 using Voxalia.ServerGame.OtherSystems;
 using Voxalia.ServerGame.WorldSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Voxalia.Shared;
+using FreneticGameCore;
 using Voxalia.Shared.Collision;
 
 namespace Voxalia.ServerGame.WorldSystem.SphereGenerator

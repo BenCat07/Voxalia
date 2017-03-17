@@ -15,6 +15,7 @@ using System.Reflection;
 using System.IO; // Permitted IO rules exception
 using Voxalia.Shared;
 using Voxalia.ServerGame.ServerMainSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.PluginSystem
 {

@@ -19,6 +19,7 @@ using System.Threading;
 using FreneticScript;
 using FreneticScript.TagHandlers.Common;
 using System.Linq;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ServerMainSystem
 {

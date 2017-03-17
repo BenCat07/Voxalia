@@ -19,10 +19,10 @@ using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.ServerGame.OtherSystems;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Objects;
-using FreneticScript;
 using Voxalia.ServerGame.TagSystem.TagObjects;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.JointSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
 {
@@ -137,10 +137,9 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             }
             else if (arg0 == "chunkDebug")
             {
-                Biome biome;
                 Location posBlock = entry.Player.GetPosition().GetBlockLocation();
                 double h = entry.Player.TheRegion.Generator.GetHeight(entry.Player.TheRegion.TheWorld.Seed, entry.Player.TheRegion.TheWorld.Seed2, entry.Player.TheRegion.TheWorld.Seed3,
-                    entry.Player.TheRegion.TheWorld.Seed4, entry.Player.TheRegion.TheWorld.Seed5, (double)posBlock.X, (double)posBlock.Y, (double)posBlock.Z, out biome);
+                    entry.Player.TheRegion.TheWorld.Seed4, entry.Player.TheRegion.TheWorld.Seed5, (double)posBlock.X, (double)posBlock.Y, (double)posBlock.Z, out Biome biome);
                 BlockInternal bi = entry.Player.TheRegion.GetBlockInternal_NoLoad((entry.Player.GetPosition() + new Location(0, 0, -0.05f)).GetBlockLocation());
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Mat: " + bi.Material + ", data: " + ((int)bi.BlockData) + ", locDat: " + ((int)bi.BlockLocalData)
                     + ", Damage: " + bi.Damage + ", Paint: " + bi.BlockPaint
@@ -201,8 +200,10 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             }
             else if (arg0 == "spawnSlime" && entry.InputArguments.Count > 2)
             {
-                SlimeEntity se = new SlimeEntity(entry.Player.TheRegion, Utilities.StringToFloat(entry.InputArguments[2]));
-                se.mod_color = ColorTag.For(entry.InputArguments[1]).Internal;
+                SlimeEntity se = new SlimeEntity(entry.Player.TheRegion, Utilities.StringToFloat(entry.InputArguments[2]))
+                {
+                    mod_color = ColorTag.For(entry.InputArguments[1]).Internal
+                };
                 se.SetPosition(entry.Player.GetPosition() + entry.Player.ForwardVector() * 5);
                 se.TheRegion.SpawnEntity(se);
             }
@@ -230,8 +231,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 Location eye = entry.Player.GetEyePosition();
                 Location forw = entry.Player.ForwardVector();
                 Location goal;
-                RayCastResult rcr;
-                if (entry.Player.TheRegion.SpecialCaseRayTrace(eye, forw, 150, MaterialSolidity.FULLSOLID, entry.Player.IgnorePlayers, out rcr))
+                if (entry.Player.TheRegion.SpecialCaseRayTrace(eye, forw, 150, MaterialSolidity.FULLSOLID, entry.Player.IgnorePlayers, out RayCastResult rcr))
                 {
                     goal = new Location(rcr.HitData.Location);
                 }
@@ -267,8 +267,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             }
             else if (arg0 == "gameMode" && entry.InputArguments.Count > 1)
             {
-                GameMode mode;
-                if (Enum.TryParse(entry.InputArguments[1].ToUpperInvariant(), out mode))
+                if (Enum.TryParse(entry.InputArguments[1].ToUpperInvariant(), out GameMode mode))
                 {
                     entry.Player.Mode = mode;
                 }
@@ -311,8 +310,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             }
             else if (arg0 == "blockDamage" && entry.InputArguments.Count > 1)
             {
-                BlockDamage damage;
-                if (Enum.TryParse(entry.InputArguments[1], out damage))
+                if (Enum.TryParse(entry.InputArguments[1], out BlockDamage damage))
                 {
                     Location posBlock = (entry.Player.GetPosition() + new Location(0, 0, -0.05f)).GetBlockLocation();
                     BlockInternal bi = entry.Player.TheRegion.GetBlockInternal(posBlock);
@@ -341,8 +339,10 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             else if (arg0 == "spawnMessage" && entry.InputArguments.Count > 1)
             {
                 string mes = entry.InputArguments[1].Replace("\\n", "\n");
-                HoverMessageEntity hme = new HoverMessageEntity(entry.Player.TheRegion, mes);
-                hme.Position = entry.Player.GetEyePosition();
+                HoverMessageEntity hme = new HoverMessageEntity(entry.Player.TheRegion, mes)
+                {
+                    Position = entry.Player.GetEyePosition()
+                };
                 entry.Player.TheRegion.SpawnEntity(hme);
             }
             else if (arg0 == "chunkTimes")

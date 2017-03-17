@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.Shared;
 using BEPUutilities;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {

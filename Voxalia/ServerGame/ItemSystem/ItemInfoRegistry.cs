@@ -9,7 +9,7 @@
 using System.Collections.Generic;
 using Voxalia.ServerGame.ItemSystem.CommonItems;
 using Voxalia.Shared;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem
 {

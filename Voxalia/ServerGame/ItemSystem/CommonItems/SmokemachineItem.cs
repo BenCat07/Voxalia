@@ -13,6 +13,7 @@ using System.Text;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {

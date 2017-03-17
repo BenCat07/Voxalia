@@ -28,6 +28,7 @@ using System.Drawing;
 using FreneticScript;
 using Voxalia.Shared.Files;
 using Voxalia.ClientGame.UISystem.MenuSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -139,7 +140,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.CLIENTINIT, "Generating window...");
             DisplayDevice dd = DisplayDevice.Default;
             Window = new GameWindow(CVars.r_width.ValueI, CVars.r_height.ValueI, new GraphicsMode(24, 24, 0, 0),
-                Program.GameName + " v" + Program.GameVersion + " (" + Program.GameVersionDescription + ")", GameWindowFlags.Default, dd, 4, 3, GraphicsContextFlags.ForwardCompatible);
+                VoxProgram.GameName + " v" + VoxProgram.GameVersion + " (" + VoxProgram.GameVersionDescription + ")", GameWindowFlags.Default, dd, 4, 3, GraphicsContextFlags.ForwardCompatible);
             Window.Load += new EventHandler<EventArgs>(Window_Load);
             Window.RenderFrame += new EventHandler<FrameEventArgs>(Window_RenderFrame);
             Window.Mouse.Move += new EventHandler<MouseMoveEventArgs>(MouseHandler.Window_MouseMove);

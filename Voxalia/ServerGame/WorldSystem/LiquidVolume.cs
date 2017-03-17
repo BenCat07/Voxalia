@@ -10,17 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using BEPUphysics;
 using BEPUphysics.Entities;
-using BEPUphysics.UpdateableSystems.ForceFields;
 using BEPUutilities;
-using BEPUphysics.CollisionShapes;
-using BEPUphysics.CollisionShapes.ConvexShapes;
 using BEPUphysics.UpdateableSystems;
 using Voxalia.Shared;
-using BEPUphysics.BroadPhaseEntries;
-using Voxalia.Shared.Collision;
 using BEPUutilities.DataStructures;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.WorldSystem
 {

@@ -16,6 +16,7 @@ using Voxalia.Shared;
 using Voxalia.Shared.Collision;
 using BEPUutilities;
 using Voxalia.ServerGame.JointSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {

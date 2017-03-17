@@ -6,10 +6,12 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using System.Collections.Generic;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {

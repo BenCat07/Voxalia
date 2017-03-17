@@ -6,15 +6,15 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.Shared;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using BEPUphysics;
-using BEPUutilities;
-using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using Voxalia.ServerGame.OtherSystems;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {

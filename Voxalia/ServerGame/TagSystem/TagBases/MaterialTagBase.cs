@@ -13,8 +13,8 @@ using System.Text;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Objects;
 using Voxalia.ServerGame.TagSystem.TagObjects;
-using FreneticScript;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.TagSystem.TagBases
 {

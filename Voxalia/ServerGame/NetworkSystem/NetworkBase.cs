@@ -14,6 +14,7 @@ using System.Net.Sockets;
 using System.Threading;
 using Voxalia.Shared;
 using Open.Nat;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.NetworkSystem
 {
@@ -77,7 +78,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                 ListenSocket.Bind(new IPEndPoint(IPAddress.Any, TheServer.Port));
             }
             ListenSocket.Listen(100);
-            ListenThread = new Thread(new ThreadStart(ListenLoop)) { Name = Program.GameName + "_v" + Program.GameVersion + "_NetworkListenThread" };
+            ListenThread = new Thread(new ThreadStart(ListenLoop)) { Name = VoxProgram.GameName + "_v" + VoxProgram.GameVersion + "_NetworkListenThread" };
             ListenThread.Start();
         }
 

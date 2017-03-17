@@ -12,8 +12,8 @@ using System.Text;
 using System.Linq;
 using System.IO;
 using System.IO.Compression;
-using FreneticScript;
 using LZ4;
+using FreneticGameCore;
 
 namespace Voxalia.Shared.Files
 {
@@ -93,16 +93,16 @@ namespace Voxalia.Shared.Files
         {
             foreach (string str in SubDirectories)
             {
-                load(str, Directory.GetFiles(str, "*.*", SearchOption.AllDirectories));
+                Load(str, Directory.GetFiles(str, "*.*", SearchOption.AllDirectories));
             }
             if (SaveDir == null)
             {
                 SaveDir = BaseDirectory;
             }
-            load(BaseDirectory, Directory.GetFiles(BaseDirectory, "*.*", SearchOption.AllDirectories));
+            Load(BaseDirectory, Directory.GetFiles(BaseDirectory, "*.*", SearchOption.AllDirectories));
         }
 
-        void load(string pth, string[] allfiles)
+        void Load(string pth, string[] allfiles)
         {
             foreach (string tfile in allfiles)
             {

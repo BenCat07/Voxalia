@@ -14,6 +14,7 @@ using Voxalia.ServerGame.JointSystem;
 using Voxalia.ServerGame.WorldSystem;
 using BEPUphysics.CollisionRuleManagement;
 using LiteDB;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {

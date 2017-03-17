@@ -6,13 +6,14 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.Shared;
 using Voxalia.ServerGame.PlayerCommandSystem.CommonCommands;
 using Voxalia.ServerGame.PlayerCommandSystem.RegionCommands;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem
 {
@@ -43,9 +44,11 @@ namespace Voxalia.ServerGame.PlayerCommandSystem
 
         public void Execute(PlayerEntity entity, List<string> arguments, string commandname)
         {
-            PlayerCommandEntry entry = new PlayerCommandEntry();
-            entry.Player = entity;
-            entry.InputArguments = arguments;
+            PlayerCommandEntry entry = new PlayerCommandEntry()
+            {
+                Player = entity,
+                InputArguments = arguments
+            };
             entry.Command = GetCommand(commandname);
             if (entry.Command == null || !entry.Command.Silent)
             {
@@ -70,8 +73,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem
 
         public AbstractPlayerCommand GetCommand(string name)
         {
-            AbstractPlayerCommand apc;
-            Commands.TryGetValue(name.ToLowerFast(), out apc);
+            Commands.TryGetValue(name.ToLowerFast(), out AbstractPlayerCommand apc);
             return apc;
         }
     }

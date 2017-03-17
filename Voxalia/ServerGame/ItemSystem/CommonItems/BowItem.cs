@@ -12,6 +12,7 @@ using Voxalia.ServerGame.EntitySystem;
 using FreneticScript.TagHandlers.Objects;
 using BEPUutilities;
 using FreneticScript.TagHandlers;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {

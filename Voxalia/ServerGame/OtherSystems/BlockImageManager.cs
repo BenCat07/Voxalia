@@ -23,6 +23,7 @@ using Voxalia.ServerGame.WorldSystem;
 using FreneticScript;
 using Voxalia.ServerGame.ServerMainSystem;
 using BEPUutilities;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.OtherSystems
 {

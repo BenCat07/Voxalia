@@ -20,10 +20,9 @@ using Voxalia.ServerGame.ItemSystem;
 using Voxalia.ServerGame.OtherSystems;
 using Voxalia.ServerGame.WorldSystem;
 using Voxalia.ServerGame.PluginSystem;
-using FreneticScript.CommandSystem;
-using FreneticScript;
 using Voxalia.Shared.Files;
 using FreneticDataSyntax;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ServerMainSystem
 {

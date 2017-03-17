@@ -11,6 +11,7 @@ using Voxalia.Shared;
 using FreneticScript;
 using FreneticScript.CommandSystem;
 using Voxalia.ServerGame.ServerMainSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.CommandSystem
 {

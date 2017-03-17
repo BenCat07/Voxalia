@@ -16,7 +16,7 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics;
 using Voxalia.ServerGame.WorldSystem;
 using BEPUutilities;
-
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {

@@ -8,6 +8,7 @@
 
 using System;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
 {

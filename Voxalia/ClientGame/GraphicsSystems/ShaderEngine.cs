@@ -14,6 +14,7 @@ using Voxalia.Shared;
 using FreneticScript;
 using Voxalia.Shared.Files;
 using Voxalia.ClientGame.ClientMainSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

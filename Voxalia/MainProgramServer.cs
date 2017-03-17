@@ -16,6 +16,7 @@ using System.IO;
 using System.Threading;
 using System.Globalization;
 using Voxalia.Shared.Files;
+using FreneticGameCore;
 
 namespace Voxalia
 {
@@ -37,9 +38,9 @@ namespace Voxalia
         static void Main(string[] args)
         {
             ConsoleHandle = Process.GetCurrentProcess().MainWindowHandle;
-            Program.PreInit();
+            VoxProgram.PreInit();
             SysConsole.Init();
-            Program.Init();
+            VoxProgram.Init();
             try
             {
                 string game = "default";

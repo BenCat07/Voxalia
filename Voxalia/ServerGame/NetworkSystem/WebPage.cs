@@ -12,13 +12,13 @@ using System.Linq;
 using System.Text;
 using Voxalia.ServerGame.ServerMainSystem;
 using Voxalia.Shared.Files;
-using FreneticScript;
 using Voxalia.Shared;
 using Voxalia.ServerGame.WorldSystem;
 using Voxalia.ServerGame.OtherSystems;
 using System.Drawing;
 using System.Drawing.Imaging;
 using FreneticDataSyntax;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.NetworkSystem
 {
@@ -84,8 +84,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                 }
                 http_request_headers[dat[0].Trim()] = dat[1].Trim();
             }
-            string encAllowed;
-            if (http_request_headers.TryGetValue("Accept-Encoding", out encAllowed))
+            if (http_request_headers.TryGetValue("Accept-Encoding", out string encAllowed))
             {
                 GZip = encAllowed.Contains("gzip");
             }
@@ -117,8 +116,7 @@ namespace Voxalia.ServerGame.NetworkSystem
             string pageLow = http_request_page.ToLowerFast();
             if (pageLow.StartsWith("/map/region/"))
             {
-                string after;
-                string region = pageLow.Substring("/map/region/".Length).BeforeAndAfter("/", out after);
+                string region = pageLow.Substring("/map/region/".Length).BeforeAndAfter("/", out string after);
                 for (int i = 0; i < TheServer.LoadedWorlds.Count; i++)
                 {
                     World world = TheServer.LoadedWorlds[i];

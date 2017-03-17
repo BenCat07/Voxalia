@@ -18,7 +18,7 @@ using FreneticScript.TagHandlers.Common;
 using FreneticScript.TagHandlers.Objects;
 using Voxalia.ServerGame.TagSystem.TagBases;
 using Voxalia.ServerGame.TagSystem.TagObjects;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem
 {

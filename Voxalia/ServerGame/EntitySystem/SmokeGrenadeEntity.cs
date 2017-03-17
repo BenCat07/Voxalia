@@ -17,6 +17,7 @@ using Voxalia.Shared;
 using Voxalia.ServerGame.ItemSystem;
 using FreneticScript.TagHandlers.Objects;
 using LiteDB;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {

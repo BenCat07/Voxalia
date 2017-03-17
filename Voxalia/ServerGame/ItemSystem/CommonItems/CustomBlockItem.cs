@@ -19,6 +19,7 @@ using Voxalia.Shared.Collision;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using Voxalia.ServerGame.OtherSystems;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {

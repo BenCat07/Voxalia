@@ -18,6 +18,7 @@ using System.Threading;
 using System.Globalization;
 using Voxalia.Shared.Files;
 using System.Runtime.InteropServices;
+using FreneticGameCore;
 
 namespace Voxalia
 {
@@ -54,7 +55,7 @@ namespace Voxalia
                 ShowWindow(ConsoleHandle, SW_HIDE);
 #endif
             }
-            Program.PreInit();
+            VoxProgram.PreInit();
             SysConsole.AllowCursor = false;
             SysConsole.Init();
             StringBuilder arger = new StringBuilder();
@@ -64,7 +65,7 @@ namespace Voxalia
             }
             try
             {
-                Program.Init();
+                VoxProgram.Init();
                 if (args.Length > 0 && args[0] == "server")
                 {
                     string[] targs = new string[args.Length - 1];

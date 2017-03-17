@@ -11,7 +11,7 @@ using System.Text;
 using System.Collections.Generic;
 using Voxalia.ServerGame.ServerMainSystem;
 using Voxalia.Shared;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.PluginSystem
 {

@@ -22,6 +22,7 @@ using FreneticScript;
 using System.Web;
 using Voxalia.ClientGame.UISystem;
 using System.Diagnostics;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem
 {
@@ -80,7 +81,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                 data["formtype"] = "getsess";
                 data["username"] = Username;
                 data["session"] = Key;
-                byte[] response = wb.UploadValues(Program.GlobalServerAddress + "account/microgetsess", "POST", data);
+                byte[] response = wb.UploadValues(VoxProgram.GlobalServerAddress + "account/microgetsess", "POST", data);
                 string resp = FileHandler.encoding.GetString(response).Trim(' ', '\n', '\r', '\t');
                 if (resp.StartsWith("ACCEPT=") && resp.EndsWith(";"))
                 {

@@ -10,6 +10,7 @@ using Voxalia.Shared;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.ItemSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
 {

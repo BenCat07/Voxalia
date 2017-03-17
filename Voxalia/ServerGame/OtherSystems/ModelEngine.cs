@@ -12,6 +12,7 @@ using Voxalia.Shared;
 using Voxalia.Shared.Files;
 using FreneticScript;
 using Voxalia.ServerGame.ServerMainSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.OtherSystems
 {

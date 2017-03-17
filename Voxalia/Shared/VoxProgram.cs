@@ -20,7 +20,7 @@ namespace Voxalia.Shared
     /// <summary>
     /// Main game program initializer.
     /// </summary>
-    public class Program
+    public class VoxProgram
     {
         /// <summary>
         /// The name of the game.

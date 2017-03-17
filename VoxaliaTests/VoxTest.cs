@@ -24,7 +24,7 @@ namespace VoxaliaTests
         /// </summary>
         public static void Setup()
         {
-            Program.PreInit();
+            VoxProgram.PreInit();
         }
     }
 }

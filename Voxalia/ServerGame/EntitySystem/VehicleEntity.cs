@@ -18,6 +18,7 @@ using Voxalia.ServerGame.JointSystem;
 using BEPUutilities;
 using FreneticScript;
 using Voxalia.ServerGame.OtherSystems;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {

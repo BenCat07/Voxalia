@@ -15,6 +15,7 @@ using Voxalia.Shared;
 using System.Runtime.CompilerServices;
 using Voxalia.Shared.Collision;
 using Voxalia.Shared.Files;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.OtherSystems
 {

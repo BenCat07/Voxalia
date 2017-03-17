@@ -10,9 +10,7 @@ using System;
 using System.ComponentModel;
 using System.Text;
 using System.Net;
-using System.Linq;
 using System.Net.Sockets;
-using System.Collections.Generic;
 using System.Collections.Specialized;
 using Voxalia.Shared;
 using Voxalia.ServerGame.ServerMainSystem;
@@ -20,8 +18,7 @@ using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsIn;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared.Files;
-using FreneticScript;
-using System.Web;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.NetworkSystem
 {
@@ -158,7 +155,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                     { "username", username },
                     { "session", key }
                 };
-                byte[] response = wb.UploadValues(Program.GlobalServerAddress + "account/microconfirm", "POST", data);
+                byte[] response = wb.UploadValues(VoxProgram.GlobalServerAddress + "account/microconfirm", "POST", data);
                 string resp = FileHandler.encoding.GetString(response).Trim(' ', '\n', '\r', '\t');
                 if (resp.StartsWith("ACCEPT=") && resp.EndsWith(";"))
                 {

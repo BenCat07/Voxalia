@@ -17,6 +17,7 @@ using FreneticScript;
 using Voxalia.Shared;
 using FreneticScript.CommandSystem;
 using FreneticScript.TagHandlers;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.CommandSystem.CommonCommands
 {
