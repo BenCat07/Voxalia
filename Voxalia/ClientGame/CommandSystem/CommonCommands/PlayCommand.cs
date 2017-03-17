@@ -6,9 +6,11 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using FreneticScript.CommandSystem;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {

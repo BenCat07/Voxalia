@@ -21,6 +21,7 @@ using Voxalia.Shared;
 using BEPUphysics.BroadPhaseEntries;
 using Voxalia.Shared.Collision;
 using BEPUutilities.DataStructures;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.WorldSystem
 {
@@ -80,9 +81,8 @@ namespace Voxalia.ClientGame.WorldSystem
                                 for (double z2 = 0.25; z2 < 1.0; z2 += 0.5)
                                 {
                                     Location lc = c + new Location(x2, y2, z2);
-                                    RayHit rh;
                                     Vector3 center = lc.ToBVector();
-                                    if (e.CollisionInformation.RayCast(new Ray(center, new Vector3(0, 0, 1)), 0.01f, out rh)) // TODO: Efficiency!
+                                    if (e.CollisionInformation.RayCast(new Ray(center, new Vector3(0, 0, 1)), 0.01f, out RayHit rh)) // TODO: Efficiency!
                                     {
                                         e.ApplyImpulse(ref center, ref impulse);
                                         e.ModifyLinearDamping(mat.GetSpeedMod());

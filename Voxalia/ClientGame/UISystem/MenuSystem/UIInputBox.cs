@@ -16,6 +16,7 @@ using OpenTK.Graphics.OpenGL4;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.UISystem.MenuSystem
 {
@@ -158,10 +159,7 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
                         }
                     }
                     modified = true;
-                    if (EnterPressed != null)
-                    {
-                        EnterPressed();
-                    }
+                    EnterPressed?.Invoke();
                 }
                 if (modified && TextModified != null)
                 {

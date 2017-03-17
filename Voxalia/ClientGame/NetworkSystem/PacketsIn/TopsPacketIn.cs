@@ -14,6 +14,7 @@ using Voxalia.Shared;
 using Voxalia.Shared.Collision;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared.Files;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 {

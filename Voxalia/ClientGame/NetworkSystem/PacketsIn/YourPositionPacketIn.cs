@@ -9,6 +9,7 @@
 using System;
 using Voxalia.Shared;
 using BEPUphysics.Character;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 {

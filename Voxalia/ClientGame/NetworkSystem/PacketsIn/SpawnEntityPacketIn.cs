@@ -15,6 +15,7 @@ using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.WorldSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 {
@@ -30,8 +31,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             long eid = Utilities.BytesToLong(Utilities.BytesPartial(data, 1, 8));
             byte[] rem = new byte[data.Length - (8 + 1)];
             Array.Copy(data, 8 + 1, rem, 0, data.Length - (8 + 1));
-            EntityTypeConstructor etc;
-            if (TheClient.EntityConstructors.TryGetValue(etype, out etc))
+            if (TheClient.EntityConstructors.TryGetValue(etype, out EntityTypeConstructor etc))
             {
                 Entity e = etc.Create(TheClient.TheRegion, rem);
                 if (e == null)

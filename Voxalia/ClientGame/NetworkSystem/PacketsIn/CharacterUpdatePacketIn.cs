@@ -6,9 +6,11 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.Shared;
 using BEPUphysics.Character;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 {
@@ -27,9 +29,11 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             ushort keys = Utilities.BytesToUshort(Utilities.BytesPartial(data, 8 + 24 + 24, 2));
             float dX = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 24 + 24 + 2, 4));
             float dY = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 24 + 24 + 2 + 4, 4));
-            Location ang = new Location();
-            ang.Yaw = dX;
-            ang.Pitch = dY;
+            Location ang = new Location()
+            {
+                Yaw = dX,
+                Pitch = dY
+            };
             byte st = data[8 + 24 + 24 + 2 + 4 + 4];
             float xm = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 24 + 24 + 2 + 4 + 4 + 1, 4));
             float ym = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 24 + 24 + 2 + 4 + 4 + 1 + 4, 4));
@@ -41,9 +45,8 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             for (int i = 0; i < TheClient.TheRegion.Entities.Count; i++)
             {
-                if (TheClient.TheRegion.Entities[i] is CharacterEntity)
+                if (TheClient.TheRegion.Entities[i] is CharacterEntity e)
                 {
-                    CharacterEntity e = (CharacterEntity)TheClient.TheRegion.Entities[i];
                     if (e.EID == eID)
                     {
                         e.SetPosition(pos);

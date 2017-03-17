@@ -20,6 +20,7 @@ using Voxalia.ClientGame.OtherSystems;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

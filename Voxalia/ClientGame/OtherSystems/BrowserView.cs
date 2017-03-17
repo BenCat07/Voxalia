@@ -21,6 +21,7 @@ using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
 using Voxalia.Shared.Files;
 using System.IO;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.OtherSystems
 {
@@ -130,12 +131,14 @@ namespace Voxalia.ClientGame.OtherSystems
 
         private Process StartProc(string file, string arg)
         {
-            ProcessStartInfo psi = new ProcessStartInfo( Environment.CurrentDirectory + "/" + file, arg);
-            psi.RedirectStandardOutput = true;
-            psi.RedirectStandardInput = true;
-            psi.CreateNoWindow = true;
-            psi.ErrorDialog = true;
-            psi.UseShellExecute = false;
+            ProcessStartInfo psi = new ProcessStartInfo(Environment.CurrentDirectory + "/" + file, arg)
+            {
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true,
+                ErrorDialog = true,
+                UseShellExecute = false
+            };
             return Process.Start(psi);
         }
 

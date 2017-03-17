@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.UISystem.MenuSystem
 {

@@ -6,9 +6,11 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.Shared;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 {
@@ -29,9 +31,8 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             long eID = Utilities.BytesToLong(Utilities.BytesPartial(data, 24 + 24 + 16 + 24 + 1, 8));
             for (int i = 0; i < TheClient.TheRegion.Entities.Count; i++)
             {
-                if (TheClient.TheRegion.Entities[i] is PhysicsEntity)
+                if (TheClient.TheRegion.Entities[i] is PhysicsEntity e)
                 {
-                    PhysicsEntity e = (PhysicsEntity)TheClient.TheRegion.Entities[i];
                     if (e.EID == eID)
                     {
                         if (e is ModelEntity && ((ModelEntity)e).PlanePilot == TheClient.Player)

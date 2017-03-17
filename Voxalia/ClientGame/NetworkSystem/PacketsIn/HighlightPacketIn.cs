@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Voxalia.Shared;
+using FreneticGameCore;
 using Voxalia.Shared.Collision;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
@@ -32,9 +33,11 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             AABB[] boxes = new AABB[len];
             for (int i = 0; i < len; i++)
             {
-                boxes[i] = new AABB();
-                boxes[i].Min = Location.FromDoubleBytes(data, 4 + i * 24 * 2);
-                boxes[i].Max = Location.FromDoubleBytes(data, 4 + i * 24 * 2 + 24);
+                boxes[i] = new AABB()
+                {
+                    Min = Location.FromDoubleBytes(data, 4 + i * 24 * 2),
+                    Max = Location.FromDoubleBytes(data, 4 + i * 24 * 2 + 24)
+                };
             }
             TheClient.TheRegion.Highlights = boxes;
             return true;

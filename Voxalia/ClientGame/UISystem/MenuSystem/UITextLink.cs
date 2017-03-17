@@ -10,6 +10,7 @@ using System;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.UISystem.MenuSystem
 {

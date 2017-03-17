@@ -14,7 +14,7 @@ using FreneticScript.CommandSystem;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.GraphicsSystems.ParticleSystem;
 using Voxalia.Shared;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.CommandSystem.GameCommands
 {

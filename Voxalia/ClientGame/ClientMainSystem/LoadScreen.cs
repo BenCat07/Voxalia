@@ -18,6 +18,7 @@ using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
 using System.Threading;
 using System.Threading.Tasks;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {

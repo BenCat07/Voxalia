@@ -13,12 +13,8 @@ using System.Linq;
 using System.Text;
 using Voxalia.ClientGame.UISystem;
 using Voxalia.ClientGame.UISystem.MenuSystem;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.OpenGL4;
-using Voxalia.Shared;
 using Voxalia.ServerGame.ServerMainSystem;
-using System.Threading.Tasks;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {

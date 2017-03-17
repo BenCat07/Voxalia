@@ -12,8 +12,8 @@ using FreneticScript.CommandSystem;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.ClientMainSystem;
 using OpenTK;
-using FreneticScript;
 using Voxalia.Shared;
+using FreneticGameCore;
 using Voxalia.Shared.Collision;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands

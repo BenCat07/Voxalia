@@ -6,9 +6,11 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.Shared;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 {
@@ -47,8 +49,10 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             Destroy(ent);
             if (enabled)
             {
-                SpotLight sl = new SpotLight(ent.GetPosition(), distance, color, Location.UnitX, 45);
-                sl.Direction = ((CharacterEntity)ent).ForwardVector();
+                SpotLight sl = new SpotLight(ent.GetPosition(), distance, color, Location.UnitX, 45)
+                {
+                    Direction = ((CharacterEntity)ent).ForwardVector()
+                };
                 sl.Reposition(ent.GetPosition());
                 ((CharacterEntity)ent).Flashlight = sl;
                 TheClient.MainWorldView.Lights.Add(sl);

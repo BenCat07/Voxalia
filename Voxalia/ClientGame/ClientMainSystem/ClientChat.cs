@@ -18,7 +18,7 @@ using Voxalia.ClientGame.OtherSystems;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
 using OpenTK;
-using OpenTK.Input;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -40,8 +40,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             int minY = 10 + (int)font.font_default.Height;
             ChatMenu = new UIGroup(UIAnchor.TOP_CENTER, () => Window.Width, () => Window.Height - minY - UIBottomHeight, () => 0, () => 0);
             ChatScroller = new UIScrollBox(UIAnchor.TOP_CENTER, () => ChatMenu.GetWidth() - (30 * 2), () => ChatMenu.GetHeight() - minY, () => 0, () => minY) { Color = new Vector4(0f, 0.5f, 0.5f, 0.6f) };
-            ChatBox = new UIInputBox("", "Enter a /command or a chat message...", font, UIAnchor.TOP_CENTER, ChatScroller.GetWidth, () => 0, () => (int)ChatScroller.GetHeight() + minY);
-            ChatBox.EnterPressed = EnterChatMessage;
+            ChatBox = new UIInputBox("", "Enter a /command or a chat message...", font, UIAnchor.TOP_CENTER, ChatScroller.GetWidth, () => 0, () => (int)ChatScroller.GetHeight() + minY)
+            {
+                EnterPressed = EnterChatMessage
+            };
             ChatMenu.AddChild(ChatBox);
             ChatMenu.AddChild(ChatScroller);
             Channels = new bool[(int)TextChannel.COUNT];

@@ -17,6 +17,7 @@ using Voxalia.Shared.Collision;
 using Voxalia.ClientGame.EntitySystem;
 using System.Threading;
 using System.Threading.Tasks;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.WorldSystem
 {

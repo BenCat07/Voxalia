@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Voxalia.Shared;
 using Voxalia.ClientGame.WorldSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

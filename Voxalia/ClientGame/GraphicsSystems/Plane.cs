@@ -8,8 +8,8 @@
 
 using System;
 using Voxalia.Shared;
-using FreneticScript;
 using BEPUutilities;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

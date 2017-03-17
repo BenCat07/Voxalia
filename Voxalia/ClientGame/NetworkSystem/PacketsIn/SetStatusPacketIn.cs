@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using Voxalia.Shared;
 using Voxalia.ClientGame.EntitySystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 {

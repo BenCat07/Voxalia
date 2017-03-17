@@ -16,7 +16,7 @@ using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
 using Voxalia.ClientGame.CommandSystem;
 using Voxalia.ClientGame.ClientMainSystem;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

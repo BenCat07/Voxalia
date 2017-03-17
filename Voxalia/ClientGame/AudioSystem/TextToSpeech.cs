@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using Voxalia.Shared;
+using FreneticGameCore;
 #if WINDOWS
 using System.Speech.Synthesis;
 #endif

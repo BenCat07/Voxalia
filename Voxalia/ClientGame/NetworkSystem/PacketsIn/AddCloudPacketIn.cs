@@ -13,6 +13,7 @@ using System.Text;
 using Voxalia.Shared;
 using Voxalia.Shared.Files;
 using Voxalia.ClientGame.WorldSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 {
@@ -33,9 +34,11 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                     break;
                 }
             }
-            Cloud cloud = new Cloud(TheClient.TheRegion, pos);
-            cloud.Velocity = vel;
-            cloud.CID = cid;
+            Cloud cloud = new Cloud(TheClient.TheRegion, pos)
+            {
+                Velocity = vel,
+                CID = cid
+            };
             int count = dr.ReadInt();
             for (int i = 0; i < count; i++)
             {

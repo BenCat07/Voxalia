@@ -11,6 +11,7 @@ using FreneticScript.CommandSystem;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {

@@ -10,6 +10,7 @@ using System;
 using Voxalia.ClientGame.UISystem;
 using Voxalia.Shared.Files;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
 {

@@ -10,12 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using FreneticScript;
 using FreneticScript.CommandSystem;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ServerGame.ServerMainSystem;
 using System.Threading.Tasks;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
 {

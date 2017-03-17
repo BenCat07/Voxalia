@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Voxalia.Shared;
+using FreneticGameCore;
 using Voxalia.ClientGame.EntitySystem;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
