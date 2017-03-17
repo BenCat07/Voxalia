@@ -376,8 +376,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             SingleAnimationNode pNodeAnim = FindNodeAnim(nodename, pNode.Mode, out double time);
             if (pNodeAnim != null)
             {
-                BEPUutilities.Vector3 vec = pNodeAnim.lerpPos(time);
-                BEPUutilities.Quaternion quat = pNodeAnim.lerpRotate(time);
+                BEPUutilities.Vector3 vec = pNodeAnim.LerpPos(time);
+                BEPUutilities.Quaternion quat = pNodeAnim.LerpRotate(time);
                 Quaternion oquat = new Quaternion((float)quat.X, (float)quat.Y, (float)quat.Z, (float)quat.W);
                 Matrix4.CreateTranslation((float)vec.X, (float)vec.Y, (float)vec.Z, out Matrix4 trans);
                 trans.Transpose();

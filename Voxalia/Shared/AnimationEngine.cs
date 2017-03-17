@@ -50,8 +50,7 @@ namespace Voxalia.Shared
         public SingleAnimation GetAnimation(string name, FileHandler Files)
         {
             string namelow = name.ToLowerFast();
-            SingleAnimation sa;
-            if (Animations.TryGetValue(namelow, out sa))
+            if (Animations.TryGetValue(namelow, out SingleAnimation sa))
             {
                 return sa;
             }
@@ -75,8 +74,7 @@ namespace Voxalia.Shared
         {
             if (Files.Exists("animations/" + name + ".anim"))
             {
-                SingleAnimation created = new SingleAnimation();
-                created.Name = name;
+                SingleAnimation created = new SingleAnimation() { Name = name };
                 string[] data = Files.ReadText("animations/" + name + ".anim").SplitFast('\n');
                 int entr = 0;
                 for (int i = 0; i < data.Length; i++)
@@ -117,8 +115,7 @@ namespace Voxalia.Shared
                     SingleAnimationNode node = null;
                     if (!isgeneral)
                     {
-                        node = new SingleAnimationNode();
-                        node.Name = type.ToLowerFast();
+                        node = new SingleAnimationNode() { Name = type.ToLowerFast() };
                     }
                     foreach (KeyValuePair<string, string> entry in entries)
                     {
@@ -221,8 +218,7 @@ namespace Voxalia.Shared
 
         public SingleAnimationNode GetNode(string name)
         {
-            SingleAnimationNode node;
-            if (node_map.TryGetValue(name, out node))
+            if (node_map.TryGetValue(name, out SingleAnimationNode node))
             {
                 return node;
             }
@@ -248,7 +244,7 @@ namespace Voxalia.Shared
 
         public List<Quaternion> Rotations = new List<Quaternion>();
 
-        int findPos(double time)
+        int FindPos(double time)
         {
             for (int i = 0; i < Positions.Count - 1; i++)
             {
@@ -260,7 +256,7 @@ namespace Voxalia.Shared
             return 0;
         }
 
-        public Vector3 lerpPos(double aTime)
+        public Vector3 LerpPos(double aTime)
         {
             if (Positions.Count == 0)
             {
@@ -271,7 +267,7 @@ namespace Voxalia.Shared
                 Location pos = Positions[0];
                 return new Vector3((double)pos.X, (double)pos.Y, (double)pos.Z);
             }
-            int index = findPos(aTime);
+            int index = FindPos(aTime);
             int nextIndex = index + 1;
             if (nextIndex >= Positions.Count)
             {
@@ -292,7 +288,7 @@ namespace Voxalia.Shared
             return new Vector3((double)npos.X, (double)npos.Y, (double)npos.Z);
         }
 
-        int findRotate(double time)
+        int FindRotate(double time)
         {
             for (int i = 0; i < Rotations.Count - 1; i++)
             {
@@ -304,7 +300,7 @@ namespace Voxalia.Shared
             return 0;
         }
 
-        public Quaternion lerpRotate(double aTime)
+        public Quaternion LerpRotate(double aTime)
         {
             if (Rotations.Count == 0)
             {
@@ -314,7 +310,7 @@ namespace Voxalia.Shared
             {
                 return Rotations[0];
             }
-            int index = findRotate(aTime);
+            int index = FindRotate(aTime);
             int nextIndex = index + 1;
             if (nextIndex >= Rotations.Count)
             {
@@ -335,13 +331,12 @@ namespace Voxalia.Shared
 
         public Matrix GetBoneTotalMatrix(double aTime, Dictionary<string, Matrix> adjs = null)
         {
-            Matrix pos = Matrix.CreateTranslation(lerpPos(aTime));
-            Matrix rot = Matrix.CreateFromQuaternion(lerpRotate(aTime));
+            Matrix pos = Matrix.CreateTranslation(LerpPos(aTime));
+            Matrix rot = Matrix.CreateFromQuaternion(LerpRotate(aTime));
             pos.Transpose();
             rot.Transpose();
             Matrix combined;
-            Matrix t;
-            if (adjs != null && adjs.TryGetValue(Name, out t))
+            if (adjs != null && adjs.TryGetValue(Name, out Matrix t))
             {
                 combined = pos * rot * t;
             }

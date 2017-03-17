@@ -117,8 +117,7 @@ namespace Voxalia.Shared
         
         public static byte ForName(string name)
         {
-            byte val;
-            if (byte.TryParse(name, out val))
+            if (byte.TryParse(name, out byte val))
             {
                 return val;
             }

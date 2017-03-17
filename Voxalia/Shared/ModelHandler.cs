@@ -36,7 +36,8 @@ namespace Voxalia.Shared
             DataStream ds = new DataStream(dat_filt);
             DataReader dr = new DataReader(ds);
             Model3D mod = new Model3D();
-            mod.MatrixA = ReadMat(dr);
+            Matrix matA = ReadMat(dr);
+            mod.MatrixA = matA;
             int meshCount = dr.ReadInt();
             mod.Meshes = new List<Model3DMesh>(meshCount);
             for (int m = 0; m < meshCount; m++)
@@ -100,9 +101,9 @@ namespace Voxalia.Shared
 
         public Model3DNode ReadSingleNode(Model3DNode root, DataReader dr)
         {
-            Model3DNode n = new Model3DNode();
-            n.Parent = root;
-            n.Name = dr.ReadFullString();
+            Model3DNode n = new Model3DNode() { Parent = root };
+            string nname = dr.ReadFullString();
+            n.Name = nname;
             n.MatrixA = ReadMat(dr);
             int cCount = dr.ReadInt();
             n.Children = new List<Model3DNode>(cCount);

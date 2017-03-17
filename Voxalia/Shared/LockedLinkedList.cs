@@ -81,9 +81,7 @@ namespace Voxalia.Shared
             // This always modifies the last entry, so lock on the last entry.
             lock (lastLock)
             {
-                Node temp = new Node();
-                temp.Data = data;
-                temp.Previous = Last;
+                Node temp = new Node() { Data = data, Previous = Last };
                 if (Last != null)
                 {
                     Last.Next = temp;

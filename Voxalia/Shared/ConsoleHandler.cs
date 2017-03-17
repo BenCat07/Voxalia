@@ -43,8 +43,7 @@ namespace Voxalia.Shared
         {
             CommandInput = new List<string>();
             RecCommandInput = new List<string>();
-            thread = new Thread(new ThreadStart(ListenLoop));
-            thread.Name = "System_ConsoleListener";
+            thread = new Thread(new ThreadStart(ListenLoop)) { Name = "System_ConsoleListener" };
             HandlerActive = true;
             thread.Start();
         }
@@ -186,10 +185,7 @@ namespace Voxalia.Shared
             {
                 for (int i = 0; i < commandsinput.Count; i++)
                 {
-                    if (OnCommandInput != null)
-                    {
-                        OnCommandInput(null, new ConsoleCommandEventArgs() { Command = Utilities.CleanStringInput(commandsinput[i]) });
-                    }
+                    OnCommandInput?.Invoke(null, new ConsoleCommandEventArgs() { Command = Utilities.CleanStringInput(commandsinput[i]) });
                 }
             }
         }
