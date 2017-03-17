@@ -16,6 +16,7 @@ using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.OtherSystems;
 using Voxalia.ServerGame.NetworkSystem;
 using LiteDB;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -150,9 +151,11 @@ namespace Voxalia.ServerGame.EntitySystem
     {
         public override Entity Create(Region tregion, BsonDocument doc)
         {
-            ModelEntity ent = new ModelEntity(doc["mod_name"].AsString, tregion);
-            ent.mode = (ModelCollisionMode)Enum.Parse(typeof(ModelCollisionMode), doc["mod_mode"].AsString);
-            ent.CanLOD = doc["mod_lod"].AsBoolean;
+            ModelEntity ent = new ModelEntity(doc["mod_name"].AsString, tregion)
+            {
+                mode = (ModelCollisionMode)Enum.Parse(typeof(ModelCollisionMode), doc["mod_mode"].AsString),
+                CanLOD = doc["mod_lod"].AsBoolean
+            };
             ent.ApplyPhysicsData(doc);
             return ent;
         }

@@ -16,6 +16,7 @@ using Voxalia.Shared;
 using Voxalia.ServerGame.OtherSystems;
 using Voxalia.ServerGame.WorldSystem;
 using Voxalia.ServerGame.ServerMainSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.TagSystem.TagObjects
 {
@@ -110,8 +111,7 @@ namespace Voxalia.ServerGame.TagSystem.TagObjects
             {
                 return this;
             }
-            TagSubHandler handler;
-            if (Handlers.TryGetValue(data[0], out handler))
+            if (Handlers.TryGetValue(data[0], out TagSubHandler handler))
             {
                 return handler.Handle(data, this).Handle(data.Shrink());
             }

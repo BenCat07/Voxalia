@@ -16,6 +16,7 @@ using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.WorldSystem;
 using Voxalia.ServerGame.ItemSystem;
 using BEPUutilities;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -29,8 +30,7 @@ namespace Voxalia.ServerGame.EntitySystem
             SetMass(0);
             CGroup = CollisionUtil.Item;
             Original = orig;
-            Location offset;
-            Shape = BlockShapeRegistry.BSD[0].GetShape(BlockDamage.NONE, out offset, false);
+            Shape = BlockShapeRegistry.BSD[0].GetShape(BlockDamage.NONE, out Location offset, false);
             SetPosition(pos.GetBlockLocation() + offset);
             SetOrientation(Quaternion.Identity);
         }

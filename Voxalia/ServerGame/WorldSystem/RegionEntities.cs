@@ -29,6 +29,7 @@ using Voxalia.ServerGame.ItemSystem;
 using Voxalia.ServerGame.ItemSystem.CommonItems;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Objects;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -77,9 +78,8 @@ namespace Voxalia.ServerGame.WorldSystem
             joint.Two.Joints.Add(joint);
             joint.JID = jID++;
             joint.Enable();
-            if (joint is BaseJoint)
+            if (joint is BaseJoint pjoint)
             {
-                BaseJoint pjoint = (BaseJoint)joint;
                 pjoint.CurrentJoint = pjoint.GetBaseJoint();
                 PhysicsWorld.Add(pjoint.CurrentJoint);
             }
@@ -96,9 +96,8 @@ namespace Voxalia.ServerGame.WorldSystem
             joint.One.Joints.Remove(joint);
             joint.Two.Joints.Remove(joint);
             joint.Disable();
-            if (joint is BaseJoint)
+            if (joint is BaseJoint pjoint)
             {
-                BaseJoint pjoint = (BaseJoint)joint;
                 if (pjoint.CurrentJoint != null)
                 {
                     try
@@ -347,8 +346,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <returns>The constructor, or null.</returns>
         public EntityConstructor ConstructorFor(EntityType etype)
         {
-            EntityConstructor ec;
-            if (EntityConstructors.TryGetValue(etype, out ec))
+            if (EntityConstructors.TryGetValue(etype, out EntityConstructor ec))
             {
                 return ec;
             }
@@ -381,8 +379,7 @@ namespace Voxalia.ServerGame.WorldSystem
             me.SetPosition(h ? new Location(rcr.HitData.Location) : pos);*/
             Vector3 treealign = new Vector3(0, 0, 1);
             Vector3 norm = /*h ? rcr.HitData.Normal : */new Vector3(0, 0, 1);
-            Quaternion orient;
-            Quaternion.GetQuaternionBetweenNormalizedVectors(ref treealign, ref norm, out orient);
+            Quaternion.GetQuaternionBetweenNormalizedVectors(ref treealign, ref norm, out Quaternion orient);
             orient *= Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)(Utilities.UtilRandom.NextDouble() * Math.PI * 2));
             me.SetOrientation(orient);
             me.SetPosition(pos);

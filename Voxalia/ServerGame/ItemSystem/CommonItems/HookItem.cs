@@ -6,12 +6,14 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.Shared;
 using Voxalia.ServerGame.JointSystem;
 using BEPUutilities;
 using BEPUphysics.CollisionRuleManagement;
 using Voxalia.Shared.Collision;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {
@@ -55,11 +57,13 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 Quaternion.CreateFromAxisAngle(new Vector3(0, 0, 1), (double)(forw.Yaw * Utilities.PI180));
             if (HitEnt == null)
             {
-                ModelEntity mod = new ModelEntity("cube", player.TheRegion);
-                mod.Mass = 0;
-                mod.CanSave = false;
-                mod.scale = new Location(0.023, 0.05, 0.05);
-                mod.mode = ModelCollisionMode.AABB;
+                ModelEntity mod = new ModelEntity("cube", player.TheRegion)
+                {
+                    Mass = 0,
+                    CanSave = false,
+                    scale = new Location(0.023, 0.05, 0.05),
+                    mode = ModelCollisionMode.AABB
+                };
                 mod.SetPosition(Position);
                 mod.SetOrientation(quat);
                 player.TheRegion.SpawnEntity(mod);
@@ -78,11 +82,13 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             for (double f = 0; f < len - 1f; f += 0.5f)
             {
                 Location cpos = Position + step * f;
-                ModelEntity ce = new ModelEntity("cube", player.TheRegion);
-                ce.Mass = 15;
-                ce.CanSave = false;
-                ce.scale = new Location(0.023, 0.05, 0.05);
-                ce.mode = ModelCollisionMode.AABB;
+                ModelEntity ce = new ModelEntity("cube", player.TheRegion)
+                {
+                    Mass = 15,
+                    CanSave = false,
+                    scale = new Location(0.023, 0.05, 0.05),
+                    mode = ModelCollisionMode.AABB
+                };
                 ce.SetPosition(cpos + step * 0.5);
                 ce.SetOrientation(quat);
                 player.TheRegion.SpawnEntity(ce);

@@ -15,6 +15,7 @@ using Voxalia.ServerGame.WorldSystem;
 using Voxalia.ServerGame.NetworkSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using LiteDB;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {

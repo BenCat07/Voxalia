@@ -27,6 +27,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.ItemSystem;
 using Voxalia.ServerGame.ItemSystem.CommonItems;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -54,8 +55,7 @@ namespace Voxalia.ServerGame.WorldSystem
             bool hA = false;
             if (considerSolid.HasFlag(MaterialSolidity.FULLSOLID))
             {
-                RayCastResult rcr;
-                if (PhysicsWorld.RayCast(ray, len, filter, out rcr))
+                if (PhysicsWorld.RayCast(ray, len, filter, out RayCastResult rcr))
                 {
                     best = rcr;
                     hA = true;
@@ -66,9 +66,11 @@ namespace Voxalia.ServerGame.WorldSystem
                 rayHit = best;
                 return hA;
             }
-            AABB box = new AABB();
-            box.Min = start;
-            box.Max = start;
+            AABB box = new AABB()
+            {
+                Min = start,
+                Max = start
+            };
             box.Include(start + dir * len);
             foreach (KeyValuePair<Vector3i, Chunk> chunk in LoadedChunks)
             {
@@ -81,8 +83,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 {
                     continue;
                 }
-                RayHit temp;
-                if (chunk.Value.FCO.RayCast(ray, len, null, considerSolid, out temp))
+                if (chunk.Value.FCO.RayCast(ray, len, null, considerSolid, out RayHit temp))
                 {
                     hA = true;
                     if (temp.T < best.HitData.T)
@@ -115,8 +116,7 @@ namespace Voxalia.ServerGame.WorldSystem
             bool hA = false;
             if (considerSolid.HasFlag(MaterialSolidity.FULLSOLID))
             {
-                RayCastResult rcr;
-                if (PhysicsWorld.ConvexCast(shape, ref rt, ref sweep, filter, out rcr))
+                if (PhysicsWorld.ConvexCast(shape, ref rt, ref sweep, filter, out RayCastResult rcr))
                 {
                     best = rcr;
                     hA = true;
@@ -128,9 +128,11 @@ namespace Voxalia.ServerGame.WorldSystem
                 return hA;
             }
             sweep = dir.ToBVector();
-            AABB box = new AABB();
-            box.Min = start;
-            box.Max = start;
+            AABB box = new AABB()
+            {
+                Min = start,
+                Max = start
+            };
             box.Include(start + dir * len);
             foreach (KeyValuePair<Vector3i, Chunk> chunk in LoadedChunks)
             {
@@ -143,8 +145,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 {
                     continue;
                 }
-                RayHit temp;
-                if (chunk.Value.FCO.ConvexCast(shape, ref rt, ref sweep, len, considerSolid, out temp))
+                if (chunk.Value.FCO.ConvexCast(shape, ref rt, ref sweep, len, considerSolid, out RayHit temp))
                 {
                     hA = true;
                     if (temp.T < best.HitData.T)
@@ -191,13 +192,12 @@ namespace Voxalia.ServerGame.WorldSystem
             BoxShape box = new BoxShape((double)rel.X, (double)rel.Y, (double)rel.Z);
             RigidTransform start = new RigidTransform(center.ToBVector(), Quaternion.Identity);
             Vector3 sweep = new Vector3(0, 0, 0.01f);
-            RayHit rh;
             foreach (BroadPhaseEntry entry in entries)
             {
                 if (entry is EntityCollidable && Collision.ShouldCollide(entry) &&
                     entry.CollisionRules.Group != CollisionUtil.Player &&
                     // NOTE: Convex cast here to ensure the object is truly 'solid' in the box area, rather than just having an overlapping bounding-box edge.
-                    entry.ConvexCast(box, ref start, ref sweep, out rh))
+                    entry.ConvexCast(box, ref start, ref sweep, out RayHit rh))
                 {
                     return true;
                 }

@@ -14,6 +14,7 @@ using Voxalia.ServerGame.WorldSystem;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.NetworkSystem;
 using LiteDB;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -220,7 +221,8 @@ namespace Voxalia.ServerGame.EntitySystem
         public override BsonDocument GetSaveData()
         {
             BsonDocument doc = new BsonDocument();
-            doc["prim_pos"] = Position.ToDoubleBytes();
+            byte[] pos = Position.ToDoubleBytes();
+            doc["prim_pos"] = pos;
             doc["prim_vel"] = Velocity.ToDoubleBytes();
             doc["prim_scale"] = Scale.ToDoubleBytes();
             doc["prim_grav"] = Gravity.ToDoubleBytes();

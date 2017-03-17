@@ -18,6 +18,7 @@ using Voxalia.ServerGame.EntitySystem;
 using System.Threading;
 using LiteDB;
 using System.Runtime.CompilerServices;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.WorldSystem
 {

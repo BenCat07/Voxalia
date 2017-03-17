@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.WorldSystem;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
 {

@@ -23,6 +23,7 @@ using FreneticScript.TagHandlers.Objects;
 using BEPUphysics.Constraints;
 using BEPUphysics.Constraints.SingleEntity;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -71,12 +72,14 @@ namespace Voxalia.ServerGame.EntitySystem
             base.SpawnBody();
             if (CursorMarker == null)
             {
-                CursorMarker = new ModelEntity("cube", TheRegion);
-                CursorMarker.scale = new Location(0.1f, 0.1f, 0.1f);
-                CursorMarker.mode = ModelCollisionMode.AABB;
-                CursorMarker.CGroup = CollisionUtil.NonSolid;
-                CursorMarker.Visible = false;
-                CursorMarker.CanSave = false;
+                CursorMarker = new ModelEntity("cube", TheRegion)
+                {
+                    scale = new Location(0.1f, 0.1f, 0.1f),
+                    mode = ModelCollisionMode.AABB,
+                    CGroup = CollisionUtil.NonSolid,
+                    Visible = false,
+                    CanSave = false
+                };
                 TheRegion.SpawnEntity(CursorMarker);
             }
             Jetpack = new JetpackMotionConstraint(this);
@@ -173,8 +176,7 @@ namespace Voxalia.ServerGame.EntitySystem
             const double baseMax = 2000.0f;
             max = baseMax; // TODO: Own mod
             ItemStack its = Items.GetItemForSlot(Items.cItem);
-            TemplateObject mod;
-            if (its.SharedAttributes.TryGetValue("jetpack_boostmod", out mod))
+            if (its.SharedAttributes.TryGetValue("jetpack_boostmod", out TemplateObject mod))
             {
                 NumberTag nt = NumberTag.TryFor(mod);
                 if (nt != null)
@@ -221,8 +223,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             double baseHover = GetMass();
             ItemStack its = Items.GetItemForSlot(Items.cItem);
-            TemplateObject mod;
-            if (its.SharedAttributes.TryGetValue("jetpack_hovermod", out mod))
+            if (its.SharedAttributes.TryGetValue("jetpack_hovermod", out TemplateObject mod))
             {
                 NumberTag nt = NumberTag.TryFor(mod);
                 if (nt != null)
@@ -265,10 +266,8 @@ namespace Voxalia.ServerGame.EntitySystem
                         {
                             return;
                         }
-                        double max;
-                        double boost = Human.JetpackBoostRate(out max);
-                        double glen;
-                        Vector3 move = GetMoveVector(out glen);
+                        double boost = Human.JetpackBoostRate(out double max);
+                        Vector3 move = GetMoveVector(out double glen);
                         Vector3 vec = -(move * (double)boost) * Delta;
                         Human.CBody.Jump();
                         Entity.ApplyLinearImpulse(ref vec);
@@ -286,9 +285,8 @@ namespace Voxalia.ServerGame.EntitySystem
                             return;
                         }
                         double hover = Human.JetpackHoverStrength();
-                        double glen;
-                        Vector3 move = GetMoveVector(out glen);
-                        Vector3 vec = -(move * (double)glen * (double)hover) * Delta;
+                        Vector3 move = GetMoveVector(out double glen);
+                        Vector3 vec = -(move * glen * hover) * Delta;
                         Entity.ApplyLinearImpulse(ref vec);
                         entity.ModifyLinearDamping(0.6f);
                     }

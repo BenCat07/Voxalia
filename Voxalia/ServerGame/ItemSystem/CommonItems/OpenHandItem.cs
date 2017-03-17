@@ -10,6 +10,7 @@ using Voxalia.Shared;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.JointSystem;
 using Voxalia.Shared.Collision;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {

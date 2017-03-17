@@ -19,6 +19,7 @@ using BEPUphysics.CollisionTests;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared.Collision;
 using LiteDB;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -102,8 +103,7 @@ namespace Voxalia.ServerGame.EntitySystem
             TargetPlayers -= TheRegion.Delta;
             if (TargetPlayers <= 0)
             {
-                double dist;
-                PlayerEntity player = NearestPlayer(out dist);
+                PlayerEntity player = NearestPlayer(out double dist);
                 if (player != null && dist < MaxPathFindDistance * MaxPathFindDistance)
                 {
                     GoTo(player);

@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Voxalia.ServerGame.ServerMainSystem;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {

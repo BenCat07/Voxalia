@@ -20,6 +20,7 @@ using Voxalia.ServerGame.NetworkSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared.Collision;
 using LiteDB;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -90,8 +91,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Origin = torigin;
             if (TraceMode == BGETraceMode.PERFECT)
             {
-                Vector3 shoffs;
-                Shape = new MobileChunkShape(new Vector3i(xwidth, ywidth, zwidth), blocks, out shoffs); // TODO: Anything offset related needed here?
+                Shape = new MobileChunkShape(new Vector3i(xwidth, ywidth, zwidth), blocks, out Vector3 shoffs); // TODO: Anything offset related needed here?
                 shapeOffs = -new Location(shoffs);
             }
             else
@@ -167,8 +167,7 @@ namespace Voxalia.ServerGame.EntitySystem
                     }
                 }
             }
-            Vector3 center;
-            ConvexHullShape chs = new ConvexHullShape(Vertices, out center);
+            ConvexHullShape chs = new ConvexHullShape(Vertices, out Vector3 center);
             offs = new Location(center);
             return chs;
         }

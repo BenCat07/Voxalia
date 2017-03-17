@@ -6,8 +6,10 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.Shared;
 using BEPUphysics.Character;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {

@@ -14,7 +14,7 @@ using Voxalia.Shared;
 using Voxalia.ServerGame.WorldSystem;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.EntitySystem;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
 {
@@ -61,8 +61,10 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
                 entry.Player.TheRegion.SetBlockMaterial(block.Key, Material.AIR, 0, 0, 1, 0, true, true);
                 blocksin[(int)(block.Key.Z - zsub) * ywidth * xwidth + (int)(block.Key.Y - ysub) * xwidth + (int)(block.Key.X - xsub)] = block.Value;
             }
-            BlockGroupEntity bge = new BlockGroupEntity(extent.Min, tm, entry.Player.TheRegion, blocksin, xwidth, ywidth, zwidth);
-            bge.scale = entry.InputArguments.Count < 2 ? Location.One : Location.FromString(entry.InputArguments[1]);
+            BlockGroupEntity bge = new BlockGroupEntity(extent.Min, tm, entry.Player.TheRegion, blocksin, xwidth, ywidth, zwidth)
+            {
+                scale = entry.InputArguments.Count < 2 ? Location.One : Location.FromString(entry.InputArguments[1])
+            };
             entry.Player.TheRegion.SpawnEntity(bge);
         }
 

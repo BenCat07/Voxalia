@@ -15,6 +15,7 @@ using Voxalia.Shared;
 using BEPUutilities;
 using BEPUphysics.Constraints;
 using BEPUphysics.Constraints.TwoEntity.Motors;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.JointSystem
 {

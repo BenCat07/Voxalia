@@ -22,6 +22,7 @@ using Voxalia.ServerGame.ItemSystem;
 using Voxalia.ServerGame.NetworkSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -272,8 +273,7 @@ namespace Voxalia.ServerGame.EntitySystem
             CBody.StepManager.MinimumDownStepHeight = CBDownStepHeight;
             TheRegion.PhysicsWorld.Add(CBody);
             RigidTransform transf = new RigidTransform(Vector3.Zero, Body.Orientation);
-            BoundingBox box;
-            Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out box);
+            Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out BoundingBox box);
             MinZ = box.Min.Z;
         }
 
@@ -416,8 +416,7 @@ namespace Voxalia.ServerGame.EntitySystem
             }
             base.Tick();
             RigidTransform transf = new RigidTransform(Vector3.Zero, Body.Orientation);
-            BoundingBox box;
-            Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out box);
+            Body.CollisionInformation.Shape.GetBoundingBox(ref transf, out BoundingBox box);
             MinZ = box.Min.Z;
         }
 

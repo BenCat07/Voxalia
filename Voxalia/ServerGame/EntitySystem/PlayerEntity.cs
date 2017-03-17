@@ -22,9 +22,7 @@ using Voxalia.ServerGame.JointSystem;
 using Voxalia.ServerGame.WorldSystem;
 using Voxalia.ServerGame.OtherSystems;
 using Voxalia.Shared.Collision;
-using BEPUphysics.Character;
-using FreneticScript;
-using FreneticScript.TagHandlers.Objects;
+using FreneticGameCore;
 using LiteDB;
 using FreneticDataSyntax;
 
