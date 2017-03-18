@@ -101,7 +101,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public void AddSide(Location normal, TextureCoordinates tc, bool offs = false, float texf = 0)
         {
-            // TODO: IMPROVE!
+            // TODO: IMPROVE! Or discard?!
             for (int i = 0; i < 6; i++)
             {
                 Normals.Add(ClientUtilities.Convert(normal));
