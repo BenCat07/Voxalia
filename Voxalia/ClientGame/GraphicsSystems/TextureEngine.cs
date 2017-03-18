@@ -63,6 +63,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public Graphics GenericGraphicsObject = null;
 
+        /// <summary>
+        /// The relevant game client.
+        /// </summary>
         public Client TheClient;
 
         /// <summary>
@@ -85,7 +88,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
             LoadedTextures.Add(Clear);
             NormalDef = GetTexture("normal_def");
         }
-
+        
+        /// <summary>
+        /// Clears away all current textures.
+        /// </summary>
         public void Empty()
         {
             for (int i = 0; i < LoadedTextures.Count; i++)
@@ -97,13 +103,25 @@ namespace Voxalia.ClientGame.GraphicsSystems
             LoadedTextures.Clear();
         }
 
+        /// <summary>
+        /// Updates the timestamp on the engine.
+        /// </summary>
+        /// <param name="time">The current time stamp.</param>
         public void Update(double time)
         {
             cTime = time;
         }
 
-        public double cTime = 0;
+        /// <summary>
+        /// The current game tick time.
+        /// </summary>
+        public double cTime = 1.0;
 
+        /// <summary>
+        /// Gets a texture that already exists by name.
+        /// </summary>
+        /// <param name="texturename">The name of the texture.</param>
+        /// <returns>The texture, if it exists.</returns>
         public Texture GetExistingTexture(string texturename)
         {
             for (int i = 0; i < LoadedTextures.Count; i++)
@@ -155,6 +173,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
             return Loaded;
         }
 
+        /// <summary>
+        /// Fired when a texture is loaded.
+        /// </summary>
         public event EventHandler<TextureLoadedEventArgs> OnTextureLoaded;
 
         /// <summary>
@@ -211,11 +232,23 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
         }
 
+        /// <summary>
+        /// Gets the ID number for a texture, loading it uniquely (won't be in the main engine!).
+        /// </summary>
+        /// <param name="name">The name of the texture.</param>
+        /// <param name="twidth">The texture width, if needed.</param>
+        /// <returns>The texture ID.</returns>
         public int GetTextureID(string name, int twidth = 0)
         {
             return (LoadTexture(name, twidth) ?? LoadTexture("white", twidth)).Original_InternalID;
         }
         
+        /// <summary>
+        /// loads a texture by name and puts it into a texture array.
+        /// </summary>
+        /// <param name="filename">The texture array.</param>
+        /// <param name="depth">The depth in the array.</param>
+        /// <param name="twidth">The texture width.</param>
         public void LoadTextureIntoArray(string filename, int depth, int twidth)
         {
             try
@@ -304,13 +337,23 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
     }
 
+    /// <summary>
+    /// Event arguments for a texture being loaded.
+    /// </summary>
     public class TextureLoadedEventArgs : EventArgs
     {
+        /// <summary>
+        /// Constructs a texture loaded event argument set.
+        /// </summary>
+        /// <param name="t">The texture that was loaded.</param>
         public TextureLoadedEventArgs(Texture t)
         {
             Tex = t;
         }
 
+        /// <summary>
+        /// The texture that was loaded.
+        /// </summary>
         public Texture Tex;
     }
 
@@ -397,8 +440,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
             return bmp;
         }
 
+        /// <summary>
+        /// The tick time this texture was last bound.
+        /// </summary>
         public double LastBindTime = 0;
 
+        /// <summary>
+        /// Checks if the texture is valid, and replaces it if needed.
+        /// </summary>
         public void CheckValid()
         {
             if (Internal_Texture == -1)

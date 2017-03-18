@@ -35,6 +35,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public Shader TextCleanerShader;
 
+        /// <summary>
+        /// The relevant game client.
+        /// </summary>
         public Client TheClient;
 
         /// <summary>
@@ -50,13 +53,23 @@ namespace Voxalia.ClientGame.GraphicsSystems
             TextCleanerShader = GetShader("text_cleaner?text");
         }
 
+        /// <summary>
+        /// whether "good graphics" are enabled for all shaders.
+        /// </summary>
         public bool MCM_GOOD_GRAPHICS = true;
 
+        /// <summary>
+        /// Updates the shader engine to the new timestamp.
+        /// </summary>
+        /// <param name="time">The current timestamp.</param>
         public void Update(double time)
         {
             cTime = time;
         }
 
+        /// <summary>
+        /// Clears away all shaders.
+        /// </summary>
         public void Clear()
         {
             for (int i = 0; i < LoadedShaders.Count; i++)
@@ -68,7 +81,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
             LoadedShaders.Clear();
         }
 
-        public double cTime = 0;
+        /// <summary>
+        /// The current tick time.
+        /// </summary>
+        public double cTime = 1.0;
 
         /// <summary>
         /// Gets the shader object for a specific shader name.
@@ -173,6 +189,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             };
         }
 
+        /// <summary>
+        /// Modifies the shader code string to include any external shaders.
+        /// </summary>
+        /// <param name="str">The shader code.</param>
+        /// <returns>The include-modified shader code.</returns>
         public string Includes(string str)
         {
             if (!str.Contains("#include"))
@@ -286,11 +307,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
     /// </summary>
     public class Shader
     {
+        /// <summary>
+        /// Constructs an empty shader.
+        /// </summary>
         public Shader()
         {
             NewVersion = this;
         }
 
+        /// <summary>
+        /// The shader engine that owns this shader.
+        /// </summary>
         public ShaderEngine Engine;
 
         /// <summary>
@@ -344,10 +371,19 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Engine.LoadedShaders.Remove(this);
         }
         
+        /// <summary>
+        /// The tick time this shader was last bound.
+        /// </summary>
         public double LastBindTime = 0;
 
+        /// <summary>
+        /// A new version of the shader, that replaces this one.
+        /// </summary>
         private Shader NewVersion = null;
 
+        /// <summary>
+        /// Checks if the shader is valid, and replaces it if needed.
+        /// </summary>
         public void CheckValid()
         {
             if (Internal_Program == -1)
