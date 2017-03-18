@@ -21,13 +21,23 @@ using FreneticGameCore;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {
+    /// <summary>
+    /// Handles rendering of fonts.
+    /// </summary>
     public class GLFontEngine
     {
+        /// <summary>
+        /// Constructs a GLFontEngine. Does not initialize.
+        /// </summary>
+        /// <param name="sengine">The shader system.</param>
         public GLFontEngine(ShaderEngine sengine)
         {
             Shaders = sengine;
         }
 
+        /// <summary>
+        /// The shader system.
+        /// </summary>
         public ShaderEngine Shaders;
 
         /// <summary>
@@ -42,9 +52,19 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public Client TheClient;
 
+        /// <summary>
+        /// The default width of the GLFont mega texture.
+        /// </summary>
         public const int DEFAULT_TEXTURE_SIZE_WIDTH = 2048;
+
+        /// <summary>
+        /// The default height of the GLFont mega texture.
+        /// </summary>
         public const int DEFAULT_TEXTURE_SIZE_HEIGHT = 2048;
 
+        /// <summary>
+        /// Expands the CPU-Side GLFont mega texture. Does not update to the GPU.
+        /// </summary>
         public void Expand()
         {
             CurrentHeight *= 2;
@@ -58,14 +78,34 @@ namespace Voxalia.ClientGame.GraphicsSystems
             CurrentBMP = bmp2;
         }
 
+        /// <summary>
+        /// The current height of the GLFont mega texture.
+        /// </summary>
         public int CurrentHeight = DEFAULT_TEXTURE_SIZE_HEIGHT;
 
+        /// <summary>
+        /// The currently used CPU-Side GLFont mega texture.
+        /// </summary>
         public Bitmap CurrentBMP;
 
+        /// <summary>
+        /// The current X coordinate.
+        /// </summary>
         public int CX = 26;
+
+        /// <summary>
+        /// The current Y coordinate.
+        /// </summary>
         public int CY = 6;
+
+        /// <summary>
+        /// The current minimum height of the GLFont mega texture.
+        /// </summary>
         public int CMinHeight = 20;
 
+        /// <summary>
+        /// Update the CPU-Side mega texture onto the GPU.
+        /// </summary>
         public void UpdateTexture()
         {
             if (TextureMain != -1)
@@ -86,10 +126,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
         }
 
         /// <summary>
-        /// Key this public and valid: if it gets released, the fonts it contains are lost for some reason!
+        /// Keep this public and valid: if it gets released, the fonts it contains are lost for some reason!
         /// </summary>
         public PrivateFontCollection pfc;
 
+        /// <summary>
+        /// The backup font that contains emojis, etc.
+        /// </summary>
         public FontFamily BackupFontFamily;
 
         /// <summary>
@@ -207,6 +250,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
             textfile = tempfile;
         }
 
+        /// <summary>
+        /// The GPU-Side mega texture ID.
+        /// </summary>
         public int TextureMain = -1;
 
         /// <summary>
@@ -302,6 +348,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public float Height;
 
+        /// <summary>
+        /// Constructs a GLFont.
+        /// </summary>
+        /// <param name="font">The CPU font to use.</param>
+        /// <param name="eng">The backing engine.</param>
         public GLFont(Font font, GLFontEngine eng)
         {
             Engine = eng;
@@ -318,14 +369,24 @@ namespace Voxalia.ClientGame.GraphicsSystems
             AddAll(StringInfo.GetTextElementEnumerator(Engine.textfile).AsEnumerable<string>().ToList());
         }
 
+        /// <summary>
+        /// The format to render strings under.
+        /// </summary>
         static StringFormat sf;
 
+        /// <summary>
+        /// Prepares static helpers.
+        /// </summary>
         static GLFont()
         {
             sf = new StringFormat(StringFormat.GenericTypographic);
             sf.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces | StringFormatFlags.FitBlackBox | StringFormatFlags.NoWrap;
         }
 
+        /// <summary>
+        /// Causes the system to recognize any characters in the string, adding them to the GLFont mega texture if needed.
+        /// </summary>
+        /// <param name="inp">The text containing relevant characters.</param>
         public void RecognizeCharacters(string inp)
         {
             List<string> NeedsAdding = new List<string>();
@@ -347,6 +408,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
         }
 
+        /// <summary>
+        /// Adds all the symbols to the GLFont mega texture.
+        /// </summary>
+        /// <param name="inp">The list of symbols.</param>
+        /// <returns>The list of symbols not able to added without expaninding, if any.</returns>
         private List<string> AddAll(List<string> inp)
         {
             using (Graphics gfx = Graphics.FromImage(Engine.CurrentBMP))
@@ -372,8 +438,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         X = 6;
                         if (Y + Engine.CMinHeight > Engine.CurrentHeight)
                         {
-                            Engine.CX = (int)X;
-                            Engine.CY = (int)Y;
+                            Engine.CX = X;
+                            Engine.CY = Y;
                             List<string> toret = new List<string>();
                             for (int x = i; x < inp.Count; x++)
                             {
@@ -391,8 +457,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                     X += (int)Math.Ceiling(nwidth + 8); // TODO: 8 -> ???
                 }
-                Engine.CX = (int)X;
-                Engine.CY = (int)Y;
+                Engine.CX = X;
+                Engine.CY = Y;
                 return null;
             }
         }
@@ -405,6 +471,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Engine.Fonts.Remove(this);
         }
 
+        /// <summary>
+        /// ASCII range symbol rectangle locations.
+        /// </summary>
         private RectangleF[] ASCIILocs = new RectangleF[128];
 
         /// <summary>
