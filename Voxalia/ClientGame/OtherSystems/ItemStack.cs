@@ -14,6 +14,7 @@ using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.GraphicsSystems;
 using FreneticGameCore;
+using FreneticGameGraphics;
 
 namespace Voxalia.ClientGame.OtherSystems
 {

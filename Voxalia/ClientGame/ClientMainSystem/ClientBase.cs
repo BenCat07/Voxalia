@@ -28,6 +28,7 @@ using System.Drawing;
 using FreneticGameCore.Files;
 using Voxalia.ClientGame.UISystem.MenuSystem;
 using FreneticGameCore;
+using FreneticGameGraphics;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -351,7 +352,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.CLIENTINIT, "Loading base textures...");
             PreInitRendering();
             Textures = new TextureEngine();
-            Textures.InitTextureSystem(this);
+            Textures.InitTextureSystem(Files);
             ItemFrame = Textures.GetTexture("ui/hud/item_frame");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading shaders...");
             Shaders = new ShaderEngine();
@@ -367,7 +368,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 SysConsole.Output(OutputType.CLIENTINIT, "Disabling good graphics (Appears to be Intel: '" + GLVendor + "')");
                 Shaders.MCM_GOOD_GRAPHICS = false;
             }
-            Shaders.InitShaderSystem(this);
+            Shaders.InitShaderSystem(Files);
             View3D.CheckError("Load - Shaders");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading rendering helper...");
             Rendering = new Renderer(Textures, Shaders);

@@ -19,6 +19,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using FreneticGameCore;
+using FreneticGameGraphics;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {
@@ -59,14 +60,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         double CTime;
 
-        public void CalcTexture(VRController cont, double timeNow)
+        public void CalcTexture(VRController cont, double timeNow, Client tclient)
         {
             if (timeNow == CTime)
             {
                 return;
             }
             CTime = timeNow;
-            BaseTexture.Engine.TheClient.Shaders.ColorMultShader.Bind();
+            tclient.Shaders.ColorMultShader.Bind();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, FBO);
             GL.Disable(EnableCap.CullFace);
             GL.Viewport(0, 0, 512, 512);
@@ -76,21 +77,21 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Matrix4 basic = Matrix4.CreateOrthographicOffCenter(-1, 1, -1, 1, -1, 1);
             GL.UniformMatrix4(1, false, ref basic);
             GL.UniformMatrix4(2, false, ref id);
-            BaseTexture.Engine.TheClient.Rendering.RenderRectangle(-1, -1, 1, 1);
+            tclient.Rendering.RenderRectangle(-1, -1, 1, 1);
             bool touched = cont.Touched.HasFlag(VRButtons.TRACKPAD);
             bool pressed = cont.Pressed.HasFlag(VRButtons.TRACKPAD);
             if (touched || pressed)
             {
                 BaseTexture.Engine.White.Bind();
-                BaseTexture.Engine.TheClient.Rendering.SetColor(pressed ? PressSpotColor : TouchSpotColor);
+                tclient.Rendering.SetColor(pressed ? PressSpotColor : TouchSpotColor);
                 Vector2 hsize = pressed ? PressSpotHalfSize : TouchSpotHalfSize;
-                BaseTexture.Engine.TheClient.Rendering.RenderRectangle(cont.TrackPad.X - hsize.X, cont.TrackPad.Y - hsize.X, cont.TrackPad.X + hsize.X, cont.TrackPad.Y + hsize.Y);
+                tclient.Rendering.RenderRectangle(cont.TrackPad.X - hsize.X, cont.TrackPad.Y - hsize.X, cont.TrackPad.X + hsize.X, cont.TrackPad.Y + hsize.Y);
             }
             GL.BindTexture(TextureTarget.Texture2D, 0);
-            BaseTexture.Engine.TheClient.Rendering.SetColor(Color4.White);
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, BaseTexture.Engine.TheClient.MainWorldView.cFBO);
+            tclient.Rendering.SetColor(Color4.White);
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, tclient.MainWorldView.cFBO);
             GL.Enable(EnableCap.CullFace);
-            BaseTexture.Engine.TheClient.MainWorldView.FixVP();
+            tclient.MainWorldView.FixVP();
         }
 
         public void Destroy()

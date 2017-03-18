@@ -18,6 +18,7 @@ using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared.Collision;
 using FreneticGameCore;
+using FreneticGameGraphics;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

@@ -46,7 +46,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             {
                 success = true;
                 TheClient.Textures.Empty();
-                TheClient.Textures.InitTextureSystem(TheClient);
+                TheClient.Textures.InitTextureSystem(TheClient.Files);
             }
             if (is_blocks || is_textures || is_all)
             {

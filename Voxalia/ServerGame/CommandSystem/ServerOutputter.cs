@@ -8,7 +8,6 @@
 
 using System;
 using Voxalia.Shared;
-using FreneticScript;
 using FreneticScript.CommandSystem;
 using Voxalia.ServerGame.ServerMainSystem;
 using FreneticGameCore;
@@ -49,7 +48,7 @@ namespace Voxalia.ServerGame.CommandSystem
             if (queue.Outputsystem != null)
             {
                 queue.Outputsystem.Invoke("Unknown command '" + TextStyle.Color_Standout
-                    + basecommand + TextStyle.Color_Error + "'.", MessageType.BAD);
+                    + basecommand + TextStyle.Color_Error + "'.", FreneticScript.MessageType.BAD);
             }
         }
 

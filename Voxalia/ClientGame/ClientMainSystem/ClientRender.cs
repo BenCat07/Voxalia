@@ -25,6 +25,7 @@ using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.EntitySystem;
 using FreneticGameCore.Files;
 using FreneticGameCore;
+using FreneticGameGraphics;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -1452,7 +1453,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (VR.Left != null)
             {
                 Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Left.Position;
-                VR.LeftTexture.CalcTexture(VR.Left, GlobalTickTimeLocal);
+                VR.LeftTexture.CalcTexture(VR.Left, GlobalTickTimeLocal, this);
                 isVox = true;
                 SetEnts();
                 mmcircle.Tex = new Texture() { Internal_Texture = VR.LeftTexture.Texture, Engine = Textures };
@@ -1462,7 +1463,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (VR.Right != null)
             {
                 Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Right.Position;
-                VR.RightTexture.CalcTexture(VR.Right, GlobalTickTimeLocal);
+                VR.RightTexture.CalcTexture(VR.Right, GlobalTickTimeLocal, this);
                 isVox = true;
                 SetEnts();
                 mmcircle.Tex = new Texture() { Internal_Texture = VR.RightTexture.Texture, Engine = Textures };
