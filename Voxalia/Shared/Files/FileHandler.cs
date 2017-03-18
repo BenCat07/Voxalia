@@ -22,8 +22,14 @@ namespace Voxalia.Shared.Files
     /// </summary>
     public class FileHandler
     {
+        /// <summary>
+        /// All PAK files known to the system.
+        /// </summary>
         public List<PakFile> Paks = new List<PakFile>();
 
+        /// <summary>
+        /// All data files known to the system.
+        /// </summary>
         public List<PakkedFile> Files = new List<PakkedFile>();
 
         /// <summary>
@@ -36,8 +42,15 @@ namespace Voxalia.Shared.Files
         /// </summary>
         public string BaseDirectory = Environment.CurrentDirectory.Replace('\\', '/') + "/data/";
 
+        /// <summary>
+        /// All sub-directories used by the system.
+        /// </summary>
         public List<string> SubDirectories = new List<string>();
 
+        /// <summary>
+        /// Loads a new subdirectory.
+        /// </summary>
+        /// <param name="dir">The directory name.</param>
         public void LoadDir(string dir)
         {
             string fdir = Environment.CurrentDirectory.Replace('\\', '/') + "/" + CleanFileName(dir) + "/";
@@ -51,6 +64,9 @@ namespace Voxalia.Shared.Files
             Init();
         }
 
+        /// <summary>
+        /// Clears away all file data.
+        /// </summary>
         public void ClearAll()
         {
             foreach (PakFile pf in Paks)
@@ -61,8 +77,15 @@ namespace Voxalia.Shared.Files
             Files.Clear();
         }
 
+        /// <summary>
+        /// The current save directory.
+        /// </summary>
         public string SaveDir = null;
 
+        /// <summary>
+        /// Call early in running to set a save directory prior to loading.
+        /// </summary>
+        /// <param name="dir">The save directory.</param>
         public void SetSaveDirEarly(string dir)
         {
             SaveDir = Environment.CurrentDirectory.Replace('\\', '/') + "/" + CleanFileName(dir) + "/";
@@ -70,6 +93,10 @@ namespace Voxalia.Shared.Files
             SubDirectories.Add(SaveDir);
         }
 
+        /// <summary>
+        /// Call late in running to set a save directory after having already loaded.
+        /// </summary>
+        /// <param name="dir">The save directory.</param>
         public void SetSaveDirLate(string dir)
         {
             SubDirectories.Clear();
@@ -89,6 +116,9 @@ namespace Voxalia.Shared.Files
             Init();
         }
 
+        /// <summary>
+        /// Initialize the file system.
+        /// </summary>
         public void Init()
         {
             foreach (string str in SubDirectories)
@@ -102,6 +132,11 @@ namespace Voxalia.Shared.Files
             Load(BaseDirectory, Directory.GetFiles(BaseDirectory, "*.*", SearchOption.AllDirectories));
         }
 
+        /// <summary>
+        /// Load a set of files from a path.
+        /// </summary>
+        /// <param name="pth">The path.</param>
+        /// <param name="allfiles">A list of all files that need to be loaded.</param>
         void Load(string pth, string[] allfiles)
         {
             foreach (string tfile in allfiles)
@@ -197,6 +232,11 @@ namespace Voxalia.Shared.Files
             return output.ToString().Trim();
         }
 
+        /// <summary>
+        /// Gets the index of a file by name.
+        /// </summary>
+        /// <param name="filename">The name of the file.</param>
+        /// <returns>The index, or -1 if not found.</returns>
         public int FileIndex(string filename)
         {
             string cleaned = CleanFileName(filename);
@@ -360,6 +400,10 @@ namespace Voxalia.Shared.Files
             return folds;
         }
 
+        /// <summary>
+        /// Creates a file system directory for a path.
+        /// </summary>
+        /// <param name="path">The path.</param>
         public void CreateDirectory(string path)
         {
             string fname = SaveDir + CleanFileName(path);
@@ -490,24 +534,54 @@ namespace Voxalia.Shared.Files
         }
     }
 
+    /// <summary>
+    /// Represents a file available to the <see cref="FileHandler"/>.
+    /// </summary>
     public class PakkedFile
     {
+        /// <summary>
+        /// The name of the file.
+        /// </summary>
         public string Name = null;
 
+        /// <summary>
+        /// The full path of the file.
+        /// </summary>
         public string Handle = null;
 
+        /// <summary>
+        /// Whether the file is in a PAK file.
+        /// </summary>
         public bool IsPakked = false;
 
+        /// <summary>
+        /// The index in a PAK file, or -1.
+        /// </summary>
         public int PakIndex = -1;
 
+        /// <summary>
+        /// The PAK file inner file object.
+        /// </summary>
         public ZipStorer.ZipFileEntry Entry;
 
+        /// <summary>
+        /// Constructs a pakked file.
+        /// </summary>
+        /// <param name="name">The name of the file.</param>
+        /// <param name="handle">The system file path.</param>
         public PakkedFile(string name, string handle)
         {
             Name = name;
             Handle = handle;
         }
 
+        /// <summary>
+        /// Constructs a pakked file.
+        /// </summary>
+        /// <param name="name">The file name.</param>
+        /// <param name="handle">The PAK file path.</param>
+        /// <param name="index">The PAK index.</param>
+        /// <param name="entry">The PAK entry.</param>
         public PakkedFile(string name, string handle, int index, ZipStorer.ZipFileEntry entry)
         {
             Name = name;
@@ -518,12 +592,36 @@ namespace Voxalia.Shared.Files
         }
     }
 
+    /// <summary>
+    /// Represents a PAK file for use by the <see cref="FileHandler"/>.
+    /// </summary>
     public class PakFile
     {
+        /// <summary>
+        /// The name of the PAK file.
+        /// </summary>
         public string Name = null;
+
+        /// <summary>
+        /// The path of the PAK file.
+        /// </summary>
         public string Handle = null;
+
+        /// <summary>
+        /// The PAK file object.
+        /// </summary>
         public ZipStorer Storer = null;
+
+        /// <summary>
+        /// The index in the file list.
+        /// </summary>
         public int FileListIndex = 0;
+
+        /// <summary>
+        /// Constructs the PAK file.
+        /// </summary>
+        /// <param name="name">The name of the file.</param>
+        /// <param name="handle">The path of the file.</param>
         public PakFile(string name, string handle)
         {
             Handle = handle;

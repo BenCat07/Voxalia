@@ -6,11 +6,14 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace System.IO.Compression
 {
+    // mcmonkey - random cleaning all over the place!
+
     /// <summary>
     /// Unique class for compression/decompression file. Represents a Zip file.
     /// </summary>
@@ -134,12 +137,12 @@ namespace System.IO.Compression
         /// <returns>A valid ZipStorer object.</returns>
         public static ZipStorer Create(Stream _stream, string _comment)
         {
-            ZipStorer zip = new ZipStorer();
-            zip.Comment = _comment;
-            zip.ZipFileStream = _stream;
-            zip.Access = FileAccess.Write;
-
-            return zip;
+            return new ZipStorer()
+            {
+                Comment = _comment,
+                ZipFileStream = _stream,
+                Access = FileAccess.Write
+            }; // mcmonkey - simplify
         }
         /// <summary>
         /// Method to open an existing storage file
@@ -167,15 +170,17 @@ namespace System.IO.Compression
             if (!_stream.CanSeek && _access != FileAccess.Read)
                 throw new InvalidOperationException("Stream cannot seek");
 
-            ZipStorer zip = new ZipStorer();
+            ZipStorer zip = new ZipStorer()
+            {
+                ZipFileStream = _stream,
+                Access = _access
+            }; // mcmonkey - simplify
             //zip.FileName = _filename;
-            zip.ZipFileStream = _stream;
-            zip.Access = _access;
 
             if (zip.ReadFileInfo())
                 return zip;
 
-            throw new System.IO.InvalidDataException();
+            throw new InvalidDataException(); // mcmonkey - simplify
         }
         /// <summary>
         /// Add full contents of a file into the Zip storage
@@ -218,17 +223,18 @@ namespace System.IO.Compression
             }
 
             // Prepare the fileinfo
-            ZipFileEntry zfe = new ZipFileEntry();
-            zfe.Method = _method;
-            zfe.EncodeUTF8 = this.EncodeUTF8;
-            zfe.FilenameInZip = NormalizedFilename(_filenameInZip);
-            zfe.Comment = (_comment == null ? "" : _comment);
-
-            // Even though we write the header now, it will have to be rewritten, since we don't know compressed size or crc.
-            zfe.Crc32 = 0;  // to be updated later
-            zfe.HeaderOffset = (uint)this.ZipFileStream.Position;  // offset within file of the start of this local record
-            zfe.ModifyTime = _modTime;
-
+            ZipFileEntry zfe = new ZipFileEntry()
+            {
+                Method = _method,
+                EncodeUTF8 = EncodeUTF8,
+                FilenameInZip = NormalizedFilename(_filenameInZip),
+                Comment = _comment ?? "",
+                // Even though we write the header now, it will have to be rewritten, since we don't know compressed size or crc.
+                Crc32 = 0,  // to be updated later
+                HeaderOffset = (uint)ZipFileStream.Position, // offset within file of the start of this local record
+                ModifyTime = _modTime
+            }; // mcmonkey - simplify
+            
             // Write local header
             WriteLocalHeader(ref zfe);
             zfe.FileOffset = (uint)this.ZipFileStream.Position;
@@ -263,9 +269,13 @@ namespace System.IO.Compression
                 }
 
                 if (this.CentralDirImage != null)
+                {
                     this.WriteEndRecord(centralSize + (uint)CentralDirImage.Length, centralOffset);
+                }
                 else
+                {
                     this.WriteEndRecord(centralSize, centralOffset);
+                }
             }
 
             if (this.ZipFileStream != null)
@@ -290,7 +300,9 @@ namespace System.IO.Compression
             {
                 uint signature = BitConverter.ToUInt32(CentralDirImage, pointer);
                 if (signature != 0x02014b50)
+                {
                     break;
+                }
 
                 bool encodeUTF8 = (BitConverter.ToUInt16(CentralDirImage, pointer + 8) & 0x0800) != 0;
                 ushort method = BitConverter.ToUInt16(CentralDirImage, pointer + 10);
@@ -306,18 +318,23 @@ namespace System.IO.Compression
 
                 Encoding encoder = encodeUTF8 ? Encoding.UTF8 : DefaultEncoding;
 
-                ZipFileEntry zfe = new ZipFileEntry();
-                zfe.Method = (Compression)method;
-                zfe.FilenameInZip = encoder.GetString(CentralDirImage, pointer + 46, filenameSize);
-                zfe.FileOffset = GetFileOffset(headerOffset);
-                zfe.FileSize = fileSize;
-                zfe.CompressedSize = comprSize;
-                zfe.HeaderOffset = headerOffset;
-                zfe.HeaderSize = headerSize;
-                zfe.Crc32 = crc32;
-                zfe.ModifyTime = DosTimeToDateTime(modifyTime);
+                // mcmonkey - simplify
+                ZipFileEntry zfe = new ZipFileEntry()
+                {
+                    Method = (Compression)method,
+                    FilenameInZip = encoder.GetString(CentralDirImage, pointer + 46, filenameSize),
+                    FileOffset = GetFileOffset(headerOffset),
+                    FileSize = fileSize,
+                    CompressedSize = comprSize,
+                    HeaderOffset = headerOffset,
+                    HeaderSize = headerSize,
+                    Crc32 = crc32,
+                    ModifyTime = DosTimeToDateTime(modifyTime)
+                };
                 if (commentSize > 0)
+                {
                     zfe.Comment = encoder.GetString(CentralDirImage, pointer + 46 + filenameSize + extraSize, commentSize);
+                }
 
                 result.Add(zfe);
                 pointer += (46 + filenameSize + extraSize + commentSize);
