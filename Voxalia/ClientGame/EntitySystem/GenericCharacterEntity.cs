@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
 using Voxalia.ClientGame.OtherSystems;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.Shared.Collision;
 using FreneticGameCore;
 

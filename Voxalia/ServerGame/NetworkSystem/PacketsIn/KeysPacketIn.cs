@@ -8,7 +8,7 @@
 
 using System;
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using BEPUutilities;
 using BEPUphysics;

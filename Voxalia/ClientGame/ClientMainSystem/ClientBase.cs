@@ -25,7 +25,7 @@ using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ServerGame.ServerMainSystem;
 using System.Threading;
 using System.Drawing;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.ClientGame.UISystem.MenuSystem;
 using FreneticGameCore;
 

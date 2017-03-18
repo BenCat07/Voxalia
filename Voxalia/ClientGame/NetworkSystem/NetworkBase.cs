@@ -16,7 +16,7 @@ using System.Collections.Specialized;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.NetworkSystem.PacketsIn;
 using Voxalia.ClientGame.NetworkSystem.PacketsOut;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using System.Threading.Tasks;
 using System.Web;
 using Voxalia.ClientGame.UISystem;

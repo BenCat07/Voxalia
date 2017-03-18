@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using BEPUutilities;
 using System;
 using BEPUphysics.CollisionShapes;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using FreneticScript;
 

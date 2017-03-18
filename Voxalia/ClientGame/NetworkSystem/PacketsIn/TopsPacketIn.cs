@@ -13,7 +13,7 @@ using System.Text;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
 using Voxalia.ClientGame.OtherSystems;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn

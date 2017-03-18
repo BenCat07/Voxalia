@@ -15,7 +15,7 @@ using OpenTK.Audio.OpenAL;
 using Voxalia.Shared;
 using OggDecoder;
 using Voxalia.ClientGame.CommandSystem;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.ClientGame.ClientMainSystem;
 using System.Threading;

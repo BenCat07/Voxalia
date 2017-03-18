@@ -16,7 +16,7 @@ using Voxalia.ClientGame.ClientMainSystem;
 using System.IO;
 using System.Threading;
 using System.Globalization;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using System.Runtime.InteropServices;
 using FreneticGameCore;
 

@@ -17,7 +17,7 @@ using Voxalia.ServerGame.ServerMainSystem;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsIn;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using FreneticGameCore;
 
 namespace Voxalia.ServerGame.NetworkSystem

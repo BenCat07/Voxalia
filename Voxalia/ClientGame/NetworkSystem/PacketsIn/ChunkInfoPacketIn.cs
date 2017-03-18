@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Voxalia.Shared;
 using Voxalia.ClientGame.WorldSystem;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.Shared.Collision;
 using FreneticGameCore;
 

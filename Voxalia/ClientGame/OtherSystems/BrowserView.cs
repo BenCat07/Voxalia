@@ -19,7 +19,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using System.IO;
 using FreneticGameCore;
 

@@ -14,7 +14,7 @@ using System.Text;
 using LiteDB;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using FreneticGameCore;
 
 namespace Voxalia.ServerGame.WorldSystem

@@ -10,7 +10,7 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.ServerGame.ServerMainSystem;
 using FreneticScript.CommandSystem;
 using FreneticScript.TagHandlers;

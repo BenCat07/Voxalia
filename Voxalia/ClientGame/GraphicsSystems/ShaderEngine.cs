@@ -11,9 +11,9 @@ using System.Text;
 using System.Collections.Generic;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
 using Voxalia.ClientGame.ClientMainSystem;
 using FreneticGameCore;
+using FreneticGameCore.Files;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

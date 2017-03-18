@@ -128,13 +128,9 @@
     <Compile Include="Shared\BlockShapes\BSD75.cs" />
     <Compile Include="Shared\Collision\FullChunkObject.cs" />
     <Compile Include="Shared\Collision\FullChunkShape.cs" />
-    <Compile Include="Shared\Files\DataReader.cs" />
-    <Compile Include="Shared\Files\DataWriter.cs" />
     <Compile Include="Shared\ItemStackBase.cs" />
     <Compile Include="Shared\Collision\CollisionUtil.cs" />
     <Compile Include="Shared\ConsoleHandler.cs" />
-    <Compile Include="Shared\Files\DataStream.cs" />
-    <Compile Include="Shared\Files\FileHandler.cs" />
     <Compile Include="Shared\Material.cs" />
     <Compile Include="Shared\ModelHandler.cs" />
     <Compile Include="Shared\PingInfo.cs" />
@@ -143,8 +139,6 @@
     <Compile Include="Shared\Scheduler.cs" />
     <Compile Include="Shared\SimplexNoise.cs" />
     <Compile Include="Shared\NetworkEnums.cs" />
-    <Compile Include="Shared\Files\UnknownFileException.cs" />
-    <Compile Include="Shared\Files\ZipStorer.cs" />
     <Compile Include="Shared\ModelManagement\Simplify.cs" />
   </ItemGroup>
   <ItemGroup>

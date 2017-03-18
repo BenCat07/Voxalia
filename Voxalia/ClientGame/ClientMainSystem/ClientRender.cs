@@ -23,7 +23,7 @@ using Voxalia.Shared.Collision;
 using System.Diagnostics;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.EntitySystem;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem

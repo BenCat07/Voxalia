@@ -7,7 +7,7 @@
 //
 
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn

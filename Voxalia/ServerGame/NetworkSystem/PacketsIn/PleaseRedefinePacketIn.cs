@@ -13,7 +13,7 @@ using System.Text;
 using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.WorldSystem;
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
 {

@@ -9,7 +9,7 @@
 using System;
 using System.Drawing;
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.GraphicsSystems;

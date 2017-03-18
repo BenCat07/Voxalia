@@ -12,7 +12,7 @@ using System.Text;
 using Voxalia.Shared;
 using BEPUutilities;
 using BEPUphysics.BroadPhaseEntries;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.EntitySystem;
 using System.Threading;

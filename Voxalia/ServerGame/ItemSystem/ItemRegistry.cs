@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using Voxalia.ServerGame.ServerMainSystem;
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Common;
 using FreneticScript.TagHandlers.Objects;

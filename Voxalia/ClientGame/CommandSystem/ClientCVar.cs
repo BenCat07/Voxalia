@@ -8,7 +8,7 @@
 
 using FreneticScript;
 using FreneticScript.CommandSystem;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
 

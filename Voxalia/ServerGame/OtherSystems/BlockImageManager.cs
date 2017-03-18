@@ -17,7 +17,7 @@ using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.WorldSystem;
 using FreneticScript;

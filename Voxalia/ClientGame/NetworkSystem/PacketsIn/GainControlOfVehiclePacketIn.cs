@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.Shared;
-using Voxalia.Shared.Files;
+using FreneticGameCore.Files;
 using Voxalia.ClientGame.JointSystem;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
