@@ -399,7 +399,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                         reldat = zp.BlockLocalData;
                                     }
                                     // TODO: better darkness system!
-                                    if (reldat > 200 && bua != null && bua.Darken(x, y, wpi.Z + z))
+                                    if (reldat > 200 && bua != null && bua.Darken(x, y, wpi.Z + (z + 2) * PosMultiplier))
                                     {
                                         reldat = 100;
                                     }
