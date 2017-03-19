@@ -129,10 +129,12 @@ namespace Voxalia.ClientGame.OtherSystems
             }
         }
 
-        public void Render3D(Location pos, float rot, Location size)
+        public void Render3D(Location pos, float rot, Location size, BEPUutilities.Matrix rotFix)
         {
+            rotFix.Transpose();
             BEPUutilities.Matrix rot1 = BEPUutilities.Matrix.CreateFromAxisAngle(BEPUutilities.Vector3.UnitZ, rot)
-                * BEPUutilities.Matrix.CreateFromAxisAngle(BEPUutilities.Vector3.UnitX, (float)(Math.PI * 0.25));
+                * BEPUutilities.Matrix.CreateFromAxisAngle(BEPUutilities.Vector3.UnitX, (float)(Math.PI * 0.25))
+                * rotFix;
             if (RenderedBlock != null)
             {
                 TheClient.isVox = false;
@@ -161,7 +163,7 @@ namespace Voxalia.ClientGame.OtherSystems
             }
         }
 
-        public void Render(Location pos, Location size)
+        public void Render(Location pos, Location size, BEPUutilities.Matrix rotFix)
         {
             if (RenderedBlock != null)
             {
@@ -180,7 +182,7 @@ namespace Voxalia.ClientGame.OtherSystems
             }
             Tex.Bind();
             TheClient.Rendering.SetColor(TheClient.Rendering.AdaptColor(ClientUtilities.Convert(TheClient.Player.GetPosition()), GetColor()));
-            TheClient.Rendering.RenderRectangle((int)pos.X, (int)pos.Y, (int)(pos.X + size.X), (int)(pos.Y + size.Y));
+            TheClient.Rendering.RenderRectangle((int)pos.X, (int)pos.Y, (int)(pos.X + size.X), (int)(pos.Y + size.Y), ClientUtilities.Convert(rotFix));
         }
     }
 }

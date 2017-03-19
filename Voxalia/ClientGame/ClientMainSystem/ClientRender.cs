@@ -122,11 +122,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// This is in some situations temporarily swapped for the currently rendering view as needed.
         /// </summary>
         public View3D MainWorldView = new View3D();
-
-        /// <summary>
-        /// The rendering subsystem for the item bar.
-        /// </summary>
-        public View3D ItemBarView = new View3D();
         
         /// <summary>
         /// Early startup call to preparing some rendering systems.
@@ -148,27 +143,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             MainWorldView.LLActive = CVars.r_transpll.ValueB; // TODO: CVar edit call back
             View3D.CheckError("Load - Rendering - Settings");
             MainWorldView.Generate(this, Window.Width, Window.Height);
-            View3D.CheckError("Load - Rendering - ViewGen");
-            ItemBarView.FastOnly = true;
-            ItemBarView.ClearColor = new float[] { 1f, 1f, 1f, 1f };
-            ItemBarView.Render3D = RenderItemBar;
-            foreach (LightObject light in ItemBarView.Lights)
-            {
-                foreach (Light li in light.InternalLights)
-                {
-                    li.Destroy();
-                }
-            }
-            ItemBarView.Lights.Clear();
-            ItemBarView.RenderClearAlpha = 0f;
-            SkyLight tlight = new SkyLight(new Location(0, 0, 10), 64, Location.One, new Location(0, -1, -1).Normalize(), 64, false, 64);
-            ItemBarView.Lights.Add(tlight);
-            ItemBarView.Width = 1024;
-            ItemBarView.Height = 256;
-            ItemBarView.GenerateFBO();
-            ItemBarView.Generate(this, 1024, 256);
-            // TODO: Use the item bar in VR mode.
-            View3D.CheckError("Load - Rendering - Item Bar");
             skybox = new VBO[6];
             for (int i = 0; i < 6; i++)
             {
@@ -199,12 +173,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
         
-        public void RenderItemBar(View3D renderer)
-        {
-            Render2D(true);
-            // TODO: Render2D(false) as well in here! Item bar only though!
-        }
-
         public int TWOD_CFrame = 0;
 
         public int TWOD_FBO;
@@ -763,14 +731,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         TWOD_CFrame++;
                         if (CScreen != TheGameScreen || TWOD_CFrame > CVars.u_rate.ValueI)
                         {
-                            ItemBarView.CameraPos = -Forw * 10;
-                            ItemBarView.ForwardVec = Forw;
-                            ItemBarView.CameraUp = () => Location.UnitY; // TODO: Should this really be Y? Probably not...
-                            View3D temp = MainWorldView;
-                            MainWorldView = ItemBarView;
-                            ItemBarView.Render();
-                            MainWorldView = temp;
-                            View3D.CheckError("ItemBarRender");
                             TWOD_CFrame = 0;
                             Establish2D();
                             View3D.CheckError("RenderFrame - Establish");
@@ -920,15 +880,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     CDrawWidth = Window.Width / 2;
                     GL.Viewport(Window.Width / 2, 0, Window.Width / 2, Window.Height);
-                    Render2D(false);
+                    Render2D();
                     GL.Viewport(0, 0, Window.Width / 2, Window.Height);
-                    Render2D(false);
+                    Render2D();
                     GL.Viewport(0, 0, Window.Width, Window.Height);
                 }
                 else
                 {
                     CDrawWidth = Window.Width;
-                    Render2D(false);
+                    Render2D();
                 }
                 timer.Stop();
                 TWODTime = (double)timer.ElapsedMilliseconds / 1000f;
@@ -1966,6 +1926,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 //Render2D(true);
             }
             View3D.CheckError("Rendering - 5");
+            RenderItemBar(true);
+            RenderItemBar(false);
+            View3D.CheckError("Rendering - 6");
         }
 
         /// <summary>
@@ -2045,33 +2008,73 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         const int bottomup = 32 + 32;
 
+        public void RenderItemBar(bool sub3d)
+        {
+            const float scaley = 0.2f;
+            GL.Disable(EnableCap.CullFace);
+            Location centerPos = MainWorldView.ForwardVec * (CVars.r_znear.ValueF + 0.25f);
+            /*
+            BEPUutilities.Vector3 p1 = MainWorldView.ForwardVec.ToBVector();
+            BEPUutilities.Vector3 p2 = -MainWorldView.ForwardVec.ToBVector();
+            BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref p1, ref p2, out BEPUutilities.Quaternion quat);
+            BEPUutilities.Matrix rotFix = BEPUutilities.Matrix.CreateFromQuaternion(quat);
+            Location rel = new Location(BEPUutilities.Quaternion.Transform(new BEPUutilities.Vector3(itemScale + 1, 0, 0), quat));
+            */
+            Matrix4 lookAt = Matrix4.LookAt(ClientUtilities.Convert(MainWorldView.ForwardVec), Vector3.Zero, ClientUtilities.Convert(MainWorldView.CameraUp()));
+            Matrix4 inverted = lookAt.Inverted();
+            BEPUutilities.Matrix rotFix = ClientUtilities.ConvertBEPU(inverted);
+            Vector4 v = Vector4.Transform(new Vector4(1.01f, 0, 0, 1), inverted);
+            Location rel = ClientUtilities.Convert(v.Xyz) / v.W;
+            if (RenderExtraItems > 0)
+            {
+                RenderExtraItems -= gDelta;
+                if (RenderExtraItems < 0)
+                {
+                    RenderExtraItems = 0;
+                }
+                RenderItem(GetItemForSlot(QuickBarPos - 5), centerPos + rel * -6, scaley, sub3d, rotFix);
+                RenderItem(GetItemForSlot(QuickBarPos - 4), centerPos + rel * -5, scaley, sub3d, rotFix);
+                RenderItem(GetItemForSlot(QuickBarPos - 3), centerPos + rel * -4, scaley, sub3d, rotFix);
+                RenderItem(GetItemForSlot(QuickBarPos + 3), centerPos + rel * 3, scaley, sub3d, rotFix);
+                RenderItem(GetItemForSlot(QuickBarPos + 4), centerPos + rel * 4, scaley, sub3d, rotFix);
+                RenderItem(GetItemForSlot(QuickBarPos + 5), centerPos + rel * -5, scaley, sub3d, rotFix);
+            }
+            RenderItem(GetItemForSlot(QuickBarPos - 2), centerPos + rel * -3, scaley, sub3d, rotFix);
+            RenderItem(GetItemForSlot(QuickBarPos - 1), centerPos + rel * -2, scaley, sub3d, rotFix);
+            RenderItem(GetItemForSlot(QuickBarPos + 1), centerPos + rel * 1, scaley, sub3d, rotFix);
+            RenderItem(GetItemForSlot(QuickBarPos + 2), centerPos + rel * 2, scaley, sub3d, rotFix);
+            RenderItem(GetItemForSlot(QuickBarPos), centerPos + rel * -1, scaley * 2f, sub3d, rotFix);
+            if (!sub3d)
+            {
+                Matrix4 tmat = Ortho;
+                Ortho = MainWorldView.PrimaryMatrix * ClientUtilities.Convert(rotFix) * Matrix4.CreateTranslation(ClientUtilities.Convert(centerPos));
+                string it = "^%^e^7" + GetItemForSlot(QuickBarPos).DisplayName;
+                float size = FontSets.Standard.MeasureFancyText(it);
+                FontSets.Standard.DrawColoredText(it, new Location(-size / 2f, Window.Height - (itemScale * 2 + bottomup) - FontSets.Standard.font_default.Height - 5, 0));
+                Ortho = tmat;
+            }
+        }
+
         /// <summary>
         /// Renders the 2D screen data, or 3D pieces of the 2D screen.
         /// </summary>
-        public void Render2D(bool sub3d)
+        public void Render2D()
         {
             if (IsMainMenu)
             {
                 return;
             }
-            if (sub3d)
-            {
-                //GL.Disable(EnableCap.DepthTest);
-                FixPersp = Matrix4.CreateOrthographicOffCenter(0, 1024, 256, 0, -(itemScale * 2f), (itemScale * 2f));
-                isVox = false;
-                SetVox();
-            }
             GL.Disable(EnableCap.CullFace);
             if (CVars.u_showhud.ValueB && !InvShown())
             {
-                if (!sub3d && CVars.u_showping.ValueB)
+                if (CVars.u_showping.ValueB)
                 {
                     string pingdetail = "^0^e^&ping: " + (Math.Max(LastPingValue, GlobalTickTimeLocal - LastPingTime) * 1000.0).ToString(pingformat) + "ms";
                     string pingdet2 = "^0^e^&average: " + (APing * 1000.0).ToString(pingformat) + "ms";
                     FontSets.Standard.DrawColoredText(pingdetail, new Location(Window.Width - FontSets.Standard.MeasureFancyText(pingdetail), Window.Height - FontSets.Standard.font_default.Height * 2, 0));
                     FontSets.Standard.DrawColoredText(pingdet2, new Location(Window.Width - FontSets.Standard.MeasureFancyText(pingdet2), Window.Height - FontSets.Standard.font_default.Height, 0));
                 }
-                if (!sub3d && CVars.u_debug.ValueB)
+                if (CVars.u_debug.ValueB)
                 {
                     FontSets.Standard.DrawColoredText(FontSets.Standard.SplitAppropriately("^!^e^7gFPS(calc): " + (1f / gDelta).ToString(timeformat_fps2) + ", gFPS(actual): " + gFPS + ", gFPS(range): " + gFPS_Min + " to " + gFPS_Max
                         + "\nHeld Item: " + GetItemForSlot(QuickBarPos).ToString()
@@ -2088,108 +2091,76 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         Window.Width - 10), new Location(0, 0, 0), Window.Height, 1, false, "^r^!^e^7");
                 }
                 int center = Window.Width / 2;
-                if (RenderExtraItems > 0)
+                float percent = 0;
+                if (Player.MaxHealth != 0)
                 {
-                    RenderExtraItems -= gDelta;
-                    if (RenderExtraItems < 0)
-                    {
-                        RenderExtraItems = 0;
-                    }
-                    RenderItem(GetItemForSlot(QuickBarPos - 5), new Location(center - (itemScale + itemScale + itemScale + itemScale + itemScale + itemScale + 3), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
-                    RenderItem(GetItemForSlot(QuickBarPos - 4), new Location(center - (itemScale + itemScale + itemScale + itemScale + itemScale + 3), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
-                    RenderItem(GetItemForSlot(QuickBarPos - 3), new Location(center - (itemScale + itemScale + itemScale + itemScale + 3), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
-                    RenderItem(GetItemForSlot(QuickBarPos + 3), new Location(center + (itemScale + itemScale + itemScale + 2), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
-                    RenderItem(GetItemForSlot(QuickBarPos + 4), new Location(center + (itemScale + itemScale + itemScale + itemScale + 2), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
-                    RenderItem(GetItemForSlot(QuickBarPos + 5), new Location(center + (itemScale + itemScale + itemScale + itemScale + itemScale + 2), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
+                    percent = (float)Math.Round((Player.Health / Player.MaxHealth) * 10000) / 100f;
                 }
-                RenderItem(GetItemForSlot(QuickBarPos - 2), new Location(center - (itemScale + itemScale + itemScale + 3), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
-                RenderItem(GetItemForSlot(QuickBarPos - 1), new Location(center - (itemScale + itemScale + 2), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
-                RenderItem(GetItemForSlot(QuickBarPos + 1), new Location(center + (itemScale + 1), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
-                RenderItem(GetItemForSlot(QuickBarPos + 2), new Location(center + (itemScale + itemScale + 2), Window.Height - (itemScale + 16 + bottomup), 0), itemScale, sub3d);
-                RenderItem(GetItemForSlot(QuickBarPos), new Location(center - (itemScale + 1), Window.Height - (itemScale * 2 + bottomup), 0), itemScale * 2, sub3d);
-                if (!sub3d)
+                int healthbaroffset = 300;
+                Textures.White.Bind();
+                Rendering.SetColor(Color4.Black);
+                Rendering.RenderRectangle(center - healthbaroffset, Window.Height - 30, center + healthbaroffset, Window.Height - 2);
+                Rendering.SetColor(Color4.Red);
+                Rendering.RenderRectangle(center - healthbaroffset + 2, Window.Height - 28, center - (healthbaroffset - 2) * ((100 - percent) / 100), Window.Height - 4);
+                Rendering.SetColor(Color4.Cyan);
+                Rendering.RenderRectangle(center + 2, Window.Height - 28, center + healthbaroffset - 2, Window.Height - 4); // TODO: Armor percent
+                FontSets.SlightlyBigger.DrawColoredText("^S^!^e^0Health: " + Player.Health.ToString(healthformat) + "/" + Player.MaxHealth.ToString(healthformat) + " = " + percent.ToString(healthformat) + "%",
+                    new Location(center - healthbaroffset + 4, Window.Height - 26, 0));
+                FontSets.SlightlyBigger.DrawColoredText("^S^%^e^0Armor: " + "100.0" + "/" + "100.0" + " = " + "100.0" + "%", // TODO: Armor values!
+                    new Location(center + 4, Window.Height - 26, 0));
+                if (CVars.u_showmap.ValueB)
                 {
-                    string it = "^%^e^7" + GetItemForSlot(QuickBarPos).DisplayName;
-                    float size = FontSets.Standard.MeasureFancyText(it);
-                    FontSets.Standard.DrawColoredText(it, new Location(center - size / 2f, Window.Height - (itemScale * 2 + bottomup) - FontSets.Standard.font_default.Height - 5, 0));
-                    float percent = 0;
-                    if (Player.MaxHealth != 0)
-                    {
-                        percent = (float)Math.Round((Player.Health / Player.MaxHealth) * 10000) / 100f;
-                    }
-                    int healthbaroffset = 300;
+                    Rendering.SetColor(Color4.White);
+                    Textures.Black.Bind();
+                    Rendering.RenderRectangle(Window.Width - 16 - 200, 16, Window.Width - 16, 16 + 200); // TODO: Dynamic size?
+                    GL.BindTexture(TextureTarget.Texture2D, map_fbo_texture);
+                    Rendering.RenderRectangle(Window.Width - 16 - (200 - 2), 16 + 2, Window.Width - 16 - 2, 16 + (200 - 2));
+                }
+                int cX = Window.Width / 2;
+                int cY = Window.Height / 2;
+                int move = (int)Player.GetVelocity().LengthSquared() / 5;
+                if (move > 20)
+                {
+                    move = 20;
+                }
+                Rendering.SetColor(Color4.White);
+                Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_tl").Bind(); // TODO: Save! Don't re-grab every tick!
+                Rendering.RenderRectangle(cX - CVars.u_reticlescale.ValueI - move, cY - CVars.u_reticlescale.ValueI - move, cX - move, cY - move);
+                Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_tr").Bind();
+                Rendering.RenderRectangle(cX + move, cY - CVars.u_reticlescale.ValueI - move, cX + CVars.u_reticlescale.ValueI + move, cY - move);
+                Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_bl").Bind();
+                Rendering.RenderRectangle(cX - CVars.u_reticlescale.ValueI - move, cY + move, cX - move, cY + CVars.u_reticlescale.ValueI + move);
+                Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_br").Bind();
+                Rendering.RenderRectangle(cX + move, cY + move, cX + CVars.u_reticlescale.ValueI + move, cY + CVars.u_reticlescale.ValueI + move);
+                if (CVars.u_showrangefinder.ValueB)
+                {
+                    FontSets.Standard.DrawColoredText(CameraDistance.ToString("0.0"), new Location(cX + move + CVars.u_reticlescale.ValueI, cY + move + CVars.u_reticlescale.ValueI, 0));
+                }
+                if (CVars.u_showcompass.ValueB)
+                {
                     Textures.White.Bind();
                     Rendering.SetColor(Color4.Black);
-                    Rendering.RenderRectangle(center - healthbaroffset, Window.Height - 30, center + healthbaroffset, Window.Height - 2);
-                    Rendering.SetColor(Color4.Red);
-                    Rendering.RenderRectangle(center - healthbaroffset + 2, Window.Height - 28, center - (healthbaroffset - 2) * ((100 - percent) / 100), Window.Height - 4);
-                    Rendering.SetColor(Color4.Cyan);
-                    Rendering.RenderRectangle(center + 2, Window.Height - 28, center + healthbaroffset - 2, Window.Height - 4); // TODO: Armor percent
-                    FontSets.SlightlyBigger.DrawColoredText("^S^!^e^0Health: " + Player.Health.ToString(healthformat) + "/" + Player.MaxHealth.ToString(healthformat) + " = " + percent.ToString(healthformat) + "%",
-                        new Location(center - healthbaroffset + 4, Window.Height - 26, 0));
-                    FontSets.SlightlyBigger.DrawColoredText("^S^%^e^0Armor: " + "100.0" + "/" + "100.0" + " = " + "100.0" + "%", // TODO: Armor values!
-                        new Location(center + 4, Window.Height - 26, 0));
-                    if (CVars.u_showmap.ValueB)
-                    {
-                        Rendering.SetColor(Color4.White);
-                        Textures.Black.Bind();
-                        Rendering.RenderRectangle(Window.Width - 16 - 200, 16, Window.Width - 16, 16 + 200); // TODO: Dynamic size?
-                        GL.BindTexture(TextureTarget.Texture2D, map_fbo_texture);
-                        Rendering.RenderRectangle(Window.Width - 16 - (200 - 2), 16 + 2, Window.Width - 16 - 2, 16 + (200 - 2));
-                    }
-                    int cX = Window.Width / 2;
-                    int cY = Window.Height / 2;
-                    int move = (int)Player.GetVelocity().LengthSquared() / 5;
-                    if (move > 20)
-                    {
-                        move = 20;
-                    }
+                    Rendering.RenderRectangle(64, Window.Height - (32 + 32), Window.Width - 64, Window.Height - 32);
+                    Rendering.SetColor(Color4.Gray);
+                    Rendering.RenderRectangle(66, Window.Height - (32 + 30), Window.Width - 66, Window.Height - 34);
                     Rendering.SetColor(Color4.White);
-                    Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_tl").Bind(); // TODO: Save! Don't re-grab every tick!
-                    Rendering.RenderRectangle(cX - CVars.u_reticlescale.ValueI - move, cY - CVars.u_reticlescale.ValueI - move, cX - move, cY - move);
-                    Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_tr").Bind();
-                    Rendering.RenderRectangle(cX + move, cY - CVars.u_reticlescale.ValueI - move, cX + CVars.u_reticlescale.ValueI + move, cY - move);
-                    Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_bl").Bind();
-                    Rendering.RenderRectangle(cX - CVars.u_reticlescale.ValueI - move, cY + move, cX - move, cY + CVars.u_reticlescale.ValueI + move);
-                    Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_br").Bind();
-                    Rendering.RenderRectangle(cX + move, cY + move, cX + CVars.u_reticlescale.ValueI + move, cY + CVars.u_reticlescale.ValueI + move);
-                    if (CVars.u_showrangefinder.ValueB)
-                    {
-                        FontSets.Standard.DrawColoredText(CameraDistance.ToString("0.0"), new Location(cX + move + CVars.u_reticlescale.ValueI, cY + move + CVars.u_reticlescale.ValueI, 0));
-                    }
-                    if (CVars.u_showcompass.ValueB)
-                    {
-                        Textures.White.Bind();
-                        Rendering.SetColor(Color4.Black);
-                        Rendering.RenderRectangle(64, Window.Height - (32 + 32), Window.Width - 64, Window.Height - 32);
-                        Rendering.SetColor(Color4.Gray);
-                        Rendering.RenderRectangle(66, Window.Height - (32 + 30), Window.Width - 66, Window.Height - 34);
-                        Rendering.SetColor(Color4.White);
-                        RenderCompassCoord(Vector4d.UnitY, "N");
-                        RenderCompassCoord(-Vector4d.UnitY, "S");
-                        RenderCompassCoord(Vector4d.UnitX, "E");
-                        RenderCompassCoord(-Vector4d.UnitX, "W");
-                        RenderCompassCoord(new Vector4d(1, 1, 0, 0), "NE");
-                        RenderCompassCoord(new Vector4d(1, -1, 0, 0), "SE");
-                        RenderCompassCoord(new Vector4d(-1, 1, 0, 0), "NW");
-                        RenderCompassCoord(new Vector4d(-1, -1, 0, 0), "SW");
-                    }
-                    if (!IsChatVisible())
-                    {
-                        ChatRenderRecent();
-                    }
+                    RenderCompassCoord(Vector4d.UnitY, "N");
+                    RenderCompassCoord(-Vector4d.UnitY, "S");
+                    RenderCompassCoord(Vector4d.UnitX, "E");
+                    RenderCompassCoord(-Vector4d.UnitX, "W");
+                    RenderCompassCoord(new Vector4d(1, 1, 0, 0), "NE");
+                    RenderCompassCoord(new Vector4d(1, -1, 0, 0), "SE");
+                    RenderCompassCoord(new Vector4d(-1, 1, 0, 0), "NW");
+                    RenderCompassCoord(new Vector4d(-1, -1, 0, 0), "SW");
                 }
-            }
-            if (sub3d)
-            {
-                FixPersp = Matrix4.Identity;
-            }
-            else
-            {
-                if (Loading > 0)
+                if (!IsChatVisible())
                 {
-                    RenderLoader(CDrawWidth - 100f, 100f, 100f, gDelta);
+                    ChatRenderRecent();
                 }
+            }
+            if (Loading > 0)
+            {
+                RenderLoader(CDrawWidth - 100f, 100f, 100f, gDelta);
             }
         }
 
@@ -2227,25 +2198,25 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <param name="pos">Where to render it.</param>
         /// <param name="size">How big to render it, in pixels.</param>
         /// <param name="sub3d">Whether to render in 3D (true) or 2D (false).</param>
-        public void RenderItem(ItemStack item, Location pos, int size, bool sub3d)
+        /// <param name="rotFix">The rotation fix matrix.</param>
+        public void RenderItem(ItemStack item, Location pos, float size, bool sub3d, BEPUutilities.Matrix rotFix)
         {
+            IsOrtho = true;
             if (sub3d)
             {
-                IsOrtho = true;
-                pos.X += 512f - (Window.Width * 0.5f);
-                pos.Y += 256f - (Window.Height);// - bottomup;
-                item.Render3D(pos+ new Location(size * 0.5f, size * 0.5f, 0f), (float)GlobalTickTimeLocal * 0.5f, new Location(size * 0.75f));
+                item.Render3D(pos, (float)GlobalTickTimeLocal * 0.5f, new Location(size * 0.75f), rotFix);
                 IsOrtho = false;
                 return;
             }
             ItemFrame.Bind();
             Rendering.SetColor(Color4.White);
-            Rendering.RenderRectangle((int)pos.X - 1, (int)pos.Y - 1, (int)(pos.X + size) + 1, (int)(pos.Y + size) + 1);
-            item.Render(pos, new Location(size, size, 0));
+            Rendering.RenderRectangle((float)pos.X - 1, (float)pos.Y - 1, (float)(pos.X + size) + 1, (float)(pos.Y + size) + 1, ClientUtilities.Convert(rotFix));
+            item.Render(pos, new Location(size, size, 0), rotFix);
             if (item.Count > 0)
             {
                 FontSets.SlightlyBigger.DrawColoredText("^!^e^7^S" + item.Count, new Location(pos.X + 5, pos.Y + size - FontSets.SlightlyBigger.font_default.Height / 2f - 5, 0));
             }
+            IsOrtho = false;
         }
 
         /// <summary>

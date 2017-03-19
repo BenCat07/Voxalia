@@ -17,15 +17,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
 {
     public class GameScreen : UIScreen
     {
-        UIColoredBox Hud3DHelper()
-        {
-            return new UIColoredBox(new Vector4(1f, 1f, 1f, 0f), UIAnchor.BOTTOM_CENTER, () => 1024, () => 256, () => 0, () => 0) { GetTexture = () => TheClient.ItemBarView.CurrentFBOTexture, Flip = true };
-        }
-
         public GameScreen(Client tclient) : base(tclient)
         {
             ResetOnRender = false;
-            AddChild(Hud3DHelper());
         }
 
         public override void SwitchTo()
