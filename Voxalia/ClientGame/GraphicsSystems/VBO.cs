@@ -28,11 +28,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
         uint _BoneWeightVBO;
         uint _BoneID2VBO;
         uint _BoneWeight2VBO;
-        uint _TCOLVBO;
-        uint _THVVBO;
-        uint _THWVBO;
-        uint _THV2VBO;
-        uint _THW2VBO;
         uint _TangentVBO;
         public int _VAO = -1;
 
@@ -51,11 +46,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public List<Vector4> BoneWeights;
         public List<Vector4> BoneIDs2;
         public List<Vector4> BoneWeights2;
-        public List<Vector4> TCOLs;
-        public List<Vector4> THVs;
-        public List<Vector4> THWs;
-        public List<Vector4> THVs2;
-        public List<Vector4> THWs2;
 
         public long LastVRAM = 0;
 
@@ -85,17 +75,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             normals = null;
             tangents = null;
             texts = null;
-            TCOLs = null;
-            THVs = null;
-            THWs = null;
-            THVs2 = null;
-            THWs2 = null;
             v4_colors = null;
-            v4_tcolors = null;
-            v4_thvs = null;
-            v4_thws = null;
-            v4_thvs2 = null;
-            v4_thws2 = null;
         }
 
         public int vC;
@@ -261,15 +241,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     GL.DeleteBuffer(_ColorVBO);
                     colors = false;
                 }
-                if (tcols)
-                {
-                    GL.DeleteBuffer(_TCOLVBO);
-                    GL.DeleteBuffer(_THVVBO);
-                    GL.DeleteBuffer(_THWVBO);
-                    GL.DeleteBuffer(_THV2VBO);
-                    GL.DeleteBuffer(_THW2VBO);
-                    tcols = false;
-                }
                 if (bones)
                 {
                     GL.DeleteBuffer(_BoneIDVBO);
@@ -281,34 +252,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 generated = false;
             }
         }
-
-        public void Oldvert()
-        {
-            verts = Vertices.ToArray();
-            normals = Normals.ToArray();
-            texts = TexCoords.ToArray();
-            tangents = Tangents != null ? Tangents.ToArray() : TangentsFor(verts, normals, texts);
-            v4_colors = Colors?.ToArray();
-            v4_tcolors = TCOLs?.ToArray();
-            v4_thvs = THVs?.ToArray();
-            v4_thws = THWs?.ToArray();
-            v4_thvs2 = THVs2?.ToArray();
-            v4_thws2 = THWs2?.ToArray();
-            Vertices = null;
-            Normals = null;
-            TexCoords = null;
-            Tangents = null;
-            Colors = null;
-            TCOLs = null;
-            THVs = null;
-            THWs = null;
-            THVs2 = null;
-            THWs2 = null;
-            // TODO: Other arrays?
-        }
-
+        
         bool colors;
-        bool tcols;
         bool bones;
 
         public Vector3[] verts = null;
@@ -317,94 +262,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         Vector3[] texts = null;
         Vector3[] tangents = null;
         Vector4[] v4_colors = null;
-        Vector4[] v4_tcolors = null;
-        Vector4[] v4_thvs = null;
-        Vector4[] v4_thws = null;
-        Vector4[] v4_thvs2 = null;
-        Vector4[] v4_thws2 = null;
-
-        public void UpdateBuffer()
-        {
-            if (Vertices == null && verts == null)
-            {
-                SysConsole.Output(OutputType.ERROR, "Failed to update VBO, null vertices!");
-                return;
-            }
-            LastVRAM = 0;
-            Vector3[] vecs = verts ?? Vertices.ToArray();
-            uint[] inds = indices ?? Indices.ToArray();
-            Vector3[] norms = normals ?? Normals.ToArray();
-            Vector3[] texs = texts ?? TexCoords.ToArray();
-            Vector3[] tangs = Tangents != null ? Tangents.ToArray() : (tangents ?? TangentsFor(vecs, norms, texs));
-            Vector4[] cols = Colors != null ? Colors.ToArray() : v4_colors;
-            Vector4[] tcols = TCOLs != null ? TCOLs.ToArray() : v4_tcolors;
-            Vector4[] thvs = THVs != null ? THVs.ToArray() : v4_thvs;
-            Vector4[] thws = THWs != null ? THWs.ToArray() : v4_thws;
-            Vector4[] thvs2 = THVs2 != null ? THVs2.ToArray() : v4_thvs2;
-            Vector4[] thws2 = THWs2 != null ? THWs2.ToArray() : v4_thws2;
-            vC = vecs.Length;
-            // Vertex buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _VertexVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(vecs.Length * Vector3.SizeInBytes), vecs, BufferMode);
-            LastVRAM += vecs.Length * Vector3.SizeInBytes;
-            // Normal buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _NormalVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(norms.Length * Vector3.SizeInBytes), norms, BufferMode);
-            LastVRAM += norms.Length * Vector3.SizeInBytes;
-            // TexCoord buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _TexCoordVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(texs.Length * Vector3.SizeInBytes), texs, BufferMode);
-            LastVRAM += texs.Length * Vector3.SizeInBytes;
-            // Tangent buffer
-            GL.BindBuffer(BufferTarget.ArrayBuffer, _TangentVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tangs.Length * Vector3.SizeInBytes), tangs, BufferMode);
-            LastVRAM += tangs.Length * Vector3.SizeInBytes;
-            // Color buffer
-            if (cols != null)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _ColorVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(cols.Length * Vector4.SizeInBytes), cols, BufferMode);
-                LastVRAM += cols.Length * Vector4.SizeInBytes;
-            }
-            // TCOL buffer
-            if (tcols != null)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _TCOLVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tcols.Length * Vector4.SizeInBytes), tcols, BufferMode);
-                LastVRAM += tcols.Length * Vector4.SizeInBytes;
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THVVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thvs.Length * Vector4.SizeInBytes), thvs, BufferMode);
-                LastVRAM += thvs.Length * Vector4.SizeInBytes;
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THWVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thws.Length * Vector4.SizeInBytes), thws, BufferMode);
-                LastVRAM += thws.Length * Vector4.SizeInBytes;
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THV2VBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thvs2.Length * Vector4.SizeInBytes), thvs2, BufferMode);
-                LastVRAM += thvs2.Length * Vector4.SizeInBytes;
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THW2VBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thws2.Length * Vector4.SizeInBytes), thws2, BufferMode);
-                LastVRAM += thws2.Length * Vector4.SizeInBytes;
-            }
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            // Index buffer
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, _IndexVBO);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(inds.Length * sizeof(uint)), inds, BufferMode);
-            LastVRAM += inds.Length * sizeof(uint);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-        }
-
-        public void GenerateOrUpdate()
-        {
-            if (generated)
-            {
-                UpdateBuffer();
-            }
-            else
-            {
-                GenerateVBO();
-            }
-        }
-
+        
         public BufferUsageHint BufferMode = BufferUsageHint.StaticDraw;
 
         public static Vector3[] TangentsFor(Vector3[] vecs, Vector3[] norms, Vector3[] texs)
@@ -488,11 +346,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Vector3[] texs = texts ?? TexCoords.ToArray();
             Vector3[] tangs = Tangents != null ? Tangents.ToArray() : (tangents ?? TangentsFor(vecs, norms, texs));
             Vector4[] cols = Colors != null ? Colors.ToArray() : v4_colors;
-            Vector4[] tcols = TCOLs != null ? TCOLs.ToArray() : v4_tcolors;
-            Vector4[] thvs = THVs != null ? THVs.ToArray() : v4_thvs;
-            Vector4[] thws = THWs != null ? THWs.ToArray() : v4_thws;
-            Vector4[] thvs2 = THVs2 != null ? THVs2.ToArray() : v4_thvs2;
-            Vector4[] thws2 = THWs2 != null ? THWs2.ToArray() : v4_thws2;
             vC = inds.Length;
             Vector4[] ids = null;
             if (BoneIDs != null)
@@ -542,31 +395,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _ColorVBO);
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(cols.Length * Vector4.SizeInBytes), cols, BufferMode);
                 LastVRAM += cols.Length * Vector4.SizeInBytes;
-            }
-            // TCOL buffer
-            if (tcols != null)
-            {
-                this.tcols = true;
-                GL.GenBuffers(1, out _TCOLVBO);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _TCOLVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tcols.Length * Vector4.SizeInBytes), tcols, BufferMode);
-                LastVRAM += tcols.Length * Vector4.SizeInBytes;
-                GL.GenBuffers(1, out _THVVBO);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THVVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thvs.Length * Vector4.SizeInBytes), thvs, BufferMode);
-                LastVRAM += thvs.Length * Vector4.SizeInBytes;
-                GL.GenBuffers(1, out _THWVBO);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THWVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thws.Length * Vector4.SizeInBytes), thws, BufferMode);
-                LastVRAM += thws.Length * Vector4.SizeInBytes;
-                GL.GenBuffers(1, out _THV2VBO);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THV2VBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thvs2.Length * Vector4.SizeInBytes), thvs2, BufferMode);
-                LastVRAM += thvs2.Length * Vector4.SizeInBytes;
-                GL.GenBuffers(1, out _THW2VBO);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THW2VBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thws2.Length * Vector4.SizeInBytes), thws2, BufferMode);
-                LastVRAM += thws2.Length * Vector4.SizeInBytes;
             }
             // Weight buffer
             if (weights != null)
@@ -623,19 +451,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _ColorVBO);
                 GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
             }
-            if (tcols != null)
-            {
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _TCOLVBO);
-                GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THVVBO);
-                GL.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THWVBO);
-                GL.VertexAttribPointer(7, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THV2VBO);
-                GL.VertexAttribPointer(8, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, _THW2VBO);
-                GL.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, false, 0, 0);
-            }
             if (weights != null)
             {
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _BoneWeightVBO);
@@ -663,14 +478,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             if (cols != null)
             {
                 GL.EnableVertexAttribArray(4);
-            }
-            if (tcols != null)
-            {
-                GL.EnableVertexAttribArray(5);
-                GL.EnableVertexAttribArray(6);
-                GL.EnableVertexAttribArray(7);
-                GL.EnableVertexAttribArray(8);
-                GL.EnableVertexAttribArray(9);
             }
             if (weights != null)
             {

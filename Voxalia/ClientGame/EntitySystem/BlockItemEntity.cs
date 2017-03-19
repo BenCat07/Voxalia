@@ -45,11 +45,11 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public Location Offset;
 
-        public VBO vbo = null;
+        public ChunkVBO vbo = null;
 
         public void GenVBO()
         {
-            vbo = new VBO();
+            vbo = new ChunkVBO();
             List<BEPUutilities.Vector3> vecs = BlockShapeRegistry.BSD[Dat].GetVertices(new BEPUutilities.Vector3(0, 0, 0), false, false, false, false, false, false);
             List<BEPUutilities.Vector3> norms = BlockShapeRegistry.BSD[Dat].GetNormals(new BEPUutilities.Vector3(0, 0, 0), false, false, false, false, false, false);
             List<BEPUutilities.Vector3> tcoord = BlockShapeRegistry.BSD[Dat].GetTCoords(new BEPUutilities.Vector3(0, 0, 0), Mat, false, false, false, false, false, false);

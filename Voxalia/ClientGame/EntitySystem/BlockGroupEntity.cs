@@ -152,7 +152,7 @@ namespace Voxalia.ClientGame.EntitySystem
             TheClient.Rendering.SetColor(Color4.White);
         }
 
-        public VBO vbo;
+        public ChunkVBO vbo;
 
         // TODO: Make asyncable!
         public void SetupVBO()
@@ -244,7 +244,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
-            vbo = new VBO()
+            vbo = new ChunkVBO()
             {
                 THVs = new List<OpenTK.Vector4>(),
                 THWs = new List<OpenTK.Vector4>(),
