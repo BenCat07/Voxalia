@@ -179,9 +179,7 @@
     <Compile Include="ClientGame\EntitySystem\PrimitiveEntity.cs" />
     <Compile Include="ClientGame\EntitySystem\PrimitiveModelEntity.cs" />
     <Compile Include="ClientGame\EntitySystem\StaticBlockEntity.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\FontSetEngine.cs" />
     <Compile Include="ClientGame\GraphicsSystems\Frustum.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\GLFontEngine.cs" />
     <Compile Include="ClientGame\GraphicsSystems\LightingSystem\Light.cs" />
     <Compile Include="ClientGame\GraphicsSystems\LightingSystem\LightObject.cs" />
     <Compile Include="ClientGame\GraphicsSystems\LightingSystem\LightOrtho.cs" />
@@ -199,7 +197,6 @@
     <Compile Include="ClientGame\GraphicsSystems\Renderer.cs" />
     <Compile Include="ClientGame\GraphicsSystems\RenderSurface4Part.cs" />
     <Compile Include="ClientGame\GraphicsSystems\TextureBlock.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\TextVBO.cs" />
     <Compile Include="ClientGame\GraphicsSystems\VBO.cs" />
     <Compile Include="ClientGame\GraphicsSystems\View3D.cs" />
     <Compile Include="ClientGame\GraphicsSystems\VRSupport.cs" />

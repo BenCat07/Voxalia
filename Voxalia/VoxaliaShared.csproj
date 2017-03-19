@@ -137,7 +137,6 @@
     <Compile Include="Shared\Plane.cs" />
     <Compile Include="Shared\VoxProgram.cs" />
     <Compile Include="Shared\Scheduler.cs" />
-    <Compile Include="Shared\SimplexNoise.cs" />
     <Compile Include="Shared\NetworkEnums.cs" />
     <Compile Include="Shared\ModelManagement\Simplify.cs" />
   </ItemGroup>

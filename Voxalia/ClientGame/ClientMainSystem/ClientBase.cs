@@ -384,9 +384,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             View3D.CheckError("Load - Textures");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading fonts...");
             Fonts = new GLFontEngine(Shaders);
-            Fonts.Init(this);
+            Fonts.Init(Files);
             FontSets = new FontSetEngine(Fonts);
-            FontSets.Init(this);
+            FontSets.Init((subdat) => Languages.GetText(Files, subdat), () => Ortho, () => GlobalTickTimeLocal);
             View3D.CheckError("Load - Fonts");
             PassLoadScreen();
             SysConsole.Output(OutputType.CLIENTINIT, "Loading animation engine...");

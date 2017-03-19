@@ -6,8 +6,10 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using Voxalia.Shared;
 using Voxalia.ServerGame.WorldSystem.SimpleGenerator.Biomes;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 {
