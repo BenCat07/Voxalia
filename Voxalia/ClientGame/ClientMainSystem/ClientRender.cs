@@ -39,9 +39,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// A stack of reusable VBOs, for chunks.
         /// TODO: Is tracking this actually helpful?
-        /// TODO: Is a ConcurrentStack the best mode here? Perhaps a Queue instead?
         /// </summary>
-        public ConcurrentStack<VBO> vbos = new ConcurrentStack<VBO>();
+        public ConcurrentQueue<ChunkVBO> vbos = new ConcurrentQueue<ChunkVBO>();
         
         /// <summary>
         /// Gets an estimated Video RAM (graphics memory) usage, broken into component usages.

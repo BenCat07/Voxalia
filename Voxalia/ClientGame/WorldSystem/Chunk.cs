@@ -108,7 +108,7 @@ namespace Voxalia.ClientGame.WorldSystem
             DestroyPlants();
         }
 
-        void DestroyVBO(VBO tV)
+        void DestroyVBO(ChunkVBO tV)
         {
             if (tV != null)
             {
@@ -116,7 +116,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     if (tV.generated && OwningRegion.TheClient.vbos.Count < MAX_VBOS_REMEMBERED)
                     {
-                        OwningRegion.TheClient.vbos.Push(tV);
+                        OwningRegion.TheClient.vbos.Enqueue(tV);
                     }
                     else
                     {

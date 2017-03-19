@@ -23,9 +23,9 @@ namespace Voxalia.ClientGame.WorldSystem
 {
     public partial class Chunk
     {
-        public VBO _VBOSolid = null;
+        public ChunkVBO _VBOSolid = null;
 
-        public VBO _VBOTransp = null;
+        public ChunkVBO _VBOTransp = null;
 
         // TODO: Possibly store world locations rather than local block locs?
         public KeyValuePair<Vector3i, Material>[] Lits = new KeyValuePair<Vector3i, Material>[0];
@@ -514,12 +514,12 @@ namespace Voxalia.ClientGame.WorldSystem
                 }
                 if (rh.Vertices.Count == 0)
                 {
-                    VBO tV = transp ? _VBOTransp : _VBOSolid;
+                    ChunkVBO tV = transp ? _VBOTransp : _VBOSolid;
                     if (tV != null)
                     {
                         if (OwningRegion.TheClient.vbos.Count < MAX_VBOS_REMEMBERED)
                         {
-                            OwningRegion.TheClient.vbos.Push(tV);
+                            OwningRegion.TheClient.vbos.Enqueue(tV);
                         }
                         else
                         {
@@ -571,9 +571,9 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     inds[i] = i;
                 }
-                if (!OwningRegion.TheClient.vbos.TryPop(out VBO tVBO))
+                if (!OwningRegion.TheClient.vbos.TryDequeue(out ChunkVBO tVBO))
                 {
-                    tVBO = new VBO();
+                    tVBO = new ChunkVBO();
                 }
                 tVBO.indices = inds;
                 tVBO.Vertices = rh.Vertices;
@@ -586,10 +586,6 @@ namespace Voxalia.ClientGame.WorldSystem
                 tVBO.THVs2 = rh.THVs2;
                 tVBO.THWs2 = rh.THWs2;
                 tVBO.Tangents = rh.Tangs;
-                tVBO.BoneWeights = null;
-                tVBO.BoneIDs = null;
-                tVBO.BoneWeights2 = null;
-                tVBO.BoneIDs2 = null;
                 tVBO.Oldvert();
                 Vector3[] posset = poses.ToArray();
                 Vector4[] colorset = colorses.ToArray();
@@ -601,12 +597,12 @@ namespace Voxalia.ClientGame.WorldSystem
                 }
                 OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
                 {
-                    VBO tV = transp ? _VBOTransp : _VBOSolid;
+                    ChunkVBO tV = transp ? _VBOTransp : _VBOSolid;
                     if (tV != null)
                     {
                         if (OwningRegion.TheClient.vbos.Count < MAX_VBOS_REMEMBERED)
                         {
-                            OwningRegion.TheClient.vbos.Push(tV);
+                            OwningRegion.TheClient.vbos.Enqueue(tV);
                         }
                         else
                         {
@@ -673,7 +669,7 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 return;
             }
-            VBO _VBO = OwningRegion.TheClient.MainWorldView.FBOid.IsSolid() ? _VBOSolid : _VBOTransp;
+            ChunkVBO _VBO = OwningRegion.TheClient.MainWorldView.FBOid.IsSolid() ? _VBOSolid : _VBOTransp;
             if (_VBO != null && _VBO.generated)
             {
                 Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(WorldPosition.ToLocation() * CHUNK_SIZE));
@@ -738,7 +734,7 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public Region OwningRegion;
 
-        public VBO _VBO;
+        public ChunkVBO _VBO;
         
         public void Render()
         {
@@ -777,7 +773,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 }
                 return;
             }
-            VBO tVBO = new VBO();
+            ChunkVBO tVBO = new ChunkVBO();
             uint[] inds = new uint[FullBlock.Vertices.Count];
             for (uint i = 0; i < FullBlock.Vertices.Count; i++)
             {
@@ -794,10 +790,6 @@ namespace Voxalia.ClientGame.WorldSystem
             tVBO.THVs2 = FullBlock.THVs2;
             tVBO.THWs2 = FullBlock.THWs2;
             tVBO.Tangents = FullBlock.Tangs;
-            tVBO.BoneWeights = null;
-            tVBO.BoneIDs = null;
-            tVBO.BoneWeights2 = null;
-            tVBO.BoneIDs2 = null;
             tVBO.Oldvert(); // This is the only call safely asyncable really
             _VBO = tVBO;
             tVBO.GenerateOrUpdate();
