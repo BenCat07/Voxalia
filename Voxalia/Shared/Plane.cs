@@ -41,6 +41,12 @@ namespace Voxalia.Shared
         /// </summary>
         public double D;
 
+        /// <summary>
+        /// Constructs a plane, calculating a normal.
+        /// </summary>
+        /// <param name="v1">Vertex one.</param>
+        /// <param name="v2">Vertex two.</param>
+        /// <param name="v3">Vertex three.</param>
         public Plane(Location v1, Location v2, Location v3)
         {
             vec1 = v1;
@@ -50,6 +56,13 @@ namespace Voxalia.Shared
             D = -(Normal.Dot(vec1));
         }
 
+        /// <summary>
+        /// Constructs a plane, with a known normal.
+        /// </summary>
+        /// <param name="v1">Vertex one.</param>
+        /// <param name="v2">Vertex two.</param>
+        /// <param name="v3">Vertex three.</param>
+        /// <param name="_normal">The precalculated normal.</param>
         public Plane(Location v1, Location v2, Location v3, Location _normal)
         {
             vec1 = v1;
@@ -59,6 +72,11 @@ namespace Voxalia.Shared
             D = -(Normal.Dot(vec1));
         }
 
+        /// <summary>
+        /// Constructs a plane from a normal and its distance from the origin (no vertices calculated).
+        /// </summary>
+        /// <param name="_normal">The normal.</param>
+        /// <param name="_d">The distance.</param>
         public Plane(Location _normal, double _d)
         {
             double fact = 1 / _normal.Length();
@@ -85,6 +103,10 @@ namespace Voxalia.Shared
             return start + t * ba;
         }
 
+        /// <summary>
+        /// Flips the normal, returned as a new object.
+        /// </summary>
+        /// <returns></returns>
         public Plane FlipNormal()
         {
             return new Plane(vec3, vec2, vec1, -Normal);
@@ -131,6 +153,10 @@ namespace Voxalia.Shared
             return psign;
         }
         
+        /// <summary>
+        /// Converts the plane to a simple string form.
+        /// </summary>
+        /// <returns>The plane string.</returns>
         public override string ToString()
         {
             return "[" + vec1.ToString() + "/" + vec2.ToString() + "/" + vec3.ToString() + "]";
