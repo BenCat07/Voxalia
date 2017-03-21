@@ -174,12 +174,14 @@ namespace VoxaliaLauncher
                 res.AppendLine();
             }
             bool canSelect = richTextBox1.SelectionLength <= 0;
+            SuspendLayout();
             richTextBox1.Rtf = res.FinalOutput(16);
             if (CanSelect)
             {
                 richTextBox1.Select(richTextBox1.Rtf.Length - 1, 1);
                 richTextBox1.ScrollToCaret();
             }
+            ResumeLayout();
         }
 
         private void LauncherLog_FormClosed(object sender, FormClosedEventArgs e)
