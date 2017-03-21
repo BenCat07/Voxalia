@@ -106,7 +106,7 @@ namespace Voxalia.Shared.ModelManagement
 
         // Determinant
 
-        public double det(int a11, int a12, int a13,
+        public double Det(int a11, int a12, int a13,
                     int a21, int a22, int a23,
                     int a31, int a32, int a33)
         {
@@ -175,7 +175,7 @@ namespace Voxalia.Shared.ModelManagement
         //                 5..8 are good numbers
         //                 more iterations yield higher quality
         //
-        void simplify_mesh(int target_count, double agressiveness = 7)
+        void Simplify_mesh(int target_count, double agressiveness = 7)
         {
             // main iteration loop 
 
@@ -195,7 +195,7 @@ namespace Voxalia.Shared.ModelManagement
                 // update mesh once in a while
                 if (iteration % 5 == 0)
                 {
-                    update_mesh(iteration);
+                    Update_mesh(iteration);
                 }
 
                 // clear dirty flag
@@ -236,19 +236,19 @@ namespace Voxalia.Shared.ModelManagement
 
                             // Compute vertex to collapse to
                             Vector3 p = new Vector3();
-                            calculate_error(i0, i1, ref p);
+                            Calculate_error(i0, i1, ref p);
 
                             // dont remove if flipped
-                            if (flipped(p, i0, i1, ref v0, ref v1, ref deleted0)) continue;
-                            if (flipped(p, i1, i0, ref v1, ref v0, ref deleted1)) continue;
+                            if (Flipped(p, i0, i1, ref v0, ref v1, ref deleted0)) continue;
+                            if (Flipped(p, i1, i0, ref v1, ref v0, ref deleted1)) continue;
 
                             // not flipped, so remove edge												
                             v0.p = p;
                             v0.q = v1.q + v0.q;
                             int tstart = refs.Count;
 
-                            update_triangles(i0, ref v0, ref deleted0, ref deleted_triangles);
-                            update_triangles(i0, ref v1, ref deleted1, ref deleted_triangles);
+                            Update_triangles(i0, ref v0, ref deleted0, ref deleted_triangles);
+                            Update_triangles(i0, ref v1, ref deleted1, ref deleted_triangles);
 
                             vertices[i0] = v0;
                             vertices[i1] = v1;
@@ -283,12 +283,12 @@ namespace Voxalia.Shared.ModelManagement
             }
 
             // clean up mesh
-            compact_mesh();
+            Compact_mesh();
         }
 
         // Check if a triangle flips when this edge is removed
 
-        bool flipped(Vector3 p, int i0, int i1, ref Vertex v0, ref Vertex v1, ref ListHelper<int> deleted)
+        bool Flipped(Vector3 p, int i0, int i1, ref Vertex v0, ref Vertex v1, ref ListHelper<int> deleted)
         {
             int bordercount = 0;
             for (int k = 0; k < v0.tcount; k++)
@@ -322,7 +322,7 @@ namespace Voxalia.Shared.ModelManagement
 
         // Update triangle connections and edge error after a edge is collapsed
 
-        void update_triangles(int i0, ref Vertex v, ref ListHelper<int> deleted, ref int deleted_triangles)
+        void Update_triangles(int i0, ref Vertex v, ref ListHelper<int> deleted, ref int deleted_triangles)
         {
             Vector3 p = new Vector3();
             for (int k = 0; k < v.tcount; k++)
@@ -338,9 +338,9 @@ namespace Voxalia.Shared.ModelManagement
                 }
                 t.v[r.tvertex] = i0;
                 t.dirty = 1;
-                t.err[0] = calculate_error(t.v[0], t.v[1], ref p);
-                t.err[1] = calculate_error(t.v[1], t.v[2], ref p);
-                t.err[2] = calculate_error(t.v[2], t.v[0], ref p);
+                t.err[0] = Calculate_error(t.v[0], t.v[1], ref p);
+                t.err[1] = Calculate_error(t.v[1], t.v[2], ref p);
+                t.err[2] = Calculate_error(t.v[2], t.v[0], ref p);
                 t.err[3] = Math.Min(t.err[0], Math.Min(t.err[1], t.err[2]));
                 refs.Add(r);
                 triangles[r.tid] = t;
@@ -349,7 +349,7 @@ namespace Voxalia.Shared.ModelManagement
 
         // compact triangles, compute edge error and build reference list
 
-        void update_mesh(int iteration)
+        void Update_mesh(int iteration)
         {
             if (iteration > 0) // compact triangles
             {
@@ -407,7 +407,7 @@ namespace Voxalia.Shared.ModelManagement
                     Vector3 p = new Vector3();
                     for (int j = 0; j < 3; j++)
                     {
-                        t.err[j] = calculate_error(t.v[j], t.v[(j + 1) % 3], ref p);
+                        t.err[j] = Calculate_error(t.v[j], t.v[(j + 1) % 3], ref p);
                     }
                     t.err[3] = Math.Min(t.err[0], Math.Min(t.err[1], t.err[2]));
                     triangles[i] = t;
@@ -514,7 +514,7 @@ namespace Voxalia.Shared.ModelManagement
 
         // Finally compact mesh before exiting
 
-        void compact_mesh()
+        void Compact_mesh()
         {
             int dst = 0;
             for (int i = 0; i < vertices.Count; i++)
@@ -566,7 +566,7 @@ namespace Voxalia.Shared.ModelManagement
 
         // Error between vertex and Quadric
 
-        double vertex_error(SymetricMatrix q, double x, double y, double z)
+        double Vertex_error(SymetricMatrix q, double x, double y, double z)
         {
             return q[0] * x * x + 2 * q[1] * x * y + 2 * q[2] * x * z + 2 * q[3] * x + q[4] * y * y
                  + 2 * q[5] * y * z + 2 * q[6] * y + q[7] * z * z + 2 * q[8] * z + q[9];
@@ -574,22 +574,22 @@ namespace Voxalia.Shared.ModelManagement
 
         // Error for one edge
 
-        double calculate_error(int id_v1, int id_v2, ref Vector3 p_result)
+        double Calculate_error(int id_v1, int id_v2, ref Vector3 p_result)
         {
             // compute interpolated vertex 
 
             SymetricMatrix q = vertices[id_v1].q + vertices[id_v2].q;
             bool border = vertices[id_v1].border != 0 && vertices[id_v2].border != 0;
             double error = 0;
-            double det = q.det(0, 1, 2, 1, 4, 5, 2, 5, 7);
+            double det = q.Det(0, 1, 2, 1, 4, 5, 2, 5, 7);
 
             if (det != 0 && !border)
             {
                 // q_delta is invertible
-                p_result.X = -1 / det * (q.det(1, 2, 3, 4, 5, 6, 5, 7, 8)); // vx = A41/det(q_delta) 
-                p_result.Y = 1 / det * (q.det(0, 2, 3, 1, 5, 6, 2, 7, 8));  // vy = A42/det(q_delta) 
-                p_result.Z = -1 / det * (q.det(0, 1, 3, 1, 4, 6, 2, 5, 8)); // vz = A43/det(q_delta) 
-                error = vertex_error(q, p_result.X, p_result.Y, p_result.Z);
+                p_result.X = -1 / det * (q.Det(1, 2, 3, 4, 5, 6, 5, 7, 8)); // vx = A41/det(q_delta) 
+                p_result.Y = 1 / det * (q.Det(0, 2, 3, 1, 5, 6, 2, 7, 8));  // vy = A42/det(q_delta) 
+                p_result.Z = -1 / det * (q.Det(0, 1, 3, 1, 4, 6, 2, 5, 8)); // vz = A43/det(q_delta) 
+                error = Vertex_error(q, p_result.X, p_result.Y, p_result.Z);
             }
             else
             {
@@ -597,9 +597,9 @@ namespace Voxalia.Shared.ModelManagement
                 Vector3 p1 = vertices[id_v1].p;
                 Vector3 p2 = vertices[id_v2].p;
                 Vector3 p3 = (p1 + p2) / 2;
-                double error1 = vertex_error(q, p1.X, p1.Y, p1.Z);
-                double error2 = vertex_error(q, p2.X, p2.Y, p2.Z);
-                double error3 = vertex_error(q, p3.X, p3.Y, p3.Z);
+                double error1 = Vertex_error(q, p1.X, p1.Y, p1.Z);
+                double error2 = Vertex_error(q, p2.X, p2.Y, p2.Z);
+                double error3 = Vertex_error(q, p3.X, p3.Y, p3.Z);
                 error = Math.Min(error1, Math.Min(error2, error3));
                 if (error1 == error) p_result = p1;
                 if (error2 == error) p_result = p2;
