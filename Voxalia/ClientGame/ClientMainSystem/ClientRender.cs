@@ -2020,13 +2020,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             BEPUutilities.Matrix rotFix = BEPUutilities.Matrix.CreateFromQuaternion(quat);
             Location rel = new Location(BEPUutilities.Quaternion.Transform(new BEPUutilities.Vector3(itemScale + 1, 0, 0), quat));
             */
-            /*Matrix4 lookAt = Matrix4.LookAt(ClientUtilities.Convert(MainWorldView.ForwardVec), Vector3.Zero, ClientUtilities.Convert(MainWorldView.CameraUp()));
+            Matrix4 lookAt = Matrix4.LookAt(ClientUtilities.Convert(MainWorldView.ForwardVec), Vector3.Zero, ClientUtilities.Convert(MainWorldView.CameraUp()));
             Matrix4 inverted = lookAt.Inverted();
             BEPUutilities.Matrix rotFix = ClientUtilities.ConvertBEPU(inverted);
             Vector4 v = Vector4.Transform(new Vector4(1.01f, 0, 0, 1), inverted);
-            Location rel = ClientUtilities.Convert(v.Xyz) / v.W;*/
-            Location rel = MainWorldView.ForwardVec.CrossProduct(MainWorldView.CameraUp());
-            BEPUutilities.Matrix rotFix = BEPUutilities.Matrix.Identity;
+            Location rel = ClientUtilities.Convert(v.Xyz) / v.W;
             if (RenderExtraItems > 0)
             {
                 RenderExtraItems -= gDelta;
