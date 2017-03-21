@@ -44,7 +44,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             if (InvCurrent != null)
             {
-                InvCurrent.Render3D(Location.Zero, (float)GlobalTickTimeLocal * 0.5f, new Location(6), BEPUutilities.Matrix.Identity);
+                InvCurrent.Render3D(Location.Zero, (float)GlobalTickTimeLocal * 0.5f, new Location(6));
             }
         }
 
