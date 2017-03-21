@@ -102,7 +102,6 @@
     <Compile Include="Shared\Collision\ReusableGenericCollidable.cs" />
     <Compile Include="Shared\Collision\Vector3i.cs" />
     <Compile Include="Shared\LanguageEngine.cs" />
-    <Compile Include="Shared\LockedLinkedList.cs" />
     <Compile Include="Shared\Model3D.cs" />
     <Compile Include="Shared\Collision\AABB.cs" />
     <Compile Include="Shared\AnimationEngine.cs" />
@@ -136,7 +135,6 @@
     <Compile Include="Shared\PingInfo.cs" />
     <Compile Include="Shared\Plane.cs" />
     <Compile Include="Shared\VoxProgram.cs" />
-    <Compile Include="Shared\Scheduler.cs" />
     <Compile Include="Shared\NetworkEnums.cs" />
     <Compile Include="Shared\ModelManagement\Simplify.cs" />
   </ItemGroup>
