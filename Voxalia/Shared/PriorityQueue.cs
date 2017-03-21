@@ -15,19 +15,47 @@ using Voxalia.Shared;
 
 namespace Voxalia.Shared
 {
+    /// <summary>
+    /// Helper for live-sorted queues of data.
+    /// </summary>
+    /// <typeparam name="T">The data type at hand.</typeparam>
     public class PriorityQueue<T>
     {
+        /// <summary>
+        /// Represents a single node in a queue.
+        /// </summary>
         private struct Node
         {
+            /// <summary>
+            /// The data at hand.
+            /// </summary>
             public T Data;
 
+            /// <summary>
+            /// The priority of the data.
+            /// </summary>
             public double Priority;
         }
 
+        /// <summary>
+        /// Where the queue starts.
+        /// </summary>
         private int start;
+
+        /// <summary>
+        /// How many nodes are actually in the queue.
+        /// </summary>
         private int numNodes;
+
+        /// <summary>
+        /// All current nodes.
+        /// </summary>
         private Node[] nodes; // TODO: Array possibly isn't the most efficient way to store a priority queue, even when working with structs? Experiment!
         
+        /// <summary>
+        /// Constructs the priority queue.
+        /// </summary>
+        /// <param name="capacity">The capacity to prepare.</param>
         public PriorityQueue(int capacity = 512)
         {
             start = 0;
@@ -35,6 +63,9 @@ namespace Voxalia.Shared
             nodes = new Node[capacity];
         }
         
+        /// <summary>
+        /// Gets the number of items in the queue.
+        /// </summary>
         public int Count
         {
             get
@@ -43,6 +74,9 @@ namespace Voxalia.Shared
             }
         }
         
+        /// <summary>
+        /// Gets the present capacity already prepared.
+        /// </summary>
         public int Capacity
         {
             get
@@ -51,6 +85,9 @@ namespace Voxalia.Shared
             }
         }
         
+        /// <summary>
+        /// Clears the queue quickly.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Clear()
         {
@@ -58,6 +95,11 @@ namespace Voxalia.Shared
             start = 0;
         }
         
+        /// <summary>
+        /// Enqueues a new item.
+        /// </summary>
+        /// <param name="nodeData">The data.</param>
+        /// <param name="priority">The priority.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Enqueue(ref T nodeData, double priority)
         {
@@ -94,6 +136,11 @@ namespace Voxalia.Shared
             numNodes++;
         }
 
+        /// <summary>
+        /// Dequeues the highest priority item.
+        /// DO NOT CALL IF COUNT IS ZERO!
+        /// </summary>
+        /// <returns>The item dequeued.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Dequeue()
         {
@@ -109,6 +156,9 @@ namespace Voxalia.Shared
             return returnMe;
         }
 
+        /// <summary>
+        /// Internal method to resize the queue or move it sideways to fit new data.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Resize()
         {
@@ -126,6 +176,9 @@ namespace Voxalia.Shared
             start = 0;
         }
         
+        /// <summary>
+        /// Gets the first item.
+        /// </summary>
         public T First
         {
             get
