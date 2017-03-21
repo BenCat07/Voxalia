@@ -246,26 +246,38 @@ namespace Voxalia.ClientGame.WorldSystem
             return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
             */
         }
+
+        private class PlantRenderHelper
+        {
+            public List<Vector3> poses = new List<Vector3>();
+            public List<Vector4> colorses = new List<Vector4>();
+            public List<Vector2> tcses = new List<Vector2>();
+        }
         
         void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym,
             Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym, List<Chunk> potentials, bool plants, bool shaped, bool transp, BlockUpperArea bua, ChunkSLODHelper crh)
         {
             try
             {
-                ChunkRenderHelper rh = new ChunkRenderHelper();
                 BlockInternal t_air = new BlockInternal((ushort)Material.AIR, 0, 0, 255);
-                List<Vector3> poses = new List<Vector3>();
-                List<Vector4> colorses = new List<Vector4>();
-                List<Vector2> tcses = new List<Vector2>();
                 Vector3d wp = ClientUtilities.ConvertD(WorldPosition.ToLocation()) * CHUNK_SIZE;
                 Vector3i wpi = WorldPosition * CHUNK_SIZE;
                 bool isProbablyAir = true;
-                for (int x = 0; x < CSize; x++)
+                ChunkRenderHelper[] rh_s = new ChunkRenderHelper[CSize];
+                PlantRenderHelper[] ph_s = new PlantRenderHelper[CSize];
+                for (int i = 0; i < CSize; i++)
+                {
+                    rh_s[i] = new ChunkRenderHelper(128);
+                    ph_s[i] = new PlantRenderHelper();
+                }
+                Action<int> calc = (x) =>
                 {
                     if (CancelToken.IsCancellationRequested)
                     {
                         return;
                     }
+                    ChunkRenderHelper rh = rh_s[x];
+                    PlantRenderHelper ph = ph_s[x];
                     for (int y = 0; y < CSize; y++)
                     {
                         for (int z = 0; z < CSize; z++)
@@ -483,36 +495,80 @@ namespace Voxalia.ClientGame.WorldSystem
                                             {
                                                 rayhit.Location = new BEPUutilities.Vector3(rxx, ryy, 1.0);
                                             }
-                                            poses.Add(new Vector3(x + (float)rayhit.Location.X, y + (float)rayhit.Location.Y, z + (float)rayhit.Location.Z));
-                                            colorses.Add(new Vector4((float)skylight.X, (float)skylight.Y, (float)skylight.Z, 1.0f));
-                                            tcses.Add(new Vector2(c.Material.GetPlantScale(), OwningRegion.TheClient.GrassMatSet[(int)c.Material]));
+                                            ph.poses.Add(new Vector3(x + (float)rayhit.Location.X, y + (float)rayhit.Location.Y, z + (float)rayhit.Location.Z));
+                                            ph.colorses.Add(new Vector4((float)skylight.X, (float)skylight.Y, (float)skylight.Z, 1.0f));
+                                            ph.tcses.Add(new Vector2(c.Material.GetPlantScale(), OwningRegion.TheClient.GrassMatSet[(int)c.Material]));
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                };
+                Task[] tasks = new Task[CSize];
+                if (CSize < 5)
+                {
+                    for (int x = 0; x < CSize; x++)
+                    {
+                        calc(x);
+                    }
+                }
+                else
+                {
+                    for (int x = 0; x < CSize; x++)
+                    {
+                        int nx = x;
+                        tasks[x] = Task.Factory.StartNew(() => calc(nx));
+                    }
                 }
                 if (CancelToken.IsCancellationRequested)
                 {
                     return;
                 }
-                for (int i = 0; i < rh.Vertices.Count; i += 3)
+                int count = 128;
+                for (int i = 0; i < CSize; i++)
                 {
-                    Vector3 v1 = rh.Vertices[i];
-                    Vector3 dv1 = rh.Vertices[i + 1] - v1;
-                    Vector3 dv2 = rh.Vertices[i + 2] - v1;
-                    Vector3 t1 = rh.TCoords[i];
-                    Vector3 dt1 = rh.TCoords[i + 1] - t1;
-                    Vector3 dt2 = rh.TCoords[i + 2] - t1;
+                    if (tasks[i] != null)
+                    {
+                        tasks[i].Wait();
+                    }
+                    count += rh_s[i].Vertices.Count;
+                }
+                // TODO: Arrays here rather than another list wrapper thing?
+                ChunkRenderHelper rh2 = new ChunkRenderHelper(count);
+                PlantRenderHelper ph2 = new PlantRenderHelper();
+                for (int i = 0; i < CSize; i++)
+                {
+                    rh2.Vertices.AddRange(rh_s[i].Vertices);
+                    rh2.Norms.AddRange(rh_s[i].Norms);
+                    rh2.TCoords.AddRange(rh_s[i].TCoords);
+                    rh2.Cols.AddRange(rh_s[i].Cols);
+                    rh2.TCols.AddRange(rh_s[i].TCols);
+                    rh2.THVs.AddRange(rh_s[i].THVs);
+                    rh2.THWs.AddRange(rh_s[i].THWs);
+                    rh2.THVs2.AddRange(rh_s[i].THVs2);
+                    rh2.THWs2.AddRange(rh_s[i].THWs2);
+                    rh2.Tangs.AddRange(rh_s[i].Tangs);
+                    ph2.poses.AddRange(ph_s[i].poses);
+                    ph2.tcses.AddRange(ph_s[i].tcses);
+                    ph2.colorses.AddRange(ph_s[i].colorses);
+                }
+                for (int i = 0; i < rh2.Vertices.Count; i += 3)
+                {
+                    Vector3 v1 = rh2.Vertices[i];
+                    Vector3 dv1 = rh2.Vertices[i + 1] - v1;
+                    Vector3 dv2 = rh2.Vertices[i + 2] - v1;
+                    Vector3 t1 = rh2.TCoords[i];
+                    Vector3 dt1 = rh2.TCoords[i + 1] - t1;
+                    Vector3 dt2 = rh2.TCoords[i + 2] - t1;
                     Vector3 tangent = (dv1 * dt2.Y - dv2 * dt1.Y) / (dt1.X * dt2.Y - dt1.Y * dt2.X);
                     //Vector3 normal = rh.Norms[i];
                     //tangent = (tangent - normal * Vector3.Dot(normal, tangent)).Normalized(); // TODO: Necessity of this correction?
-                    rh.Tangs.Add(tangent);
-                    rh.Tangs.Add(tangent);
-                    rh.Tangs.Add(tangent);
+                    rh2.Tangs.Add(tangent);
+                    rh2.Tangs.Add(tangent);
+                    rh2.Tangs.Add(tangent);
                 }
-                if (rh.Vertices.Count == 0)
+                if (rh2.Vertices.Count == 0)
                 {
                     ChunkVBO tV = transp ? _VBOTransp : _VBOSolid;
                     if (tV != null)
@@ -550,24 +606,24 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
                     {
-                        crh.FullBlock.Vertices.AddRange(rh.Vertices);
-                        crh.FullBlock.Norms.AddRange(rh.Norms);
-                        crh.FullBlock.TCoords.AddRange(rh.TCoords);
-                        crh.FullBlock.Cols.AddRange(rh.Cols);
-                        crh.FullBlock.TCols.AddRange(rh.TCols);
-                        crh.FullBlock.THVs.AddRange(rh.THVs);
-                        crh.FullBlock.THWs.AddRange(rh.THWs);
-                        crh.FullBlock.THVs2.AddRange(rh.THVs2);
-                        crh.FullBlock.THWs2.AddRange(rh.THWs2);
-                        crh.FullBlock.Tangs.AddRange(rh.Tangs);
+                        crh.FullBlock.Vertices.AddRange(rh2.Vertices);
+                        crh.FullBlock.Norms.AddRange(rh2.Norms);
+                        crh.FullBlock.TCoords.AddRange(rh2.TCoords);
+                        crh.FullBlock.Cols.AddRange(rh2.Cols);
+                        crh.FullBlock.TCols.AddRange(rh2.TCols);
+                        crh.FullBlock.THVs.AddRange(rh2.THVs);
+                        crh.FullBlock.THWs.AddRange(rh2.THWs);
+                        crh.FullBlock.THVs2.AddRange(rh2.THVs2);
+                        crh.FullBlock.THWs2.AddRange(rh2.THWs2);
+                        crh.FullBlock.Tangs.AddRange(rh2.Tangs);
                         crh.Compile();
                         IsAir = true;
                     });
                     OwningRegion.DoneRendering(this);
                     return;
                 }
-                uint[] inds = new uint[rh.Vertices.Count];
-                for (uint i = 0; i < rh.Vertices.Count; i++)
+                uint[] inds = new uint[rh2.Vertices.Count];
+                for (uint i = 0; i < rh2.Vertices.Count; i++)
                 {
                     inds[i] = i;
                 }
@@ -576,20 +632,20 @@ namespace Voxalia.ClientGame.WorldSystem
                     tVBO = new ChunkVBO();
                 }
                 tVBO.indices = inds;
-                tVBO.Vertices = rh.Vertices;
-                tVBO.Normals = rh.Norms;
-                tVBO.TexCoords = rh.TCoords;
-                tVBO.Colors = rh.Cols;
-                tVBO.TCOLs = rh.TCols;
-                tVBO.THVs = rh.THVs;
-                tVBO.THWs = rh.THWs;
-                tVBO.THVs2 = rh.THVs2;
-                tVBO.THWs2 = rh.THWs2;
-                tVBO.Tangents = rh.Tangs;
+                tVBO.Vertices = rh2.Vertices;
+                tVBO.Normals = rh2.Norms;
+                tVBO.TexCoords = rh2.TCoords;
+                tVBO.Colors = rh2.Cols;
+                tVBO.TCOLs = rh2.TCols;
+                tVBO.THVs = rh2.THVs;
+                tVBO.THWs = rh2.THWs;
+                tVBO.THVs2 = rh2.THVs2;
+                tVBO.THWs2 = rh2.THWs2;
+                tVBO.Tangents = rh2.Tangs;
                 tVBO.Oldvert();
-                Vector3[] posset = poses.ToArray();
-                Vector4[] colorset = colorses.ToArray();
-                Vector2[] texcoordsset = tcses.ToArray();
+                Vector3[] posset = ph2.poses.ToArray();
+                Vector4[] colorset = ph2.colorses.ToArray();
+                Vector2[] texcoordsset = ph2.tcses.ToArray();
                 uint[] posind = new uint[posset.Length];
                 for (uint i = 0; i < posind.Length; i++)
                 {
@@ -696,11 +752,8 @@ namespace Voxalia.ClientGame.WorldSystem
     public class ChunkRenderHelper
     {
         const int CSize = Chunk.CHUNK_SIZE;
-
-        // TODO: Should this be so big? What value should they be at?!
-        const int StartVal = (CSize * CSize * CSize) / 10;
-
-        public ChunkRenderHelper()
+        
+        public ChunkRenderHelper(int StartVal)
         {
             Vertices = new List<Vector3>(StartVal);
             TCoords = new List<Vector3>(StartVal);
@@ -730,7 +783,7 @@ namespace Voxalia.ClientGame.WorldSystem
         public Vector3i Coordinate;
 
         // TODO: Clear and replace this if any chunks within its section get edited!
-        public ChunkRenderHelper FullBlock = new ChunkRenderHelper();
+        public ChunkRenderHelper FullBlock = new ChunkRenderHelper(512);
 
         public Region OwningRegion;
 

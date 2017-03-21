@@ -348,7 +348,7 @@ namespace Voxalia.ClientGame.WorldSystem
             Vector3i slodpos = new Vector3i(chunk_pos.X / 3, chunk_pos.Y / 3, chunk_pos.Z / 3);
             if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
-                slod.FullBlock = new ChunkRenderHelper();
+                slod.FullBlock = new ChunkRenderHelper(512);
             }
             int count = 0;
             foreach (KeyValuePair<Vector3i, Chunk> entry in LoadedChunks)
