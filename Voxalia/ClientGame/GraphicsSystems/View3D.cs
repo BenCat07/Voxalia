@@ -656,6 +656,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 CheckError("Render - Setup");
                 if (FastOnly || TheClient.CVars.r_fast.ValueB)
                 {
+                    if (TheClient.CVars.r_forward_shadows.ValueB)
+                    {
+                        RenderPass_Shadows();
+                        CheckError("Render - Shadow (Fast)");
+                    }
                     RenderPass_FAST();
                     CheckError("Render - Fast");
                     EndNF(pfbo);
@@ -869,6 +874,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 }
             }
             lights_apply:
+            if (TheClient.CVars.r_forward_shadows.ValueB)
+            {
+                GL.ActiveTexture(TextureUnit.Texture5);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.BindTexture(TextureTarget.Texture2DArray, fbo_shadow_tex);
+                GL.ActiveTexture(TextureUnit.Texture0);
+            }
             RenderingShadows = false;
             RenderLights = false;
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -1048,6 +1060,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
             else
             {
                 Render3D(this);
+            }
+            if (TheClient.CVars.r_forward_shadows.ValueB)
+            {
+                GL.ActiveTexture(TextureUnit.Texture5);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.BindTexture(TextureTarget.Texture2DArray, fbo_shadow_tex);
+                GL.ActiveTexture(TextureUnit.Texture0);
             }
             GL.ActiveTexture(TextureUnit.Texture4);
             GL.BindTexture(TextureTarget.Texture2D, 0);

@@ -255,7 +255,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_finalgodray_lights_toonify = Shaders.GetShader("finalgodray" + def + ",MCM_LIGHTS,MCM_TOONIFY");
             s_finalgodray_lights_motblur = Shaders.GetShader("finalgodray" + def + ",MCM_LIGHTS,MCM_MOTBLUR");
             string forw_extra = (CVars.r_forward_normals.ValueB ? ",MCM_NORMALS" : "")
-                + (CVars.r_forward_lights.ValueB ? ",MCM_LIGHTS" : "");
+                + (CVars.r_forward_lights.ValueB ? ",MCM_LIGHTS" : "")
+                + (CVars.r_forward_shadows.ValueB ? ",MCM_SHADOWS" : "");
             s_forw = Shaders.GetShader("forward" + def + forw_extra);
             s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX" + forw_extra);
             s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);

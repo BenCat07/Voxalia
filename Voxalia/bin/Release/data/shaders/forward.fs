@@ -47,6 +47,7 @@ layout (binding = 2) uniform sampler2D spec;
 #endif
 #endif
 layout (binding = 4) uniform sampler2D depth;
+layout (binding = 5) uniform sampler2DArray shadowtex;
 
 // ...
 
@@ -215,8 +216,17 @@ void main()
 		{
 			continue; // We can't light it! Discard straight away!
 		}
-		// TODO: Shadows
+		// TODO: maybe HD well blurred shadows?
+#if MCM_SHADOWS
+		float rd = texture(shadowtex, vec3(fs.x, fs.y, float(i))).r; // Calculate the depth of the pixel.
+		float depth = (rd >= (fs.z - 0.001) ? 1.0 : 0.0); // If we have a bad graphics card, just quickly get a 0 or 1 depth value. This will be pixelated (hard) shadows!
+		if (depth <= 0.0)
+		{
+			continue;
+		}
+#else
 		const float depth = 1.0;
+#endif
 		vec3 L = light_path / light_length; // Get the light's movement direction as a vector
 		vec3 diffuse = max(dot(fi.norm, L), 0.0)
 #if MCM_NORMALS
