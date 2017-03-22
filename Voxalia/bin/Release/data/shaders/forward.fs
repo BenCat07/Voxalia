@@ -218,8 +218,23 @@ void main()
 		}
 		// TODO: maybe HD well blurred shadows?
 #if MCM_SHADOWS
+#if 1 // TODO: MCM_SHADOW_BLURRING?
+		float depth = 0.0;
+		int loops = 0;
+		for (float x = -1.0; x <= 1.0; x += 0.5)
+		{
+			for (float y = -1.0; y <= 1.0; y += 0.5)
+			{
+				loops++;
+				float rd = texture(shadowtex, vec3(fs.x + x * tex_size, fs.y + y * tex_size, float(i))).r; // Calculate the depth of the pixel.
+				depth += (rd >= (fs.z - 0.001) ? 1.0 : 0.0);
+			}
+		}
+		depth /= loops;
+#else
 		float rd = texture(shadowtex, vec3(fs.x, fs.y, float(i))).r; // Calculate the depth of the pixel.
 		float depth = (rd >= (fs.z - 0.001) ? 1.0 : 0.0); // If we have a bad graphics card, just quickly get a 0 or 1 depth value. This will be pixelated (hard) shadows!
+#endif
 		if (depth <= 0.0)
 		{
 			continue;
