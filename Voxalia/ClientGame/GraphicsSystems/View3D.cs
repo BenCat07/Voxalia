@@ -806,12 +806,95 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 RS4P.Bind();
                 RS4P.Clear();
             }
+            float[] light_dat = new float[LIGHTS_MAX * 16];
+            float[] shadowmat_dat = new float[LIGHTS_MAX * 16];
+            int c = 0;
+            if (TheClient.CVars.r_forward_lights.ValueB)
+            {
+                // TODO: An ambient light source?
+                for (int i = 0; i < Lights.Count; i++)
+                {
+                    if (Lights[i] is SkyLight || camFrust == null || camFrust.ContainsSphere(Lights[i].EyePos.ToBVector(), Lights[i].MaxDistance))
+                    {
+                        double d1 = (Lights[i].EyePos - CameraPos).LengthSquared();
+                        double d2 = TheClient.CVars.r_lightmaxdistance.ValueD * TheClient.CVars.r_lightmaxdistance.ValueD + Lights[i].MaxDistance * Lights[i].MaxDistance;
+                        double maxrangemult = 0;
+                        if (d1 < d2 * 4 || Lights[i] is SkyLight)
+                        {
+                            maxrangemult = 1;
+                        }
+                        else if (d1 < d2 * 6)
+                        {
+                            maxrangemult = 1 - ((d1 - (d2 * 4)) / ((d2 * 6) - (d2 * 4)));
+                        }
+                        if (maxrangemult > 0)
+                        {
+                            for (int x = 0; x < Lights[i].InternalLights.Count; x++)
+                            {
+                                if (Lights[i].InternalLights[x].color.LengthSquared <= 0.01)
+                                {
+                                    continue;
+                                }
+                                Matrix4 smat = Lights[i].InternalLights[x].GetMatrix();
+                                Vector3d eyep = Lights[i].InternalLights[x].eye - ClientUtilities.ConvertD(CameraPos);
+                                Vector3 col = Lights[i].InternalLights[x].color * (float)maxrangemult;
+                                Matrix4 light_data = new Matrix4(
+                                    (float)eyep.X, (float)eyep.Y, (float)eyep.Z, // light_pos
+                                    0.7f, // diffuse_albedo
+                                    0.7f, // specular_albedo
+                                    Lights[i].InternalLights[x] is LightOrtho ? 1.0f : 0.0f, // should_sqrt
+                                    col.X, col.Y, col.Z, // light_color
+                                    Lights[i].InternalLights[x] is LightOrtho ? LightMaximum : (Lights[i].InternalLights[0].maxrange <= 0 ? LightMaximum : Lights[i].InternalLights[0].maxrange), // light_radius
+                                    0f, 0f, 0f, // eye_pos
+                                    Lights[i] is SpotLight ? 1.0f : 0.0f, // light_type
+                                    1f / ShadowTexSize(), // tex_size
+                                    0.0f // Unused.
+                                    );
+                                for (int mx = 0; mx < 4; mx++)
+                                {
+                                    for (int my = 0; my < 4; my++)
+                                    {
+                                        shadowmat_dat[c * 16 + mx * 4 + my] = smat[mx, my];
+                                        light_dat[c * 16 + mx * 4 + my] = light_data[mx, my];
+                                    }
+                                }
+                                c++;
+                                if (c >= LIGHTS_MAX)
+                                {
+                                    goto lights_apply;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            lights_apply:
             RenderingShadows = false;
             RenderLights = false;
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_SOLID;
             Vector3 maxLit = TheClient.TheRegion.GetSunAdjust().Xyz;
+            TheClient.s_forw_particles.Bind();
+            if (TheClient.CVars.r_forward_lights.ValueB)
+            {
+                GL.Uniform1(15, (float)c);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+            }
+            TheClient.s_forw_grass.Bind();
+            if (TheClient.CVars.r_forward_lights.ValueB)
+            {
+                GL.Uniform1(15, (float)c);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+            }
             TheClient.s_forwdecal.Bind();
+            if (TheClient.CVars.r_forward_lights.ValueB)
+            {
+                GL.Uniform1(15, (float)c);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
+                GL.UniformMatrix4(30 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+            }
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform4(4, new Vector4(Width, Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
@@ -821,6 +904,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
             TheClient.s_forwt.Bind();
+            if (TheClient.CVars.r_forward_lights.ValueB)
+            {
+                GL.Uniform1(15, (float)c);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+            }
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
@@ -829,6 +918,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
             TheClient.s_forw_vox.Bind();
+            if (TheClient.CVars.r_forward_lights.ValueB)
+            {
+                GL.Uniform1(15, (float)c);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+            }
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
@@ -839,6 +934,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
             TheClient.s_forw.Bind();
+            if (TheClient.CVars.r_forward_lights.ValueB)
+            {
+                GL.Uniform1(15, (float)c);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+            }
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);

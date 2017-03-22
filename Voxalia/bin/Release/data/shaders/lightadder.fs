@@ -218,6 +218,7 @@ void main() // Let's put all code in main, why not...
 		ssao_mod = (ssao_color(position, normal, diffuset.xyz) * (1.0 - renderhint.z) * 0.9) + 0.1;
 	}
 #endif
+	vec3 N = -normal;
 	// Loop over lights
 	int count = renderhint.z >= 1.0 ? 0 : int(lights_used);
 	for (int i = 0; i < count; i++)
@@ -237,7 +238,6 @@ void main() // Let's put all code in main, why not...
 	// float unused = light_data[3][3];
 	vec4 f_spos = shadow_matrix * vec4(position, 1.0); // Calculate the position of the light relative to the view.
 	f_spos /= f_spos.w; // Standard perspective divide.
-	vec3 N = -normal;
 	vec3 light_path = light_pos - position; // What path a light ray has to travel down in theory to get from the source to the current pixel.
 	float light_length = length(light_path); // How far the light is from this pixel.
 	float d = light_length / light_radius; // How far the pixel is from the end of the light.

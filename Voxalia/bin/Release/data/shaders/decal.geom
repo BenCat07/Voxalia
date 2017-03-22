@@ -38,11 +38,22 @@ out struct vox_fout
 	mat3 tbn;
 #else
 	vec3 norm;
+	vec3 pos;
 	vec3 texcoord;
 	vec4 color;
 #endif
 	float size;
 } fi;
+
+vec3 qfix(vec3 pos)
+{
+#if MCM_PRETTY
+	fi.position = vec4(pos, 1.0);
+#else
+	fi.pos = pos;
+#endif
+	return pos;
+}
 
 void main()
 {
@@ -66,19 +77,23 @@ void main()
 	vec3 xp = vec3(norm.z, norm.x, norm.y) * scale;
 	vec3 yp = vec3(norm.y, norm.z, norm.x) * scale;
 	// First Vertex
-	gl_Position = proj_matrix * vec4(pos + (-xp - yp), 1.0);
+	vec3 p = qfix(pos + (-xp - yp));
+	gl_Position = proj_matrix * vec4(p, 1.0);
 	fi.texcoord = vec3(0.0, 1.0, tid);
 	EmitVertex();
 	// Second Vertex
-	gl_Position = proj_matrix * vec4(pos + (xp - yp), 1.0);
+	p = qfix(pos + (xp - yp));
+	gl_Position = proj_matrix * vec4(p, 1.0);
 	fi.texcoord = vec3(1.0, 1.0, tid);
 	EmitVertex();
 	// Third Vertex
-	gl_Position = proj_matrix * vec4(pos + (-xp + yp), 1.0);
+	p = qfix(pos + (-xp + yp));
+	gl_Position = proj_matrix * vec4(p, 1.0);
 	fi.texcoord = vec3(0.0, 0.0, tid);
 	EmitVertex();
 	// Forth Vertex
-	gl_Position = proj_matrix * vec4(pos + (xp + yp), 1.0);
+	p = qfix(pos + (xp + yp));
+	gl_Position = proj_matrix * vec4(p, 1.0);
 	fi.texcoord = vec3(1.0, 0.0, tid);
 	EmitVertex();
 	EndPrimitive();

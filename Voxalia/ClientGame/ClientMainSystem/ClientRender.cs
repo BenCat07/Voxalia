@@ -254,7 +254,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_finalgodray_lights = Shaders.GetShader("finalgodray" + def + ",MCM_LIGHTS");
             s_finalgodray_lights_toonify = Shaders.GetShader("finalgodray" + def + ",MCM_LIGHTS,MCM_TOONIFY");
             s_finalgodray_lights_motblur = Shaders.GetShader("finalgodray" + def + ",MCM_LIGHTS,MCM_MOTBLUR");
-            string forw_extra = CVars.r_forward_normals.ValueB ? ",MCM_NORMALS" : "";
+            string forw_extra = (CVars.r_forward_normals.ValueB ? ",MCM_NORMALS" : "")
+                + (CVars.r_forward_lights.ValueB ? ",MCM_LIGHTS" : "");
             s_forw = Shaders.GetShader("forward" + def + forw_extra);
             s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX" + forw_extra);
             s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);
@@ -1293,6 +1294,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.BindTexture(TextureTarget.Texture2DArray, TBlock.TextureID);
                 GL.ActiveTexture(TextureUnit.Texture2);
                 GL.BindTexture(TextureTarget.Texture2DArray, TBlock.NormalTextureID);
+                GL.ActiveTexture(TextureUnit.Texture1);
+                GL.BindTexture(TextureTarget.Texture2DArray, TBlock.HelpTextureID);
                 GL.ActiveTexture(TextureUnit.Texture0);
             }
             else if (MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
@@ -1301,6 +1304,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.BindTexture(TextureTarget.Texture2DArray, TBlock.TextureID);
                 GL.ActiveTexture(TextureUnit.Texture2);
                 GL.BindTexture(TextureTarget.Texture2DArray, TBlock.NormalTextureID);
+                GL.ActiveTexture(TextureUnit.Texture1);
+                GL.BindTexture(TextureTarget.Texture2DArray, TBlock.HelpTextureID);
                 GL.ActiveTexture(TextureUnit.Texture0);
             }
             else if (MainWorldView.FBOid == FBOID.SHADOWS || MainWorldView.FBOid == FBOID.STATIC_SHADOWS || MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
@@ -1417,6 +1422,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 s_forw_trans = s_forw_trans.Bind();
                 GL.ActiveTexture(TextureUnit.Texture2);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.ActiveTexture(TextureUnit.Texture1);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
@@ -1425,6 +1432,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 s_forwdecal = s_forwdecal.Bind();
                 GL.ActiveTexture(TextureUnit.Texture2);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.ActiveTexture(TextureUnit.Texture1);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
@@ -1432,6 +1441,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 s_fbodecal = s_fbodecal.Bind();
                 GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.ActiveTexture(TextureUnit.Texture1);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);

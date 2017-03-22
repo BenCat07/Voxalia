@@ -38,6 +38,10 @@ out struct vox_fout
 #endif
 {
 	vec3 norm;
+#if MCM_GEOM_ACTIVE
+#else
+	vec3 pos;
+#endif
 #if MCM_VOX
 	vec3 texcoord;
 	vec4 tcol;
@@ -92,6 +96,7 @@ void main()
 	vec4 vpos_mv = mv_matrix * vpos;
     fi.color = color_for(vpos_mv, color * v_color);
 	fi.tcol = color_for(vpos_mv, tcol);
+	fi.pos = vpos_mv.xyz;
 	gl_Position = proj_matrix * vpos_mv;
 #else // MCM_VOX
 #if MCM_GEOM_ACTIVE
@@ -130,7 +135,9 @@ void main()
 	vec4 fnorm = mv_mat_simple * norm1;
 	fi.norm = fnorm.xyz / fnorm.w;
     fi.color = color_for(mv_matrix * vec4(pos1.xyz, 1.0), color * v_color);
-	gl_Position = proj_matrix * mv_matrix * vec4(pos1.xyz, 1.0);
+	vec4 posser = mv_matrix * vec4(pos1.xyz, 1.0);
+	fi.pos = posser.xyz;
+	gl_Position = proj_matrix * posser;
 #endif // else - MCM_GEOM_ACTIVE
 #endif // else - MCM_VOX
 }

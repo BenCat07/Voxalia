@@ -41,6 +41,7 @@ out struct vox_fout
 	float z;
 #else
 	vec3 norm;
+	vec3 pos;
 	vec3 texcoord;
 	vec4 color;
 #endif
@@ -59,6 +60,7 @@ vec4 qfix(in vec4 pos, in vec3 right, in vec3 pos_norm)
 	fi.tbn = transpose(mat3(right, cross(right, pos_norm), pos_norm)); // TODO: Neccessity of transpose()?
 #else
 	fi.norm = pos_norm;
+	fi.pos = pos.xyz;
 #endif
 	return pos;
 }
