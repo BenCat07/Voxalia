@@ -254,10 +254,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_finalgodray_lights = Shaders.GetShader("finalgodray" + def + ",MCM_LIGHTS");
             s_finalgodray_lights_toonify = Shaders.GetShader("finalgodray" + def + ",MCM_LIGHTS,MCM_TOONIFY");
             s_finalgodray_lights_motblur = Shaders.GetShader("finalgodray" + def + ",MCM_LIGHTS,MCM_MOTBLUR");
-            s_forw = Shaders.GetShader("forward" + def);
-            s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX");
-            s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP");
-            s_forw_vox_trans = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TRANSP");
+            string forw_extra = CVars.r_forward_normals.ValueB ? ",MCM_NORMALS" : "";
+            s_forw = Shaders.GetShader("forward" + def + forw_extra);
+            s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX" + forw_extra);
+            s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);
+            s_forw_vox_trans = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TRANSP" + forw_extra);
             s_transponly_ll = Shaders.GetShader("transponly" + def + ",MCM_LL");
             s_transponlyvox_ll = Shaders.GetShader("transponlyvox" + def + ",MCM_LL");
             s_transponlylit_ll = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_LL");
@@ -267,13 +268,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_ll_clearer = Shaders.GetShader("clearer" + def);
             s_ll_fpass = Shaders.GetShader("fpass" + def);
             s_hdrpass = Shaders.GetShader("hdrpass" + def);
-            s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE?grass");
-            s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY?grass");
+            s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE" + forw_extra  +"?grass");
+            s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY" + forw_extra  +"?grass");
             s_shadow_grass = Shaders.GetShader("shadow" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_SHADOWS?grass");
-            s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH?particles");
+            s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH" + forw_extra + "?particles");
             s_fbodecal = Shaders.GetShader("fbo" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE,MCM_PRETTY?decal");
-            s_forwdecal = Shaders.GetShader("forward" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE?decal");
-            s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT");
+            s_forwdecal = Shaders.GetShader("forward" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE" + forw_extra + "?decal");
+            s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT" + forw_extra);
             s_transponly_particles = Shaders.GetShader("transponly" + def + ",MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
             s_transponlylit_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
             s_transponlylitsh_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
@@ -1290,11 +1291,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 s_forw_vox = s_forw_vox.Bind();
                 GL.BindTexture(TextureTarget.Texture2DArray, TBlock.TextureID);
+                GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2DArray, TBlock.NormalTextureID);
+                GL.ActiveTexture(TextureUnit.Texture0);
             }
             else if (MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
             {
                 s_forw_vox_trans = s_forw_vox_trans.Bind();
                 GL.BindTexture(TextureTarget.Texture2DArray, TBlock.TextureID);
+                GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2DArray, TBlock.NormalTextureID);
+                GL.ActiveTexture(TextureUnit.Texture0);
             }
             else if (MainWorldView.FBOid == FBOID.SHADOWS || MainWorldView.FBOid == FBOID.STATIC_SHADOWS || MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
             {
@@ -1400,21 +1407,33 @@ namespace Voxalia.ClientGame.ClientMainSystem
             else if (MainWorldView.FBOid == FBOID.FORWARD_SOLID)
             {
                 s_forw = s_forw.Bind();
+                GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
             else if (MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
             {
                 s_forw_trans = s_forw_trans.Bind();
+                GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
             else if (MainWorldView.FBOid == FBOID.FORWARD_EXTRAS)
             {
                 s_forwdecal = s_forwdecal.Bind();
+                GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
             else if (MainWorldView.FBOid == FBOID.MAIN_EXTRAS)
             {
                 s_fbodecal = s_fbodecal.Bind();
+                GL.ActiveTexture(TextureUnit.Texture2);
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
             }
             else if (MainWorldView.FBOid == FBOID.SHADOWS || MainWorldView.FBOid == FBOID.STATIC_SHADOWS || MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)

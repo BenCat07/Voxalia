@@ -173,7 +173,7 @@ namespace Voxalia.ClientGame.EntitySystem
             TheClient.SetVox();
             Matrix4d mat = Matrix4d.CreateTranslation(-ClientUtilities.ConvertD(Offset)) * GetTransformationMatrix();
             TheClient.MainWorldView.SetMatrix(2, mat);
-            vbo.Render(false);
+            vbo.Render();
         }
     }
 

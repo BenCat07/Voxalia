@@ -148,7 +148,7 @@ namespace Voxalia.ClientGame.EntitySystem
             OpenTK.Matrix4d mat = OpenTK.Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * OpenTK.Matrix4d.CreateTranslation(ClientUtilities.ConvertD(shapeOffs)) * GetTransformationMatrix();
             TheClient.MainWorldView.SetMatrix(2, mat);
             TheClient.Rendering.SetColor(Color);
-            vbo.Render(false);
+            vbo.Render();
             TheClient.Rendering.SetColor(Color4.White);
         }
 

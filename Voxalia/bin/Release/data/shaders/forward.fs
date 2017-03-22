@@ -15,14 +15,26 @@
 #define MCM_BRIGHT 0
 #define MCM_INVERSE_FADE 0
 #define MCM_FADE_DEPTH 0
+#define MCM_LIGHTS 0
+#define MCM_SHADOWS 0
+#define MCM_NORMALS 0
 
 #if MCM_VOX
 layout (binding = 0) uniform sampler2DArray s;
+#if MCM_NORMALS
+layout (binding = 2) uniform sampler2DArray normal_tex;
+#endif
 #else
 #if MCM_GEOM_ACTIVE
 layout (binding = 0) uniform sampler2DArray s;
+#if MCM_NORMALS
+layout (binding = 1) uniform sampler2DArray normal_tex;
+#endif
 #else
 layout (binding = 0) uniform sampler2D s;
+#if MCM_NORMALS
+layout (binding = 1) uniform sampler2D normal_tex;
+#endif
 #endif
 #endif
 layout (binding = 4) uniform sampler2D depth;
@@ -53,6 +65,8 @@ in struct vox_fout
 #endif
 } fi;
 
+const int LIGHTS_MAX = 10;
+
 // ...
 layout (location = 4) uniform vec4 screen_size = vec4(1024, 1024, 0.1, 1000.0);
 layout (location = 5) uniform float minimum_light = 0.2;
@@ -62,6 +76,12 @@ layout (location = 11) uniform vec3 maximum_light = vec3(0.9, 0.9, 0.9);
 layout (location = 12) uniform vec4 fogCol = vec4(0.0);
 layout (location = 13) uniform float znear = 1.0;
 layout (location = 14) uniform float zfar = 1000.0;
+#if MCM_SHADOWS
+layout (location = 20) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
+#endif
+#if MCM_LIGHTS
+layout (location = 230) uniform mat4 light_data_array[LIGHTS_MAX];
+#endif
 
 layout (location = 0) out vec4 color;
 
@@ -123,8 +143,17 @@ void main()
 	color = col * fi.color;
 #if MCM_BRIGHT
 #else
-	// TODO: Maybe read the normal texture too, to increase "prettiness"? (Optionally, probably!)
-	color.xyz *= min(max(dot(-fi.norm, sunlightDir) * maximum_light, max(0.2, minimum_light)), 1.0);
+	float modder = 1.0;
+	modder *= dot(-fi.norm, sunlightDir);
+#if MCM_NORMALS
+	vec3 norm = texture(normal_tex, fi.texcoord).xyz;
+#if MCM_LIGHTS
+	// TODO: Lighting
+#else
+	modder *= dot(-norm, sunlightDir);
+#endif
+#endif
+	color.xyz *= min(max(modder * maximum_light, max(0.2, minimum_light)), 1.0);
 	applyFog();
 #endif
 	if (fogCol.w > 1.0)
@@ -135,8 +164,8 @@ void main()
 	float dist = linearizeDepth(gl_FragCoord.z);
 	vec2 fc_xy = gl_FragCoord.xy / screen_size.xy;
 	float depthval = linearizeDepth(texture(depth, fc_xy).x);
-	float mod = min(max(0.001 / max(depthval - dist, 0.001), 0.0), 1.0);
-	if (mod < 0.8)
+	float mod2 = min(max(0.001 / max(depthval - dist, 0.001), 0.0), 1.0);
+	if (mod2 < 0.8)
 	{
 		discard;
 	}

@@ -448,58 +448,15 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         }
         
-        public void Render(bool texture, bool fixafter = true)
+        public void Render()
         {
             if (!generated)
             {
                 return;
             }
-            if (texture && Tex != null)
-            {
-                GL.ActiveTexture(TextureUnit.Texture3);
-                if (Tex_Reflectivity != null)
-                {
-                    Tex_Reflectivity.Bind();
-                }
-                else
-                {
-                    Tex.Engine.Black.Bind();
-                }
-                GL.ActiveTexture(TextureUnit.Texture2);
-                if (Tex_Specular != null)
-                {
-                    Tex_Specular.Bind();
-                }
-                else
-                {
-                    Tex.Engine.Black.Bind();
-                }
-                GL.ActiveTexture(TextureUnit.Texture1);
-                if (Tex_Normal != null)
-                {
-                    Tex_Normal.Bind();
-                }
-                else
-                {
-                    Tex.Engine.NormalDef.Bind();
-                }
-                GL.ActiveTexture(TextureUnit.Texture0);
-                Tex.Bind();
-            }
             GL.BindVertexArray(_VAO);
             GL.DrawElements(PrimitiveType.Triangles, vC, DrawElementsType.UnsignedInt, IntPtr.Zero);
             GL.BindVertexArray(0);
-            if (fixafter && texture && Tex != null)
-            {
-                GL.ActiveTexture(TextureUnit.Texture3);
-                Tex.Engine.Black.Bind();
-                GL.ActiveTexture(TextureUnit.Texture2);
-                Tex.Engine.Black.Bind();
-                GL.ActiveTexture(TextureUnit.Texture1);
-                Tex.Engine.NormalDef.Bind();
-                GL.ActiveTexture(TextureUnit.Texture0);
-                Tex.Engine.White.Bind();
-            }
         }
     }
 }

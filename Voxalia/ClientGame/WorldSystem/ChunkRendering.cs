@@ -730,7 +730,7 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(WorldPosition.ToLocation() * CHUNK_SIZE));
                 OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
-                _VBO.Render(false);
+                _VBO.Render();
             }
             if (OwningRegion.TheClient.MainWorldView.FBOid == FBOID.REFRACT)
             {
@@ -739,7 +739,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(WorldPosition.ToLocation() * CHUNK_SIZE));
                     OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
-                    _VBO.Render(false);
+                    _VBO.Render();
                 }
             }
         }
@@ -800,7 +800,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 // TODO: 3 -> constants
                 Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(Coordinate.ToLocation() * Constants.CHUNK_WIDTH * 3));
                 OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
-                _VBO.Render(false);
+                _VBO.Render();
             }
         }
 

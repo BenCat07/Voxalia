@@ -40,7 +40,8 @@ namespace Voxalia.ClientGame.CommandSystem
             r_lightmaxdistance, r_shadowquality, r_shadowblur, r_shadowpace, r_shadows, r_cloudshadows,
             r_good_graphics, r_skybox, r_lensflare, r_blocktexturelinear, r_blocktexturewidth, r_toonify, r_transplighting, r_transpshadows,
             r_3d_enable, r_fast, r_chunksatonce, r_chunkoverrender, r_transpll, r_noblockshapes, r_treeshadows,
-            r_godrays, r_hdr, r_clouds, r_motionblur, r_plants, r_exposure, r_grayscale, r_vrscale;
+            r_godrays, r_hdr, r_clouds, r_motionblur, r_plants, r_exposure, r_grayscale, r_vrscale,
+            r_forward_normals;
 
         // Audio CVars
         public CVar a_musicvolume, a_musicpitch, a_globalvolume, a_globalpitch, a_music, a_quietondeselect, a_echovolume, a_enforce, a_left, a_right;
@@ -129,6 +130,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_grayscale = Register("r_grayscale", "false", CVarFlag.Boolean, "Whether to grayscale the view.");
             r_vrscale = Register("r_vrscale", "1", CVarFlag.Numeric, "What scale to put everything at in VR mode.");
             r_fog = Register("r_fog", "false", CVarFlag.Boolean, "Whether render fog should be defaultly enabled at distance.");
+            r_forward_normals = Register("r_forward_normals", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether forward mode rendering should calculate normal-map effects.");
             // Audio CVars
             a_musicvolume = Register("a_musicvolume", "0.5", CVarFlag.Numeric, "What volume the music should be.");
             a_musicpitch = Register("a_musicpitch", "1", CVarFlag.Numeric, "What pitch the music should be.");
@@ -138,8 +140,8 @@ namespace Voxalia.ClientGame.CommandSystem
             a_quietondeselect = Register("a_quietondeselect", "true", CVarFlag.Boolean, "Whether to quiet music when the window is deselected.");
             a_echovolume = Register("a_echovolume", "0", CVarFlag.Numeric, "What volume to echo microphone pickup at, for audio testing purposes. Specify 0 to not listen to the microphone at all.");
             a_enforce = Register("a_enforce", "true", CVarFlag.Boolean, "Whether to use the audio enforcement mode.");
-            a_left = Register("a_left", "true", CVarFlag.Boolean, "Whether to play left-channel audio.");
-            a_right = Register("a_right", "true", CVarFlag.Boolean, "Whether to play right-channel audio.");
+            a_left = Register("a_left", "true", CVarFlag.Boolean, "Whether to play left-channel audio (when audio enforce is enabled).");
+            a_right = Register("a_right", "true", CVarFlag.Boolean, "Whether to play right-channel audio (when audio enforce is enabled).");
             // UI CVars
             u_mouse_sensitivity = Register("u_mouse_sensitivity", "1", CVarFlag.Numeric, "How sensitive the mouse is.");
             u_reticle = Register("u_reticle", "1", CVarFlag.Textual, "What reticle to use.");
