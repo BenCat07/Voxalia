@@ -19,8 +19,15 @@ namespace Voxalia.ClientGame.GraphicsSystems
     /// </summary>
     public class Frustum
     {
+        /// <summary>
+        /// All planes on this Frustum.
+        /// </summary>
         public Plane[] Planes = new Plane[6];
         
+        /// <summary>
+        /// Constructs the Frustum from a Matrix.
+        /// </summary>
+        /// <param name="matrix">The matrix.</param>
         public Frustum(OpenTK.Matrix4d matrix)
         {
             Planes[0] = new Plane(new Vector3(-matrix.M14 - matrix.M11, -matrix.M24 - matrix.M21, -matrix.M34 - matrix.M31), -matrix.M44 - matrix.M41);

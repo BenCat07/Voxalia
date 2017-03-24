@@ -22,18 +22,40 @@ namespace Voxalia.Shared
     /// </summary>
     public class BFrustum
     {
+        /// <summary>
+        /// Near plane.
+        /// </summary>
         public BPlane Near;
 
+        /// <summary>
+        /// Far plane.
+        /// </summary>
         public BPlane Far;
 
+        /// <summary>
+        /// Left plane.
+        /// </summary>
         public BPlane Left;
 
+        /// <summary>
+        /// Right plane.
+        /// </summary>
         public BPlane Right;
 
+        /// <summary>
+        /// Top plane.
+        /// </summary>
         public BPlane Top;
 
+        /// <summary>
+        /// Bottom plane.
+        /// </summary>
         public BPlane Bottom;
 
+        /// <summary>
+        /// Constructs the Frustum from a Matrix.
+        /// </summary>
+        /// <param name="matrix">The matrix.</param>
         public BFrustum(BEPUutilities.Matrix matrix)
         {
             Left = new BPlane(new Location(-matrix.M14 - matrix.M11, -matrix.M24 - matrix.M21, -matrix.M34 - matrix.M31), -matrix.M44 - matrix.M41);
