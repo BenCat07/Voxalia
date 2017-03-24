@@ -1171,8 +1171,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             foreach (ChunkSLODHelper ch in TheRegion.SLODs.Values)
             {
                 // TODO: 3 -> constants
-                BEPUutilities.Vector3 min = ch.Coordinate.ToVector3() * Chunk.CHUNK_SIZE * 3;
-                BEPUutilities.Vector3 helpervec = new BEPUutilities.Vector3(Chunk.CHUNK_SIZE * 3, Chunk.CHUNK_SIZE * 3, Chunk.CHUNK_SIZE * 3) * 5;
+                Location min = ch.Coordinate.ToLocation() * Chunk.CHUNK_SIZE * 3;
+                Location helpervec = new Location(Chunk.CHUNK_SIZE * 3, Chunk.CHUNK_SIZE * 3, Chunk.CHUNK_SIZE * 3) * 5;
                 if ((MainWorldView.CFrust == null || MainWorldView.LongFrustum == null || MainWorldView.LongFrustum.ContainsBox(min - helpervec, min + helpervec)))
                 {
                     ch.Render();

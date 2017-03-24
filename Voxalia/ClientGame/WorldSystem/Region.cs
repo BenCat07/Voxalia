@@ -708,8 +708,8 @@ namespace Voxalia.ClientGame.WorldSystem
                 chToRender.Clear();
                 foreach (Chunk ch in LoadedChunks.Values)
                 {
-                    BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
-                    if (ch.PosMultiplier < 5 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
+                    Location min = ch.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
+                    if (ch.PosMultiplier < 5 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new Location(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
                     {
                         chToRender.Add(ch);
                     }
@@ -724,8 +724,8 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 foreach (Chunk ch in LoadedChunks.Values)
                 {
-                    BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
-                    if (ch.PosMultiplier < 5 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
+                    Location min = ch.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
+                    if (ch.PosMultiplier < 5 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new Location(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
                     {
                         ch.Render();
                     }

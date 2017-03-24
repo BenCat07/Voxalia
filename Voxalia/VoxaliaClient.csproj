@@ -179,7 +179,6 @@
     <Compile Include="ClientGame\EntitySystem\PrimitiveEntity.cs" />
     <Compile Include="ClientGame\EntitySystem\PrimitiveModelEntity.cs" />
     <Compile Include="ClientGame\EntitySystem\StaticBlockEntity.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\Frustum.cs" />
     <Compile Include="ClientGame\GraphicsSystems\LightingSystem\Light.cs" />
     <Compile Include="ClientGame\GraphicsSystems\LightingSystem\LightObject.cs" />
     <Compile Include="ClientGame\GraphicsSystems\LightingSystem\LightOrtho.cs" />
@@ -193,7 +192,6 @@
     <Compile Include="ClientGame\GraphicsSystems\ParticleSystem\ParticleEffect.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ModelEngine.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ParticleSystem\ParticleHelper.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\Plane.cs" />
     <Compile Include="ClientGame\GraphicsSystems\Renderer.cs" />
     <Compile Include="ClientGame\GraphicsSystems\RenderSurface4Part.cs" />
     <Compile Include="ClientGame\GraphicsSystems\TextureBlock.cs" />

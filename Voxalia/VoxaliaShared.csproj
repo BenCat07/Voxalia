@@ -75,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Shared\PriorityQueue.cs" />
-    <Compile Include="Shared\BFrustum.cs" />
     <Compile Include="Shared\BlockInternal.cs" />
     <Compile Include="Shared\Constants.cs" />
     <Compile Include="Shared\ModelManagement\Catmull.cs" />
@@ -133,7 +132,6 @@
     <Compile Include="Shared\Material.cs" />
     <Compile Include="Shared\ModelHandler.cs" />
     <Compile Include="Shared\PingInfo.cs" />
-    <Compile Include="Shared\Plane.cs" />
     <Compile Include="Shared\VoxProgram.cs" />
     <Compile Include="Shared\NetworkEnums.cs" />
     <Compile Include="Shared\ModelManagement\Simplify.cs" />

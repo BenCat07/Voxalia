@@ -923,7 +923,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Matrix proj = Matrix.CreatePerspectiveFieldOfViewRH(Max_FOV * Utilities.PI180, 1, 1f, 5000f);
             Matrix view = Matrix.CreateLookAtRH((LoadRelPos - LoadRelDir * 8).ToBVector(), (LoadRelPos + LoadRelDir * 8).ToBVector(), new Vector3(0, 0, 1));
             Matrix combined = view * proj;
-            BFrustum bfs = TheServer.IsMenu ? null : new BFrustum(combined);
+            Frustum bfs = TheServer.IsMenu ? null : new Frustum(combined);
             Vector3i start = TheRegion.ChunkLocFor(LoadRelPos);
             if (toSee == null)
             {

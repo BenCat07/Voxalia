@@ -21,6 +21,7 @@ using System.Diagnostics;
 using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
 using Voxalia.ClientGame.OtherSystems;
 using FreneticGameCore;
+using FreneticGameGraphics;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {
@@ -790,9 +791,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     PrimaryMatrix_OffsetFor3Dd = view2d * projd;
                 }
             }
-            LongFrustum = new Frustum(outviewD);
-            camFrust = new Frustum(PrimaryMatrixd);
-            cf2 = new Frustum(PrimaryMatrix_OffsetFor3Dd);
+            LongFrustum = new Frustum(GraphicsUtil.ConvertD(outviewD));
+            camFrust = new Frustum(GraphicsUtil.ConvertD(PrimaryMatrixd));
+            cf2 = new Frustum(GraphicsUtil.ConvertD(PrimaryMatrix_OffsetFor3Dd));
             CFrust = camFrust;
             CheckError("AfterSetup");
         }
@@ -819,7 +820,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 // TODO: An ambient light source?
                 for (int i = 0; i < Lights.Count; i++)
                 {
-                    if (Lights[i] is SkyLight || camFrust == null || camFrust.ContainsSphere(Lights[i].EyePos.ToBVector(), Lights[i].MaxDistance))
+                    if (Lights[i] is SkyLight || camFrust == null || camFrust.ContainsSphere(Lights[i].EyePos, Lights[i].MaxDistance))
                     {
                         double d1 = (Lights[i].EyePos - CameraPos).LengthSquared();
                         double d2 = TheClient.CVars.r_lightmaxdistance.ValueD * TheClient.CVars.r_lightmaxdistance.ValueD + Lights[i].MaxDistance * Lights[i].MaxDistance;
@@ -1102,7 +1103,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.Viewport(0, 0, sp, sp);
                 for (int i = 0; i < Lights.Count; i++)
                 {
-                    if (Lights[i] is SkyLight || camFrust == null || camFrust.ContainsSphere(Lights[i].EyePos.ToBVector(), Lights[i].MaxDistance))
+                    if (Lights[i] is SkyLight || camFrust == null || camFrust.ContainsSphere(Lights[i].EyePos, Lights[i].MaxDistance))
                     {
                         if (Lights[i] is SkyLight || Lights[i].EyePos.DistanceSquared(campos) <
                             TheClient.CVars.r_lightmaxdistance.ValueD * TheClient.CVars.r_lightmaxdistance.ValueD + Lights[i].MaxDistance * Lights[i].MaxDistance * 6)
@@ -1121,7 +1122,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 }
                                 else
                                 {
-                                    CFrust = new Frustum(ClientUtilities.ConvertToD(Lights[i].InternalLights[x].GetMatrix()));
+                                    CFrust = new Frustum(GraphicsUtil.ConvertD(ClientUtilities.ConvertToD(Lights[i].InternalLights[x].GetMatrix()))); // TODO: One-step conversion!
                                 }
                                 CameraPos = ClientUtilities.ConvertD(Lights[i].InternalLights[x].eye);
                                 TheClient.s_shadowvox = TheClient.s_shadowvox.Bind();
@@ -1437,7 +1438,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 // TODO: An ambient light source?
                 for (int i = 0; i < Lights.Count; i++)
                 {
-                    if (Lights[i] is SkyLight || camFrust == null || camFrust.ContainsSphere(Lights[i].EyePos.ToBVector(), Lights[i].MaxDistance))
+                    if (Lights[i] is SkyLight || camFrust == null || camFrust.ContainsSphere(Lights[i].EyePos, Lights[i].MaxDistance))
                     {
                         double d1 = (Lights[i].EyePos - CameraPos).LengthSquared();
                         double d2 = TheClient.CVars.r_lightmaxdistance.ValueD * TheClient.CVars.r_lightmaxdistance.ValueD + Lights[i].MaxDistance * Lights[i].MaxDistance;
@@ -2029,7 +2030,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 RenderLights = true;
                 for (int i = 0; i < Lights.Count; i++)
                 {
-                    if (Lights[i] is SkyLight || frustumToUse == null || frustumToUse.ContainsSphere(Lights[i].EyePos.ToBVector(), Lights[i].MaxDistance))
+                    if (Lights[i] is SkyLight || frustumToUse == null || frustumToUse.ContainsSphere(Lights[i].EyePos, Lights[i].MaxDistance))
                     {
                         for (int x = 0; x < Lights[i].InternalLights.Count; x++)
                         {
@@ -2043,7 +2044,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 float[] s_mats = new float[LIGHTS_MAX * 16];
                 for (int i = 0; i < Lights.Count; i++)
                 {
-                    if (Lights[i] is SkyLight || frustumToUse == null || frustumToUse.ContainsSphere(Lights[i].EyePos.ToBVector(), Lights[i].MaxDistance))
+                    if (Lights[i] is SkyLight || frustumToUse == null || frustumToUse.ContainsSphere(Lights[i].EyePos, Lights[i].MaxDistance))
                     {
                         for (int x = 0; x < Lights[i].InternalLights.Count; x++)
                         {

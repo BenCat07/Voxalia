@@ -68,7 +68,7 @@ namespace Voxalia.ClientGame.EntitySystem
             BEPUutilities.RigidTransform rt = new BEPUutilities.RigidTransform(GetPosition().ToBVector(), GetOrientation());
             BEPUutilities.RigidTransform.Transform(ref ModelMin, ref rt, out BEPUutilities.Vector3 bmin);
             BEPUutilities.RigidTransform.Transform(ref ModelMax, ref rt, out BEPUutilities.Vector3 bmax);
-            if (TheClient.MainWorldView.CFrust != null && !TheClient.MainWorldView.CFrust.ContainsBox(bmin, bmax))
+            if (TheClient.MainWorldView.CFrust != null && !TheClient.MainWorldView.CFrust.ContainsBox(new Location(bmin), new Location(bmax)))
             {
                 return;
             }
