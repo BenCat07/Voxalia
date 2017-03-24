@@ -198,7 +198,6 @@
     <Compile Include="ClientGame\GraphicsSystems\RenderSurface4Part.cs" />
     <Compile Include="ClientGame\GraphicsSystems\TextureBlock.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ChunkVBO.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\VBO.cs" />
     <Compile Include="ClientGame\GraphicsSystems\View3D.cs" />
     <Compile Include="ClientGame\GraphicsSystems\VRSupport.cs" />
     <Compile Include="ClientGame\JointSystem\BaseFJoint.cs" />
