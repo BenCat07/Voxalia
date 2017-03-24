@@ -693,9 +693,8 @@ namespace Voxalia.ClientGame.WorldSystem
             }
         }
 
-        public void Render()
+        public void MainRender()
         {
-            ConfigureForRenderChunk();
             /*foreach (Chunk chunk in LoadedChunks.Values)
             {
                 if (TheClient.CFrust == null || TheClient.CFrust.ContainsBox(chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE,
@@ -712,12 +711,16 @@ namespace Voxalia.ClientGame.WorldSystem
                     BEPUutilities.Vector3 min = ch.WorldPosition.ToVector3() * Chunk.CHUNK_SIZE;
                     if (ch.PosMultiplier < 5 && (TheClient.MainWorldView.CFrust == null || TheClient.MainWorldView.CFrust.ContainsBox(min, min + new BEPUutilities.Vector3(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE))))
                     {
-                        ch.Render();
                         chToRender.Add(ch);
                     }
                 }
             }
-            else if (TheClient.MainWorldView.FBOid == FBOID.SHADOWS || TheClient.MainWorldView.FBOid == FBOID.STATIC_SHADOWS)
+        }
+
+        public void Render()
+        {
+            ConfigureForRenderChunk();
+            if (TheClient.MainWorldView.FBOid == FBOID.SHADOWS || TheClient.MainWorldView.FBOid == FBOID.STATIC_SHADOWS)
             {
                 foreach (Chunk ch in LoadedChunks.Values)
                 {
@@ -727,10 +730,6 @@ namespace Voxalia.ClientGame.WorldSystem
                         ch.Render();
                     }
                 }
-            }
-            else if (TheClient.MainWorldView.FBOid.IsMainTransp() || TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
-            {
-                // Do nothing.
             }
             else
             {

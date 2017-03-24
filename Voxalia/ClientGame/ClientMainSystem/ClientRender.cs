@@ -1806,12 +1806,38 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         ent.Render();
                     }
                 }
+                else if (view.FBOid.IsMainSolid())
+                {
+                    SetEnts();
+                    TheRegion.MainRender();
+                    List<Entity> entsRender = CVars.r_drawents.ValueB ? new List<Entity>(TheRegion.Entities) : new List<Entity>();
+                    if (view.FBOid != FBOID.DYNAMIC_SHADOWS)
+                    {
+                        foreach (Chunk ch in TheRegion.chToRender)
+                        {
+                            entsRender.Add(new ChunkEntity(ch));
+                        }
+                    }
+                    Location pos = Player.GetPosition();
+                    IEnumerable<Entity> ents = entsRender.OrderBy((e) => e.GetPosition().DistanceSquared(MainWorldView.RenderRelative));
+                    foreach (Entity ent in ents)
+                    {
+                        ent.Render();
+                    }
+                }
                 else if (CVars.r_drawents.ValueB)
                 {
                     for (int i = 0; i < TheRegion.Entities.Count; i++)
                     {
                         TheRegion.Entities[i].Render();
                     }
+                }
+                if (!transparents && view.FBOid != FBOID.DYNAMIC_SHADOWS && !view.FBOid.IsMainSolid())
+                {
+                    isVox = false;
+                    SetVox();
+                    TheRegion.Render();
+                    SetEnts();
                 }
                 SetEnts();
                 if (CVars.g_weathermode.ValueI > 0)
@@ -1843,17 +1869,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             View3D.CheckError("Rendering - 1");
             SetEnts();
-            if (!transparents)
-            {
-                if (view.FBOid != FBOID.DYNAMIC_SHADOWS)
-                {
-                    isVox = false;
-                    SetVox();
-                    TheRegion.Render();
-                    SetEnts();
-                }
-                TheRegion.RenderPlants();
-            }
             View3D.CheckError("Rendering - 2");
             if (view.FBOid == FBOID.STATIC_SHADOWS)
             {
