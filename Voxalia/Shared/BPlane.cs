@@ -14,7 +14,7 @@ namespace Voxalia.Shared
     /// <summary>
     /// Represents a triangle in 3D space.
     /// </summary>
-    public class Plane
+    public class BPlane
     {
         /// <summary>
         /// The normal of the plane.
@@ -47,7 +47,7 @@ namespace Voxalia.Shared
         /// <param name="v1">Vertex one.</param>
         /// <param name="v2">Vertex two.</param>
         /// <param name="v3">Vertex three.</param>
-        public Plane(Location v1, Location v2, Location v3)
+        public BPlane(Location v1, Location v2, Location v3)
         {
             vec1 = v1;
             vec2 = v2;
@@ -63,7 +63,7 @@ namespace Voxalia.Shared
         /// <param name="v2">Vertex two.</param>
         /// <param name="v3">Vertex three.</param>
         /// <param name="_normal">The precalculated normal.</param>
-        public Plane(Location v1, Location v2, Location v3, Location _normal)
+        public BPlane(Location v1, Location v2, Location v3, Location _normal)
         {
             vec1 = v1;
             vec2 = v2;
@@ -77,7 +77,7 @@ namespace Voxalia.Shared
         /// </summary>
         /// <param name="_normal">The normal.</param>
         /// <param name="_d">The distance.</param>
-        public Plane(Location _normal, double _d)
+        public BPlane(Location _normal, double _d)
         {
             double fact = 1 / _normal.Length();
             Normal = _normal * fact;
@@ -107,9 +107,9 @@ namespace Voxalia.Shared
         /// Flips the normal, returned as a new object.
         /// </summary>
         /// <returns></returns>
-        public Plane FlipNormal()
+        public BPlane FlipNormal()
         {
-            return new Plane(vec3, vec2, vec1, -Normal);
+            return new BPlane(vec3, vec2, vec1, -Normal);
         }
 
         /// <summary>
@@ -167,14 +167,14 @@ namespace Voxalia.Shared
         /// </summary>
         /// <param name="input">The plane string.</param>
         /// <returns>A plane.</returns>
-        public static Plane FromString(string input)
+        public static BPlane FromString(string input)
         {
             string[] data = input.Replace("[", "").Replace("]", "").Replace(" ", "").SplitFast('/');
             if (data.Length < 3)
             {
                 return null;
             }
-            return new Plane(Location.FromString(data[0]), Location.FromString(data[1]), Location.FromString(data[2]));
+            return new BPlane(Location.FromString(data[0]), Location.FromString(data[1]), Location.FromString(data[2]));
         }
     }
 }

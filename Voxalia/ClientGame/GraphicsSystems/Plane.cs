@@ -43,6 +43,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public double D;
 
+        /// <summary>
+        /// Constructs a plane, calculating a normal.
+        /// </summary>
+        /// <param name="v1">Vertex one.</param>
+        /// <param name="v2">Vertex two.</param>
+        /// <param name="v3">Vertex three.</param>
         public Plane(Vector3 v1, Vector3 v2, Vector3 v3)
         {
             vec1 = v1;
@@ -53,6 +59,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
             D = (float)-Vector3.Dot(Normal, vec1);
         }
 
+        /// <summary>
+        /// Constructs a plane, with a known normal.
+        /// </summary>
+        /// <param name="v1">Vertex one.</param>
+        /// <param name="v2">Vertex two.</param>
+        /// <param name="v3">Vertex three.</param>
+        /// <param name="_normal">The precalculated normal.</param>
         public Plane(Vector3 v1, Vector3 v2, Vector3 v3, Vector3 _normal)
         {
             vec1 = v1;
@@ -62,6 +75,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             D = (float)-Vector3.Dot(Normal, vec1);
         }
 
+        /// <summary>
+        /// Constructs a plane from a normal and its distance from the origin (no vertices calculated).
+        /// </summary>
+        /// <param name="_normal">The normal.</param>
+        /// <param name="_d">The distance.</param>
         public Plane(Vector3 _normal, double _d)
         {
             double fact = 1f / _normal.Length();
@@ -88,6 +106,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
             return start + t * ba;
         }
 
+        /// <summary>
+        /// Flips the normal, returned as a new object.
+        /// </summary>
+        /// <returns></returns>
         public Plane FlipNormal()
         {
             return new Plane(vec3, vec2, vec1, -Normal);
@@ -133,7 +155,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             return psign;
         }
-        
+
+        /// <summary>
+        /// Converts the plane to a simple string form.
+        /// </summary>
+        /// <returns>The plane string.</returns>
         public override string ToString()
         {
             return "[" + vec1.ToString() + "/" + vec2.ToString() + "/" + vec3.ToString() + "]";

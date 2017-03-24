@@ -22,26 +22,26 @@ namespace Voxalia.Shared
     /// </summary>
     public class BFrustum
     {
-        public Plane Near;
+        public BPlane Near;
 
-        public Plane Far;
+        public BPlane Far;
 
-        public Plane Left;
+        public BPlane Left;
 
-        public Plane Right;
+        public BPlane Right;
 
-        public Plane Top;
+        public BPlane Top;
 
-        public Plane Bottom;
+        public BPlane Bottom;
 
         public BFrustum(BEPUutilities.Matrix matrix)
         {
-            Left = new Plane(new Location(-matrix.M14 - matrix.M11, -matrix.M24 - matrix.M21, -matrix.M34 - matrix.M31), -matrix.M44 - matrix.M41);
-            Right = new Plane(new Location(matrix.M11 - matrix.M14, matrix.M21 - matrix.M24, matrix.M31 - matrix.M34), matrix.M41 - matrix.M44);
-            Top = new Plane(new Location(matrix.M12 - matrix.M14, matrix.M22 - matrix.M24, matrix.M32 - matrix.M34), matrix.M42 - matrix.M44);
-            Bottom = new Plane(new Location(-matrix.M14 - matrix.M12, -matrix.M24 - matrix.M22, -matrix.M34 - matrix.M32), -matrix.M44 - matrix.M42);
-            Near = new Plane(new Location(-matrix.M13, -matrix.M23, -matrix.M33), -matrix.M43);
-            Far = new Plane(new Location(matrix.M13 - matrix.M14, matrix.M23 - matrix.M24, matrix.M33 - matrix.M34), matrix.M43 - matrix.M44);
+            Left = new BPlane(new Location(-matrix.M14 - matrix.M11, -matrix.M24 - matrix.M21, -matrix.M34 - matrix.M31), -matrix.M44 - matrix.M41);
+            Right = new BPlane(new Location(matrix.M11 - matrix.M14, matrix.M21 - matrix.M24, matrix.M31 - matrix.M34), matrix.M41 - matrix.M44);
+            Top = new BPlane(new Location(matrix.M12 - matrix.M14, matrix.M22 - matrix.M24, matrix.M32 - matrix.M34), matrix.M42 - matrix.M44);
+            Bottom = new BPlane(new Location(-matrix.M14 - matrix.M12, -matrix.M24 - matrix.M22, -matrix.M34 - matrix.M32), -matrix.M44 - matrix.M42);
+            Near = new BPlane(new Location(-matrix.M13, -matrix.M23, -matrix.M33), -matrix.M43);
+            Far = new BPlane(new Location(matrix.M13 - matrix.M14, matrix.M23 - matrix.M24, matrix.M33 - matrix.M34), matrix.M43 - matrix.M44);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Voxalia.Shared
             };
             for (int p = 0; p < 6; p++)
             {
-                Plane pl = GetFor(p);
+                BPlane pl = GetFor(p);
                 int inC = 8;
                 for (int i = 0; i < 8; i++)
                 {
@@ -78,6 +78,7 @@ namespace Voxalia.Shared
 
                 if (inC == 0)
                 {
+                    /*
                     // Backup
                     if (Contains(min)) { return true; }
                     else if (Contains(max)) { return true; }
@@ -86,7 +87,7 @@ namespace Voxalia.Shared
                     else if (Contains(new Location(max.X, min.Y, max.Z))) { return true; }
                     else if (Contains(new Location(max.X, min.Y, min.Z))) { return true; }
                     else if (Contains(new Location(max.X, max.Y, min.Z))) { return true; }
-                    else if (Contains(new Location(min.X, max.Y, min.Z))) { return true; }
+                    else if (Contains(new Location(min.X, max.Y, min.Z))) { return true; }*/
                     return false;
                 }
             }
@@ -124,7 +125,7 @@ namespace Voxalia.Shared
         /// <summary>
         /// Gets the plane associated with an index.
         /// </summary>
-        public Plane GetFor(int i)
+        public BPlane GetFor(int i)
         {
             switch (i)
             {
@@ -159,7 +160,7 @@ namespace Voxalia.Shared
             return true;
         }
 
-        double TryPoint(Location point, Plane plane)
+        double TryPoint(Location point, BPlane plane)
         {
             return point.X * plane.Normal.X + point.Y * plane.Normal.Y + point.Z * plane.Normal.Z + plane.D;
         }
