@@ -67,7 +67,7 @@ void main()
 #if MCM_GEOM_ACTIVE
 	pos1 = vec4(position, 1.0);
 	norm1 = vec4(normal, 1.0);
-	f.tbn = transpose(mat3(vec3(0.0), vec3(0.0), normal));
+	f.tbn = transpose(mat3(vec3(0.0), vec3(0.0), normal)); // TODO: Improve for decals?!
 	f.texcoord = texcoords;
     f.color = color * v_color;
 	gl_Position = mv_matrix * vec4(pos1.xyz, 1.0);

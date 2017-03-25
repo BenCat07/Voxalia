@@ -37,7 +37,7 @@ out struct vox_out
 out struct vox_fout
 #endif
 {
-	vec3 norm;
+	mat3 tbn;
 #if MCM_GEOM_ACTIVE
 #else
 	vec3 pos;
@@ -92,7 +92,10 @@ void main()
 	fi.thv = thv;
 	fi.thw = thw;
 	vec4 normo = mv_mat_simple * vec4(normal, 1.0);
-	fi.norm = normo.xyz;
+	vec3 tf_normal = (mv_mat_simple * vec4(normal, 0.0)).xyz;
+	vec3 tf_tangent = (mv_mat_simple * vec4(tangent, 0.0)).xyz;
+	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent, normal), 0.0)).xyz;
+	fi.tbn = transpose(mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
 	vec4 vpos_mv = mv_matrix * vpos;
     fi.color = color_for(vpos_mv, color * v_color);
 	fi.tcol = color_for(vpos_mv, tcol);
@@ -102,7 +105,7 @@ void main()
 #if MCM_GEOM_ACTIVE
 	f.texcoord = texcoords.xy;
 	vec4 normo = mv_mat_simple * vec4(normal, 1.0);
-	f.norm = normo.xyz;
+	f.tbn = transpose(mat3(vec3(0.0), vec3(0.0), normal)); // TODO: Improve for decals?!
 	f.color = color * v_color;
 	gl_Position = mv_matrix * vec4(position, 1.0);
 #else // MCM_GEOM_ACTIVE
@@ -133,11 +136,14 @@ void main()
 	pos1 *= simplebone_matrix;
 	norm1 *= simplebone_matrix;
 	vec4 fnorm = mv_mat_simple * norm1;
-	fi.norm = fnorm.xyz / fnorm.w;
     fi.color = color_for(mv_matrix * vec4(pos1.xyz, 1.0), color * v_color);
 	vec4 posser = mv_matrix * vec4(pos1.xyz, 1.0);
 	fi.pos = posser.xyz;
 	gl_Position = proj_matrix * posser;
+	vec3 tf_normal = (mv_mat_simple * vec4(norm1.xyz, 0.0)).xyz; // TODO: Should BT be here?
+	vec3 tf_tangent = (mv_mat_simple * vec4(tangent, 0.0)).xyz; // TODO: Should BT be here?
+	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent, norm1.xyz), 0.0)).xyz; // TODO: Should BT be here?
+	fi.tbn = transpose(mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
 #endif // else - MCM_GEOM_ACTIVE
 #endif // else - MCM_VOX
 }

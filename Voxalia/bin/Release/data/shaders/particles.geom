@@ -24,7 +24,7 @@ in struct vox_out
 	vec4 color;
 	mat3 tbn;
 #else
-	vec3 norm;
+	mat3 tbn;
 	vec2 texcoord;
 	vec4 color;
 #endif
@@ -40,7 +40,7 @@ out struct vox_fout
 	vec2 scrpos;
 	float z;
 #else
-	vec3 norm;
+	mat3 tbn;
 	vec3 pos;
 	vec3 texcoord;
 	vec4 color;
@@ -52,14 +52,13 @@ out struct vox_fout
 
 vec4 qfix(in vec4 pos, in vec3 right, in vec3 pos_norm)
 {
+	fi.tbn = transpose(mat3(right, cross(right, pos_norm), pos_norm)); // TODO: Neccessity of transpose()?
 #if MCM_PRETTY
 	fi.position = pos;
 	vec4 npos = proj_matrix * pos;
 	fi.scrpos = npos.xy / npos.w * 0.5 + vec2(0.5);
 	fi.z = npos.z;
-	fi.tbn = transpose(mat3(right, cross(right, pos_norm), pos_norm)); // TODO: Neccessity of transpose()?
 #else
-	fi.norm = pos_norm;
 	fi.pos = pos.xyz;
 #endif
 	return pos;

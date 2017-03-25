@@ -23,7 +23,7 @@ in struct vox_out
 	vec4 color;
 	mat3 tbn;
 #else
-	vec3 norm;
+	mat3 tbn;
 	vec2 texcoord;
 	vec4 color;
 #endif
@@ -37,7 +37,7 @@ out struct vox_fout
 	vec4 color;
 	mat3 tbn;
 #else
-	vec3 norm;
+	mat3 tbn;
 	vec3 pos;
 	vec3 texcoord;
 	vec4 color;
@@ -58,18 +58,13 @@ vec3 qfix(vec3 pos)
 void main()
 {
 	vec3 pos = gl_in[0].gl_Position.xyz;
-	 // TODO: Configurable decal render range cap!
+	 // TODO: Configurable decal render range cap! Maybe with a fade over distance?
 	/*if (dot(pos, pos) > (50.0 * 50.0))
 	{
 		return;
 	}*/
-#if MCM_PRETTY
 	vec3 norm = vec3(f[0].tbn[0][2], f[0].tbn[1][2], f[0].tbn[2][2]);
 	fi.tbn = f[0].tbn;
-#else
-	vec3 norm = f[0].norm;
-	fi.norm = norm;
-#endif
 	float scale = f[0].texcoord.x * 0.5;
 	float tid = f[0].texcoord.y;
 	fi.color = f[0].color;

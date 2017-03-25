@@ -17,30 +17,23 @@
 #define MCM_FADE_DEPTH 0
 #define MCM_LIGHTS 0
 #define MCM_SHADOWS 0
-#define MCM_NORMALS 0
 
 #if MCM_VOX
 layout (binding = 0) uniform sampler2DArray s;
-#if MCM_NORMALS
 layout (binding = 2) uniform sampler2DArray normal_tex;
-#endif
 #if MCM_LIGHTS
 layout (binding = 3) uniform sampler2DArray htex;
 #endif
 #else
 #if MCM_GEOM_ACTIVE
 layout (binding = 0) uniform sampler2DArray s;
-#if MCM_NORMALS
 layout (binding = 1) uniform sampler2DArray normal_tex;
-#endif
 #if MCM_LIGHTS
 layout (binding = 2) uniform sampler2DArray spec;
 #endif
 #else
 layout (binding = 0) uniform sampler2D s;
-#if MCM_NORMALS
 layout (binding = 1) uniform sampler2D normal_tex;
-#endif
 #if MCM_LIGHTS
 layout (binding = 2) uniform sampler2D spec;
 #endif
@@ -53,7 +46,7 @@ layout (binding = 5) uniform sampler2DArray shadowtex;
 
 in struct vox_fout
 {
-	vec3 norm;
+	mat3 tbn;
 	vec3 pos;
 #if MCM_VOX
 	vec3 texcoord;
@@ -166,10 +159,9 @@ void main()
 	color = col * fi.color;
 #if MCM_BRIGHT
 #else // MCM_BRIGHT
+	vec3 norms = texture(normal_tex, fi.texcoord).xyz * 2.0 - vec3(1.0);
+	vec3 tf_normal = normalize(fi.tbn * norms);
 #if MCM_LIGHTS
-#if MCM_NORMALS
-	vec3 norm = texture(normal_tex, fi.texcoord).xyz * 2.0 - vec3(1.0);
-#endif // MCM_NORMALS
 	vec3 res_color = vec3(0.0);
 	int count = int(lights_used);
 	float att = 0.0;
@@ -243,29 +235,14 @@ void main()
 		const float depth = 1.0;
 #endif
 		vec3 L = light_path / light_length; // Get the light's movement direction as a vector
-		vec3 diffuse = max(dot(fi.norm, L), 0.0)
-#if MCM_NORMALS
-			// TODO:	* max(dot(norm, L), 0.0)
-#endif // MCM_NORMALS
-				* vec3(diffuse_albedo); // Find out how much diffuse light to apply
+		vec3 diffuse = max(dot(tf_normal, L), 0.0) * vec3(diffuse_albedo); // Find out how much diffuse light to apply
 		vec3 reller = normalize(fi.pos - eye_pos);
-		vec3 specular = vec3(pow(max(dot(reflect(L, -fi.norm), reller)
-#if MCM_NORMALS
-			// TODO:	* dot(reflect(L, -norm), reller)
-#endif // MCM_NORMALS
-		, 0.0), 200.0) * specular_albedo * specularStrength); // Find out how much specular light to apply.
+		vec3 specular = vec3(pow(max(dot(reflect(L, -tf_normal), reller), 0.0), 200.0) * specular_albedo * specularStrength); // Find out how much specular light to apply.
 		res_color += (vec3(depth, depth, depth) * atten * (diffuse * light_color) * color.xyz) + (min(specular, 1.0) * light_color * atten * depth); // Put it all together now.
 	}
 	color.xyz = min(res_color + color.xyz * 0.2, vec3(1.0));
 #else // MCM_LIGHTS
-	vec3 modder = vec3(1.0);
-	modder *= dot(-fi.norm, sunlightDir);
-#if MCM_NORMALS
-	// TODO: vec3 norm = texture(normal_tex, fi.texcoord).xyz * 2.0 - vec3(1.0);
-	// TODO: Rotate `norm` by `fi.norm` 
-	// TODO: modder *= dot(-norm, sunlightDir);
-#endif // MCM_NORMALS
-	color.xyz *= min(max(modder * maximum_light, max(0.2, minimum_light)), 1.0);
+	color.xyz *= min(max(dot(-tf_normal, sunlightDir) * maximum_light, max(0.2, minimum_light)), 1.0);
 #endif // else - MCM_LIGHTS
 	applyFog();
 #endif // else - MCM_BRIGHT
