@@ -16,9 +16,9 @@ layout (binding = 2) uniform sampler2DArray normal_tex;
 
 layout (location = 3) uniform vec4 v_color = vec4(1.0);
 // ...
-layout (location = 5) uniform float minimum_light = 0.0;
-// ...
 layout (location = 8) uniform vec2 light_clamp = vec2(0.0, 1.0);
+// ...
+layout (location = 16) uniform float minimum_light = 0.0;
 
 in struct vox_out
 {

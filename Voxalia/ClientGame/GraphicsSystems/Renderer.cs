@@ -329,7 +329,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             if (Client.Central.MainWorldView.RenderLights) // TODO: Pass client reference!
             {
-                GL.Uniform1(5, min);
+                GL.Uniform1(16, min);
             }
         }
 

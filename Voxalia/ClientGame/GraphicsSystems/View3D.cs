@@ -2267,5 +2267,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
         {
             return id == FBOID.SHADOWS || id == FBOID.STATIC_SHADOWS || id == FBOID.DYNAMIC_SHADOWS || id == FBOID.FORWARD_SOLID || id == FBOID.REFRACT || id == FBOID.MAIN;
         }
+
+        public static bool IsForward(this FBOID id)
+        {
+            return id == FBOID.FORWARD_SOLID || id == FBOID.FORWARD_TRANSP || id == FBOID.FORWARD_EXTRAS;
+        }
     }
 }

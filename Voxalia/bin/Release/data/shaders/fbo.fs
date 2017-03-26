@@ -31,9 +31,10 @@ layout (binding = 3) uniform sampler2D refl;
 
 // ...
 layout (location = 4) uniform vec4 screen_size = vec4(1024, 1024, 0.1, 1000.0);
-layout (location = 5) uniform float minimum_light = 0.0;
 // ...
 layout (location = 9) uniform float refract_eta = 0.0;
+// ...
+layout (location = 16) uniform float minimum_light = 0.0;
 
 in struct vox_fout
 {

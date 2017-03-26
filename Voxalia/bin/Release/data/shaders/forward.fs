@@ -73,7 +73,6 @@ const int LIGHTS_MAX = 10;
 
 // ...
 layout (location = 4) uniform vec4 screen_size = vec4(1024, 1024, 0.1, 1000.0);
-layout (location = 5) uniform float minimum_light = 0.2;
 // ...
 layout (location = 10) uniform vec3 sunlightDir = vec3(0.0, 0.0, -1.0);
 layout (location = 11) uniform vec3 maximum_light = vec3(0.9, 0.9, 0.9);
@@ -81,6 +80,7 @@ layout (location = 12) uniform vec4 fogCol = vec4(0.0);
 layout (location = 13) uniform float znear = 1.0;
 layout (location = 14) uniform float zfar = 1000.0;
 layout (location = 15) uniform float lights_used = 0.0;
+layout (location = 16) uniform float minimum_light = 0.2;
 #if MCM_LIGHTS
 layout (location = 20) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
 layout (location = 30) uniform mat4 light_data_array[LIGHTS_MAX];
