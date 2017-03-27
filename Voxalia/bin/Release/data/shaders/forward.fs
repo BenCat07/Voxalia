@@ -108,7 +108,7 @@ float fix_sqr(in float inTemp)
 
 void main()
 {
-	vec4 col = texture(s, fi.texcoord);
+	vec4 col = textureLod(s, fi.texcoord, float(int(gl_FragCoord.z * 3.0))); // TODO: LOGIC?!
 #if MCM_VOX
 	if (fi.tcol.w == 0.0 && fi.tcol.x == 0.0 && fi.tcol.z == 0.0 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7)
 	{

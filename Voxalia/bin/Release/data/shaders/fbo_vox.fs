@@ -79,7 +79,7 @@ void main()
 		discard;
 	}
 #endif
-	vec4 col = texture(s, f.texcoord);
+	vec4 col = textureLod(s, f.texcoord, float(int(gl_FragCoord.z * 3.0))); // TODO: LOGIC?!
 	vec3 t_normal = texture(normal_tex, f.texcoord).xyz;
 	// Setup
 	vec3 thval = vec3(0.0); // Value
