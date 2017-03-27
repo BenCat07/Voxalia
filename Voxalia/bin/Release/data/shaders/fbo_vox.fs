@@ -39,15 +39,6 @@ layout (location = 2) out vec4 normal;
 layout (location = 3) out vec4 renderhint;
 layout (location = 4) out vec4 renderhint2;
 
-float mip_map_level(in vec2 texture_coordinate)
-{
-    vec2 dx_vtc = dFdx(texture_coordinate);
-    vec2 dy_vtc = dFdy(texture_coordinate);
-    float delta_max_sqr = max(dot(dx_vtc, dx_vtc), dot(dy_vtc, dy_vtc));
-    float mml = 0.5 * log2(delta_max_sqr);
-    return max(0, mml);
-}
-
 void main()
 {
 	vec4 dets = texture(htex, f.texcoord);
@@ -88,7 +79,7 @@ void main()
 		discard;
 	}
 #endif
-	vec4 col = textureLod(s, f.texcoord, mip_map_level(f.texcoord.xy * textureSize(s, 0).xy));
+	vec4 col = textureLod(s, f.texcoord, textureQueryLod(s, f.texcoord.xy).x);
 	vec3 t_normal = texture(normal_tex, f.texcoord).xyz;
 	// Setup
 	vec3 thval = vec3(0.0); // Value
