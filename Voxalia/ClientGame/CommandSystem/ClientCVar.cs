@@ -41,7 +41,8 @@ namespace Voxalia.ClientGame.CommandSystem
             r_good_graphics, r_skybox, r_lensflare, r_blocktexturelinear, r_blocktexturewidth, r_toonify, r_transplighting, r_transpshadows,
             r_3d_enable, r_fast, r_chunksatonce, r_chunkoverrender, r_transpll, r_noblockshapes, r_treeshadows,
             r_godrays, r_hdr, r_clouds, r_motionblur, r_plants, r_exposure, r_grayscale, r_vrscale,
-            r_forward_normals, r_forward_lights, r_forward_shadows;
+            r_forward_normals, r_forward_lights, r_forward_shadows,
+            r_block_mipmaps;
 
         // Audio CVars
         public CVar a_musicvolume, a_musicpitch, a_globalvolume, a_globalpitch, a_music, a_quietondeselect, a_echovolume, a_enforce, a_left, a_right;
@@ -133,6 +134,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_forward_normals = Register("r_forward_normals", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether forward mode rendering should calculate normal-map effects.");
             r_forward_lights = Register("r_forward_lights", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether forward mode rendering should calculate live lighting effects.");
             r_forward_shadows = Register("r_forward_shadows", "false", CVarFlag.Boolean | CVarFlag.Delayed, "Whether forward mode rendering should calculate dynamic shadow effects.");
+            r_block_mipmaps = Register("r_block_mipmaps", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether mipmaps should be enabled for block textures.");
             // Audio CVars
             a_musicvolume = Register("a_musicvolume", "0.5", CVarFlag.Numeric, "What volume the music should be.");
             a_musicpitch = Register("a_musicpitch", "1", CVarFlag.Numeric, "What pitch the music should be.");

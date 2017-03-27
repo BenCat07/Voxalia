@@ -1098,7 +1098,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void RenderSkybox()
         {
+            View3D.CheckError("Rendering - Sky - Before");
             GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
+            View3D.CheckError("Rendering - Sky - Prep - Mat");
             float skyAlpha = (float)Math.Max(Math.Min((SunAngle.Pitch - 70.0) / (-90.0), 1.0), 0.06);
             GL.ActiveTexture(TextureUnit.Texture3);
             Textures.Black.Bind();
@@ -1107,12 +1109,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.ActiveTexture(TextureUnit.Texture1);
             Textures.NormalDef.Bind();
             GL.ActiveTexture(TextureUnit.Texture0);
+            View3D.CheckError("Rendering - Sky - Prep - Textures");
             Rendering.SetMinimumLight(1.0f);
-            Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * 1.6f), 1)); // TODO: 1.6 -> Externally defined constant. SunLightMod? Also, verify this value is used properly!
+            //Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * 1.6f), 1)); // TODO: 1.6 -> Externally defined constant. SunLightMod? Also, verify this value is used properly!
             GL.Disable(EnableCap.CullFace);
             Rendering.SetColor(Color4.White);
+            View3D.CheckError("Rendering - Sky - Prep - Color");
             Matrix4 scale = Matrix4.CreateScale(GetSecondSkyDistance());
             GL.UniformMatrix4(2, false, ref scale);
+            View3D.CheckError("Rendering - Sky - Prep - Scale");
+            View3D.CheckError("Rendering - Sky - Prep");
             // TODO: Save textures!
             Textures.GetTexture("skies/" + CVars.r_skybox.Value + "_night/bottom").Bind();
             skybox[0].Render(false);
@@ -1129,6 +1135,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Rendering.SetColor(new Vector4(1, 1, 1, skyAlpha));
             scale = Matrix4.CreateScale(GetSkyDistance());
             GL.UniformMatrix4(2, false, ref scale);
+            View3D.CheckError("Rendering - Sky - Night");
             // TODO: Save textures!
             Textures.GetTexture("skies/" + CVars.r_skybox.Value + "/bottom").Bind();
             skybox[0].Render(false);
@@ -1143,6 +1150,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Textures.GetTexture("skies/" + CVars.r_skybox.Value + "/yp").Bind();
             skybox[5].Render(false);
             Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * SunLightModDirect), 1));
+            View3D.CheckError("Rendering - Sky - Light");
             float zf = ZFar();
             float spf = 600f;
             Textures.GetTexture("skies/sun").Bind(); // TODO: Store var!
@@ -1151,6 +1159,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 * Matrix4.CreateRotationZ((float)((180f + SunAngle.Yaw) * Utilities.PI180))
                 * Matrix4.CreateTranslation(ClientUtilities.Convert(TheSun.Direction * -(GetSkyDistance() * 0.96f)));
             Rendering.RenderRectangle(0, 0, spf, spf, rot); // TODO: Adjust scale based on view rad
+            View3D.CheckError("Rendering - Sky - Sun");
             Textures.GetTexture("skies/planet").Bind(); // TODO: Store var!
             float ppf = 1000f;
             Rendering.SetColor(new Color4(PlanetLight, PlanetLight, PlanetLight, 1));
@@ -1159,6 +1168,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 * Matrix4.CreateRotationZ((float)((180f + PlanetAngle.Yaw) * Utilities.PI180))
                 * Matrix4.CreateTranslation(ClientUtilities.Convert(PlanetDir * -(GetSkyDistance() * 0.8f)));
             Rendering.RenderRectangle(0, 0, ppf, ppf, rot);
+            View3D.CheckError("Rendering - Sky - Planet");
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.Enable(EnableCap.CullFace);
             Matrix4 ident = Matrix4.Identity;
@@ -1168,6 +1178,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             SetVox();
             GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
+            View3D.CheckError("Rendering - Sky - PostPrep");
             foreach (ChunkSLODHelper ch in TheRegion.SLODs.Values)
             {
                 // TODO: 3 -> constants
@@ -1178,8 +1189,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ch.Render();
                 }
             }
+            View3D.CheckError("Rendering - Sky - Slods");
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+            View3D.CheckError("Rendering - Sky - Clear");
         }
 
         /// <summary>
@@ -1735,6 +1748,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <param name="view">The view to render.</param>
         public void Render3D(View3D view)
         {
+            View3D.CheckError("Rendering - 0 - Prep");
             bool transparents = MainWorldView.FBOid.IsMainTransp() || MainWorldView.FBOid == FBOID.FORWARD_TRANSP;
             GL.Enable(EnableCap.CullFace);
             if (view.ShadowsOnly)
@@ -1757,6 +1771,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         TheRegion.GenShadowCasters[i].Render();
                     }
                 }
+                View3D.CheckError("Rendering - 0 - Shadows");
             }
             else
             {
@@ -1776,6 +1791,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     RenderSkybox();
                     s_forw.Bind();
                 }
+                View3D.CheckError("Rendering - 0 - Sky");
                 SetEnts();
                 if (transparents)
                 {
@@ -1805,6 +1821,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     {
                         ent.Render();
                     }
+                    View3D.CheckError("Rendering - 0 - Transp");
                 }
                 else if (view.FBOid.IsMainSolid())
                 {
@@ -1824,6 +1841,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     {
                         ent.Render();
                     }
+                    View3D.CheckError("Rendering - 0 - Main");
                 }
                 else if (CVars.r_drawents.ValueB)
                 {
@@ -1831,6 +1849,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     {
                         TheRegion.Entities[i].Render();
                     }
+                    View3D.CheckError("Rendering - 0 - Other/Ents");
                 }
                 if (!transparents && view.FBOid != FBOID.DYNAMIC_SHADOWS && !view.FBOid.IsMainSolid())
                 {
@@ -1838,6 +1857,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     SetVox();
                     TheRegion.Render();
                     SetEnts();
+                    View3D.CheckError("Rendering - 0 - Region");
                 }
                 SetEnts();
                 if (CVars.g_weathermode.ValueI > 0)
@@ -1861,6 +1881,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             SnowCyl.Draw();
                         }
                     }
+                    View3D.CheckError("Rendering - 0 - Weather");
                 }
                 if (MainWorldView.FBOid == FBOID.MAIN)
                 {

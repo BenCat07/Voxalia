@@ -63,7 +63,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             TextureID = GL.GenTexture();
             TWidth = cvars.r_blocktexturewidth.ValueI;
             GL.BindTexture(TextureTarget.Texture2DArray, TextureID);
-            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 1, SizedInternalFormat.Rgba8, TWidth, TWidth, MaterialHelpers.Textures.Length);
+            int levels = TheClient.CVars.r_block_mipmaps.ValueB ? 4 : 1;
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, MaterialHelpers.Textures.Length);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)(cvars.r_blocktexturelinear.ValueB ? TextureMinFilter.Linear: TextureMinFilter.Nearest));
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)(cvars.r_blocktexturelinear.ValueB ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
@@ -168,6 +169,23 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 }
             }
             double time = (MaterialHelpers.Textures.Length + 1) * LoadRate;
+            if (TheClient.CVars.r_block_mipmaps.ValueB)
+            {
+                Action mipmap = () =>
+                {
+                    GL.BindTexture(TextureTarget.Texture2DArray, TextureID);
+                    GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
+                    View3D.CheckError("Mipmapping");
+                };
+                if (delayable)
+                {
+                    TheClient.Schedule.ScheduleSyncTask(mipmap, time);
+                }
+                else
+                {
+                    mipmap();
+                }
+            }
             for (int ia = 0; ia < texs.Count; ia++)
             {
                 int i = ia;

@@ -19,10 +19,8 @@ layout (location = 1) uniform mat4 proj_matrix = mat4(1.0);
 #if MCM_SHADOWS
 layout (location = 5) uniform float should_sqrt = 0.0;
 #endif
-// ...
-layout (location = 7) uniform vec3 wind = vec3(0.0);
-// ...
 layout (location = 6) uniform float time = 0.0;
+layout (location = 7) uniform vec3 wind = vec3(0.0);
 
 in struct vox_out
 {

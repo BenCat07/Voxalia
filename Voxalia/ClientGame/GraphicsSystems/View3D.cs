@@ -554,7 +554,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public static void CheckError(string loc)
         {
-#if DEBUG
+#if !DEBUG
             ErrorCode ec = GL.GetError();
             while (ec != ErrorCode.NoError)
             {
@@ -807,6 +807,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public void RenderPass_FAST()
         {
+            CheckError("Render/Fast - Prep");
             if (TheClient.CVars.r_decals.ValueB)
             {
                 RS4P.Bind();
@@ -874,6 +875,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                 }
             }
+            CheckError("Render/Fast - Shadows");
             lights_apply:
             if (TheClient.CVars.r_forward_shadows.ValueB)
             {
@@ -882,6 +884,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.BindTexture(TextureTarget.Texture2DArray, fbo_shadow_tex);
                 GL.ActiveTexture(TextureUnit.Texture0);
             }
+            CheckError("Render/Fast - Uniforms 1");
             RenderingShadows = false;
             RenderLights = false;
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -894,20 +897,28 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
                 GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
             }
+            CheckError("Render/Fast - Uniforms 2");
             TheClient.s_forw_grass.Bind();
+            CheckError("Render/Fast - Uniforms 2.2");
             if (TheClient.CVars.r_forward_lights.ValueB)
             {
                 GL.Uniform1(15, (float)c);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
                 GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
             }
+            CheckError("Render/Fast - Uniforms 2.5");
             TheClient.s_forwdecal.Bind();
+            CheckError("Render/Fast - Uniforms 2.6");
             if (TheClient.CVars.r_forward_lights.ValueB)
             {
                 GL.Uniform1(15, (float)c);
+                CheckError("Render/Fast - Uniforms 2.7");
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
-                GL.UniformMatrix4(30 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+                CheckError("Render/Fast - Uniforms 2.8");
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+                CheckError("Render/Fast - Uniforms 2.9");
             }
+            CheckError("Render/Fast - Uniforms 3");
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform4(4, new Vector4(Width, Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
@@ -917,12 +928,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
             TheClient.s_forwt.Bind();
-            if (TheClient.CVars.r_forward_lights.ValueB)
-            {
-                GL.Uniform1(15, (float)c);
-                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
-                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
-            }
+            CheckError("Render/Fast - Uniforms 4");
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
@@ -937,6 +943,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
                 GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
             }
+            CheckError("Render/Fast - Uniforms 5");
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
@@ -953,6 +960,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
                 GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
             }
+            CheckError("Render/Fast - Uniforms 6");
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
@@ -962,6 +970,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             TheClient.Rendering.SetColor(Color4.White);
             GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
+            CheckError("Render/Fast - Uniforms");
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
             {
                 Viewport(Width / 2, 0, Width / 2, Height);
@@ -981,10 +990,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
+                CheckError("Render/Fast - 3D Solid");
             }
             else
             {
                 Render3D(this);
+                CheckError("Render/Fast - Solid");
             }
             if (TheClient.CVars.r_decals.ValueB)
             {
@@ -1000,6 +1011,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.ActiveTexture(TextureUnit.Texture0);
                 FBOid = FBOID.FORWARD_EXTRAS;
                 GL.DepthMask(false);
+                CheckError("Render/Fast - Decal Prep");
                 if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
                 {
                     Viewport(Width / 2, 0, Width / 2, Height);
@@ -1012,12 +1024,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     Viewport(0, 0, Width, Height);
                     CameraPos = cameraBasePos + cameraAdjust;
                     CFrust = camFrust;
+                    CheckError("Render/Fast - Decals 3D");
                 }
                 else
                 {
                     FBOid = FBOID.FORWARD_EXTRAS;
                     TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
                     DecalRender?.Invoke(this);
+                    CheckError("Render/Fast - Decals");
                 }
             }
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -1039,6 +1053,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(14, TheClient.ZFar());
             TheClient.Rendering.SetColor(Color4.White);
             PostFirstRender?.Invoke();
+            CheckError("Render/Fast - Transp Unifs");
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
             {
                 Viewport(Width / 2, 0, Width / 2, Height);
@@ -1057,10 +1072,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Viewport(0, 0, Width, Height);
                 CameraPos = cameraBasePos + cameraAdjust;
                 CFrust = camFrust;
+                CheckError("Render/Fast - Transp 3D");
             }
             else
             {
                 Render3D(this);
+                CheckError("Render/Fast - Transp");
             }
             if (TheClient.CVars.r_forward_shadows.ValueB)
             {
