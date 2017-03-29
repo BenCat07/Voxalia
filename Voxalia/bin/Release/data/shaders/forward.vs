@@ -158,9 +158,9 @@ vec4 color_for(in vec4 pos, in vec4 colt)
 	{
 		if (colt.x == 0.0 && colt.y == 0.0 && colt.z == 0.0)
 		{
-			float r = snoise2(vec3((pos.x + time) / 10.0, (pos.y + time) / 10.0, (pos.z + time) / 10.0));
-			float g = snoise2(vec3((pos.x + 50.0 + time * 2) / 10.0, (pos.y + 127.0 + time * 1.7) / 10.0, (pos.z + 10.0 + time * 2.3) / 10.0));
-			float b = snoise2(vec3((pos.x - 50.0 - time) / 10.0, (pos.y - 65.0 - time * 1.56) / 10.0, (pos.z + 73.0 - time * 1.3) / 10.0));
+			float r = snoise2(vec3((pos.x + time) * 0.1, (pos.y + time) * 0.1, (pos.z + time) * 0.1));
+			float g = snoise2(vec3((pos.x + 50.0 + time * 2) * 0.1, (pos.y + 127.0 + time * 1.7) * 0.1, (pos.z + 10.0 + time * 2.3) * 0.1));
+			float b = snoise2(vec3((pos.x - 50.0 - time) * 0.1, (pos.y - 65.0 - time * 1.56) * 0.1, (pos.z + 73.0 - time * 1.3) * 0.1));
 			return vec4(r, g, b, 1.0);
 		}
 		else if (colt.y < 0.7 && colt.y > 0.3 && colt.x == 0.0 && colt.z == 0.0)
