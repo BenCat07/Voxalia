@@ -102,7 +102,6 @@
     <Compile Include="Shared\Collision\Vector3i.cs" />
     <Compile Include="Shared\LanguageEngine.cs" />
     <Compile Include="Shared\Model3D.cs" />
-    <Compile Include="Shared\Collision\AABB.cs" />
     <Compile Include="Shared\AnimationEngine.cs" />
     <Compile Include="Shared\BlockShapeRegistry.cs" />
     <Compile Include="Shared\BlockShapes\BSD83.cs" />
