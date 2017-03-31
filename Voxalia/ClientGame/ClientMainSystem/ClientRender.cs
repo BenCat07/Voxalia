@@ -26,6 +26,7 @@ using Voxalia.ClientGame.EntitySystem;
 using FreneticGameCore.Files;
 using FreneticGameCore;
 using FreneticGameGraphics;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {

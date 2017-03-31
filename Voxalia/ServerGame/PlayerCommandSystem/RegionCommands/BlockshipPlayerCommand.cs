@@ -15,6 +15,7 @@ using Voxalia.ServerGame.WorldSystem;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.EntitySystem;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
 {

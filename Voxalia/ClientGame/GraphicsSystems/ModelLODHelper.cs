@@ -10,6 +10,7 @@ using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
 using Voxalia.ClientGame.OtherSystems;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

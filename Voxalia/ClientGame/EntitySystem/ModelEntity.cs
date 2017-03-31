@@ -22,6 +22,7 @@ using BEPUphysics.Constraints.SingleEntity;
 using Voxalia.ClientGame.JointSystem;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

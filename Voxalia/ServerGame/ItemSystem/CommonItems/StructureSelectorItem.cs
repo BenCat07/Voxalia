@@ -20,6 +20,7 @@ using BEPUphysics;
 using BEPUphysics.CollisionTests;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.ItemSystem.CommonItems
 {
@@ -65,8 +66,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             // TODO: Generic 'player.gettargetblock'?
             Location eye = player.ItemSource();
             Location forw = player.ItemDir;
-            RayCastResult rcr;
-            bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, 5, MaterialSolidity.ANY, player.IgnoreThis, out rcr);
+            bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, 5, MaterialSolidity.ANY, player.IgnoreThis, out RayCastResult rcr);
             if (h)
             {
                 if (rcr.HitObject != null && rcr.HitObject is EntityCollidable && ((EntityCollidable)rcr.HitObject).Entity != null)
@@ -97,8 +97,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             // TODO: Generic 'player.gettargetblock'?
             Location eye = player.ItemSource();
             Location forw = player.ItemDir;
-            RayCastResult rcr;
-            bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, 5, MaterialSolidity.ANY, player.IgnoreThis, out rcr);
+            bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, 5, MaterialSolidity.ANY, player.IgnoreThis, out RayCastResult rcr);
             if (h)
             {
                 if (rcr.HitObject != null && rcr.HitObject is EntityCollidable && ((EntityCollidable)rcr.HitObject).Entity != null)
