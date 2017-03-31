@@ -64,8 +64,7 @@ namespace Voxalia.Shared.Collision
             Entity e = Entity;
             Vector3 vel = e.LinearVelocity * dt;
             RigidTransform start = new RigidTransform(e.Position + new Vector3(0, 0, 0.05f), e.Orientation);
-            RayCastResult rcr;
-            if (e.Space.ConvexCast((ConvexShape)e.CollisionInformation.Shape, ref start, ref vel, IgnoreThis, out rcr))
+            if (e.Space.ConvexCast((ConvexShape)e.CollisionInformation.Shape, ref start, ref vel, IgnoreThis, out RayCastResult rcr))
             {
                 vel += new Vector3(0, 0, HopHeight);
                 if (!e.Space.ConvexCast((ConvexShape)e.CollisionInformation.Shape, ref start, ref vel, IgnoreThis, out rcr))
