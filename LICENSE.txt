@@ -29,7 +29,7 @@ as denoted by the "Copyright (C) yyyy" prefix.
 The software may additionally be sold or sub-licensed (but not relicensed)
 by any person or party permitted to do so by the Software Owner,
 as granted at the Software Owner's discretion. Further, the Software Owner
-may permit, at the Softwar Owner's discretion, any seller of the Software
+may permit, at the Software Owner's discretion, any seller of the Software
 to themselves grant this special right to other persons or parties.
 
 B: Any relicensing of the software is to be done and handled at the
