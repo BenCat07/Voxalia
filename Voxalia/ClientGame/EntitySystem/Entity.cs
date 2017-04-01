@@ -88,6 +88,11 @@ namespace Voxalia.ClientGame.EntitySystem
             throw new NotImplementedException();
         }
 
+        public override string ToString()
+        {
+            return "Entity";
+        }
+
         public abstract Location GetPosition();
 
         public abstract void SetPosition(Location pos);

@@ -554,7 +554,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public static void CheckError(string loc)
         {
-#if !DEBUG
+#if DEBUG
             ErrorCode ec = GL.GetError();
             while (ec != ErrorCode.NoError)
             {
@@ -2145,9 +2145,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.Uniform2(8, new Vector2(Width, Height));
                 CheckError("PreRenderTranspLights - 1.75");
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
-                GL.UniformMatrix4(10, LIGHTS_MAX, false, s_mats);
-                GL.UniformMatrix4(20, LIGHTS_MAX, false, l_dats1);
-                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats2);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);
+                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats1);
+                GL.UniformMatrix4(40, LIGHTS_MAX, false, l_dats2);
                 CheckError("PreRenderTranspLights - 2");
                 if (TheClient.CVars.r_transpshadows.ValueB && TheClient.CVars.r_shadows.ValueB)
                 {
@@ -2175,9 +2175,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.Uniform1(7, (float)TheClient.GlobalTickTimeLocal);
                 GL.Uniform2(8, new Vector2(Width, Height));
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
-                GL.UniformMatrix4(10, LIGHTS_MAX, false, s_mats);
-                GL.UniformMatrix4(20, LIGHTS_MAX, false, l_dats1);
-                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats2);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);
+                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats1);
+                GL.UniformMatrix4(40, LIGHTS_MAX, false, l_dats2);
                 CheckError("PreRenderTranspLights - 3");
                 if (TheClient.CVars.r_transpshadows.ValueB && TheClient.CVars.r_shadows.ValueB)
                 {
@@ -2204,9 +2204,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(2, false, ref IdentityMatrix);
                 GL.Uniform2(8, new Vector2(Width, Height));
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
-                GL.UniformMatrix4(10, LIGHTS_MAX, false, s_mats);
-                GL.UniformMatrix4(20, LIGHTS_MAX, false, l_dats1);
-                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats2);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);
+                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats1);
+                GL.UniformMatrix4(40, LIGHTS_MAX, false, l_dats2);
                 GL.ActiveTexture(TextureUnit.Texture4);
                 GL.BindTexture(TextureTarget.Texture2DArray, fbo_shadow_tex);
                 GL.ActiveTexture(TextureUnit.Texture0);

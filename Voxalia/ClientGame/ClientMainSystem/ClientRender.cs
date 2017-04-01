@@ -1701,6 +1701,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 throw new NotImplementedException();
             }
+
+            public override string ToString()
+            {
+                return "Particles: " + DistMin;
+            }
         }
 
         public class ChunkEntity : Entity
@@ -1740,6 +1745,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             public override void SetPosition(Location pos)
             {
                 throw new NotImplementedException();
+            }
+
+            public override string ToString()
+            {
+                return "Chunk: " + MainChunk.WorldPosition;
             }
         }
 
@@ -1796,6 +1806,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 SetEnts();
                 if (transparents)
                 {
+                    View3D.CheckError("Rendering - 0 - Transp - Pre");
                     List<Entity> entsRender = CVars.r_drawents.ValueB ? new List<Entity>(TheRegion.Entities) : new List<Entity>();
                     foreach (Chunk ch in TheRegion.chToRender)
                     {
@@ -1818,9 +1829,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     }
                     Location pos = Player.GetPosition();
                     IEnumerable<Entity> ents = entsRender.OrderBy((e) => e.GetPosition().DistanceSquared(MainWorldView.RenderRelative)).Reverse();
+                    View3D.CheckError("Rendering - 0 - Transp - Prepared");
                     foreach (Entity ent in ents)
                     {
                         ent.Render();
+                        View3D.CheckError("Rendering - 0 - Transp - Specific: " + ent.ToString());
                     }
                     View3D.CheckError("Rendering - 0 - Transp");
                 }

@@ -666,8 +666,8 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public void ConfigureForRenderChunk()
         {
-            TheClient.Rendering.SetColor(OpenTK.Vector4.One);
-            TheClient.Rendering.SetMinimumLight(0f);
+            TheClient.Rendering.SetColor(OpenTK.Vector4.One); // TODO: Necessity?
+            TheClient.Rendering.SetMinimumLight(0f); // TODO: Necessity?
             if (TheClient.RenderTextures)
             {
                 GL.BindTexture(TextureTarget.Texture2D, 0);

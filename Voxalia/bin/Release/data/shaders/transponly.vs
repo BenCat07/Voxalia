@@ -26,8 +26,8 @@ layout (location = 1) uniform mat4 proj_matrix = mat4(1.0);
 layout (location = 2) uniform mat4 model_matrix = mat4(1.0);
 layout (location = 3) uniform vec4 v_color = vec4(1.0);
 // ...
-layout (location = 40) uniform mat4 simplebone_matrix = mat4(1.0);
-layout (location = 41) uniform mat4 boneTrans[MAX_BONES];
+layout (location = 50) uniform mat4 simplebone_matrix = mat4(1.0);
+layout (location = 51) uniform mat4 boneTrans[MAX_BONES];
 
 out struct vox_out
 {

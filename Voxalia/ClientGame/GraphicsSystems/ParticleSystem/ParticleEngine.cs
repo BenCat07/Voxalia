@@ -111,10 +111,12 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         public void Render(double mind, double maxd)
         {
+            View3D.CheckError("Rendering - Particles - Pre");
             double mindsq = mind * mind;
             double maxdsq = maxd * maxd;
             if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP || TheClient.MainWorldView.FBOid.IsMainTransp())
             {
+                View3D.CheckError("Rendering - Particles - PreFX");
                 List<Vector3> pos = new List<Vector3>();
                 List<Vector4> col = new List<Vector4>();
                 List<Vector2> tcs = new List<Vector2>();
@@ -153,6 +155,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                         ActiveEffects.RemoveAt(i--);
                     }
                 }
+                View3D.CheckError("Rendering - Particles - PreClouds");
                 if (TheClient.CVars.r_clouds.ValueB)
                 {
                     int cloudID = GetTextureID("effects/clouds/cloud2"); // TODO: Cache!
@@ -184,6 +187,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                         col.AddRange(datas[i].Cols);
                         tcs.AddRange(datas[i].TCs);
                     }
+                    View3D.CheckError("Rendering - Particles - PostClouds");
                 }
                 if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
                 {
