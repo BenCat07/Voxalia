@@ -159,7 +159,8 @@ namespace Voxalia.ClientGame.WorldSystem
                 }
             }
             bool plants = PosMultiplier == 1 && OwningRegion.TheClient.CVars.r_plants.ValueB;
-            bool shaped = OwningRegion.TheClient.CVars.r_noblockshapes.ValueB;
+            bool shaped = OwningRegion.TheClient.CVars.r_noblockshapes.ValueB || PosMultiplier >= 5;
+            bool smooth = OwningRegion.TheClient.CVars.r_slodsmoothing.ValueB;
             if (!OwningRegion.UpperAreas.TryGetValue(new Vector2i(WorldPosition.X, WorldPosition.Y), out BlockUpperArea bua))
             {
                 bua = null;
@@ -173,18 +174,18 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 CancelTokenSource = new CancellationTokenSource();
                 CancelToken = CancelTokenSource.Token;
-                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, false, bua, crh);
+                VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, false, bua, crh, smooth);
                 if (CancelToken.IsCancellationRequested)
                 {
                     return;
                 }
                 if (crh == null)
                 {
-                    VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, false, shaped, true, bua, null);
-                }
-                if (CancelToken.IsCancellationRequested)
-                {
-                    return;
+                    VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, false, shaped, true, bua, null, false);
+                    if (CancelToken.IsCancellationRequested)
+                    {
+                        return;
+                    }
                 }
                 OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
                 {
@@ -255,10 +256,78 @@ namespace Voxalia.ClientGame.WorldSystem
         }
         
         void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym,
-            Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym, List<Chunk> potentials, bool plants, bool shaped, bool transp, BlockUpperArea bua, ChunkSLODHelper crh)
+            Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym, List<Chunk> potentials, bool plants, bool shaped, bool transp, BlockUpperArea bua, ChunkSLODHelper crh, bool smooth)
         {
             try
             {
+                if (crh != null && smooth)
+                {
+                    List<BEPUutilities.Vector3> Verts = new List<BEPUutilities.Vector3>(CSize * CSize);
+                    for (int x = 0; x < CSize; x++)
+                    {
+                        for (int y = 0; y < CSize; y++)
+                        {
+                            for (int z = 0; z < CSize; z++)
+                            {
+                                BlockInternal c = GetBlockAt(x, y, z);
+                                if (!c.IsOpaque())
+                                {
+                                    continue;
+                                }
+                                List<BEPUutilities.Vector3> vertset = BlockShapeRegistry.BSD[0].BSSD.Verts[0];
+                                for (int i = 0; i < vertset.Count; i++)
+                                {
+                                    BEPUutilities.Vector3 vti_use = new BEPUutilities.Vector3(x + vertset[i].X, y + vertset[i].Y, z + vertset[i].Z) * PosMultiplier;
+                                    // TODO: 3 -> constants
+                                    vti_use += new BEPUutilities.Vector3(WorldPosition.X - (WorldPosition.X / 3) * 3, WorldPosition.Y - (WorldPosition.Y / 3) * 3, WorldPosition.Z - (WorldPosition.Z / 3) * 3) * CHUNK_SIZE;
+                                    Verts.Add(vti_use);
+                                }
+                            }
+                        }
+                    }
+                    if (Verts.Count == 0)
+                    {
+                        IsAir = true;
+                        OwningRegion.DoneRendering(this);
+                        return;
+                    }
+                    List<BEPUutilities.Vector3> OutVerts = new List<BEPUutilities.Vector3>();
+                    BEPUutilities.ConvexHullHelper.GetConvexHull(Verts, OutVerts);
+                    ChunkRenderHelper trh = new ChunkRenderHelper(OutVerts.Count + 5);
+                    for (int i = 0; i < OutVerts.Count; i++)
+                    {
+                        BEPUutilities.Vector3 vert = OutVerts[i];
+                        Vector3 vec = new Vector3((float)vert.X, (float)vert.Y, (float)vert.Z);
+                        trh.Vertices.Add(vec);
+                        // TODO: Calculate the below options correctly...
+                        trh.Norms.Add(new Vector3(0, 0, 1));
+                        trh.Tangs.Add(new Vector3(0, 1, 0));
+                        trh.TCols.Add(new Vector4(1, 1, 1, 1));
+                        trh.Cols.Add(new Vector4(1, 1, 1, 1));
+                        trh.TCoords.Add(new Vector3(0, 0, 1));
+                        trh.THVs.Add(new Vector4(0, 0, 0, 0));
+                        trh.THVs2.Add(new Vector4(0, 0, 0, 0));
+                        trh.THWs.Add(new Vector4(0, 0, 0, 0));
+                        trh.THWs2.Add(new Vector4(0, 0, 0, 0));
+                    }
+                    OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
+                    {
+                        crh.FullBlock.Vertices.AddRange(trh.Vertices);
+                        crh.FullBlock.Norms.AddRange(trh.Norms);
+                        crh.FullBlock.TCoords.AddRange(trh.TCoords);
+                        crh.FullBlock.Cols.AddRange(trh.Cols);
+                        crh.FullBlock.TCols.AddRange(trh.TCols);
+                        crh.FullBlock.THVs.AddRange(trh.THVs);
+                        crh.FullBlock.THWs.AddRange(trh.THWs);
+                        crh.FullBlock.THVs2.AddRange(trh.THVs2);
+                        crh.FullBlock.THWs2.AddRange(trh.THWs2);
+                        crh.FullBlock.Tangs.AddRange(trh.Tangs);
+                        crh.Compile();
+                        IsAir = true;
+                    });
+                    OwningRegion.DoneRendering(this);
+                    return;
+                }
                 BlockInternal t_air = new BlockInternal((ushort)Material.AIR, 0, 0, 255);
                 Vector3d wp = ClientUtilities.ConvertD(WorldPosition.ToLocation()) * CHUNK_SIZE;
                 Vector3i wpi = WorldPosition * CHUNK_SIZE;
