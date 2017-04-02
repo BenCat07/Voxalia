@@ -110,7 +110,12 @@ void main()
 {
 	vec4 col = textureLod(s, fi.texcoord, textureQueryLod(s, fi.texcoord.xy).x);
 #if MCM_VOX
+	float rhBlur = 0.0;
 	if (fi.tcol.w == 0.0 && fi.tcol.x == 0.0 && fi.tcol.z == 0.0 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7)
+	{
+		rhBlur = (fi.tcol.y - 0.31) * ((1.0 / 0.38) * (3.14159 * 2.0));
+	}
+	else if (fi.tcol.w == 0.0 && fi.tcol.x == 0.0 && fi.tcol.z == 0.0 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7)
 	{
 		col *= fi.tcol;
 	}
@@ -159,6 +164,7 @@ void main()
 	color = col * fi.color;
 #if MCM_BRIGHT
 #else // MCM_BRIGHT
+	float opac_min = 0.0;
 	vec3 norms = texture(normal_tex, fi.texcoord).xyz * 2.0 - vec3(1.0);
 	vec3 tf_normal = normalize(fi.tbn * norms);
 #if MCM_LIGHTS
@@ -237,7 +243,9 @@ void main()
 		vec3 L = light_path / light_length; // Get the light's movement direction as a vector
 		vec3 diffuse = max(dot(tf_normal, L), 0.0) * vec3(diffuse_albedo); // Find out how much diffuse light to apply
 		vec3 reller = normalize(fi.pos - eye_pos);
-		vec3 specular = vec3(pow(max(dot(reflect(L, -tf_normal), reller), 0.0), 200.0) * specular_albedo * specularStrength); // Find out how much specular light to apply.
+		float spec_res = pow(max(dot(reflect(L, -tf_normal), reller), 0.0), 200.0) * specular_albedo * specularStrength;
+		opac_min += spec_res;
+		vec3 specular = vec3(spec_res); // Find out how much specular light to apply.
 		res_color += (vec3(depth, depth, depth) * atten * (diffuse * light_color) * color.xyz) + (min(specular, 1.0) * light_color * atten * depth); // Put it all together now.
 	}
 	color.xyz = min(res_color + color.xyz * 0.2, vec3(1.0));
@@ -245,6 +253,15 @@ void main()
 	color.xyz *= min(max(dot(-tf_normal, sunlightDir) * maximum_light, max(0.2, minimum_light)), 1.0);
 #endif // else - MCM_LIGHTS
 	applyFog();
+#if MCM_TRANSP
+#if MCM_VOX
+	if (rhBlur > 0.0)
+	{
+		float opacity_mod = length(fi.pos.xyz) * 0.05;
+		color.w *= min(opacity_mod + opac_min, 0.9);
+	}
+#endif // MCM_VOX
+#endif // MCM_TRANSP
 #endif // else - MCM_BRIGHT
 	if (fogCol.w > 1.0)
 	{

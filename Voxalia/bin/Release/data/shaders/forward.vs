@@ -165,7 +165,7 @@ vec4 color_for(in vec4 pos, in vec4 colt)
 		}
 		else if (colt.y < 0.7 && colt.y > 0.3 && colt.x == 0.0 && colt.z == 0.0)
 		{
-			return vec4(1.0);
+			return colt;
 		}
 		else if (colt.x > 0.3 && colt.x < 0.7 && colt.y > 0.3 && colt.y < 0.7 && colt.z > 0.3 && colt.z < 0.7)
 		{
