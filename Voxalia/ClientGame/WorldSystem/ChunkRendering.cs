@@ -291,24 +291,87 @@ namespace Voxalia.ClientGame.WorldSystem
                         OwningRegion.DoneRendering(this);
                         return;
                     }
-                    List<BEPUutilities.Vector3> OutVerts = new List<BEPUutilities.Vector3>();
+                    BEPUutilities.ConvexHullHelper.RemoveRedundantPoints(Verts);
+                    List<int> OutVerts = new List<int>();
                     BEPUutilities.ConvexHullHelper.GetConvexHull(Verts, OutVerts);
                     ChunkRenderHelper trh = new ChunkRenderHelper(OutVerts.Count + 5);
-                    for (int i = 0; i < OutVerts.Count; i++)
+                    for (int i = 0; i < OutVerts.Count; i += 3)
                     {
-                        BEPUutilities.Vector3 vert = OutVerts[i];
-                        Vector3 vec = new Vector3((float)vert.X, (float)vert.Y, (float)vert.Z);
-                        trh.Vertices.Add(vec);
-                        // TODO: Calculate the below options correctly...
-                        trh.Norms.Add(new Vector3(0, 0, 1));
-                        trh.Tangs.Add(new Vector3(0, 1, 0));
-                        trh.TCols.Add(new Vector4(1, 1, 1, 1));
-                        trh.Cols.Add(new Vector4(1, 1, 1, 1));
-                        trh.TCoords.Add(new Vector3(0, 0, 1));
-                        trh.THVs.Add(new Vector4(0, 0, 0, 0));
-                        trh.THVs2.Add(new Vector4(0, 0, 0, 0));
-                        trh.THWs.Add(new Vector4(0, 0, 0, 0));
-                        trh.THWs2.Add(new Vector4(0, 0, 0, 0));
+                        Plane plane = new Plane(new Location(Verts[OutVerts[i]]), new Location(Verts[OutVerts[i + 1]]), new Location(Verts[OutVerts[i + 2]]));
+                        Vector3 norm = ClientUtilities.Convert(plane.Normal);
+                        Vector3 tang;
+                        MaterialSide side;
+                        if (norm.Z > 0.9f)
+                        {
+                            side = MaterialSide.TOP;
+                            tang = Vector3.Cross(norm, Vector3.UnitY);
+                        }
+                        else
+                        {
+                            tang = Vector3.Cross(norm, Vector3.UnitZ);
+                            if (norm.Z < -0.8f)
+                            {
+                                side = MaterialSide.BOTTOM;
+                            }
+                            else if (norm.X > 0.8f)
+                            {
+                                side = MaterialSide.XP;
+                            }
+                            else if (norm.X < -0.8f)
+                            {
+                                side = MaterialSide.XM;
+                            }
+                            else if (norm.Y > 0.8f)
+                            {
+                                side = MaterialSide.XP;
+                            }
+                            else if (norm.Y < -0.8f)
+                            {
+                                side = MaterialSide.XM;
+                            }
+                            else
+                            {
+                                side = MaterialSide.TOP;
+                            }
+                        }
+                        BEPUutilities.Vector3 fvert = Verts[OutVerts[i]];
+                        int bid_x = Math.Max(0, Math.Min(CSize - 1, (int)fvert.X));
+                        int bid_y = Math.Max(0, Math.Min(CSize - 1, (int)fvert.Y));
+                        int bid_z = Math.Max(0, Math.Min(CSize - 1, (int)fvert.Z));
+                        BlockInternal relevantBI = GetBlockAt(bid_x, bid_y, bid_z);
+                        int tid = relevantBI.Material.TextureID(side);
+                        for (int n = 0; n < 3; n++)
+                        {
+                            BEPUutilities.Vector3 vert = Verts[OutVerts[i + n]];
+                            Vector3 vec = new Vector3((float)vert.X, (float)vert.Y, (float)vert.Z);
+                            trh.Vertices.Add(vec);
+                            trh.Norms.Add(norm);
+                            trh.Tangs.Add(tang);
+                            trh.TCols.Add(new Vector4(1, 1, 1, 1));
+                            trh.Cols.Add(new Vector4(1, 1, 1, 1));
+                            float tx;
+                            float ty;
+                            if (side == MaterialSide.TOP || side == MaterialSide.BOTTOM)
+                            {
+                                tx = Math.Max(0f, Math.Min(1f, vec.X - bid_x));
+                                ty = Math.Max(0f, Math.Min(1f, vec.Y - bid_y));
+                            }
+                            else if (side == MaterialSide.XP || side == MaterialSide.XM)
+                            {
+                                tx = Math.Max(0f, Math.Min(1f, vec.Y - bid_y));
+                                ty = Math.Max(0f, Math.Min(1f, vec.Z - bid_z));
+                            }
+                            else
+                            {
+                                tx = Math.Max(0f, Math.Min(1f, vec.X - bid_x));
+                                ty = Math.Max(0f, Math.Min(1f, vec.Z - bid_z));
+                            }
+                            trh.TCoords.Add(new Vector3(tx, ty, tid));
+                            trh.THVs.Add(new Vector4(0, 0, 0, 0));
+                            trh.THVs2.Add(new Vector4(0, 0, 0, 0));
+                            trh.THWs.Add(new Vector4(0, 0, 0, 0));
+                            trh.THWs2.Add(new Vector4(0, 0, 0, 0));
+                        }
                     }
                     OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
                     {
