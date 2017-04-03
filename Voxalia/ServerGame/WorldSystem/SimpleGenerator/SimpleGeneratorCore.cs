@@ -140,6 +140,8 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return Biomes;
         }
 
+        public const double MountainHeightMapSize = 4000;
+
         public const double GlobalHeightMapSize = 400;
 
         public const double LocalHeightMapSize = 40;
@@ -226,56 +228,38 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         {
             // TODO: better non-simplex code?!
             double val = SimplexNoise.Generate((double)seed3 + (x / SolidityMapSize), (double)seed4 + (y / SolidityMapSize), (double)seed5 + (z / SolidityMapSize));
-            //SysConsole.Output(OutputType.INFO, seed3 + "," + seed4 + "," + seed5 + " -> " + x + ", " + y + ", " + z + " -> " + val);
             return val < biome.AirDensity();
         }
 
-        public double GetHeightQuick(int Seed, int seed2, double x, double y)
+        public double GetHeightQuick(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y)
         {
+            double mheight = SimplexNoise.Generate((double)seed4 + (x / MountainHeightMapSize), (double)seed3 + (y / MountainHeightMapSize)) * 2f - 1f;
+            if (mheight > 0.9)
+            {
+                mheight = (mheight - 0.9) * 7000f;
+            }
+            else if (mheight < -0.9)
+            {
+                mheight = (mheight + 0.9) * 4000f;
+            }
             double lheight = SimplexNoise.Generate((double)seed2 + (x / GlobalHeightMapSize), (double)Seed + (y / GlobalHeightMapSize)) * 50f - 10f;
             double height = SimplexNoise.Generate((double)Seed + (x / LocalHeightMapSize), (double)seed2 + (y / LocalHeightMapSize)) * 6f - 3f;
-            return lheight + height;
+            return mheight + lheight + height;
         }
-
-        // TODO: Clean, reduce to only what's necessary. Every entry in this list makes things that much more expensive.
-        /*public static Vector3i[] Rels = new Vector3i[] { new Vector3i(-10, 10, 0), new Vector3i(-10, -10, 0), new Vector3i(10, 10, 0), new Vector3i(10, -10, 0),
-        new Vector3i(-15, 15, 0), new Vector3i(-15, -15, 0), new Vector3i(15, 15, 0), new Vector3i(15, -15, 0),
-        new Vector3i(-20, 20, 0), new Vector3i(-20, -20, 0), new Vector3i(20, 20, 0), new Vector3i(20, -20, 0),
-        new Vector3i(-5, 5, 0), new Vector3i(-5, -5, 0), new Vector3i(5, 5, 0), new Vector3i(5, -5, 0),
-        new Vector3i(-10, 0, 0), new Vector3i(0, -10, 0), new Vector3i(10, 0, 0), new Vector3i(0, 10, 0),
-        new Vector3i(-20, 0, 0), new Vector3i(0, -20, 0), new Vector3i(20, 0, 0), new Vector3i(0, 20, 0),
-        new Vector3i(-15, 0, 0), new Vector3i(0, -15, 0), new Vector3i(15, 0, 0), new Vector3i(0, 15, 0),
-        new Vector3i(-5, 0, 0), new Vector3i(0, -5, 0), new Vector3i(5, 0, 0), new Vector3i(0, 5, 0)};
-
-        double relmod = 1f;*/
-
+        
         public override double GetHeight(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, double z, out Biome biome)
         {
 #if TIMINGS
             Stopwatch sw = new Stopwatch();
             sw.Start();
             try
-#endif
             {
-                double valBasic = GetHeightQuick(Seed, seed2, x, y);
-                //if (z < -50 || z > 50)
-                {
-                    biome = Biomes.BiomeFor(seed2, seed3, seed4, x, y, z, valBasic);
-                    return valBasic;
-                }
-                /*Biome b = Biomes.BiomeFor(seed2, seed3, seed4, x, y, z, valBasic);
-                double total = valBasic; * ((SimpleBiome)b).HeightMod();
-                foreach (Vector3i vecer in Rels)
-                {
-                    double valt = GetHeightQuick(Seed, seed2, x + vecer.X * relmod, y + vecer.Y * relmod);
-                    Biome bt = Biomes.BiomeFor(seed2, seed3, seed4, x + vecer.X * relmod, y + vecer.Y * relmod, z, valt);
-                    total += valt * ((SimpleBiome)bt).HeightMod();
-                }
-                biome = b;
-                return total / (Rels.Length + 1);
-                */
-            }
+#endif
+            double valBasic = GetHeightQuick(Seed, seed2, seed3, seed4, seed5, x, y);
+            biome = Biomes.BiomeFor(seed2, seed3, seed4, x, y, z, valBasic);
+            return valBasic;
 #if TIMINGS
+            }
             finally
             {
                 sw.Stop();
@@ -314,7 +298,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 
         public byte[] OreShapes = new byte[] { 0, 64, 65, 66, 67, 68 };
 
-        public int MaxNonAirHeight = 2;
+        public int MaxNonAirHeight = 100;
 
         public override void Populate(int Seed, int seed2, int seed3, int seed4, int seed5, Chunk chunk)
         {

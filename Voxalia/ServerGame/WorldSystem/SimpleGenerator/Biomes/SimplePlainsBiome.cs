@@ -19,7 +19,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Biomes
 
         public override Material SurfaceBlock()
         {
-            return Material.GRASS_PLAINS;
+            return Material.GRASS_PLAINS_TALL;
         }
 
         public override double HeightMod()

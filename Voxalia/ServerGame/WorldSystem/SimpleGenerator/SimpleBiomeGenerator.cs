@@ -15,9 +15,9 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 {
     public class SimpleBiomeGenerator: BiomeGenerator
     {
-        public double TemperatureMapSize = 2400;
+        public double TemperatureMapSize = 1200;
 
-        public double DownfallMapSize = 4800;
+        public double DownfallMapSize = 2400;
 
         public override double GetTemperature(int seed2, int seed3, double x, double y)
         {
