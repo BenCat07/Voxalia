@@ -9,6 +9,8 @@
 #version 430 core
 
 #define MCM_GEOM_ACTIVE 0
+#define MCM_FADE_DEPTH 0
+#define MCM_SHADOWS 0
 
 #if MCM_GEOM_ACTIVE
 layout (binding = 0) uniform sampler2DArray s;
@@ -28,8 +30,10 @@ in struct vox_fout
 #endif
 	vec4 color;
 	mat3 tbn;
-#if MCM_INVERSE_FADE
+#if MCM_FADE_DEPTH
+#if MCM_SHADOWS
 	float size;
+#endif
 #endif
 } fi;
 

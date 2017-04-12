@@ -10,6 +10,8 @@
 
 #define MCM_PRETTY 0
 #define MCM_FADE_DEPTH 0
+#define MCM_SHADOWS 0
+#define MCM_IS_A_SHADOW 0
 
 layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
@@ -37,8 +39,11 @@ out struct vox_fout
 	vec3 texcoord;
 	vec4 color;
 	mat3 tbn;
+#if MCM_IS_A_SHADOW
+#else
 	vec2 scrpos;
 	float z;
+#endif
 #else
 	mat3 tbn;
 	vec3 pos;
@@ -56,8 +61,11 @@ vec4 qfix(in vec4 pos, in vec3 right, in vec3 pos_norm)
 #if MCM_PRETTY
 	fi.position = pos;
 	vec4 npos = proj_matrix * pos;
+#if MCM_IS_A_SHADOW
+#else
 	fi.scrpos = npos.xy / npos.w * 0.5 + vec2(0.5);
 	fi.z = npos.z;
+#endif
 #else
 	fi.pos = pos.xyz;
 #endif

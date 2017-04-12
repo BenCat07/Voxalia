@@ -114,7 +114,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             View3D.CheckError("Rendering - Particles - Pre");
             double mindsq = mind * mind;
             double maxdsq = maxd * maxd;
-            if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP || TheClient.MainWorldView.FBOid.IsMainTransp())
+            if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP || TheClient.MainWorldView.FBOid.IsMainTransp() || TheClient.MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
             {
                 View3D.CheckError("Rendering - Particles - PreFX");
                 List<Vector3> pos = new List<Vector3>();
@@ -173,7 +173,13 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                             pd.TCs = new Vector2[cloud.Points.Count];
                             for (int i = 0; i < cloud.Points.Count; i++)
                             {
-                                pd.Poses[i] = ClientUtilities.Convert((cloud.Position + cloud.Points[i]) - TheClient.MainWorldView.CameraPos);
+                                Location ppos = (cloud.Position + cloud.Points[i]) - TheClient.MainWorldView.CameraPos;
+                                double dist = ppos.DistanceSquared(TheClient.MainWorldView.CameraPos);
+                                if (dist < mindsq || dist >= maxdsq)
+                                {
+                                    // TODO: Fix this. List? -> continue;
+                                }
+                                pd.Poses[i] = ClientUtilities.Convert(ppos);
                                 pd.Cols[i] = Vector4.One; // TODO: Colored clouds?
                                 pd.TCs[i] = new Vector2(cloud.Sizes[i], cloudID);
                             }
@@ -197,6 +203,10 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     GL.Uniform4(12, new Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
                     GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
                     GL.Uniform1(14, TheClient.ZFar());
+                }
+                else if (TheClient.MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
+                {
+                    TheClient.s_shadow_parts = TheClient.s_shadow_parts.Bind();
                 }
                 else
                 {

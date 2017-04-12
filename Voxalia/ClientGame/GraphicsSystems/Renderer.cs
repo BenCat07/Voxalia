@@ -224,22 +224,50 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public TextureEngine Engine;
         public ShaderEngine Shaders;
 
+        public bool bbreak = true;
+
         /// <summary>
         /// Renders a line box.
         /// </summary>
         public void RenderLineBox(Location min, Location max, Matrix4d? rot = null)
         {
+            if (min.IsNaN() || min.IsInfinite() || max.IsNaN() || max.IsInfinite())
+            {
+                SysConsole.Output(OutputType.WARNING, "Invalid line box from " + min + " to " + max);
+                return;
+            }
+            GL.ActiveTexture(TextureUnit.Texture0);
             Engine.White.Bind();
             View3D.CheckError("RenderLineBox: BindTexture");
             Location halfsize = (max - min) / 2;
+            if ((min + halfsize) == Location.Zero)
+            {
+                return; // ???
+            }
+            if (Math.Abs(min.X + halfsize.X) < 1 || Math.Abs(min.Y + halfsize.Y) < 1 || Math.Abs(min.Z + halfsize.Z) < 1)
+            {
+                return; // ???
+            }
+            if (Math.Abs(min.X) < 1 || Math.Abs(min.Y) < 1 || Math.Abs(min.Z) < 1)
+            {
+                return; // ???
+            }
+            if (bbreak)
+            {
+                return; // TODO: Fix!
+            }
             Matrix4d mat = Matrix4d.Scale(ClientUtilities.ConvertD(halfsize))
-                * (rot != null && rot.HasValue ? rot.Value : Matrix4d.Identity)
-                * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(min + halfsize));
+            * (rot != null && rot.HasValue ? rot.Value : Matrix4d.Identity)
+            * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(min + halfsize));
             Client.Central.MainWorldView.SetMatrix(2, mat); // TODO: Client reference!
             View3D.CheckError("RenderLineBox: SetMatrix");
             GL.BindVertexArray(Box._VAO);
             View3D.CheckError("RenderLineBox: Bind VAO");
             GL.DrawElements(PrimitiveType.Lines, 24, DrawElementsType.UnsignedInt, IntPtr.Zero);
+            if (View3D.CheckError("RenderLineBox: Pass"))
+            {
+                SysConsole.Output(OutputType.DEBUG, "Caught: " + Box._VAO + ", " + min + ", " + max + ", " + halfsize);
+            }
         }
 
         /// <summary>

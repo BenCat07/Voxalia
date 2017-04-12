@@ -41,7 +41,7 @@ using FreneticGameCore;
 
 namespace Voxalia.ClientGame.EntitySystem
 {
-    public abstract class CharacterEntity : PhysicsEntity, EntityAnimated
+    public abstract class CharacterEntity : PhysicsEntity, IEntityAnimated
     {
         public CharacterEntity(Region tregion)
             : base(tregion, true, true)

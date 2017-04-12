@@ -90,7 +90,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public override string ToString()
         {
-            return "Entity";
+            return "Entity/" + GetType().FullName + "/" + GetPosition();
         }
 
         public abstract Location GetPosition();

@@ -274,6 +274,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE" + forw_extra  +"?grass");
             s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY" + forw_extra  +"?grass");
             s_shadow_grass = Shaders.GetShader("shadow" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_SHADOWS?grass");
+            s_shadow_parts = Shaders.GetShader("shadow" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_SHADOWS,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH,MCM_IS_A_SHADOW?particles");
             s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH" + forw_extra + "?particles");
             s_fbodecal = Shaders.GetShader("fbo" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE,MCM_PRETTY?decal");
             s_forwdecal = Shaders.GetShader("forward" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE" + forw_extra + "?decal");
@@ -442,6 +443,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The Shadow Pass shader, for grass.
         /// </summary>
         public Shader s_shadow_grass;
+
+        /// <summary>
+        /// The Shadow Pass shader, for particles.
+        /// </summary>
+        public Shader s_shadow_parts;
 
         /// <summary>
         /// The final write + godrays shader.
@@ -1753,6 +1759,25 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        void AddParticles(List<Entity> entsRender)
+        {
+            if (CVars.r_particles.ValueB)
+            {
+                // TODO: More clever logic, based on actual entity and particle clumpings?
+                // TODO: Alternately, each set of particles (per source) as its own separate bit?
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0, DistMax = 0.5 });
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0.5, DistMax = 1 });
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1, DistMax = 1.75 });
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1.75, DistMax = 3 });
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 3, DistMax = 4.5 });
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 4.5, DistMax = 7 });
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 7, DistMax = 12 });
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 12, DistMax = 20 });
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 20, DistMax = 40 });
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 40, DistMax = 100 }); // TODO: 100 -> particles view render distance!
+            }
+        }
+
         /// <summary>
         /// Renders the 3D world upon instruction from the internal view render code.
         /// </summary>
@@ -1766,6 +1791,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 if (view.FBOid != FBOID.STATIC_SHADOWS)
                 {
+                    View3D.CheckError("Rendering - 0 - DynShadows (Pre)");
                     for (int i = 0; i < TheRegion.ShadowCasters.Count; i++)
                     {
                         if (view.FBOid == FBOID.DYNAMIC_SHADOWS && ((TheRegion.ShadowCasters[i] as PhysicsEntity)?.GenBlockShadows).GetValueOrDefault(false))
@@ -1773,6 +1799,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             continue;
                         }
                         TheRegion.ShadowCasters[i].Render();
+                        if (View3D.CheckError("Rendering - 0 - DynShadows: " + i))
+                        {
+                            SysConsole.Output(OutputType.DEBUG, "Caught: " + TheRegion.ShadowCasters[i]);
+                        }
+                    }
+                    View3D.CheckError("Rendering - 0 - DynShadows");
+                    List<Entity> entsRender = new List<Entity>();
+                    AddParticles(entsRender);
+                    foreach (Entity ent in entsRender)
+                    {
+                        ent.Render();
+                        View3D.CheckError("Rendering - 0 - TranspShadow - Specific: " + ent.ToString());
                     }
                 }
                 else
@@ -1812,21 +1850,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     {
                         entsRender.Add(new ChunkEntity(ch));
                     }
-                    if (CVars.r_particles.ValueB)
-                    {
-                        // TODO: More clever logic, based on actual entity and particle clumpings?
-                        // TODO: Alternately, each set of particles (per source) as its own separate bit?
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0, DistMax = 0.5 });
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 0.5, DistMax = 1 });
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1, DistMax = 1.75 });
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 1.75, DistMax = 3 });
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 3, DistMax = 4.5 });
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 4.5, DistMax = 7 });
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 7, DistMax = 12 });
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 12, DistMax = 20 });
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 20, DistMax = 40 });
-                        entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 40, DistMax = 100 }); // TODO: 100 -> particles view render distance!
-                    }
+                    AddParticles(entsRender);
                     Location pos = Player.GetPosition();
                     IEnumerable<Entity> ents = entsRender.OrderBy((e) => e.GetPosition().DistanceSquared(MainWorldView.RenderRelative)).Reverse();
                     View3D.CheckError("Rendering - 0 - Transp - Prepared");

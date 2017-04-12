@@ -26,9 +26,9 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             string anim = TheClient.Network.Strings.StringForIndex(Utilities.BytesToInt(Utilities.BytesPartial(data, 8, 4)));
             byte mode = data[8 + 4];
             Entity e = TheClient.TheRegion.GetEntity(EID);
-            if (e != null && e is EntityAnimated)
+            if (e != null && e is IEntityAnimated)
             {
-                ((EntityAnimated)e).SetAnimation(anim, mode);
+                ((IEntityAnimated)e).SetAnimation(anim, mode);
                 return true;
             }
             SysConsole.Output(OutputType.WARNING, "Not an animated entity: " + EID + " -> " + e);

@@ -552,16 +552,19 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public float[] ClearColor = new float[] { 0f, 1f, 1f, 1f };
 
-        public static void CheckError(string loc)
+        public static bool CheckError(string loc)
         {
-#if DEBUG
+            bool b = false;
+#if !DEBUG
             ErrorCode ec = GL.GetError();
             while (ec != ErrorCode.NoError)
             {
                 SysConsole.Output(OutputType.ERROR, "OpenGL error [" + loc + "]: " + ec + "\n" + Environment.StackTrace);
                 ec = GL.GetError();
+                b = true;
             }
 #endif
+            return b;
         }
 
         public float RenderClearAlpha = 1f;
@@ -1141,6 +1144,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 {
                                     CFrust = new Frustum(GraphicsUtil.ConvertD(ClientUtilities.ConvertToD(Lights[i].InternalLights[x].GetMatrix()))); // TODO: One-step conversion!
                                 }
+                                CheckError("Pre-Prerender - Shadows - " + i);
                                 CameraPos = ClientUtilities.ConvertD(Lights[i].InternalLights[x].eye);
                                 TheClient.s_shadowvox = TheClient.s_shadowvox.Bind();
                                 SetMatrix(2, Matrix4d.Identity);
@@ -1152,12 +1156,20 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
                                 GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
                                 Lights[i].InternalLights[x].SetProj();
+                                CheckError("Pre-Prerender2 - Shadows - " + i);
+                                TheClient.s_shadow_parts = TheClient.s_shadow_parts.Bind();
+                                SetMatrix(2, Matrix4d.Identity);
+                                GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
+                                GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
+                                Lights[i].InternalLights[x].SetProj();
                                 TheClient.s_shadow = TheClient.s_shadow.Bind();
                                 SetMatrix(2, Matrix4d.Identity);
+                                CheckError("Pre-Prerender3 - Shadows - " + i);
                                 GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
                                 GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
                                 TranspShadows = Lights[i].InternalLights[x].transp;
                                 Lights[i].InternalLights[x].SetProj();
+                                CheckError("Pre-Prerender4 - Shadows - " + i);
                                 DrawBuffer(DrawBufferMode.ColorAttachment0);
                                 GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
                                 if (Lights[i] is SkyLight sky)
@@ -1170,6 +1182,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                         GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
                                         GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
                                         FBOid = FBOID.STATIC_SHADOWS;
+                                        CheckError("Prerender - Shadows - " + i);
                                         Render3D(this);
                                     }
                                     BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
@@ -1193,6 +1206,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 }
                                 FBOid = FBOID.NONE;
                                 n++;
+                                CheckError("Postrender - Shadows - " + i);
                                 if (n >= LIGHTS_MAX)
                                 {
                                     goto complete;

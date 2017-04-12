@@ -8,7 +8,7 @@
 
 namespace Voxalia.ClientGame.EntitySystem
 {
-    public interface EntityAnimated
+    public interface IEntityAnimated
     {
         void SetAnimation(string anim, byte mode);
     }
