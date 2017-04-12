@@ -3,7 +3,9 @@ Voxalia
 
 **Voxalia, a game about blocks and such.**
 
-Built using OpenTK (a C# binding of OpenGL for the 3D rendering), BEPUphysics (a capable pure-C# physics engine), and FreneticScript (powerful and adaptive game modding).
+Built within our own in-house Frenetic Game Engine!
+
+Also built using: OpenTK (a C# binding of OpenGL for the 3D rendering), BEPUphysics (a capable pure-C# physics engine), and FreneticScript (powerful and adaptive game modding).
 
 Also used libraries:
 
