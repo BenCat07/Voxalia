@@ -20,6 +20,8 @@ layout (location = 1) uniform mat4 proj_matrix = mat4(1.0);
 // ...
 #if MCM_SHADOWS
 layout (location = 5) uniform float should_sqrt = 0.0;
+// ..
+layout (location = 7) uniform vec3 camPos = vec3(0.0);
 #endif
 
 in struct vox_out
@@ -98,7 +100,11 @@ void main()
 {
 	vec3 pos = gl_in[0].gl_Position.xyz;
 	vec3 up = vec3(0.0, 0.0, 1.0);
+#if MCM_SHADOWS
+	vec3 pos_norm = normalize(pos.xyz - camPos);
+#else
 	vec3 pos_norm = normalize(pos.xyz);
+#endif
 	if (abs(pos_norm.x) < 0.01 && abs(pos_norm.y) < 0.01)
 	{
 		up = vec3(0.0, 1.0, 0.0);
