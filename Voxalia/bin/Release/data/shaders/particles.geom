@@ -17,6 +17,10 @@ layout (points) in;
 layout (triangle_strip, max_vertices = 4) out;
 
 layout (location = 1) uniform mat4 proj_matrix = mat4(1.0);
+// ...
+#if MCM_SHADOWS
+layout (location = 5) uniform float should_sqrt = 0.0;
+#endif
 
 in struct vox_out
 {
@@ -55,6 +59,24 @@ out struct vox_fout
 #endif
 } fi;
 
+float fix_sqr(in float inTemp)
+{
+	return 1.0 - (inTemp * inTemp);
+}
+
+vec4 final_fix(in vec4 pos)
+{
+#if MCM_SHADOWS
+	if (should_sqrt >= 0.5)
+	{
+		pos /= pos.w;
+		pos.x = sign(pos.x) * fix_sqr(1.0 - abs(pos.x));
+		pos.y = sign(pos.y) * fix_sqr(1.0 - abs(pos.y));
+	}
+#endif
+	return pos;
+}
+
 vec4 qfix(in vec4 pos, in vec3 right, in vec3 pos_norm)
 {
 	fi.tbn = transpose(mat3(right, cross(right, pos_norm), pos_norm)); // TODO: Neccessity of transpose()?
@@ -75,11 +97,6 @@ vec4 qfix(in vec4 pos, in vec3 right, in vec3 pos_norm)
 void main()
 {
 	vec3 pos = gl_in[0].gl_Position.xyz;
-	 // TODO: Configurable particles render range cap!
-	/*if (dot(pos, pos) > (50.0 * 50.0))
-	{
-		return;
-	}*/
 	vec3 up = vec3(0.0, 0.0, 1.0);
 	vec3 pos_norm = normalize(pos.xyz);
 	if (abs(pos_norm.x) < 0.01 && abs(pos_norm.y) < 0.01)
@@ -105,19 +122,19 @@ void main()
 	vec3 right_n = (rot_mat * vec4(right, 1.0)).xyz;
 	vec3 up_n = (rot_mat * vec4(up, 1.0)).xyz;
 	// First Vertex
-	gl_Position = proj_matrix * qfix(vec4(pos - (right_n + up_n) * scale, 1.0), right_n, pos_norm);
+	gl_Position = final_fix(proj_matrix * qfix(vec4(pos - (right_n + up_n) * scale, 1.0), right_n, pos_norm));
 	fi.texcoord = vec3(0.0, 1.0, tid);
 	EmitVertex();
 	// Second Vertex
-	gl_Position = proj_matrix * qfix(vec4(pos + (right_n - up_n) * scale, 1.0), right_n, pos_norm);
+	gl_Position = final_fix(proj_matrix * qfix(vec4(pos + (right_n - up_n) * scale, 1.0), right_n, pos_norm));
 	fi.texcoord = vec3(1.0, 1.0, tid);
 	EmitVertex();
 	// Third Vertex
-	gl_Position = proj_matrix * qfix(vec4(pos - (right_n - up_n) * scale, 1.0), right_n, pos_norm);
+	gl_Position = final_fix(proj_matrix * qfix(vec4(pos - (right_n - up_n) * scale, 1.0), right_n, pos_norm));
 	fi.texcoord = vec3(0.0, 0.0, tid);
 	EmitVertex();
 	// Forth Vertex
-	gl_Position = proj_matrix * qfix(vec4(pos + (right_n + up_n) * scale, 1.0), right_n, pos_norm);
+	gl_Position = final_fix(proj_matrix * qfix(vec4(pos + (right_n + up_n) * scale, 1.0), right_n, pos_norm));
 	fi.texcoord = vec3(1.0, 0.0, tid);
 	EmitVertex();
 	EndPrimitive();

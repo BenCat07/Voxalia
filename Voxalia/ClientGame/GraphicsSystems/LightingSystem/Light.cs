@@ -24,7 +24,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.LightingSystem
         public Vector3 color;
         public bool NeedsUpdate = true;
         public bool transp = false;
-        public bool CastShadows = false;
+        public bool CastShadows = true;
 
         public void Create(Vector3d pos, Vector3d targ, float fov, float max_range, Vector3 col)
         {

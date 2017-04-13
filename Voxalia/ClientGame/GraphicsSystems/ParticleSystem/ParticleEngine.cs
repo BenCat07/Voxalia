@@ -112,10 +112,11 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
         public void Render(double mind, double maxd)
         {
             View3D.CheckError("Rendering - Particles - Pre");
-            double mindsq = mind * mind;
-            double maxdsq = maxd * maxd;
-            if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP || TheClient.MainWorldView.FBOid.IsMainTransp() || TheClient.MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
+            if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP || TheClient.MainWorldView.FBOid.IsMainTransp()
+                || (TheClient.MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS && TheClient.MainWorldView.TranspShadows))
             {
+                double mindsq = mind * mind;
+                double maxdsq = maxd * maxd;
                 View3D.CheckError("Rendering - Particles - PreFX");
                 List<Vector3> pos = new List<Vector3>();
                 List<Vector4> col = new List<Vector4>();

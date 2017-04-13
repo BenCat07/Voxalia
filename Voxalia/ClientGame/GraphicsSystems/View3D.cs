@@ -1104,7 +1104,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         }
 
         public Location RenderRelative;
-
+        
         /// <summary>
         /// Calculate shadow maps for the later (lighting) render passes.
         /// </summary>
