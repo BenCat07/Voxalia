@@ -204,6 +204,7 @@ float ssao_color(in vec3 position, in vec3 normal, vec3 difcol)
 
 void main() // Let's put all code in main, why not...
 {
+	//color = vec4(texture(shadowtex, vec3(f.texcoord.xy, 1.0)).x, 0.0, 0.0, 1.0); return; // ------------------------------------------
 	vec3 res_color = vec3(0.0);
 	float aff = 0.0;
 	// Gather all the texture information.
