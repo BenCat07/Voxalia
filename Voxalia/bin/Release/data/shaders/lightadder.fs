@@ -211,12 +211,14 @@ void main() // Let's put all code in main, why not...
 	vec3 position = texture(positiontex, f.texcoord).xyz;
 	vec3 renderhint = texture(renderhinttex, f.texcoord).xyz;
 	vec4 diffuset = texture(diffusetex, f.texcoord);
-	float ssao_mod = 1.0;
 #if MCM_SSAO
+	float ssao_mod = 1.0;
 	if (renderhint.z < 1.0)
 	{
 		ssao_mod = (ssao_color(position, normal, diffuset.xyz) * (1.0 - renderhint.z) * 0.9) + 0.1;
 	}
+#else
+	const float ssao_mod = 1.0;
 #endif
 	vec3 N = -normal;
 	// Loop over lights

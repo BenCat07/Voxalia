@@ -24,6 +24,14 @@ namespace Voxalia.ClientGame.GraphicsSystems.LightingSystem
 
         Location Color;
 
+        public void SetCastShadows(bool shad)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                InternalLights[i].CastShadows = shad;
+            }
+        }
+
         public PointLight(Location pos, int tsize, float radius, Location col)
         {
             EyePos = pos;

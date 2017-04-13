@@ -845,6 +845,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 {
                                     continue;
                                 }
+                                if (!Lights[i].InternalLights[x].CastShadows)
+                                {
+                                    // TODO: Special impl.
+                                    continue;
+                                }
                                 Matrix4 smat = Lights[i].InternalLights[x].GetMatrix();
                                 Vector3d eyep = Lights[i].InternalLights[x].eye - ClientUtilities.ConvertD(CameraPos);
                                 Vector3 col = Lights[i].InternalLights[x].color * (float)maxrangemult;
@@ -1132,6 +1137,10 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             for (int x = 0; x < Lights[i].InternalLights.Count; x++)
                             {
                                 if (Lights[i].InternalLights[x].color.LengthSquared <= 0.01)
+                                {
+                                    continue;
+                                }
+                                if (!Lights[i].InternalLights[x].CastShadows)
                                 {
                                     continue;
                                 }
@@ -1488,6 +1497,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             {
                                 if (Lights[i].InternalLights[x].color.LengthSquared <= 0.01)
                                 {
+                                    continue;
+                                }
+                                if (!Lights[i].InternalLights[x].CastShadows)
+                                {
+                                    // TODO: Special impl.
                                     continue;
                                 }
                                 Matrix4 smat = Lights[i].InternalLights[x].GetMatrix();
