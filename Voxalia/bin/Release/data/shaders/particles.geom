@@ -18,7 +18,7 @@ layout (triangle_strip, max_vertices = 4) out;
 
 layout (location = 1) uniform mat4 proj_matrix = mat4(1.0);
 // ...
-#if MCM_SHADOWS
+#if MCM_IS_A_SHADOW
 layout (location = 5) uniform float should_sqrt = 0.0;
 // ..
 layout (location = 7) uniform vec3 camPos = vec3(0.0);
@@ -68,7 +68,7 @@ float fix_sqr(in float inTemp)
 
 vec4 final_fix(in vec4 pos)
 {
-#if MCM_SHADOWS
+#if MCM_IS_A_SHADOW
 	if (should_sqrt >= 0.5)
 	{
 		pos /= pos.w;
@@ -100,7 +100,7 @@ void main()
 {
 	vec3 pos = gl_in[0].gl_Position.xyz;
 	vec3 up = vec3(0.0, 0.0, 1.0);
-#if MCM_SHADOWS
+#if MCM_IS_A_SHADOW
 	vec3 pos_norm = normalize(pos.xyz - camPos);
 #else
 	vec3 pos_norm = normalize(pos.xyz);
