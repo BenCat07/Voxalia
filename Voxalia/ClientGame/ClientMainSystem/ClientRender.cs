@@ -1815,6 +1815,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 else
                 {
+                    SetVox();
+                    TheRegion.ConfigureForRenderChunk();
+                    foreach (Chunk ch in TheRegion.LoadedChunks.Values)
+                    {
+                        ch.Render();
+                        View3D.CheckError("Rendering - 0 - StaticShadow:Chunks - Layer: " + ch.WorldPosition.Z);
+                    }
+                    SetEnts();
                     for (int i = 0; i < TheRegion.GenShadowCasters.Length; i++)
                     {
                         TheRegion.GenShadowCasters[i].Render();
