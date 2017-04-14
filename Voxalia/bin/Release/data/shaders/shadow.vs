@@ -32,8 +32,8 @@ layout (location = 5) uniform float should_sqrt = 0.0;
 // ...
 #if MCM_GEOM_ACTIVE
 #else
-layout (location = 50) uniform mat4 simplebone_matrix = mat4(1.0);
-layout (location = 51) uniform mat4 boneTrans[MAX_BONES];
+layout (location = 100) uniform mat4 simplebone_matrix = mat4(1.0);
+layout (location = 101) uniform mat4 boneTrans[MAX_BONES];
 #endif
 
 #if MCM_GEOM_ACTIVE

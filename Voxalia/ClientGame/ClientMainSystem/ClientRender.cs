@@ -823,7 +823,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         View3D.CheckError("RenderFrame - VR");
                         GL.BindTexture(TextureTarget.Texture2D, TWOD_FBO_Tex);
                         Matrix4 ortho = Matrix4.CreateOrthographicOffCenter(0, Window.Width, 0, Window.Height, -1, 1);
-                        GL.UniformMatrix4(40, false, ref View3D.IdentityMatrix);
+                        GL.UniformMatrix4(100, false, ref View3D.IdentityMatrix);
                         GL.UniformMatrix4(1, false, ref ortho);
                         Rendering.RenderRectangle(0, 0, Window.Width, Window.Height);
                         View3D.CheckError("RenderFrame - TWOD");

@@ -42,3 +42,4 @@ packages/
 VoxaliaTests/bin/Release/
 TestResult.xml
 bin/release/default/
+*.config

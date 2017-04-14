@@ -41,7 +41,7 @@ layout(size1x32, binding = 6) coherent uniform uimageBuffer uib_llist;
 layout(size1x32, binding = 7) coherent uniform uimageBuffer uib_cspage;
 #endif
 
-const int LIGHTS_MAX = 10; // How many lights we can ever have.
+const int LIGHTS_MAX = 20; // How many lights we can ever have.
 
 layout (location = 4) uniform float desaturationAmount = 1.0;
 // ...
@@ -51,8 +51,8 @@ layout (location = 9) uniform mat4 lights_used_helper;
 layout (location = 16) uniform float minimum_light;
 // ...
 layout (location = 20) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
-layout (location = 30) uniform mat4 light_details_array[LIGHTS_MAX];
-layout (location = 40) uniform mat4 light_details2_array[LIGHTS_MAX];
+layout (location = 40) uniform mat4 light_details_array[LIGHTS_MAX];
+layout (location = 60) uniform mat4 light_details2_array[LIGHTS_MAX];
 
 #if MCM_GEOM_ACTIVE
 in struct vox_fout

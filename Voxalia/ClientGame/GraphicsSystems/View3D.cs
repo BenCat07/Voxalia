@@ -845,11 +845,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 {
                                     continue;
                                 }
-                                if (!Lights[i].InternalLights[x].CastShadows)
-                                {
-                                    // TODO: Special impl.
-                                    continue;
-                                }
                                 Matrix4 smat = Lights[i].InternalLights[x].GetMatrix();
                                 Vector3d eyep = Lights[i].InternalLights[x].eye - ClientUtilities.ConvertD(CameraPos);
                                 Vector3 col = Lights[i].InternalLights[x].color * (float)maxrangemult;
@@ -1140,10 +1135,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                 {
                                     continue;
                                 }
-                                if (!Lights[i].InternalLights[x].CastShadows)
-                                {
-                                    continue;
-                                }
                                 BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
                                 if (Lights[i].InternalLights[x] is LightOrtho)
                                 {
@@ -1206,7 +1197,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                         Render3D(this);
                                     }
                                 }
-                                else // TODO: lights[i].ShouldCastShadows?
+                                else if (!Lights[i].InternalLights[x].CastShadows)
+                                {
+                                    BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                    GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+                                    GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
+                                }
+                                else
                                 {
                                     BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
                                     GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
@@ -1420,7 +1417,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public Frustum camFrust;
 
-        const int LIGHTS_MAX = 10;
+        const int LIGHTS_MAX = 20;
 
         public void RenderPass_Lights()
         {
@@ -1498,11 +1495,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             {
                                 if (Lights[i].InternalLights[x].color.LengthSquared <= 0.01)
                                 {
-                                    continue;
-                                }
-                                if (!Lights[i].InternalLights[x].CastShadows)
-                                {
-                                    // TODO: Special impl.
                                     continue;
                                 }
                                 Matrix4 smat = Lights[i].InternalLights[x].GetMatrix();
@@ -2175,8 +2167,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 CheckError("PreRenderTranspLights - 1.75");
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);
-                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats1);
-                GL.UniformMatrix4(40, LIGHTS_MAX, false, l_dats2);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, l_dats1);
+                GL.UniformMatrix4(20 + LIGHTS_MAX + LIGHTS_MAX, LIGHTS_MAX, false, l_dats2);
                 CheckError("PreRenderTranspLights - 2");
                 if (TheClient.CVars.r_transpshadows.ValueB && TheClient.CVars.r_shadows.ValueB)
                 {
@@ -2205,8 +2197,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.Uniform2(8, new Vector2(Width, Height));
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);
-                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats1);
-                GL.UniformMatrix4(40, LIGHTS_MAX, false, l_dats2);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, l_dats1);
+                GL.UniformMatrix4(20 + LIGHTS_MAX + LIGHTS_MAX, LIGHTS_MAX, false, l_dats2);
                 CheckError("PreRenderTranspLights - 3");
                 if (TheClient.CVars.r_transpshadows.ValueB && TheClient.CVars.r_shadows.ValueB)
                 {
@@ -2234,8 +2226,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.Uniform2(8, new Vector2(Width, Height));
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);
-                GL.UniformMatrix4(30, LIGHTS_MAX, false, l_dats1);
-                GL.UniformMatrix4(40, LIGHTS_MAX, false, l_dats2);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, l_dats1);
+                GL.UniformMatrix4(20 + LIGHTS_MAX + LIGHTS_MAX, LIGHTS_MAX, false, l_dats2);
                 GL.ActiveTexture(TextureUnit.Texture4);
                 GL.BindTexture(TextureTarget.Texture2DArray, fbo_shadow_tex);
                 GL.ActiveTexture(TextureUnit.Texture0);

@@ -106,8 +106,7 @@ namespace Voxalia.Shared.Collision
         public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweepnorm, double slen, MaterialSolidity solidness, out RayHit hit)
         {
             RigidTransform rt = new RigidTransform(startingTransform.Position - Position, startingTransform.Orientation);
-            RayHit rHit;
-            bool h = ChunkShape.ConvexCast(castShape, ref rt, ref sweepnorm, slen, solidness, out rHit);
+            bool h = ChunkShape.ConvexCast(castShape, ref rt, ref sweepnorm, slen, solidness, out RayHit rHit);
             rHit.Location = rHit.Location + Position;
             hit = rHit;
             return h;
@@ -116,10 +115,9 @@ namespace Voxalia.Shared.Collision
         public override bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweep, Func<BroadPhaseEntry, bool> filter, out RayHit hit)
         {
             RigidTransform rt = new RigidTransform(startingTransform.Position - Position, startingTransform.Orientation);
-            RayHit rHit;
             double slen = sweep.Length();
             Vector3 sweepnorm = sweep / slen;
-            bool h = ChunkShape.ConvexCast(castShape, ref rt, ref sweepnorm, slen, MaterialSolidity.FULLSOLID, out rHit);
+            bool h = ChunkShape.ConvexCast(castShape, ref rt, ref sweepnorm, slen, MaterialSolidity.FULLSOLID, out RayHit rHit);
             rHit.Location = rHit.Location + Position;
             hit = rHit;
             return h;
@@ -133,8 +131,7 @@ namespace Voxalia.Shared.Collision
         public bool RayCast(Ray ray, double maximumLength, Func<BroadPhaseEntry, bool> filter, MaterialSolidity solidness, out RayHit rayHit)
         {
             Ray r2 = new Ray(ray.Position - Position, ray.Direction);
-            RayHit rHit;
-            bool h = ChunkShape.RayCast(ref r2, maximumLength, solidness, out rHit);
+            bool h = ChunkShape.RayCast(ref r2, maximumLength, solidness, out RayHit rHit);
             rHit.Location = rHit.Location + Position;
             rayHit = rHit;
             return h;

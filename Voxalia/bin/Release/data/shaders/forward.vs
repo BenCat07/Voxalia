@@ -75,8 +75,8 @@ layout (location = 6) uniform float time;
 #else
 #if MCM_GEOM_ACTIVE
 #else
-layout (location = 50) uniform mat4 simplebone_matrix = mat4(1.0);
-layout (location = 51) uniform mat4 boneTrans[MAX_BONES];
+layout (location = 100) uniform mat4 simplebone_matrix = mat4(1.0);
+layout (location = 101) uniform mat4 boneTrans[MAX_BONES];
 #endif
 #endif
 
