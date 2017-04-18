@@ -28,7 +28,7 @@ namespace Voxalia.ClientGame.EntitySystem
     {
         PointLight light;
 
-        public float Brightness = 1.3f; // TODO: Controllable!
+        public float Brightness = 2.0f; // TODO: Controllable!
 
         public GlowstickEntity(Region tregion, int color)
             : base(tregion, false)
@@ -61,6 +61,7 @@ namespace Voxalia.ClientGame.EntitySystem
         public override void SpawnBody()
         {
             light = new PointLight(GetPosition(), 64, 15, new Location(GColor.R, GColor.G, GColor.B) * Brightness);
+            light.SetCastShadows(false);
             TheClient.MainWorldView.Lights.Add(light);
             base.SpawnBody();
         }

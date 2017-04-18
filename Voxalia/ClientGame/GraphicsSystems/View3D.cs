@@ -839,24 +839,20 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         }
                         if (maxrangemult > 0)
                         {
-                            for (int x = 0; x < Lights[i].InternalLights.Count; x++)
+                            if (Lights[i] is PointLight pl && !pl.CastShadows)
                             {
-                                if (Lights[i].InternalLights[x].color.LengthSquared <= 0.01)
-                                {
-                                    continue;
-                                }
-                                Matrix4 smat = Lights[i].InternalLights[x].GetMatrix();
-                                Vector3d eyep = Lights[i].InternalLights[x].eye - ClientUtilities.ConvertD(CameraPos);
-                                Vector3 col = Lights[i].InternalLights[x].color * (float)maxrangemult;
+                                Matrix4 smat = Matrix4.Identity;
+                                Vector3d eyep = Lights[i].InternalLights[0].eye - ClientUtilities.ConvertD(CameraPos);
+                                Vector3 col = Lights[i].InternalLights[0].color * (float)maxrangemult;
                                 Matrix4 light_data = new Matrix4(
                                     (float)eyep.X, (float)eyep.Y, (float)eyep.Z, // light_pos
                                     0.7f, // diffuse_albedo
                                     0.7f, // specular_albedo
-                                    Lights[i].InternalLights[x] is LightOrtho ? 1.0f : 0.0f, // should_sqrt
+                                    0.0f, // should_sqrt
                                     col.X, col.Y, col.Z, // light_color
-                                    Lights[i].InternalLights[x] is LightOrtho ? LightMaximum : (Lights[i].InternalLights[0].maxrange <= 0 ? LightMaximum : Lights[i].InternalLights[0].maxrange), // light_radius
+                                    (Lights[i].InternalLights[0].maxrange <= 0 ? LightMaximum : Lights[i].InternalLights[0].maxrange), // light_radius
                                     0f, 0f, 0f, // eye_pos
-                                    Lights[i] is SpotLight ? 1.0f : 0.0f, // light_type
+                                    2.0f, // light_type
                                     1f / ShadowTexSize(), // tex_size
                                     0.0f // Unused.
                                     );
@@ -874,12 +870,50 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     goto lights_apply;
                                 }
                             }
+                            else
+                            {
+                                for (int x = 0; x < Lights[i].InternalLights.Count; x++)
+                                {
+                                    if (Lights[i].InternalLights[x].color.LengthSquared <= 0.01)
+                                    {
+                                        continue;
+                                    }
+                                    Matrix4 smat = Lights[i].InternalLights[x].GetMatrix();
+                                    Vector3d eyep = Lights[i].InternalLights[x].eye - ClientUtilities.ConvertD(CameraPos);
+                                    Vector3 col = Lights[i].InternalLights[x].color * (float)maxrangemult;
+                                    Matrix4 light_data = new Matrix4(
+                                        (float)eyep.X, (float)eyep.Y, (float)eyep.Z, // light_pos
+                                        0.7f, // diffuse_albedo
+                                        0.7f, // specular_albedo
+                                        Lights[i].InternalLights[x] is LightOrtho ? 1.0f : 0.0f, // should_sqrt
+                                        col.X, col.Y, col.Z, // light_color
+                                        Lights[i].InternalLights[x] is LightOrtho ? LightMaximum : (Lights[i].InternalLights[0].maxrange <= 0 ? LightMaximum : Lights[i].InternalLights[0].maxrange), // light_radius
+                                        0f, 0f, 0f, // eye_pos
+                                        Lights[i] is SpotLight ? 1.0f : 0.0f, // light_type
+                                        1f / ShadowTexSize(), // tex_size
+                                        0.0f // Unused.
+                                        );
+                                    for (int mx = 0; mx < 4; mx++)
+                                    {
+                                        for (int my = 0; my < 4; my++)
+                                        {
+                                            shadowmat_dat[c * 16 + mx * 4 + my] = smat[mx, my];
+                                            light_dat[c * 16 + mx * 4 + my] = light_data[mx, my];
+                                        }
+                                    }
+                                    c++;
+                                    if (c >= LIGHTS_MAX)
+                                    {
+                                        goto lights_apply;
+                                    }
+                                }
+                            }
                         }
                     }
                 }
             }
-            CheckError("Render/Fast - Shadows");
             lights_apply:
+            CheckError("Render/Fast - Lights");
             if (TheClient.CVars.r_forward_shadows.ValueB)
             {
                 GL.ActiveTexture(TextureUnit.Texture5);
@@ -1129,94 +1163,105 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             TheClient.CVars.r_lightmaxdistance.ValueD * TheClient.CVars.r_lightmaxdistance.ValueD + Lights[i].MaxDistance * Lights[i].MaxDistance * 6)
                         {
                             LightsC++;
-                            for (int x = 0; x < Lights[i].InternalLights.Count; x++)
+                            if (Lights[i] is PointLight pl && !pl.CastShadows)
                             {
-                                if (Lights[i].InternalLights[x].color.LengthSquared <= 0.01)
-                                {
-                                    continue;
-                                }
-                                BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
-                                if (Lights[i].InternalLights[x] is LightOrtho)
-                                {
-                                    CFrust = null;
-                                }
-                                else
-                                {
-                                    CFrust = new Frustum(GraphicsUtil.ConvertD(ClientUtilities.ConvertToD(Lights[i].InternalLights[x].GetMatrix()))); // TODO: One-step conversion!
-                                }
-                                CheckError("Pre-Prerender - Shadows - " + i);
-                                CameraPos = ClientUtilities.ConvertD(Lights[i].InternalLights[x].eye);
-                                TheClient.s_shadowvox = TheClient.s_shadowvox.Bind();
-                                SetMatrix(2, Matrix4d.Identity);
-                                Lights[i].InternalLights[x].SetProj();
-                                GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
-                                GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
-                                TheClient.s_shadow_grass = TheClient.s_shadow_grass.Bind();
-                                SetMatrix(2, Matrix4d.Identity);
-                                GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
-                                GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
-                                Lights[i].InternalLights[x].SetProj();
-                                CheckError("Pre-Prerender2 - Shadows - " + i);
-                                TheClient.s_shadow_parts = TheClient.s_shadow_parts.Bind();
-                                SetMatrix(2, Matrix4d.Identity);
-                                GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
-                                GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
-                                GL.Uniform3(7, ClientUtilities.Convert(CameraPos));
-                                Lights[i].InternalLights[x].SetProj();
-                                TheClient.s_shadow = TheClient.s_shadow.Bind();
-                                SetMatrix(2, Matrix4d.Identity);
-                                CheckError("Pre-Prerender3 - Shadows - " + i);
-                                GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
-                                GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
-                                TranspShadows = Lights[i].InternalLights[x].transp;
-                                Lights[i].InternalLights[x].SetProj();
-                                CheckError("Pre-Prerender4 - Shadows - " + i);
-                                DrawBuffer(DrawBufferMode.ColorAttachment0);
-                                GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
-                                if (Lights[i] is SkyLight sky)
-                                {
-                                    if (redraw || sky.InternalLights[0].NeedsUpdate)
-                                    {
-                                        sky.InternalLights[0].NeedsUpdate = false;
-                                        BindFramebuffer(FramebufferTarget.Framebuffer, sky.FBO);
-                                        DrawBuffer(DrawBufferMode.ColorAttachment0);
-                                        GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
-                                        GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
-                                        FBOid = FBOID.STATIC_SHADOWS;
-                                        CheckError("Prerender - Shadows - " + i);
-                                        Render3D(this);
-                                    }
-                                    BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
-                                    GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, sky.FBO);
-                                    GL.BlitFramebuffer(0, 0, sky.TexWidth, sky.TexWidth, 0, 0, sp, sp, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
-                                    GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
-                                    if (TheClient.CVars.r_dynamicshadows.ValueB)
-                                    {
-                                        GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
-                                        FBOid = FBOID.DYNAMIC_SHADOWS;
-                                        Render3D(this);
-                                    }
-                                }
-                                else if (!Lights[i].InternalLights[x].CastShadows)
-                                {
-                                    BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
-                                    GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
-                                    GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
-                                }
-                                else
-                                {
-                                    BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
-                                    GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
-                                    GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
-                                    FBOid = FBOID.SHADOWS;
-                                    Render3D(this);
-                                }
-                                FBOid = FBOID.NONE;
                                 n++;
-                                CheckError("Postrender - Shadows - " + i);
                                 if (n >= LIGHTS_MAX)
                                 {
                                     goto complete;
+                                }
+                            }
+                            else
+                            {
+                                for (int x = 0; x < Lights[i].InternalLights.Count; x++)
+                                {
+                                    if (Lights[i].InternalLights[x].color.LengthSquared <= 0.01)
+                                    {
+                                        continue;
+                                    }
+                                    BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                    if (Lights[i].InternalLights[x] is LightOrtho)
+                                    {
+                                        CFrust = null;
+                                    }
+                                    else
+                                    {
+                                        CFrust = new Frustum(GraphicsUtil.ConvertD(ClientUtilities.ConvertToD(Lights[i].InternalLights[x].GetMatrix()))); // TODO: One-step conversion!
+                                    }
+                                    CheckError("Pre-Prerender - Shadows - " + i);
+                                    CameraPos = ClientUtilities.ConvertD(Lights[i].InternalLights[x].eye);
+                                    TheClient.s_shadowvox = TheClient.s_shadowvox.Bind();
+                                    SetMatrix(2, Matrix4d.Identity);
+                                    Lights[i].InternalLights[x].SetProj();
+                                    GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
+                                    GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
+                                    TheClient.s_shadow_grass = TheClient.s_shadow_grass.Bind();
+                                    SetMatrix(2, Matrix4d.Identity);
+                                    GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
+                                    GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
+                                    Lights[i].InternalLights[x].SetProj();
+                                    CheckError("Pre-Prerender2 - Shadows - " + i);
+                                    TheClient.s_shadow_parts = TheClient.s_shadow_parts.Bind();
+                                    SetMatrix(2, Matrix4d.Identity);
+                                    GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
+                                    GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
+                                    GL.Uniform3(7, ClientUtilities.Convert(CameraPos));
+                                    Lights[i].InternalLights[x].SetProj();
+                                    TheClient.s_shadow = TheClient.s_shadow.Bind();
+                                    SetMatrix(2, Matrix4d.Identity);
+                                    CheckError("Pre-Prerender3 - Shadows - " + i);
+                                    GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
+                                    GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
+                                    TranspShadows = Lights[i].InternalLights[x].transp;
+                                    Lights[i].InternalLights[x].SetProj();
+                                    CheckError("Pre-Prerender4 - Shadows - " + i);
+                                    DrawBuffer(DrawBufferMode.ColorAttachment0);
+                                    GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
+                                    if (Lights[i] is SkyLight sky)
+                                    {
+                                        if (redraw || sky.InternalLights[0].NeedsUpdate)
+                                        {
+                                            sky.InternalLights[0].NeedsUpdate = false;
+                                            BindFramebuffer(FramebufferTarget.Framebuffer, sky.FBO);
+                                            DrawBuffer(DrawBufferMode.ColorAttachment0);
+                                            GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
+                                            GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+                                            FBOid = FBOID.STATIC_SHADOWS;
+                                            CheckError("Prerender - Shadows - " + i);
+                                            Render3D(this);
+                                        }
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                        GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, sky.FBO);
+                                        GL.BlitFramebuffer(0, 0, sky.TexWidth, sky.TexWidth, 0, 0, sp, sp, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                                        GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
+                                        if (TheClient.CVars.r_dynamicshadows.ValueB)
+                                        {
+                                            GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
+                                            FBOid = FBOID.DYNAMIC_SHADOWS;
+                                            Render3D(this);
+                                        }
+                                    }
+                                    else if (!Lights[i].InternalLights[x].CastShadows)
+                                    {
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                        GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+                                        GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
+                                    }
+                                    else
+                                    {
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                        GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
+                                        GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
+                                        FBOid = FBOID.SHADOWS;
+                                        Render3D(this);
+                                    }
+                                    FBOid = FBOID.NONE;
+                                    n++;
+                                    CheckError("Postrender - Shadows - " + i);
+                                    if (n >= LIGHTS_MAX)
+                                    {
+                                        goto complete;
+                                    }
                                 }
                             }
                         }
