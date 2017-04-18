@@ -190,7 +190,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         
         public void GenerateLightHelpers()
         {
-            View3D.CheckError("Load - View3D - Pre");
+            CheckError("Load - View3D - Pre");
             if (RS4P != null)
             {
                 RS4P.Destroy();

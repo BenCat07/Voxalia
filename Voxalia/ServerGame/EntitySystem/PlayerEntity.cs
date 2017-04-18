@@ -820,8 +820,10 @@ namespace Voxalia.ServerGame.EntitySystem
                     {
                         removes.Add(ch.ChunkPos);
                     }
-                    else if (!ShouldSeeChunk(ch.ChunkPos) && ch.LOD <= BestLOD)
+                    else if (!ShouldSeeChunkExtra(ch.ChunkPos, ch.LOD) && ch.LOD <= BestLOD)
                     {
+                        // TODO: Awkward code trick...
+                        // This causes the chunk to updated at next TryChunk call.
                         ch.LOD = Chunk.CHUNK_SIZE;
                     }
                 }
@@ -1279,6 +1281,11 @@ namespace Voxalia.ServerGame.EntitySystem
         public Location losPos = Location.NaN;
 
         /// <summary>
+        /// Half a chunk's width, the extra distance to load a chunk from.
+        /// </summary>
+        public const double LOAD_EXTRA_DIST = Constants.CHUNK_WIDTH * 0.5;
+
+        /// <summary>
         /// Whether the player's presence alone is sufficient reason for a chunk to remain loaded.
         /// </summary>
         /// <param name="cpos">The chunk position.</param>
@@ -1290,7 +1297,13 @@ namespace Voxalia.ServerGame.EntitySystem
                 || Math.Abs(cpos.Y - wpos.Y) > (ViewRadiusInChunks + ViewRadExtra5)
                 || Math.Abs(cpos.Z - wpos.Z) > (ViewRadiusInChunks + ViewRadExtra5Height))
             {
-                return false;
+                Location cposCalc = cpos.ToLocation() * Constants.CHUNK_WIDTH;
+                if (Math.Abs(cposCalc.X - LoadRelPos.X) > ((ViewRadiusInChunks + ViewRadExtra5) * Constants.CHUNK_WIDTH + LOAD_EXTRA_DIST)
+                    || Math.Abs(cposCalc.Y - LoadRelPos.Y) > ((ViewRadiusInChunks + ViewRadExtra5) * Constants.CHUNK_WIDTH + LOAD_EXTRA_DIST)
+                    || Math.Abs(cposCalc.Z - LoadRelPos.Z) > ((ViewRadiusInChunks + ViewRadExtra5Height) * Constants.CHUNK_WIDTH + LOAD_EXTRA_DIST))
+                {
+                    return false;
+                }
             }
             return true;
         }
@@ -1366,6 +1379,40 @@ namespace Voxalia.ServerGame.EntitySystem
                 || Math.Abs(cpos.Z - wpos.Z) > ViewRadiusInChunks)
             {
                 return false;
+            }
+            return true;
+        }
+
+        public bool ShouldSeeChunkExtra(Vector3i cpos, int lod)
+        {
+            if (LoadRelPos.IsNaN())
+            {
+                return false;
+            }
+            int viewRad = ViewRadiusInChunks;
+            int viewRadh = ViewRadiusInChunks;
+            if (lod == 2)
+            {
+                viewRad += ViewRadExtra2;
+                viewRadh += ViewRadExtra2Height;
+            }
+            else if (lod == 5)
+            {
+                viewRad += ViewRadExtra5;
+                viewRadh += ViewRadExtra5Height;
+            }
+            Vector3i wpos = TheRegion.ChunkLocFor(LoadRelPos);
+            if (Math.Abs(cpos.X - wpos.X) > viewRad
+                || Math.Abs(cpos.Y - wpos.Y) > viewRad
+                || Math.Abs(cpos.Z - wpos.Z) > viewRadh)
+            {
+                Location cposCalc = cpos.ToLocation() * Constants.CHUNK_WIDTH;
+                if (Math.Abs(cposCalc.X - LoadRelPos.X) > (viewRad * Constants.CHUNK_WIDTH + LOAD_EXTRA_DIST)
+                    || Math.Abs(cposCalc.Y - LoadRelPos.Y) > (viewRad * Constants.CHUNK_WIDTH + LOAD_EXTRA_DIST)
+                    || Math.Abs(cposCalc.Z - LoadRelPos.Z) > (viewRadh * Constants.CHUNK_WIDTH + LOAD_EXTRA_DIST))
+                {
+                    return false;
+                }
             }
             return true;
         }
