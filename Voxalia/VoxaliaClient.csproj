@@ -64,6 +64,9 @@
     <Reference Include="BEPUutilities">
       <HintPath>BEPUutilities.dll</HintPath>
     </Reference>
+    <Reference Include="Cloo">
+      <HintPath>.\Cloo.dll</HintPath>
+    </Reference>
     <Reference Include="csogg">
       <HintPath>csogg.dll</HintPath>
     </Reference>
@@ -162,6 +165,7 @@
     <Compile Include="ClientGame\CommandSystem\UICommands\RightwardCommand.cs" />
     <Compile Include="ClientGame\CommandSystem\UICommands\LeftwardCommand.cs" />
     <Compile Include="ClientGame\CommandSystem\UICommands\ForwardCommand.cs" />
+    <Compile Include="ClientGame\ComputeSystem\OpenCLTest.cs" />
     <Compile Include="ClientGame\EntitySystem\BasicPrimitiveEntity.cs" />
     <Compile Include="ClientGame\EntitySystem\BlockItemEntity.cs" />
     <Compile Include="ClientGame\EntitySystem\BlockGroupEntity.cs" />

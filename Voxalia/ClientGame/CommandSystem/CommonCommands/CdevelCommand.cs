@@ -24,6 +24,7 @@ using Voxalia.ClientGame.OtherSystems;
 using OpenTK;
 using BEPUphysics;
 using FreneticGameCore;
+using Voxalia.ClientGame.ComputeSystem;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {
@@ -238,6 +239,12 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                 case "soundCount":
                     {
                         entry.Info(queue, "Sound effects: " + TheClient.Sounds.Effects.Count + ", playing now: " + TheClient.Sounds.PlayingNow.Count);
+                        break;
+                    }
+                case "testCl":
+                    {
+                        OpenCLTest cltes = new OpenCLTest();
+                        cltes.Test();
                         break;
                     }
                 default:
