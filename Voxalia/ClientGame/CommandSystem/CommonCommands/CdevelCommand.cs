@@ -243,7 +243,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                     }
                 case "testCl":
                     {
-                        OpenCLTest cltes = new OpenCLTest();
+                        OpenCLTest cltes = new OpenCLTest() { TheClient = TheClient };
                         cltes.Test();
                         break;
                     }

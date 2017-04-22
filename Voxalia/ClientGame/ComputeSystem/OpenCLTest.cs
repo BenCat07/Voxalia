@@ -8,11 +8,16 @@ using Cloo.Bindings;
 using System.Runtime.InteropServices;
 using FreneticGameCore;
 using Voxalia.Shared;
+using Voxalia.ClientGame.ClientMainSystem;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace Voxalia.ClientGame.ComputeSystem
 {
     public class OpenCLTest
     {
+        public Client TheClient;
+
         public void Test()
         {
             Setup();
@@ -21,6 +26,13 @@ namespace Voxalia.ClientGame.ComputeSystem
         public IntPtr GenStringSpace(int size)
         {
             return Marshal.AllocHGlobal(size);
+        }
+
+        public byte[] IntPtrToBytes(IntPtr ptr, int size)
+        {
+            byte[] chrs = new byte[size];
+            Marshal.Copy(ptr, chrs, 0, size);
+            return chrs;
         }
 
         public string IntPtrToString(IntPtr ptr, int size)
@@ -127,14 +139,14 @@ namespace Voxalia.ClientGame.ComputeSystem
             CheckEC(CL11.GetDeviceIDs(bestPlat, wantedType, 0, null, out int num_dev));
             CLDeviceHandle[] devs = new CLDeviceHandle[num_dev];
             CheckEC(CL11.GetDeviceIDs(bestPlat, wantedType, num_dev, devs, out IGNORED));
-            IntPtr[] props = new IntPtr[]
+            IntPtr[] cprops = new IntPtr[]
             {
                 (IntPtr)ComputeContextPropertyName.Platform,
                 bestPlat.Value,
                 IntPtr.Zero,
                 IntPtr.Zero
             };
-            CLContextHandle context = CL11.CreateContext(props, num_dev, devs, null, IntPtr.Zero, out ComputeErrorCode errcode_ret);
+            CLContextHandle context = CL11.CreateContext(cprops, num_dev, devs, null, IntPtr.Zero, out ComputeErrorCode errcode_ret);
             CheckEC(errcode_ret);
             CLContext = context;
         }
@@ -143,6 +155,39 @@ namespace Voxalia.ClientGame.ComputeSystem
         {
             CL11.ReleaseContext(CLContext);
         }
+
+        // TODO: Ensure accurate OpenGL connection magic. Cloo appears too overly restricted and outdated to be able to do this correctly?
+        /*
+        public void Ignored()
+        {
+            CLx clx = new CLx(ComputePlatform.GetByHandle(bestPlat.Value));
+            IntPtr[] props = new IntPtr[]
+            {
+                (IntPtr)ComputeContextPropertyName.Platform,
+                bestPlat.Value,
+                (IntPtr)ComputeContextPropertyName.CL_GL_CONTEXT_KHR,
+                (TheClient.Window.Context as IGraphicsContextInternal).Context.Handle,
+                // TODO: WGL_HDC_KHR?
+                IntPtr.Zero
+            };
+            CheckEC(clx.GetGLContextInfoKHR(props, ComputeGLContextInfo.CL_CURRENT_DEVICE_FOR_GL_CONTEXT_KHR, IntPtr.Zero, IntPtr.Zero, out IntPtr size_ret));
+            int sized = size_ret.ToInt32();
+            IntPtr buff = GenStringSpace(sized);
+            CheckEC(clx.GetGLContextInfoKHR(props, ComputeGLContextInfo.CL_CURRENT_DEVICE_FOR_GL_CONTEXT_KHR, size_ret, buff, out IntPtr IGNOREDPTR));
+            byte[] b = IntPtrToBytes(buff, sized);
+            DeleteIntPtrString(buff);
+            CLDeviceHandle[] devs = new CLDeviceHandle[b.Length / IntPtr.Size];
+            for (int i = 0; i < devs.Length; i++)
+            {
+                // Excessively 64-bit capped!
+                ulong tmp = 0;
+                for (int x = 0; x < IntPtr.Size; x++)
+                {
+                    tmp |= (ulong)b[i * IntPtr.Size + x] << x;
+                }
+                devs[i] = new CLDeviceHandle() { Handle = new IntPtr(unchecked((long)tmp)) };
+            }
+        }*/
 
         public CLContextHandle CLContext;
     }
