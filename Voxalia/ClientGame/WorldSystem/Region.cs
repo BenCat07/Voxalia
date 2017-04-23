@@ -922,12 +922,15 @@ namespace Voxalia.ClientGame.WorldSystem
                 KeyValuePair<Vector3i, Material>[] arr = potentials[i].Lits;
                 for (int k = 0; k < arr.Length; k++)
                 {
-                    double distsq = (arr[k].Key.ToLocation() + loc).DistanceSquared(pos);
+                    Location relCoord = (arr[k].Key.ToLocation() + loc);
+                    double distsq = relCoord.DistanceSquared(pos);
                     double range = arr[k].Value.GetLightEmitRange();
-                    // TODO: Apply normal vector stuff?
                     if (distsq < range * range)
                     {
-                        lit += arr[k].Value.GetLightEmit() * (range - Math.Sqrt(distsq)); // TODO: maybe apply normals?
+                        double dist = Math.Sqrt(distsq);
+                        Location rel_norm = (relCoord - pos) * (1.0 / dist);
+                        double norm_lit = Math.Max(norm.Dot(rel_norm), 0.0);
+                        lit += arr[k].Value.GetLightEmit() * (range - dist) * norm_lit;
                     }
                 }
             }
