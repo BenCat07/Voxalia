@@ -409,7 +409,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     chunk.OnRendered = () =>
                     {
                         LoadedChunks.Remove(pos);
-                        ch.Destroy();
+                        ch.Destroy(false);
                         LoadedChunks.Add(pos, chunk);
                     };
                     ch.SucceededBy = chunk;
