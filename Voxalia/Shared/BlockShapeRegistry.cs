@@ -178,7 +178,8 @@ namespace Voxalia.Shared
     {
         NONE = 0,
         FULL = 1,
-        BOTTOM_HALF = 2
+        BOTTOM_HALF = 2,
+        NO_FILL = 3
         // TODO: More!
     }
 
@@ -186,7 +187,11 @@ namespace Voxalia.Shared
     {
         public static bool Covers(this BlockSideCoverage a, BlockSideCoverage b)
         {
-            if (a == BlockSideCoverage.NONE)
+            if (b == BlockSideCoverage.NO_FILL)
+            {
+                return false;
+            }
+            else if (a == BlockSideCoverage.NONE)
             {
                 return false;
             }
@@ -215,6 +220,12 @@ namespace Voxalia.Shared
             AbleToFill_YM = OccupiesYM() ? BlockSideCoverage.FULL : BlockSideCoverage.NONE;
             AbleToFill_XP = OccupiesXP() ? BlockSideCoverage.FULL : BlockSideCoverage.NONE;
             AbleToFill_XM = OccupiesXM() ? BlockSideCoverage.FULL : BlockSideCoverage.NONE;
+            RequiresToFill_ZP = OccupiesTOP() ? BlockSideCoverage.FULL : BlockSideCoverage.NO_FILL;
+            RequiresToFill_ZM = OccupiesBOTTOM() ? BlockSideCoverage.FULL : BlockSideCoverage.NO_FILL;
+            RequiresToFill_YP = OccupiesYP() ? BlockSideCoverage.FULL : BlockSideCoverage.NO_FILL;
+            RequiresToFill_YM = OccupiesYM() ? BlockSideCoverage.FULL : BlockSideCoverage.NO_FILL;
+            RequiresToFill_XP = OccupiesXP() ? BlockSideCoverage.FULL : BlockSideCoverage.NO_FILL;
+            RequiresToFill_XM = OccupiesXM() ? BlockSideCoverage.FULL : BlockSideCoverage.NO_FILL;
         }
 
         public const double SHRINK_CONSTANT = 0.9;
