@@ -436,6 +436,26 @@ namespace Voxalia.ClientGame.WorldSystem
             return null;
         }
 
+        /// <summary>
+        /// Gets the material at a location, searching a specific map of chunks first (prior to searching globally).
+        /// </summary>
+        /// <param name="chunkmap">A map of chunks to search first.</param>
+        /// <param name="pos">The location.</param>
+        /// <returns>The material.</returns>
+        public Material GetBlockMaterial(Dictionary<Vector3i, Chunk> chunkmap, Location pos)
+        {
+            Vector3i cpos = ChunkLocFor(pos);
+            if (!chunkmap.TryGetValue(cpos, out Chunk ch))
+            {
+                return Material.AIR;
+            }
+            int x = (int)Math.Floor(pos.X) - (int)cpos.X * Chunk.CHUNK_SIZE;
+            int y = (int)Math.Floor(pos.Y) - (int)cpos.Y * Chunk.CHUNK_SIZE;
+            int z = (int)Math.Floor(pos.Z) - (int)cpos.Z * Chunk.CHUNK_SIZE;
+            return (Material)ch.GetBlockAt(x, y, z).BlockMaterial;
+        }
+
+
         public Material GetBlockMaterial(Location pos)
         {
             return (Material)GetBlockInternal(pos).BlockMaterial;
@@ -915,6 +935,12 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public Location GetBlockLight(Location pos, Location norm, List<Chunk> potentials)
         {
+            // TODO: Figure out clen propogation / prevention of light going through blocks...
+            /*Dictionary<Vector3i, Chunk> pots = new Dictionary<Vector3i, Chunk>(potentials.Count + 10);
+            for (int i = 0; i < potentials.Count; i++)
+            {
+                pots[potentials[i].WorldPosition] = potentials[i];
+            }*/
             Location lit = Location.Zero;
             for (int i = 0; i < potentials.Count; i++)
             {
@@ -929,8 +955,24 @@ namespace Voxalia.ClientGame.WorldSystem
                     {
                         double dist = Math.Sqrt(distsq);
                         Location rel_norm = (relCoord - pos) * (1.0 / dist);
-                        double norm_lit = Math.Max(norm.Dot(rel_norm), 0.0);
+                        /*Location o_p = pos.GetBlockLocation();
+                        Location o_end = relCoord.GetBlockLocation();
+                        for (int b = 0; b < dist; b++)
+                        {
+                            Location p = (pos + rel_norm * b).GetBlockLocation();
+                            if (p.DistanceSquared(o_p) < 1.0 || p.DistanceSquared(o_end) < 1.0)
+                            {
+                                continue;
+                            }
+                            if (GetBlockMaterial(pots, p).IsOpaque())
+                            {
+                                goto skip;
+                            }
+                        }*/
+                        double norm_lit = dist < 2.0 ? 1.0 : Math.Max(norm.Dot(rel_norm), 0.0);
                         lit += arr[k].Value.GetLightEmit() * (range - dist) * norm_lit;
+                        //skip:
+                        continue;
                     }
                 }
             }
