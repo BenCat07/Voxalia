@@ -334,8 +334,7 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public ChunkSLODHelper GetSLODHelp(Vector3i chunk_pos)
         {
-            // TODO: 3 -> constants
-            Vector3i slodpos = new Vector3i(chunk_pos.X / 3, chunk_pos.Y / 3, chunk_pos.Z / 3);
+            Vector3i slodpos = new Vector3i(chunk_pos.X / Constants.CHUNKS_PER_SLOD, chunk_pos.Y / Constants.CHUNKS_PER_SLOD, chunk_pos.Z / Constants.CHUNKS_PER_SLOD);
             if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
                 return slod;
@@ -345,8 +344,7 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public void RecalculatSLOD(Vector3i chunk_pos)
         {
-            // TODO: 3 -> constants
-            Vector3i slodpos = new Vector3i(chunk_pos.X / 3, chunk_pos.Y / 3, chunk_pos.Z / 3);
+            Vector3i slodpos = new Vector3i(chunk_pos.X / Constants.CHUNKS_PER_SLOD, chunk_pos.Y / Constants.CHUNKS_PER_SLOD, chunk_pos.Z / Constants.CHUNKS_PER_SLOD);
             if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
                 slod.FullBlock = new ChunkRenderHelper(512);
@@ -359,7 +357,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     continue;
                 }
                 count++;
-                Vector3i slodposser = new Vector3i(entry.Key.X / 3, entry.Key.Y / 3, entry.Key.Z / 3);
+                Vector3i slodposser = new Vector3i(entry.Key.X / Constants.CHUNKS_PER_SLOD, entry.Key.Y / Constants.CHUNKS_PER_SLOD, entry.Key.Z / Constants.CHUNKS_PER_SLOD);
                 if (slodposser == slodpos)
                 {
                     entry.Value.CreateVBO();
@@ -372,6 +370,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     slod._VBO.Destroy();
                 }
                 slod._VBO = null;
+                SLODs.Remove(slodpos);
             }
         }
 

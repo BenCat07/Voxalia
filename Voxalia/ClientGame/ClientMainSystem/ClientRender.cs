@@ -1188,9 +1188,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             View3D.CheckError("Rendering - Sky - PostPrep");
             foreach (ChunkSLODHelper ch in TheRegion.SLODs.Values)
             {
-                // TODO: 3 -> constants
-                Location min = ch.Coordinate.ToLocation() * Chunk.CHUNK_SIZE * 3;
-                Location helpervec = new Location(Chunk.CHUNK_SIZE * 3, Chunk.CHUNK_SIZE * 3, Chunk.CHUNK_SIZE * 3) * 5;
+                Location min = ch.Coordinate.ToLocation() * Chunk.CHUNK_SIZE * Constants.CHUNKS_PER_SLOD;
+                Location helpervec = new Location(Chunk.CHUNK_SIZE * Constants.CHUNKS_PER_SLOD, Chunk.CHUNK_SIZE * Constants.CHUNKS_PER_SLOD, Chunk.CHUNK_SIZE * Constants.CHUNKS_PER_SLOD)
+                    * (Constants.CHUNKS_PER_SLOD + 2);
                 if ((MainWorldView.CFrust == null || MainWorldView.LongFrustum == null || MainWorldView.LongFrustum.ContainsBox(min - helpervec, min + helpervec)))
                 {
                     ch.Render();

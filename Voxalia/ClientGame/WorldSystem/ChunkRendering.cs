@@ -278,8 +278,9 @@ namespace Voxalia.ClientGame.WorldSystem
                                 for (int i = 0; i < vertset.Count; i++)
                                 {
                                     BEPUutilities.Vector3 vti_use = new BEPUutilities.Vector3(x + vertset[i].X, y + vertset[i].Y, z + vertset[i].Z) * PosMultiplier;
-                                    // TODO: 3 -> constants
-                                    vti_use += new BEPUutilities.Vector3(WorldPosition.X - (WorldPosition.X / 3) * 3, WorldPosition.Y - (WorldPosition.Y / 3) * 3, WorldPosition.Z - (WorldPosition.Z / 3) * 3) * CHUNK_SIZE;
+                                    vti_use += new BEPUutilities.Vector3(WorldPosition.X - (WorldPosition.X / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
+                                        WorldPosition.Y - (WorldPosition.Y / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
+                                        WorldPosition.Z - (WorldPosition.Z / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD) * CHUNK_SIZE;
                                     Verts.Add(vti_use);
                                 }
                             }
@@ -510,8 +511,9 @@ namespace Voxalia.ClientGame.WorldSystem
                                     Vector3 vti_use = vt;
                                     if (crh != null)
                                     {
-                                        // TODO: 3 -> constants
-                                        vti_use += new Vector3(WorldPosition.X - (WorldPosition.X / 3) * 3, WorldPosition.Y - (WorldPosition.Y / 3) * 3, WorldPosition.Z - (WorldPosition.Z / 3) * 3) * CHUNK_SIZE;
+                                        vti_use += new Vector3(WorldPosition.X - (WorldPosition.X / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
+                                            WorldPosition.Y - (WorldPosition.Y / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
+                                            WorldPosition.Z - (WorldPosition.Z / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD) * CHUNK_SIZE;
                                     }
                                     rh.Vertices.Add(vti_use);
                                     Vector3 nt = new Vector3((float)normsi[i].X, (float)normsi[i].Y, (float)normsi[i].Z);
@@ -573,8 +575,9 @@ namespace Voxalia.ClientGame.WorldSystem
                                         Vector3 vt = new Vector3((float)(x + vecsi[i].X) * PosMultiplier, (float)(y + vecsi[i].Y) * PosMultiplier, (float)(z + vecsi[i].Z) * PosMultiplier);
                                         if (crh != null)
                                         {
-                                            // TODO: 3 -> constants
-                                            vt += new Vector3(WorldPosition.X - (WorldPosition.X / 3) * 3, WorldPosition.Y - (WorldPosition.Y / 3) * 3, WorldPosition.Z - (WorldPosition.Z / 3) * 3);
+                                            vt += new Vector3(WorldPosition.X - (WorldPosition.X / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
+                                                WorldPosition.Y - (WorldPosition.Y / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
+                                                WorldPosition.Z - (WorldPosition.Z / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD);
                                         }
                                         rh.Vertices.Add(vt);
                                         int tx = tf + i;
@@ -929,8 +932,7 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             if (_VBO != null && _VBO.generated)
             {
-                // TODO: 3 -> constants
-                Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(Coordinate.ToLocation() * Constants.CHUNK_WIDTH * 3));
+                Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(Coordinate.ToLocation() * Constants.CHUNK_SLOD_WIDTH));
                 OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
                 _VBO.Render();
             }

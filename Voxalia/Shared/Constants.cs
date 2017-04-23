@@ -51,5 +51,20 @@ namespace Voxalia.Shared
         /// <para>See <see cref="BlockInternal"/>'s details for more information on how this data works out and why this constant was chosen at 5.</para>
         /// </summary>
         public const int BYTES_PER_BLOCK = 5;
+
+        /// <summary>
+        /// This value represents the number of chunks in a SLOD chunk set.
+        /// Divide a chunk coordinate by this (integer rounded down) to get the SLOD coordinate.
+        /// Chosen as 3 as 4 was too many chunks at once, and 2 is too few, based on
+        /// pre-render timings.
+        /// </summary>
+        public const int CHUNKS_PER_SLOD = 3;
+
+        /// <summary>
+        /// This value represents the number of blocks wide a SLOD chunk set is.
+        /// (90: 30 * 3).
+        /// It is calculated as CHUNK_WIDTH (30) multiplied by CHUNKS_PER_SLOD (3).
+        /// </summary>
+        public const int CHUNK_SLOD_WIDTH = CHUNKS_PER_SLOD * CHUNK_WIDTH;
     }
 }
