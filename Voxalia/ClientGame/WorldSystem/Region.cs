@@ -933,14 +933,13 @@ namespace Voxalia.ClientGame.WorldSystem
             return (col / Math.Max(col.X, Math.Max(col.Y, col.Z))) * cap;
         }
 
-        public Location GetBlockLight(Location pos, Location norm, List<Chunk> potentials)
+        public Location GetBlockLight(Location blockPos, Location pos, Location norm, List<Chunk> potentials)
         {
-            // TODO: Figure out clen propogation / prevention of light going through blocks...
-            /*Dictionary<Vector3i, Chunk> pots = new Dictionary<Vector3i, Chunk>(potentials.Count + 10);
+            Dictionary<Vector3i, Chunk> pots = new Dictionary<Vector3i, Chunk>(potentials.Count + 10);
             for (int i = 0; i < potentials.Count; i++)
             {
                 pots[potentials[i].WorldPosition] = potentials[i];
-            }*/
+            }
             Location lit = Location.Zero;
             for (int i = 0; i < potentials.Count; i++)
             {
@@ -948,14 +947,14 @@ namespace Voxalia.ClientGame.WorldSystem
                 KeyValuePair<Vector3i, Material>[] arr = potentials[i].Lits;
                 for (int k = 0; k < arr.Length; k++)
                 {
-                    Location relCoord = (arr[k].Key.ToLocation() + loc);
+                    Location relCoord = (arr[k].Key.ToLocation() + loc) + new Location(0.5, 0.5, 0.5);
                     double distsq = relCoord.DistanceSquared(pos);
                     double range = arr[k].Value.GetLightEmitRange();
                     if (distsq < range * range)
                     {
                         double dist = Math.Sqrt(distsq);
                         Location rel_norm = (relCoord - pos) * (1.0 / dist);
-                        /*Location o_p = pos.GetBlockLocation();
+                        Location o_p = blockPos.GetBlockLocation();
                         Location o_end = relCoord.GetBlockLocation();
                         for (int b = 0; b < dist; b++)
                         {
@@ -966,11 +965,11 @@ namespace Voxalia.ClientGame.WorldSystem
                             }
                             if (GetBlockMaterial(pots, p).IsOpaque())
                             {
-                                goto skip;
+                                //goto skip;
                             }
-                        }*/
+                        }
                         double norm_lit = dist < 2.0 ? 1.0 : Math.Max(norm.Dot(rel_norm), 0.0);
-                        lit += arr[k].Value.GetLightEmit() * (range - dist) * norm_lit;
+                        lit += arr[k].Value.GetLightEmit() * Math.Max(Math.Min(1.0 - (dist / range), 1.0), 0.0) * norm_lit;
                         //skip:
                         continue;
                     }
@@ -994,7 +993,7 @@ namespace Voxalia.ClientGame.WorldSystem
             new Vector3i(1, 1, -1), new Vector3i(1, 1, 0), new Vector3i(1, 1, 1)
         };
 
-        public Location GetLightAmountForSkyValue(Location pos, Location norm, List<Chunk> potentials, float skyPrecalc)
+        public Location GetLightAmountForSkyValue(Location blockPos, Location pos, Location norm, List<Chunk> potentials, float skyPrecalc)
         {
             if (potentials == null)
             {
@@ -1012,14 +1011,14 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             Location amb = GetAmbient();
             Location sky = SkyMod(pos, norm, skyPrecalc);
-            Location blk = GetBlockLight(pos, norm, potentials);
+            Location blk = GetBlockLight(blockPos, pos, norm, potentials);
             Location.AddThree(ref amb, ref sky, ref blk, out Location res);
             return res;
         }
 
-        public OpenTK.Vector4 GetLightAmountAdjusted(Location pos, Location norm)
+        public OpenTK.Vector4 GetLightAmountAdjusted(Location blockPos, Location pos, Location norm)
         {
-            OpenTK.Vector4 vec = new OpenTK.Vector4(ClientUtilities.Convert(GetLightAmount(pos, norm, null)), 1.0f) * GetSunAdjust();
+            OpenTK.Vector4 vec = new OpenTK.Vector4(ClientUtilities.Convert(GetLightAmount(blockPos, pos, norm, null)), 1.0f) * GetSunAdjust();
             if (TheClient.CVars.r_fast.ValueB)
             {
                 return Regularize(vec);
@@ -1027,7 +1026,7 @@ namespace Voxalia.ClientGame.WorldSystem
             return RegularizeBig(vec, 5f);
         }
 
-        public Location GetLightAmount(Location pos, Location norm, List<Chunk> potentials)
+        public Location GetLightAmount(Location blockPos, Location pos, Location norm, List<Chunk> potentials)
         {
             if (potentials == null)
             {
@@ -1044,7 +1043,7 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             Location amb = GetAmbient();
             Location sky = GetSkyLight(pos, norm);
-            Location blk = GetBlockLight(pos, norm, potentials);
+            Location blk = GetBlockLight(blockPos, pos, norm, potentials);
             if (TheClient.CVars.r_fast.ValueB)
             {
                 blk = Regularize(blk);

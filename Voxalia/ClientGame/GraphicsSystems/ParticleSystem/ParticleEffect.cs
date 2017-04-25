@@ -167,7 +167,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             {
                 WindOffset += WindMod * TheClient.TheRegion.ActualWind * SimplexNoiseInternal.Generate((start.X + TheClient.GlobalTickTimeLocal) * 0.2, (start.Y + TheClient.GlobalTickTimeLocal) * 0.2, start.Z * 0.2) * 0.1;
             }
-            Vector4 light = TheClient.TheRegion.GetLightAmountAdjusted(start, Location.UnitZ);
+            Vector4 light = TheClient.TheRegion.GetLightAmountAdjusted(start.GetBlockLocation(), start, Location.UnitZ);
             Vector4 scolor = new Vector4((float)Color.X * light.X, (float)Color.Y * light.Y, (float)Color.Z * light.Z, Alpha * light.W);
             Vector4 scolor2 = new Vector4((float)Color2.X * light.X, (float)Color2.Y * light.Y, (float)Color2.Z * light.Z, Alpha * light.W);
             Vector4 rcol = scolor * rel + scolor2 * (1 - rel);
@@ -218,7 +218,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             {
                 WindOffset += WindMod * TheClient.TheRegion.ActualWind * SimplexNoiseInternal.Generate((start.X + TheClient.GlobalTickTimeLocal) * 0.2, (start.Y + TheClient.GlobalTickTimeLocal) * 0.2, start.Z * 0.2) * 0.1;
             }
-            Vector4 light = TheClient.TheRegion.GetLightAmountAdjusted(start, Location.UnitZ);
+            Vector4 light = TheClient.TheRegion.GetLightAmountAdjusted(start.GetBlockLocation(), start, Location.UnitZ);
             Vector4 scolor = new Vector4((float)Color.X * light.X, (float)Color.Y * light.Y, (float)Color.Z * light.Z, Alpha * light.W);
             Vector4 scolor2 = new Vector4((float)Color2.X * light.X, (float)Color2.Y * light.Y, (float)Color2.Z * light.Z, Alpha * light.W);
             Vector4 rcol = scolor * rel + scolor2 * (1 - rel);
