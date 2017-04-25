@@ -1888,6 +1888,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         ent.Render();
                     }
                     View3D.CheckError("Rendering - 0 - Main");
+                    TheRegion.RenderPlants();
                 }
                 else if (CVars.r_drawents.ValueB)
                 {
