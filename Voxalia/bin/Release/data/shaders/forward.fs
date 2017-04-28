@@ -258,7 +258,7 @@ void main()
 		vec3 specular = vec3(spec_res); // Find out how much specular light to apply.
 		res_color += (vec3(depth, depth, depth) * atten * (diffuse * light_color) * color.xyz) + (min(specular, 1.0) * light_color * atten * depth); // Put it all together now.
 	}
-	color.xyz = min(res_color + color.xyz * 0.2, vec3(1.0));
+	color.xyz = min(res_color * (1.0 - max(0.2, minimum_light)) + color.xyz * max(0.2, minimum_light), vec3(1.0));
 #else // MCM_LIGHTS
 	color.xyz *= min(max(dot(-tf_normal, sunlightDir) * maximum_light, max(0.2, minimum_light)), 1.0);
 #endif // else - MCM_LIGHTS

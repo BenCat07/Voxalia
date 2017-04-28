@@ -337,7 +337,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.DeleteTexture(CurrentFBOTexture);
                 GL.DeleteTexture(CurrentFBODepth);
             }
-            View3D.CheckError("Load - View3D - GenFBO - Deletes");
+            CheckError("Load - View3D - GenFBO - Deletes");
             GL.ActiveTexture(TextureUnit.Texture0);
             CurrentFBOTexture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, CurrentFBOTexture);
@@ -359,7 +359,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, CurrentFBODepth, 0);
             BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             GL.BindTexture(TextureTarget.Texture2D, 0);
-            View3D.CheckError("Load - View3D - GenFBO");
+            CheckError("Load - View3D - GenFBO");
         }
 
         int NF_Tex = -1;
@@ -376,7 +376,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 return FB_Tex;
             }
-            View3D.CheckError("View3D - NFTex - Pre");
+            CheckError("View3D - NFTex - Pre");
             GL.ActiveTexture(TextureUnit.Texture0);
             NF_Tex = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, NF_Tex);
@@ -398,7 +398,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, NF_DTx, 0);
             BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             GL.BindTexture(TextureTarget.Texture2D, 0);
-            View3D.CheckError("View3D - NFTex");
+            CheckError("View3D - NFTex");
             return NF_Tex;
         }
         

@@ -42,6 +42,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             int[] ints = new int[6];
             // TODO: Normals too!
             int fbo = GL.GenFramebuffer();
+            GL.Viewport(0, 0, TWIDTH, TWIDTH);
             ints[0] = RenderSide(0, model, box, fbo, Vector3.UnitX, Vector3.UnitZ, Matrix4d.CreateOrthographicOffCenter(box.Min.Y, box.Max.Y, box.Min.Z, box.Max.Z, box.Min.X, box.Max.X), oTrans);
             ints[1] = RenderSide(1, model, box, fbo, -Vector3.UnitX, Vector3.UnitZ, Matrix4d.CreateOrthographicOffCenter(box.Max.Y, box.Min.Y, box.Min.Z, box.Max.Z, box.Min.X, box.Max.X), oTrans);
             ints[2] = RenderSide(2, model, box, fbo, Vector3.UnitY, Vector3.UnitZ, Matrix4d.CreateOrthographicOffCenter(box.Min.X, box.Max.X, box.Min.Z, box.Max.Z, box.Min.Y, box.Max.Y), oTrans);
@@ -51,6 +52,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.DeleteFramebuffer(fbo);
             model.LODHelper = ints;
             GL.DrawBuffer(DrawBufferMode.Back);
+            TheClient.MainWorldView.OSetViewport();
         }
 
         public int RenderSide(int side, Model model, AABB box, int fbo, Vector3 forw, Vector3 up, Matrix4d ortho, Matrix4 oTrans)
@@ -68,7 +70,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, tex, 0);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, DepthTex, 0);
             GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
-            GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0f, 0f, 0f, 1f }); // TODO: Swap 1f to 0f when the model is placed more correctly
+            GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0f, 0f, 0f, 0f });
             GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
             Matrix4 view = Matrix4.LookAt(Vector3.Zero, forw, up);
             Matrix4 mat = view * ClientUtilities.Convert(ortho);

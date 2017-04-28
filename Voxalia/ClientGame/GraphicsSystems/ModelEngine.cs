@@ -467,12 +467,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 return;
             }
-            Vector3 vpos = ClientUtilities.Convert(pos - Engine.TheClient.MainWorldView.RenderRelative);
-            GL.BindTexture(TextureTarget.Texture2D, LODHelper[0]);
             Vector3 wid = ClientUtilities.Convert(LODBox.Max - LODBox.Min);
+            Vector3 vpos = ClientUtilities.Convert(pos - Engine.TheClient.MainWorldView.RenderRelative) + new Vector3(0f, 0f, wid.Z * 0.5f);
             Vector3 offs = new Vector3(-0.5f, -0.5f, 0f);
             Matrix4 off1 = Matrix4.CreateTranslation(offs);
             //Matrix4 off2 = Matrix4.CreateTranslation(-offs);
+            Engine.TheClient.Rendering.SetMinimumLight(1f);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[0]);
             Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.X, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * 0.25f) * Matrix4.CreateTranslation(vpos));
             GL.BindTexture(TextureTarget.Texture2D, LODHelper[1]);
             Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.X, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * 0.75f) * Matrix4.CreateTranslation(vpos));
@@ -481,10 +482,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.BindTexture(TextureTarget.Texture2D, LODHelper[3]);
             Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Y, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * -0.75f) * Matrix4.CreateTranslation(vpos));
             GL.BindTexture(TextureTarget.Texture2D, LODHelper[4]);
-            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Z, wid.X, 1f) * Matrix4.CreateTranslation(vpos + new Vector3(0, 0, (float)LODBox.Max.Z)));
+            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Z, wid.X, 1f) * Matrix4.CreateTranslation(vpos));
             GL.BindTexture(TextureTarget.Texture2D, LODHelper[5]);
-            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Z, wid.X, 1f) * Matrix4.CreateRotationX((float)Math.PI) * Matrix4.CreateTranslation(vpos + new Vector3(0, 0, (float)LODBox.Max.Z)));
+            Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Z, wid.X, 1f) * Matrix4.CreateRotationX((float)Math.PI) * Matrix4.CreateTranslation(vpos));
             GL.BindTexture(TextureTarget.Texture2D, 0);
+            Engine.TheClient.Rendering.SetMinimumLight(0f);
         }
         
         /// <summary>

@@ -432,12 +432,12 @@ namespace Voxalia.ClientGame.EntitySystem
                 return;
             }
             // TODO: Make optional: based on (customizable) distance!
-            /*bool b = true;
+            bool b = true;
             if (b)
             {
                 model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()));
                 return;
-            }*/
+            }
             Matrix4d orient = GetOrientationMatrix();
             Matrix4d mat = (Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * orient * transform * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition())));
             TheClient.MainWorldView.SetMatrix(2, mat);
