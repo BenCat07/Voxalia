@@ -329,7 +329,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// All the meshes this model has.
         /// </summary>
         public List<ModelMesh> Meshes;
-        
+
         public ModelNode RootNode;
 
         public bool ModelBoundsSet = false;
@@ -365,6 +365,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 }
             }
             GL.UniformMatrix4(101, mats.Length, false, set);
+        }
+
+        public void BoneSafe()
+        {
+            Matrix4 ident = Matrix4.Identity;
+            GL.UniformMatrix4(100, false, ref ident);
+            Matrix4[] mats = new Matrix4[] { ident };
+            SetBones(mats);
         }
         
         public Dictionary<string, Matrix4> CustomAnimationAdjustments = new Dictionary<string, Matrix4>();

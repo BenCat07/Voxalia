@@ -375,7 +375,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 if (model.LODHelper == null)
                 {
                     model.LODBox = new AABB() { Min = new Location(ModelMin), Max = new Location(ModelMax) };
-                    TheClient.LODHelp.PreRender(model, model.LODBox);
+                    TheClient.LODHelp.PreRender(model, model.LODBox, ClientUtilities.Convert(transform));
                 }
             }
         }
@@ -431,7 +431,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
-            // TODO: Make optional: based on distance!
+            // TODO: Make optional: based on (customizable) distance!
             /*bool b = true;
             if (b)
             {

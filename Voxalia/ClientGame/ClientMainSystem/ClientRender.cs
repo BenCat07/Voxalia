@@ -1596,13 +1596,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <param name="view">The view to render.</param>
         public void RenderDecal(View3D view)
         {
-            bool isMore = pDecals != Decals.Count;
+            //bool isMore = pDecals != Decals.Count;
             pDecals = Decals.Count;
             if (Decals.Count == 0)
             {
                 return;
             }
-            // TODO: Expiration goes here. Set isMore true if any expired.
+            // TODO: Expiration goes here? Set isMore true if any expired.
             //GL.PolygonOffset(-1, -2);
             GL.Disable(EnableCap.CullFace);
             GL.ActiveTexture(TextureUnit.Texture0);
