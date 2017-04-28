@@ -431,9 +431,9 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
-            // TODO: Make optional: based on (customizable) distance!
-            bool b = true;
-            if (b)
+            double maxr = TheClient.CVars.r_modeldistance.ValueF;
+            double distsq = GetPosition().DistanceSquared(TheClient.MainWorldView.RenderRelative);
+            if (distsq > maxr * maxr)
             {
                 model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()));
                 return;
