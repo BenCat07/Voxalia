@@ -14,6 +14,7 @@ using FreneticGameCore.Files;
 using Voxalia.Shared.Collision;
 using System.Threading;
 using System.Globalization;
+using System.Reflection;
 
 namespace Voxalia.Shared
 {
@@ -28,9 +29,9 @@ namespace Voxalia.Shared
         public const string GameName = "Voxalia";
 
         /// <summary>
-        /// The version of the game.
+        /// The version of the game. Automatically read from file.
         /// </summary>
-        public const string GameVersion = "0.1.1";
+        public static readonly string GameVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();
 
         /// <summary>
         /// The description of the game version.
