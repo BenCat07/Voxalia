@@ -330,6 +330,10 @@ namespace Voxalia.ClientGame.WorldSystem
                             {
                                 side = MaterialSide.XM;
                             }
+                            else if (norm.Z < 0.0f)
+                            {
+                                side = MaterialSide.BOTTOM;
+                            }
                             else
                             {
                                 side = MaterialSide.TOP;
@@ -350,6 +354,7 @@ namespace Voxalia.ClientGame.WorldSystem
                             trh.Tangs.Add(tang);
                             trh.TCols.Add(new Vector4(1, 1, 1, 1));
                             trh.Cols.Add(new Vector4(1, 1, 1, 1));
+                            /*
                             float tx;
                             float ty;
                             if (side == MaterialSide.TOP || side == MaterialSide.BOTTOM)
@@ -367,12 +372,15 @@ namespace Voxalia.ClientGame.WorldSystem
                                 tx = Math.Max(0f, Math.Min(1f, vec.X - bid_x));
                                 ty = Math.Max(0f, Math.Min(1f, vec.Z - bid_z));
                             }
-                            trh.TCoords.Add(new Vector3(tx, ty, tid));
+                            trh.TCoords.Add(new Vector3(tx, ty, tid));*/
                             trh.THVs.Add(new Vector4(0, 0, 0, 0));
                             trh.THVs2.Add(new Vector4(0, 0, 0, 0));
                             trh.THWs.Add(new Vector4(0, 0, 0, 0));
                             trh.THWs2.Add(new Vector4(0, 0, 0, 0));
                         }
+                        trh.TCoords.Add(new Vector3(0, 0, tid));
+                        trh.TCoords.Add(new Vector3(1, 0, tid));
+                        trh.TCoords.Add(new Vector3(1, 1, tid));
                     }
                     OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
                     {
