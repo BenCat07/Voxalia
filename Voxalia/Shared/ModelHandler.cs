@@ -22,16 +22,26 @@ namespace Voxalia.Shared
     public class ModelHandler
     {
         /// <summary>
-        /// Loads a model from .VMD (Voxalia Model Data) input.
+        /// Loads a model from .FMD (Frenetic Model Data) input.
         /// </summary>
         public Model3D LoadModel(byte[] data)
         {
-            if (data.Length < 3 || data[0] != 'V' || data[1] != 'M' || data[2] != 'D')
+            // TODO: Remove VMD option!
+            if (data.Length < "FMD001".Length || (data[0] != 'F' && data[0] != 'V') || data[1] != 'M' || data[2] != 'D')
             {
                 throw new Exception("Model3D: Invalid header bits.");
             }
-            byte[] dat_filt = new byte[data.Length - "VMD001".Length];
-            Array.ConstrainedCopy(data, "VMD001".Length, dat_filt, 0, dat_filt.Length);
+            string vers = ((char)data[3]).ToString() + ((char)data[4]).ToString() + ((char)data[5]).ToString();
+            if (!int.TryParse(vers, out int vid))
+            {
+                throw new Exception("Model3D: Invalid version ID.");
+            }
+            if (vid < 001)
+            {
+                throw new Exception("Model3D: Bad version.");
+            }
+            byte[] dat_filt = new byte[data.Length - "FMD001".Length];
+            Array.ConstrainedCopy(data, "FMD001".Length, dat_filt, 0, dat_filt.Length);
             dat_filt = FileHandler.UnGZip(dat_filt);
             DataStream ds = new DataStream(dat_filt);
             DataReader dr = new DataReader(ds);
