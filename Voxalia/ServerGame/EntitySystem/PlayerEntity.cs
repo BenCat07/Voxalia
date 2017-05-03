@@ -127,8 +127,8 @@ namespace Voxalia.ServerGame.EntitySystem
                 SysConsole.Output(OutputType.WARNING, "Invalid gamemode for " + Name + ", reverting to SURVIVOR!");
                 Mode = GameMode.SURVIVOR;
             }
-            base.SetMaxHealth(config.GetFloat("maxhealth", 100).Value);
-            base.SetHealth(config.GetFloat("health", 100).Value);
+            Damageable().SetMaxHealth(config.GetFloat("maxhealth", 100).Value);
+            Damageable().SetHealth(config.GetFloat("health", 100).Value);
             if (config.GetString("flying", "false").ToLowerFast() == "true") // TODO: ReadBoolean?
             {
                 TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
@@ -157,8 +157,8 @@ namespace Voxalia.ServerGame.EntitySystem
         public void SaveToConfig(FDSSection config)
         {
             config.Set("gamemode", Mode.ToString());
-            config.Set("maxhealth", GetMaxHealth());
-            config.Set("health", GetHealth());
+            config.Set("maxhealth", Damageable().GetMaxHealth());
+            config.Set("health", Damageable().GetHealth());
             config.Set("flying", IsFlying ? "true": "false"); // TODO: Boolean safety
             config.Set("velocity", GetVelocity().ToString());
             config.Set("position", GetPosition().ToString());
@@ -442,8 +442,17 @@ namespace Voxalia.ServerGame.EntitySystem
             model = "players/human_male_004";
             mod_zrot = 270;
             mod_scale = 1.5f;
-            base.SetMaxHealth(100);
-            base.SetHealth(100);
+            Damageable().SetMaxHealth(100);
+            Damageable().SetHealth(100);
+            Damageable().HealthSetPostEvent.Add((p, e) =>
+            {
+                SendStatus();
+            }, 0);
+            Damageable().EffectiveDeathEvent.Add((p, e) =>
+            {
+                Damageable().SetHealth(Damageable().GetMaxHealth());
+                Teleport(TheRegion.TheWorld.SpawnPoint);
+            }, 0);
             Network = conn;
             SetMass(tmass);
             CanRotate = false;
@@ -702,7 +711,7 @@ namespace Voxalia.ServerGame.EntitySystem
             }
             if (GetPosition().Z < TheServer.CVars.g_minheight.ValueD)
             {
-                Damage(1); // TODO: Configurable damage amount!
+                Damageable().Damage(1); // TODO: Configurable damage amount!
             }
             AutoSaveTicks++;
             if (AutoSaveTicks > 30) // TODO: Constant fix!
@@ -1703,42 +1712,9 @@ namespace Voxalia.ServerGame.EntitySystem
         /// </summary>
         public void SendStatus()
         {
-            Network.SendPacket(new YourStatusPacketOut(GetHealth(), GetMaxHealth(), Flags));
+            Network.SendPacket(new YourStatusPacketOut(Damageable().GetHealth(), Damageable().GetMaxHealth(), Flags));
         }
-
-        /// <summary>
-        /// Implements <see cref="LivingEntity.SetHealth(double)"/>.
-        /// </summary>
-        /// <param name="health">The health value.</param>
-        public override void SetHealth(double health)
-        {
-            if (TheServer.IsMenu)
-            {
-                health = GetMaxHealth();
-            }
-            base.SetHealth(health);
-            SendStatus();
-        }
-
-        /// <summary>
-        /// Implements <see cref="LivingEntity.SetMaxHealth(double)"/>.
-        /// </summary>
-        /// <param name="maxhealth">The maximum health value.</param>
-        public override void SetMaxHealth(double maxhealth)
-        {
-            base.SetMaxHealth(maxhealth);
-            SendStatus();
-        }
-
-        /// <summary>
-        /// Implements <see cref="LivingEntity.Die"/>.
-        /// </summary>
-        public override void Die()
-        {
-            SetHealth(MaxHealth);
-            Teleport(TheRegion.TheWorld.SpawnPoint);
-        }
-
+        
         /// <summary>
         /// The Block Group Entity being used to represent a paste.
         /// </summary>

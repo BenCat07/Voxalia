@@ -17,10 +17,12 @@ using Voxalia.ServerGame.WorldSystem;
 using Voxalia.ServerGame.ItemSystem;
 using BEPUutilities;
 using FreneticGameCore;
+using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
-    public abstract class StaticBlockEntity : PhysicsEntity, EntityDamageable
+    // TODO: Class name is weird. This isn't a block! A static block would be a voxel...
+    public abstract class StaticBlockEntity : PhysicsEntity
     {
         public ItemStack Original;
 
@@ -33,6 +35,21 @@ namespace Voxalia.ServerGame.EntitySystem
             Shape = BlockShapeRegistry.BSD[0].GetShape(BlockDamage.NONE, out Location offset, false);
             SetPosition(pos.GetBlockLocation() + offset);
             SetOrientation(Quaternion.Identity);
+            DamageableEntityProperty dep = Damageable();
+            dep.SetMaxHealth(5);
+            dep.SetHealth(5);
+            dep.EffectiveDeathEvent.Add((p, e) =>
+            {
+                // TODO: Break into a grabbable item?
+                RemoveMe();
+            }, 0);
+        }
+
+        private static Func<DamageableEntityProperty> GetDamageProperty = () => new DamageableEntityProperty();
+
+        public DamageableEntityProperty Damageable()
+        {
+            return Properties.GetOrAddProperty(GetDamageProperty);
         }
 
         public override NetworkEntityType GetNetType()
@@ -46,43 +63,6 @@ namespace Voxalia.ServerGame.EntitySystem
             Utilities.IntToBytes((ushort)Original.Datum).CopyTo(dat, 0);
             GetPosition().ToDoubleBytes().CopyTo(dat, 4);
             return dat;
-        }
-
-        public double Health = 5;
-
-        public double MaxHealth = 5;
-
-        public double GetHealth()
-        {
-            return Health;
-        }
-
-        public double GetMaxHealth()
-        {
-            return MaxHealth;
-        }
-
-        public void SetHealth(double health)
-        {
-            Health = health;
-            if (health < 0)
-            {
-                RemoveMe();
-            }
-        }
-
-        public void SetMaxHealth(double health)
-        {
-            MaxHealth = health;
-            if (Health > MaxHealth)
-            {
-                SetHealth(MaxHealth);
-            }
-        }
-
-        public void Damage(double amount)
-        {
-            SetHealth(GetHealth() - amount);
         }
     }
 }

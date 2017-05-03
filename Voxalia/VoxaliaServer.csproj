@@ -99,12 +99,11 @@
     <Compile Include="ServerGame\EntitySystem\BlockGroupEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\CharacterEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\Entity.cs" />
-    <Compile Include="ServerGame\EntitySystem\EntityDamageable.cs" />
+    <Compile Include="ServerGame\EntitySystem\EntityPropertiesSystem\DamageableEntityProperty.cs" />
     <Compile Include="ServerGame\EntitySystem\HoverMessageEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\PlaneEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\HelicopterEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\HumanoidEntity.cs" />
-    <Compile Include="ServerGame\EntitySystem\LivingEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\EntityUseable.cs" />
     <Compile Include="ServerGame\EntitySystem\GrenadeEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\GlowstickEntity.cs" />
@@ -271,7 +270,6 @@
     <Compile Include="ServerGame\TagSystem\TagBases\RecipeResultTagBase.cs" />
     <Compile Include="ServerGame\TagSystem\TagBases\RecipeTagBase.cs" />
     <Compile Include="ServerGame\TagSystem\TagBases\ItemTagBase.cs" />
-    <Compile Include="ServerGame\TagSystem\TagBases\LivingEntityTagBase.cs" />
     <Compile Include="ServerGame\TagSystem\TagBases\LocationTagBase.cs" />
     <Compile Include="ServerGame\TagSystem\TagBases\MaterialTagBase.cs" />
     <Compile Include="ServerGame\TagSystem\TagBases\ModelEntityTagBase.cs" />
@@ -292,7 +290,6 @@
     <Compile Include="ServerGame\TagSystem\TagObjects\GrenadeEntityTag.cs" />
     <Compile Include="ServerGame\TagSystem\TagObjects\ItemEntityTag.cs" />
     <Compile Include="ServerGame\TagSystem\TagObjects\ItemTag.cs" />
-    <Compile Include="ServerGame\TagSystem\TagObjects\LivingEntityTag.cs" />
     <Compile Include="ServerGame\TagSystem\TagObjects\ColorTag.cs" />
     <Compile Include="ServerGame\TagSystem\TagObjects\LocationTag.cs" />
     <Compile Include="ServerGame\TagSystem\TagObjects\MaterialTag.cs" />

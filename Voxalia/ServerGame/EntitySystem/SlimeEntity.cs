@@ -20,6 +20,7 @@ using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared.Collision;
 using LiteDB;
 using FreneticGameCore;
+using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -39,6 +40,11 @@ namespace Voxalia.ServerGame.EntitySystem
             PathFindCloseEnough = 1f;
             SetMass(10);
             model = "mobs/slimes/slime";
+            Damageable().EffectiveDeathEvent.Add((p, e) =>
+            {
+                // TODO: Death effect!
+                RemoveMe();
+            }, 0);
             //mod_xrot = -90;
         }
 
@@ -76,12 +82,11 @@ namespace Voxalia.ServerGame.EntitySystem
                 return;
             }
             PhysicsEntity pe = (PhysicsEntity)((EntityCollidable)other).Entity.Tag;
-            if (!(pe is EntityDamageable))
+            if (pe.Properties.TryGetProperty(out DamageableEntityProperty damageable))
             {
-                return;
+                damageable.Damage(DamageAmt);
+                ApplyDamage = DamageDelay;
             }
-            ((EntityDamageable)pe).Damage(DamageAmt);
-            ApplyDamage = DamageDelay;
         }
 
         public double DamageAmt = 5;
@@ -144,13 +149,7 @@ namespace Voxalia.ServerGame.EntitySystem
             // TODO: Save properly!
             return null;
         }
-
-        public override void Die()
-        {
-            // TODO: Death effect!
-            RemoveMe();
-        }
-
+        
         public override Location GetEyePosition()
         {
             return GetPosition() + new Location(0, 0, 0.3);

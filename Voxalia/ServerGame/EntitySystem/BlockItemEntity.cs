@@ -14,10 +14,11 @@ using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared.Collision;
 using LiteDB;
 using FreneticGameCore;
+using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
-    public class BlockItemEntity : PhysicsEntity, EntityUseable, EntityDamageable
+    public class BlockItemEntity : PhysicsEntity, EntityUseable
     {
         public BlockInternal Original;
 
@@ -29,6 +30,20 @@ namespace Voxalia.ServerGame.EntitySystem
             Original = orig;
             Shape = BlockShapeRegistry.BSD[orig.BlockData].GetShape(orig.Damage, out Location offset, true);
             SetPosition(pos.GetBlockLocation() + offset);
+            DamageableEntityProperty dep = Damageable();
+            dep.SetMaxHealth(5);
+            dep.SetHealth(5);
+            dep.EffectiveDeathEvent.Add((p, e) =>
+            {
+                RemoveMe();
+            }, 0);
+        }
+
+        private static Func<DamageableEntityProperty> GetDamageProperty = () => new DamageableEntityProperty();
+
+        public DamageableEntityProperty Damageable()
+        {
+            return Properties.GetOrAddProperty(GetDamageProperty);
         }
 
         public override NetworkEntityType GetNetType()
@@ -89,43 +104,6 @@ namespace Voxalia.ServerGame.EntitySystem
         public void StopUse(Entity user)
         {
             // Do nothing.
-        }
-
-        public double Health = 5;
-
-        public double MaxHealth = 5;
-
-        public double GetHealth()
-        {
-            return Health;
-        }
-
-        public double GetMaxHealth()
-        {
-            return MaxHealth;
-        }
-
-        public void SetHealth(double health)
-        {
-            Health = health;
-            if (health < 0)
-            {
-                RemoveMe();
-            }
-        }
-
-        public void SetMaxHealth(double health)
-        {
-            MaxHealth = health;
-            if (Health > MaxHealth)
-            {
-                SetHealth(MaxHealth);
-            }
-        }
-
-        public void Damage(double amount)
-        {
-            SetHealth(GetHealth() - amount);
         }
     }
 

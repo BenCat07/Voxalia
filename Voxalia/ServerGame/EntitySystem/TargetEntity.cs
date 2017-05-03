@@ -27,8 +27,8 @@ namespace Voxalia.ServerGame.EntitySystem
             model = "players/human_male_004";
             mod_zrot = 270;
             mod_scale = 1.5f;
-            SetMaxHealth(100);
-            SetHealth(100);
+            Damageable().SetMaxHealth(100);
+            Damageable().SetHealth(100);
             SetMass(70);
             Items = new EntityInventory(tregion, this);
             // TODO: Better way to gather item details!
@@ -37,6 +37,15 @@ namespace Voxalia.ServerGame.EntitySystem
             Items.cItem = 1;
             Items.Items[0].Info.PrepItem(this, Items.Items[0]);
             ShouldShine = true;
+            Damageable().EffectiveDeathEvent.Add((p, e) =>
+            {
+                if (Removed)
+                {
+                    return;
+                }
+                TheRegion.Explode(GetPosition(), 5);
+                RemoveMe();
+            }, 0);
         }
 
         public override NetworkEntityType GetNetType()
@@ -108,16 +117,6 @@ namespace Voxalia.ServerGame.EntitySystem
             }
             distSquared = distsq;
             return player;
-        }
-        
-        public override void Die()
-        {
-            if (Removed)
-            {
-                return;
-            }
-            TheRegion.Explode(GetPosition(), 5);
-            RemoveMe();
         }
     }
 }

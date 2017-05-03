@@ -24,6 +24,7 @@ using System.Threading;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.OtherSystems;
 using FreneticGameCore;
+using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -402,12 +403,11 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 foreach (Entity e in GetEntitiesInRadius(pos, rad * 5)) // TODO: Physent-specific search method?
                 {
-                    // TODO: Generic entity 'Damage' method?
-                    if (e is LivingEntity)
+                    if (e.Properties.TryGetProperty(out DamageableEntityProperty damageable))
                     {
                         Location offs = e.GetPosition() - pos;
-                        double dpower = (double)((rad * 5) - offs.Length()); // TODO: Efficiency?
-                        (e as LivingEntity).Damage(dpower);
+                        double dpower = ((rad * 5) - offs.Length()); // TODO: Efficiency? (Length is slow!)
+                        damageable.Damage(dpower);
                     }
                 }
             }
@@ -446,12 +446,12 @@ namespace Voxalia.ServerGame.WorldSystem
                 foreach (Entity e in GetEntitiesInRadius(pos, rad * 5)) // TODO: Physent-specific search method?
                 {
                     // TODO: Generic entity 'ApplyForce' method
-                    if (e is PhysicsEntity)
+                    if (e is PhysicsEntity physent)
                     {
                         Location offs = e.GetPosition() - pos;
-                        double dpower = (double)((rad * 5) - offs.Length()); // TODO: Efficiency?
+                        double dpower = ((rad * 5) - offs.Length()); // TODO: Efficiency? (Length is slow!)
                         Location force = new Location(1, 1, 3) * dpower;
-                        (e as PhysicsEntity).ApplyForce(force);
+                        physent.ApplyForce(force);
                     }
                 }
             }

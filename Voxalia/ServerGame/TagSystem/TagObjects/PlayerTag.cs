@@ -35,8 +35,7 @@ namespace Voxalia.ServerGame.TagSystem.TagObjects
 
         public static PlayerTag For(Server tserver, string pname)
         {
-            long pid;
-            if (long.TryParse(pname, out pid))
+            if (long.TryParse(pname, out long pid))
             {
                 foreach (PlayerEntity player in tserver.Players)
                 {
@@ -90,7 +89,7 @@ namespace Voxalia.ServerGame.TagSystem.TagObjects
                 // @Example "Fortifier" .health could return "100".
                 // -->
                 case "health":
-                    return new NumberTag(Internal.Health).Handle(data.Shrink());
+                    return new NumberTag(Internal.Damageable().GetHealth()).Handle(data.Shrink());
                 // <--[tag]
                 // @Name PlayerTag.is_afk
                 // @Group Status
@@ -120,7 +119,7 @@ namespace Voxalia.ServerGame.TagSystem.TagObjects
                 case "held_item":
                     return new ItemTag(Internal.Items.GetItemForSlot(Internal.Items.cItem)).Handle(data.Shrink());
                 default:
-                    return new LivingEntityTag((LivingEntity)Internal).Handle(data);
+                    return new PhysicsEntityTag(Internal).Handle(data);
             }
         }
 

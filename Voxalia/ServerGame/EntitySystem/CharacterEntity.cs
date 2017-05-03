@@ -23,15 +23,26 @@ using Voxalia.ServerGame.NetworkSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using FreneticScript;
 using FreneticGameCore;
+using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
-    public abstract class CharacterEntity: LivingEntity
+    public abstract class CharacterEntity: PhysicsEntity
     {
         public CharacterEntity(Region tregion, double maxhealth)
-            : base(tregion, maxhealth)
+            : base(tregion)
         {
             CGroup = CollisionUtil.Character;
+            DamageableEntityProperty dep = Damageable();
+            dep.SetMaxHealth(maxhealth);
+            dep.SetHealth(maxhealth);
+        }
+        
+        private static Func<DamageableEntityProperty> GetDamageProperty = () => new DamageableEntityProperty();
+
+        public DamageableEntityProperty Damageable()
+        {
+            return Properties.GetOrAddProperty(GetDamageProperty);
         }
 
         public override long GetRAMUsage()

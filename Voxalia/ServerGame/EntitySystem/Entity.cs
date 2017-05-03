@@ -20,6 +20,17 @@ using FreneticGameCore;
 namespace Voxalia.ServerGame.EntitySystem
 {
     /// <summary>
+    /// Represents the properties of an entity.
+    /// </summary>
+    public class EntityProperties : PropertyHolder
+    {
+        /// <summary>
+        /// The entity that holds these properties.
+        /// </summary>
+        public Entity HoldingEntity;
+    }
+
+    /// <summary>
     /// Represents an object within the world.
     /// </summary>
     public abstract class Entity
@@ -28,6 +39,11 @@ namespace Voxalia.ServerGame.EntitySystem
         /// The region that holds this entity.
         /// </summary>
         public Region TheRegion;
+
+        /// <summary>
+        /// This entity's properties.
+        /// </summary>
+        public readonly EntityProperties Properties;
 
         /// <summary>
         /// Constructs the entity object.
@@ -39,6 +55,7 @@ namespace Voxalia.ServerGame.EntitySystem
             TheRegion = tregion;
             TheServer = tregion.TheServer;
             Ticks = tickme;
+            Properties = new EntityProperties() { HoldingEntity = this };
         }
 
         /// <summary>

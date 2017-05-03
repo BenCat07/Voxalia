@@ -15,6 +15,7 @@ using Voxalia.ServerGame.WorldSystem;
 using BEPUphysics.CollisionRuleManagement;
 using LiteDB;
 using FreneticGameCore;
+using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -134,9 +135,9 @@ namespace Voxalia.ServerGame.EntitySystem
             if (args.Info.HitEnt != null)
             {
                 PhysicsEntity pe = (PhysicsEntity)args.Info.HitEnt.Tag;
-                if (pe is EntityDamageable)
+                if (pe.Properties.TryGetProperty(out DamageableEntityProperty damageable))
                 {
-                    ((EntityDamageable)pe).Damage(Damage + DamageTimesVelocity * (double)len);
+                    damageable.Damage(Damage + DamageTimesVelocity * (double)len);
                 }
                 Vector3 loc = (args.Info.Position - pe.GetPosition()).ToBVector();
                 Vector3 impulse = GetVelocity().ToBVector() * DamageTimesVelocity / 1000f;

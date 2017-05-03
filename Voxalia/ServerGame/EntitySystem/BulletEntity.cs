@@ -14,6 +14,7 @@ using Voxalia.ServerGame.NetworkSystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using LiteDB;
 using FreneticGameCore;
+using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -65,9 +66,9 @@ namespace Voxalia.ServerGame.EntitySystem
                 Vector3 impulse = GetVelocity().ToBVector() * Damage / 1000f;
                 physent.Body.ApplyImpulse(ref loc, ref impulse);
                 physent.Body.ActivityInformation.Activate();
-                if (physent is EntityDamageable)
+                if (physent.Properties.TryGetProperty(out DamageableEntityProperty damageable))
                 {
-                    ((EntityDamageable)physent).Damage(Damage);
+                    damageable.Damage(Damage);
                 }
             }
             if (SplashSize > 0 && SplashDamage > 0)

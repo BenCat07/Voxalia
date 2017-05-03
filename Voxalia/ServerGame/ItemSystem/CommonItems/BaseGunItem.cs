@@ -227,9 +227,9 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
         public void UpdatePlayer(HumanoidEntity character)
         {
             // TODO: Should this be a method on PlayerEntity?
-            if (character is PlayerEntity)
+            if (character is PlayerEntity pl)
             {
-                ((PlayerEntity)character).Network.SendPacket(new YourStatusPacketOut(character.GetHealth(), character.GetMaxHealth(), character.Flags));
+                pl.Network.SendPacket(new YourStatusPacketOut(character.Damageable().GetHealth(), character.Damageable().GetMaxHealth(), character.Flags));
             }
         }
     }

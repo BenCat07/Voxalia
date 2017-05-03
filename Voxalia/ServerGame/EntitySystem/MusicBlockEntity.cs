@@ -18,10 +18,11 @@ using FreneticScript.TagHandlers.Objects;
 using BEPUutilities;
 using LiteDB;
 using FreneticGameCore;
+using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
-    class MusicBlockEntity : ModelEntity, EntityUseable, EntityDamageable
+    public class MusicBlockEntity : ModelEntity, EntityUseable
     {
         public ItemStack Original;
 
@@ -34,6 +35,14 @@ namespace Voxalia.ServerGame.EntitySystem
             SetMass(0);
             SetPosition(pos.GetBlockLocation() + new Location(0.5));
             SetOrientation(Quaternion.Identity);
+            DamageableEntityProperty dep = Damageable();
+            dep.SetMaxHealth(5);
+            dep.SetHealth(5);
+            dep.EffectiveDeathEvent.Add((p, e) =>
+            {
+                // TODO: Break into a grabbable item?
+                RemoveMe();
+            }, 0);
         }
 
         public override void SpawnBody()
@@ -46,13 +55,20 @@ namespace Voxalia.ServerGame.EntitySystem
             return EntityType.MUSIC_BLOCK;
         }
 
+        private static Func<DamageableEntityProperty> GetDamageProperty = () => new DamageableEntityProperty();
+
+        public DamageableEntityProperty Damageable()
+        {
+            return Properties.GetOrAddProperty(GetDamageProperty);
+        }
+
         public override BsonDocument GetSaveData()
         {
             BsonDocument doc = new BsonDocument();
             AddPhysicsData(doc);
             doc["mb_item"] = Original.ServerBytes();
-            doc["mb_health"] = (double)GetHealth();
-            doc["mb_maxhealth"] = (double)GetMaxHealth();
+            doc["mb_health"] = Damageable().GetHealth();
+            doc["mb_maxhealth"] = Damageable().GetMaxHealth();
             return doc;
         }
         
@@ -71,44 +87,6 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             // Do nothing
         }
-
-        public double Health = 5;
-
-        public double MaxHealth = 5;
-
-        public double GetHealth()
-        {
-            return Health;
-        }
-
-        public double GetMaxHealth()
-        {
-            return MaxHealth;
-        }
-
-        public void SetHealth(double health)
-        {
-            Health = health;
-            if (health < 0)
-            {
-                RemoveMe();
-                // TODO: Break into a grabbable item?
-            }
-        }
-
-        public void SetMaxHealth(double health)
-        {
-            MaxHealth = health;
-            if (Health > MaxHealth)
-            {
-                SetHealth(MaxHealth);
-            }
-        }
-
-        public void Damage(double amount)
-        {
-            SetHealth(GetHealth() - amount);
-        }
     }
 
     public class MusicBlockEntityConstructor : EntityConstructor
@@ -117,8 +95,8 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             ItemStack it = new ItemStack(doc["mb_item"].AsBinary, tregion.TheServer);
             MusicBlockEntity mbe = new MusicBlockEntity(tregion, it, Location.Zero);
-            mbe.SetMaxHealth((double)doc["mb_maxhealth"].AsDouble);
-            mbe.SetHealth((double)doc["mb_health"].AsDouble);
+            mbe.Damageable().SetMaxHealth(doc["mb_maxhealth"].AsDouble);
+            mbe.Damageable().SetHealth(doc["mb_health"].AsDouble);
             return mbe;
         }
     }
