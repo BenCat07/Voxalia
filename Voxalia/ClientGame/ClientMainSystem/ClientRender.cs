@@ -230,6 +230,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             string def = CVars.r_good_graphics.ValueB ? "#MCM_GOOD_GRAPHICS" : "#";
             s_shadow = Shaders.GetShader("shadow" + def);
+            s_shadow_nobones = Shaders.GetShader("shadow" + def + ",MCM_NO_BONES");
             s_shadowvox = Shaders.GetShader("shadowvox" + def);
             s_fbo = Shaders.GetShader("fbo" + def);
             s_fbot = Shaders.GetShader("fbo" + def + ",MCM_TRANSP_ALLOWED");
@@ -259,8 +260,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 + (CVars.r_forward_lights.ValueB ? ",MCM_LIGHTS" : "")
                 + (CVars.r_forward_shadows.ValueB ? ",MCM_SHADOWS" : "");
             s_forw = Shaders.GetShader("forward" + def + forw_extra);
+            s_forw_nobones = Shaders.GetShader("forward" + def + ",MCM_NO_BONES" + forw_extra);
             s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX" + forw_extra);
             s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);
+            s_forw_trans_nobones = Shaders.GetShader("forward" + def + ",MCM_TRANSP,MCM_NO_BONES" + forw_extra);
             s_forw_vox_trans = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TRANSP" + forw_extra);
             s_transponly_ll = Shaders.GetShader("transponly" + def + ",MCM_LL");
             s_transponlyvox_ll = Shaders.GetShader("transponlyvox" + def + ",MCM_LL");
@@ -278,7 +281,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH" + forw_extra + "?particles");
             s_fbodecal = Shaders.GetShader("fbo" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE,MCM_PRETTY?decal");
             s_forwdecal = Shaders.GetShader("forward" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE" + forw_extra + "?decal");
-            s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT" + forw_extra);
+            s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT,MCM_NO_BONES" + forw_extra);
             s_transponly_particles = Shaders.GetShader("transponly" + def + ",MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
             s_transponlylit_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
             s_transponlylitsh_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
@@ -435,6 +438,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public Shader s_shadow;
 
         /// <summary>
+        /// The Shadow Pass shader, with bones off.
+        /// </summary>
+        public Shader s_shadow_nobones;
+
+        /// <summary>
         /// The Shadow Pass shader, for voxels.
         /// </summary>
         public Shader s_shadowvox;
@@ -576,6 +584,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public Shader s_forw;
 
         /// <summary>
+        /// The shader used for forward ('fast') rendering of data, with no bones.
+        /// </summary>
+        public Shader s_forw_nobones;
+
+        /// <summary>
         /// The shader used for forward ('fast') rendering of voxels.
         /// </summary>
         public Shader s_forw_vox;
@@ -584,6 +597,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The shader used for forward ('fast') rendering of transparent data.
         /// </summary>
         public Shader s_forw_trans;
+
+        /// <summary>
+        /// The shader used for forward ('fast') rendering of transparent data, with no bones.
+        /// </summary>
+        public Shader s_forw_trans_nobones;
 
         /// <summary>
         /// The shader used for forward ('fast') rendering of transparent voxels.
@@ -1340,15 +1358,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        bool pBones = false;
+
         /// <summary>
         /// Switch the system to entity rendering mode.
         /// </summary>
-        public void SetEnts()
+        public void SetEnts(bool bones = false)
         {
-            if (!isVox)
+            if (!isVox && bones == pBones)
             {
                 return;
             }
+            pBones = bones;
             isVox = false;
             if (MainWorldView.FBOid == FBOID.MAIN)
             {
@@ -1432,7 +1453,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             else if (MainWorldView.FBOid == FBOID.FORWARD_SOLID)
             {
-                s_forw = s_forw.Bind();
+                if (bones)
+                {
+                    s_forw = s_forw.Bind();
+                }
+                else
+                {
+                    s_forw_nobones = s_forw_nobones.Bind();
+                }
                 GL.ActiveTexture(TextureUnit.Texture2);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -1440,7 +1468,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             else if (MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
             {
-                s_forw_trans = s_forw_trans.Bind();
+                if (bones)
+                {
+                    s_forw_trans = s_forw_trans.Bind();
+                }
+                else
+                {
+                    s_forw_trans_nobones = s_forw_trans_nobones.Bind();
+                }
                 GL.ActiveTexture(TextureUnit.Texture2);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
                 GL.ActiveTexture(TextureUnit.Texture1);
@@ -1471,7 +1506,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             else if (MainWorldView.FBOid == FBOID.SHADOWS || MainWorldView.FBOid == FBOID.STATIC_SHADOWS || MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
             {
                 GL.BindTexture(TextureTarget.Texture2DArray, 0);
-                s_shadow = s_shadow.Bind();
+                if (bones)
+                {
+                    s_shadow = s_shadow.Bind();
+                }
+                else
+                {
+                    s_shadow_nobones = s_shadow_nobones.Bind();
+                }
             }
             if (FixPersp != Matrix4.Identity)
             {

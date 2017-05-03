@@ -830,7 +830,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
-            TheClient.SetEnts();
+            TheClient.SetEnts(true);
             if (TheClient.CVars.n_debugmovement.ValueB)
             {
                 if (ServerLocation.IsInfinite() || ServerLocation.IsNaN() || renderrelpos.IsInfinite() || renderrelpos.IsNaN())

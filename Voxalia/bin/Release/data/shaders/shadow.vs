@@ -9,6 +9,7 @@
 #version 430 core
 
 #define MCM_GEOM_ACTIVE 0
+#define MCM_NO_BONES 0
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -65,7 +66,11 @@ void main()
 #if MCM_GEOM_ACTIVE
 	pos1 = vec4(position, 1.0);
 #else
+#if MCM_NO_BONES
+	const float rem = 1.0;
+#else
 	float rem = 1.0 - (Weights[0] + Weights[1] + Weights[2] + Weights[3] + Weights2[0] + Weights2[1] + Weights2[2] + Weights2[3]);
+#endif
 	mat4 BT = mat4(1.0);
 	if (rem < 0.99)
 	{

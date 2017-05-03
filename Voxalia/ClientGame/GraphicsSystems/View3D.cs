@@ -923,7 +923,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
             CheckError("Render/Fast - Uniforms 1");
             RenderingShadows = false;
-            RenderLights = false;
+            RenderLights = TheClient.CVars.r_forward_lights.ValueB;
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_SOLID;
             Vector3 maxLit = TheClient.TheRegion.GetSunAdjust().Xyz;
@@ -981,6 +981,23 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
             }
             CheckError("Render/Fast - Uniforms 5");
+            GL.UniformMatrix4(1, false, ref PrimaryMatrix);
+            GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+            GL.Uniform1(14, TheClient.ZFar());
+            TheClient.Rendering.SetColor(Color4.White);
+            GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
+            GL.Uniform3(11, maxLit);
+            TheClient.s_forw_nobones.Bind();
+            if (TheClient.CVars.r_forward_lights.ValueB)
+            {
+                GL.Uniform1(15, (float)c);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+            }
+            CheckError("Render/Fast - Uniforms 5.5");
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
@@ -1074,6 +1091,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.ActiveTexture(TextureUnit.Texture0);
             FBOid = FBOID.FORWARD_TRANSP;
             TheClient.s_forw_vox_trans.Bind();
+            GL.UniformMatrix4(1, false, ref PrimaryMatrix);
+            GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
+            GL.Uniform1(14, TheClient.ZFar());
+            TheClient.Rendering.SetColor(Color4.White);
+            TheClient.s_forw_trans_nobones.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
@@ -1206,6 +1231,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
                                     GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
                                     GL.Uniform3(7, ClientUtilities.Convert(CameraPos));
+                                    Lights[i].InternalLights[x].SetProj();
+                                    TheClient.s_shadow_nobones = TheClient.s_shadow_nobones.Bind();
+                                    SetMatrix(2, Matrix4d.Identity);
+                                    CheckError("Pre-Prerender2.5 - Shadows - " + i);
+                                    GL.Uniform1(5, (Lights[i].InternalLights[x] is LightOrtho) ? 1.0f : 0.0f);
+                                    GL.Uniform1(4, Lights[i].InternalLights[x].transp ? 1.0f : 0.0f);
+                                    TranspShadows = Lights[i].InternalLights[x].transp;
                                     Lights[i].InternalLights[x].SetProj();
                                     TheClient.s_shadow = TheClient.s_shadow.Bind();
                                     SetMatrix(2, Matrix4d.Identity);

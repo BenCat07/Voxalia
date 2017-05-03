@@ -11,6 +11,7 @@
 #define MCM_VOX 0
 #define MCM_GEOM_ACTIVE 0
 #define MCM_INVERSE_FADE 0
+#define MCM_NO_BONES 0
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -112,7 +113,11 @@ void main()
 	vec4 pos1;
 	vec4 norm1;
 	fi.texcoord = texcoords.xy;
+#if MCM_NO_BONES
+	const float rem = 0.0;
+#else
 	float rem = Weights[0] + Weights[1] + Weights[2] + Weights[3] + Weights2[0] + Weights2[1] + Weights2[2] + Weights2[3];
+#endif
 	if (rem > 0.01)
 	{
 		mat4 BT = mat4(1.0);
