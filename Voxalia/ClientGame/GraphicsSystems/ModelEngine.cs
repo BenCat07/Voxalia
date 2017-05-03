@@ -321,7 +321,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public string Name;
 
-        public int[] LODHelper = null;
+        public KeyValuePair<int, int>[] LODHelper = null;
 
         public AABB LODBox = null;
 
@@ -472,21 +472,42 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Vector3 offs = new Vector3(-0.5f, -0.5f, 0f);
             Matrix4 off1 = Matrix4.CreateTranslation(offs);
             //Matrix4 off2 = Matrix4.CreateTranslation(-offs);
-            Engine.TheClient.Rendering.SetMinimumLight(1f);
-            GL.BindTexture(TextureTarget.Texture2D, LODHelper[0]);
+            //Engine.TheClient.Rendering.SetMinimumLight(1f);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[0].Key);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[0].Value);
             Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.X, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * 0.25f) * Matrix4.CreateTranslation(vpos));
-            GL.BindTexture(TextureTarget.Texture2D, LODHelper[1]);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[1].Key);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[1].Value);
             Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.X, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * 0.75f) * Matrix4.CreateTranslation(vpos));
-            GL.BindTexture(TextureTarget.Texture2D, LODHelper[2]);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[2].Key);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[2].Value);
             Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Y, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * -0.25f) * Matrix4.CreateTranslation(vpos));
-            GL.BindTexture(TextureTarget.Texture2D, LODHelper[3]);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[3].Key);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[3].Value);
             Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Y, wid.Z, 1f) * Matrix4.CreateRotationX((float)Math.PI * 0.5f) * Matrix4.CreateRotationZ((float)Math.PI * -0.75f) * Matrix4.CreateTranslation(vpos));
-            GL.BindTexture(TextureTarget.Texture2D, LODHelper[4]);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[4].Key);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[4].Value);
             Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Z, wid.X, 1f) * Matrix4.CreateTranslation(vpos));
-            GL.BindTexture(TextureTarget.Texture2D, LODHelper[5]);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[5].Key);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2D, LODHelper[5].Value);
             Engine.TheClient.Rendering.RenderRectangle3D(off1 * Matrix4.CreateScale(wid.Z, wid.X, 1f) * Matrix4.CreateRotationX((float)Math.PI) * Matrix4.CreateTranslation(vpos));
+            GL.ActiveTexture(TextureUnit.Texture1);
             GL.BindTexture(TextureTarget.Texture2D, 0);
-            Engine.TheClient.Rendering.SetMinimumLight(0f);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
+            //Engine.TheClient.Rendering.SetMinimumLight(0f);
         }
         
         /// <summary>

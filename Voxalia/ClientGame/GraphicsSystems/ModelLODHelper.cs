@@ -39,7 +39,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public void PreRender(Model model, AABB box, Matrix4 oTrans)
         {
             // TODO: Accelerate this: one big texture rather than 6 small ones?
-            int[] ints = new int[6];
+            KeyValuePair<int, int>[] ints = new KeyValuePair<int, int>[6];
             // TODO: Normals too!
             int fbo = GL.GenFramebuffer();
             GL.Viewport(0, 0, TWIDTH, TWIDTH);
@@ -55,7 +55,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             TheClient.MainWorldView.OSetViewport();
         }
 
-        public int RenderSide(int side, Model model, AABB box, int fbo, Vector3 forw, Vector3 up, Matrix4d ortho, Matrix4 oTrans)
+        public KeyValuePair<int, int> RenderSide(int side, Model model, AABB box, int fbo, Vector3 forw, Vector3 up, Matrix4d ortho, Matrix4 oTrans)
         {
             int tex = GL.GenTexture();
             GL.ActiveTexture(TextureUnit.Texture0);
@@ -65,11 +65,20 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            int ntex = GL.GenTexture();
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, ntex);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgb, TWIDTH, TWIDTH, 0, PixelFormat.Rgb, PixelType.UnsignedByte, IntPtr.Zero);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, fbo);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, tex, 0);
+            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment1, TextureTarget.Texture2D, ntex, 0);
             GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, TextureTarget.Texture2D, DepthTex, 0);
-            GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
+            GL.DrawBuffers(2, new DrawBuffersEnum[] { DrawBuffersEnum.ColorAttachment0, DrawBuffersEnum.ColorAttachment1 });
             GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0f, 0f, 0f, 0f });
             GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
             Matrix4 view = Matrix4.LookAt(Vector3.Zero, forw, up);
@@ -92,7 +101,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             model.BoneSafe();
             model.Draw();
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            return tex;
+            return new KeyValuePair<int, int>(tex, ntex);
         }
     }
 }

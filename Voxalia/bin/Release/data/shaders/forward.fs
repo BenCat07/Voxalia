@@ -87,6 +87,7 @@ layout (location = 40) uniform mat4 light_data_array[LIGHTS_MAX];
 #endif
 
 layout (location = 0) out vec4 color;
+layout (location = 1) out vec3 nrml;
 
 float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a linear distance (still from 0.0 to 1.0).
 {
@@ -166,6 +167,7 @@ void main()
 #else // MCM_BRIGHT
 	float opac_min = 0.0;
 	vec3 norms = texture(normal_tex, fi.texcoord).xyz * 2.0 - vec3(1.0);
+	nrml = norms;
 	vec3 tf_normal = normalize(fi.tbn * norms);
 #if MCM_LIGHTS
 	vec3 res_color = vec3(0.0);
