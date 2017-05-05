@@ -52,22 +52,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BEPUphysics">
-      <HintPath>BEPUphysics.dll</HintPath>
+      <HintPath>..\FreneticGameEngine\FreneticGameCore\BEPUphysics.dll</HintPath>
     </Reference>
     <Reference Include="BEPUutilities">
-      <HintPath>BEPUutilities.dll</HintPath>
+      <HintPath>..\FreneticGameEngine\FreneticGameCore\BEPUutilities.dll</HintPath>
     </Reference>
     <Reference Include="FreneticDataSyntax">
-      <HintPath>FreneticDataSyntax.dll</HintPath>
+      <HintPath>..\FreneticGameEngine\FreneticGameCore\FreneticDataSyntax.dll</HintPath>
     </Reference>
     <Reference Include="FreneticScript">
-      <HintPath>FreneticScript.dll</HintPath>
+      <HintPath>..\FreneticGameEngine\FreneticGameCore\FreneticScript.dll</HintPath>
     </Reference>
     <Reference Include="LiteDB">
       <HintPath>LiteDB.dll</HintPath>
     </Reference>
     <Reference Include="LZ4">
-      <HintPath>.\LZ4.dll</HintPath>
+      <HintPath>..\FreneticGameEngine\FreneticGameCore\LZ4.dll</HintPath>
     </Reference>
     <Reference Include="Open.Nat">
       <HintPath>Open.Nat.dll</HintPath>

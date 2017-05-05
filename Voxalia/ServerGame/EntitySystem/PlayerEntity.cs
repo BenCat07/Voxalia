@@ -458,8 +458,6 @@ namespace Voxalia.ServerGame.EntitySystem
             CanRotate = false;
             SetPosition(TheRegion.TheWorld.SpawnPoint);
             Items = new PlayerInventory(this);
-            // TEMPORARY TEST:
-            AddProperty(new PhysicsEntityProperty(new PhysicsSpace() { Internal = TheRegion.PhysicsWorld }));
         }
 
         /// <summary>

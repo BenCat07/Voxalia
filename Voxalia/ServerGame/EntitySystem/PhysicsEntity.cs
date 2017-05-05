@@ -359,8 +359,8 @@ namespace Voxalia.ServerGame.EntitySystem
             Body = new BEPUphysics.Entities.Entity(Shape, Mass);
             Body.CollisionInformation.CollisionRules.Group = CGroup;
             InternalOffset = new Location(Body.Position);
-            Body.AngularVelocity = new Vector3((double)AVel.X, (double)AVel.Y, (double)AVel.Z);
-            Body.LinearVelocity = new Vector3((double)LVel.X, (double)LVel.Y, (double)LVel.Z);
+            Body.AngularVelocity = new Vector3(AVel.X, AVel.Y, AVel.Z);
+            Body.LinearVelocity = new Vector3(LVel.X, LVel.Y, LVel.Z);
             Body.WorldTransform = WorldTransform; // TODO: Position, Orientation
             Body.Tag = this;
             Body.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Passive;
