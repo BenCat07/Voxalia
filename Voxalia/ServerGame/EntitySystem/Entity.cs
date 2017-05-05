@@ -22,7 +22,7 @@ namespace Voxalia.ServerGame.EntitySystem
     /// <summary>
     /// Represents an object within the world.
     /// </summary>
-    public abstract class Entity : PropertyHolder
+    public abstract class Entity : BasicEntity
     {
         /// <summary>
         /// The region that holds this entity.
@@ -35,10 +35,10 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <param name="tregion">The region it will be in.</param>
         /// <param name="tickme">Whether it ticks at all ever.</param>
         public Entity(Region tregion, bool tickme)
+            : base(tickme)
         {
             TheRegion = tregion;
             TheServer = tregion.TheServer;
-            Ticks = tickme;
         }
 
         /// <summary>
@@ -82,22 +82,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// Whether this entity is allowed to save to file.
         /// </summary>
         public bool CanSave = true;
-
-        /// <summary>
-        /// The unique ID for this entity.
-        /// </summary>
-        public long EID = 0;
         
-        /// <summary>
-        /// Whether this entity should tick.
-        /// </summary>
-        public readonly bool Ticks;
-
-        /// <summary>
-        /// Whether the entity is spawned into the world.
-        /// </summary>
-        public bool IsSpawned = false;
-
         /// <summary>
         /// The seat this entity is currently sitting in.
         /// </summary>
@@ -125,14 +110,6 @@ namespace Voxalia.ServerGame.EntitySystem
         public AbstractPacketOut GetSpawnPacket()
         {
             return new SpawnEntityPacketOut(this);
-        }
-
-        /// <summary>
-        /// Tick the entity. Default implementation throws exception.
-        /// </summary>
-        public virtual void Tick()
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -180,12 +157,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// Tells the entity it needs to be active.
         /// </summary>
         public abstract void PotentialActivate();
-
-        /// <summary>
-        /// The entity is removed from the owning region, or will be momentarily.
-        /// </summary>
-        public bool Removed = false;
-
+        
         /// <summary>
         /// Removes the entity from the owning region.
         /// </summary>
