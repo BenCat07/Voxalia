@@ -30,7 +30,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {
     public class CdevelCommand: AbstractCommand
     {
-        public Client TheClient;
+        Client TheClient;
 
         public CdevelCommand(Client tclient)
         {
@@ -40,13 +40,14 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             Arguments = "";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
             if (entry.Arguments.Count < 1)
             {
                 ShowUsage(queue, entry);
                 return;
             }
+            Client TheClient = (entry.Command as CdevelCommand).TheClient;
             switch (entry.GetArgument(queue, 0))
             {
                 case "lightDebug":

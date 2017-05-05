@@ -30,13 +30,14 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
             Arguments = "";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as NetusageCommand).TheClient;
             entry.Info(queue, "Network usage (last second): " + GetUsages(TheClient.Network.UsagesLastSecond));
             entry.Info(queue, "Network usage (total): " + GetUsages(TheClient.Network.UsagesTotal));
         }
 
-        public string GetUsages(long[] usages)
+        public static string GetUsages(long[] usages)
         {
             return "Effects: " + usages[(int)NetUsageType.EFFECTS]
                 + ", entities: " + usages[(int)NetUsageType.ENTITIES]

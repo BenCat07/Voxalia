@@ -22,12 +22,13 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
         {
             TheClient = tclient;
             Name = "secondary";
-            Description = "Makes the player attack secondarily.";
+            Description = "Makes the player use the secondary item option.";
             Arguments = "";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as SecondaryCommand).TheClient;
             if (entry.Marker == 0)
             {
                 queue.HandleError(entry, "Must use +, -, or !");

@@ -15,7 +15,6 @@ using Voxalia.ServerGame.ServerMainSystem;
 using FreneticScript.CommandSystem;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Common;
-using Voxalia.ServerGame.TagSystem.TagObjects;
 using FreneticScript.TagHandlers.Objects;
 using FreneticGameCore;
 
@@ -81,18 +80,16 @@ namespace Voxalia.ServerGame.ItemSystem
 
         public double GetAttributeF(string attr, double def)
         {
-            TemplateObject outp;
-            if (Attributes.TryGetValue(attr, out outp))
+            if (Attributes.TryGetValue(attr, out TemplateObject outp))
             {
-                return (double)NumberTag.TryFor(outp).Internal;
+                return NumberTag.TryFor(outp).Internal;
             }
             return def;
         }
 
         public int GetAttributeI(string attr, int def)
         {
-            TemplateObject outp;
-            if (Attributes.TryGetValue(attr, out outp))
+            if (Attributes.TryGetValue(attr, out TemplateObject outp))
             {
                 return (int)IntegerTag.TryFor(outp).Internal;
             }
@@ -205,10 +202,10 @@ namespace Voxalia.ServerGame.ItemSystem
                 {
                     type = "bool";
                 }
-                else if (val.Value is ItemTag)
+                /* else if (val.Value is ItemTag)
                 {
                     type = "item";
-                }
+                }*/
                 else
                 {
                     type = "text";
@@ -236,7 +233,7 @@ namespace Voxalia.ServerGame.ItemSystem
             return TagParser.Escape(Name) + "[secondary=" + (SecondaryName == null ? "" : EscapeTagBase.Escape(SecondaryName)) + ";display=" + EscapeTagBase.Escape(DisplayName) + ";count=" + Count
                 + ";weight=" + Weight + ";volume=" + Volume + ";temperature=" + Temperature + ";renderascomponent=" + (RenderAsComponent ? "true" : "false") + ";componentrenderoffset=" + ComponentRenderOffset.ToSimpleString()
                 + ";description=" + EscapeTagBase.Escape(Description) + ";texture=" + EscapeTagBase.Escape(GetTextureName()) + ";model=" + EscapeTagBase.Escape(GetModelName()) + ";bound=" + (IsBound ? "true" : "false")
-                + ";drawcolor=" + new ColorTag(DrawColor).ToString() + ";datum=" + Datum + ";shared=" + SharedStr() + ";local=" + EscapedLocalStr() + ";components=" + ComponentEscapedString() + "]";
+                + ";drawcolor=" + DrawColor.ToString() + ";datum=" + Datum + ";shared=" + SharedStr() + ";local=" + EscapedLocalStr() + ";components=" + ComponentEscapedString() + "]";
         }
 
         public override string ToString()
@@ -326,9 +323,9 @@ namespace Voxalia.ServerGame.ItemSystem
                     case "bound":
                         bound = tval == "true";
                         break;
-                    case "drawcolor":
-                        color = (ColorTag.For(tval) ?? new ColorTag(color)).Internal;
-                        break;
+                    //case "drawcolor":
+                    //    color = (ColorTag.For(tval) ?? new ColorTag(color)).Internal;
+                    //    break;
                     case "datum":
                         datum = IntDatumFor(tval);
                         break;
@@ -361,10 +358,12 @@ namespace Voxalia.ServerGame.ItemSystem
                         // TODO: Maybe actually just error?
                 }
             }
-            ItemStack item = new ItemStack(name, secname, tserver, count, tex, display, descrip, color, model, bound, datum);
-            item.Weight = weight;
-            item.Volume = volume;
-            item.Temperature = temperature;
+            ItemStack item = new ItemStack(name, secname, tserver, count, tex, display, descrip, color, model, bound, datum)
+            {
+                Weight = weight,
+                Volume = volume,
+                Temperature = temperature
+            };
             pairs = SplitUpPairs(shared.Substring(1, shared.Length - 2));
             foreach (KeyValuePair<string, string> pair in pairs)
             {
@@ -404,8 +403,7 @@ namespace Voxalia.ServerGame.ItemSystem
             for (int i = 0; i < data.Length; i++)
             {
                 string cur = data[i].Trim();
-                int read;
-                if (int.TryParse(cur, out read))
+                if (int.TryParse(cur, out int read))
                 {
                     temp += read;
                     continue;
@@ -432,8 +430,8 @@ namespace Voxalia.ServerGame.ItemSystem
             {
                 case "text":
                     return new TextTag(content);
-                case "item":
-                    return ItemTag.For(tserver, content);
+                //case "item":
+                //    return ItemTag.For(tserver, content);
                 case "numb":
                     return NumberTag.TryFor(content);
                 case "inte":

@@ -34,8 +34,9 @@ namespace Voxalia.ServerGame.CommandSystem.CommonCommands
 
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Server TheServer = (entry.Command as MeminfoCommand).TheServer;
             const string rn = "   Region Name Here   ";
             const string cr = "Chunk Exact RAM in MB";
             const string er = "Entity Est. RAM in MB";

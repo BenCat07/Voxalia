@@ -43,8 +43,7 @@ namespace Voxalia.ServerGame.ItemSystem
                 List<ItemStack> usedhere = new List<ItemStack>();
                 for (int x = 0; x < Recipes[i].Input.Length; x++)
                 {
-                    int used;
-                    if (!HasRequirement(Recipes[i].Mode, Recipes[i].Input[x], inpitems, out used))
+                    if (!HasRequirement(Recipes[i].Mode, Recipes[i].Input[x], inpitems, out int used))
                     {
                         goto rip;
                     }
@@ -62,16 +61,15 @@ namespace Voxalia.ServerGame.ItemSystem
 
         public static RecipeMode ModeFor(ListTag modeinput)
         {
-            if (modeinput.ListEntries.Count == 1 && modeinput.ListEntries[0].ToString().ToLowerFast() == "strict")
+            if (modeinput.Internal.Count == 1 && modeinput.Internal[0].ToString().ToLowerFast() == "strict")
             {
                 return RecipeMode.BOUND | RecipeMode.COLOR | RecipeMode.DATUM | RecipeMode.DESCRIPTION | RecipeMode.DISPLAY | RecipeMode.LOCAL
                     | RecipeMode.MODEL | RecipeMode.SECONDARY | RecipeMode.SHARED | RecipeMode.TEXTURE | RecipeMode.TYPE | RecipeMode.WEIGHT | RecipeMode.VOLUME;
             }
             RecipeMode mode = 0;
-            foreach (TemplateObject obj in modeinput.ListEntries)
+            foreach (TemplateObject obj in modeinput.Internal)
             {
-                RecipeMode adder;
-                if (Enum.TryParse(obj.ToString().ToUpperInvariant(), out adder))
+                if (Enum.TryParse(obj.ToString().ToUpperInvariant(), out RecipeMode adder))
                 {
                     mode |= adder;
                 }

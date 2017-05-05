@@ -38,13 +38,14 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
             Arguments = "<key>";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
             if (entry.Arguments.Count < 1)
             {
                 ShowUsage(queue, entry);
                 return;
             }
+            Client TheClient = (entry.Command as BindblockCommand).TheClient;
             string key = entry.GetArgument(queue, 0);
             if (key == "\0CALLBACK")
             {

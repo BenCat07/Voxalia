@@ -25,8 +25,9 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
             MaximumArguments = 3;
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as ConnectCommand).TheClient;
             entry.Good(queue, "Connecting...");
             TheClient.Network.Connect(entry.GetArgument(queue, 0), entry.GetArgument(queue, 1), false, entry.GetArgument(queue, 2));
         }

@@ -23,8 +23,9 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
             Arguments = "";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as ItemrightCommand).TheClient;
             if (entry.Marker == 0)
             {
                 queue.HandleError(entry, "Must use +, -, or !");

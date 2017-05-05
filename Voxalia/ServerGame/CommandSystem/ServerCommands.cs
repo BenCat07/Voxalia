@@ -11,8 +11,6 @@ using FreneticScript.CommandSystem;
 using Voxalia.ServerGame.CommandSystem.CommonCommands;
 using Voxalia.ServerGame.CommandSystem.PlayerCommands;
 using Voxalia.ServerGame.CommandSystem.FileCommands;
-using Voxalia.ServerGame.CommandSystem.ItemCommands;
-using Voxalia.ServerGame.TagSystem.TagBases;
 
 namespace Voxalia.ServerGame.CommandSystem
 {
@@ -58,38 +56,9 @@ namespace Voxalia.ServerGame.CommandSystem
 
             // World Commands
             // ...
-
-            // Item Commands
-            CommandSystem.RegisterCommand(new AddrecipeCommand(TheServer));
-            CommandSystem.RegisterCommand(new GiveCommand(TheServer));
             
             // Player Management Commands
             CommandSystem.RegisterCommand(new KickCommand(TheServer));
-
-            // Tag Bases
-            CommandSystem.TagSystem.Register(new ArrowEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new BlockGroupEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new BlockItemEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new BulletEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new ColorTagBase());
-            CommandSystem.TagSystem.Register(new EntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new GlowstickEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new GrenadeEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new ItemEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new ItemTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new LocationTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new MaterialTagBase());
-            CommandSystem.TagSystem.Register(new ModelEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new PhysicsEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new PlayerTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new PrimitiveEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new RecipeResultTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new RecipeTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new WorldTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new ServerTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new SmokeGrenadeEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new VehicleEntityTagBase(TheServer));
-            CommandSystem.TagSystem.Register(new VehiclePartEntityTagBase(TheServer));
 
             // Wrap up
             CommandSystem.PostInit();

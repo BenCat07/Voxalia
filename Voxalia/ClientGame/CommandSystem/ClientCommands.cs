@@ -12,7 +12,6 @@ using Voxalia.ClientGame.CommandSystem.UICommands;
 using Voxalia.ClientGame.CommandSystem.CommonCommands;
 using Voxalia.ClientGame.CommandSystem.NetworkCommands;
 using Voxalia.ClientGame.CommandSystem.GameCommands;
-using Voxalia.ClientGame.CommandSystem.TagBases;
 
 namespace Voxalia.ClientGame.CommandSystem
 {
@@ -89,13 +88,7 @@ namespace Voxalia.ClientGame.CommandSystem
             // Game Commands
             CommandSystem.RegisterCommand(new InventoryCommand(TheClient));
             CommandSystem.RegisterCommand(new TesteffectCommand(TheClient));
-
-            // General Tags
-            CommandSystem.TagSystem.Register(new AudioTagBase(TheClient));
-
-            // Entity Tags
-            CommandSystem.TagSystem.Register(new PlayerTagBase(TheClient));
-
+            
             CommandSystem.PostInit();
         }
 

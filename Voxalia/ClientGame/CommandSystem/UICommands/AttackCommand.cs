@@ -16,18 +16,21 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// </summary>
     class AttackCommand : AbstractCommand
     {
+        // TODO: PrimaryCommand?
+
         public Client TheClient;
 
         public AttackCommand(Client tclient)
         {
             TheClient = tclient;
             Name = "attack";
-            Description = "Makes the player attack.";
+            Description = "Makes the player 'attack': use the primary weapon option.";
             Arguments = "";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as AttackCommand).TheClient;
             if (entry.Marker == 0)
             {
                 queue.HandleError(entry, "Must use +, -, or !");

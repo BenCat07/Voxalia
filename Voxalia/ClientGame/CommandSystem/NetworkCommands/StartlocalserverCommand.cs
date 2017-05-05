@@ -32,8 +32,9 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
             Waitable = true;
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as StartlocalserverCommand).TheClient;
             string arg0 = "28010";
             if (entry.Arguments.Count >= 1)
             {

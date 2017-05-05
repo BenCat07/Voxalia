@@ -26,8 +26,9 @@ namespace Voxalia.ServerGame.CommandSystem.CommonCommands
             Arguments = "";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Server TheServer = (entry.Command as QuitCommand).TheServer;
             TheServer.ShutDown();
         }
     }

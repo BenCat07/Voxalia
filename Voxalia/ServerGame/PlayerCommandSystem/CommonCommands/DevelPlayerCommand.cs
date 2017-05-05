@@ -19,7 +19,6 @@ using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.ServerGame.OtherSystems;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Objects;
-using Voxalia.ServerGame.TagSystem.TagObjects;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.JointSystem;
 using FreneticGameCore;
@@ -202,7 +201,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             {
                 SlimeEntity se = new SlimeEntity(entry.Player.TheRegion, Utilities.StringToFloat(entry.InputArguments[2]))
                 {
-                    mod_color = ColorTag.For(entry.InputArguments[1]).Internal
+                    //mod_color = ColorTag.For(entry.InputArguments[1]).Internal
                 };
                 se.SetPosition(entry.Player.GetPosition() + entry.Player.ForwardVector() * 5);
                 se.TheRegion.SpawnEntity(se);

@@ -16,8 +16,6 @@ using FreneticGameCore.Files;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Common;
 using FreneticScript.TagHandlers.Objects;
-using Voxalia.ServerGame.TagSystem.TagBases;
-using Voxalia.ServerGame.TagSystem.TagObjects;
 using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem
@@ -40,8 +38,7 @@ namespace Voxalia.ServerGame.ItemSystem
         public ItemStack GetItem(string name, int count = 1)
         {
             string low = name.ToLowerFast();
-            ItemStack ist;
-            if (BaseItems.TryGetValue(low, out ist))
+            if (BaseItems.TryGetValue(low, out ItemStack ist))
             {
                 ist = ist.Duplicate();
                 ist.Count = count;
@@ -150,8 +147,9 @@ namespace Voxalia.ServerGame.ItemSystem
                 {
                     res_description = "^[lang=voxalia|items." + tname.Replace("/", ".") + ".description]";
                 }
-                ItemStack it = new ItemStack(res_type, res_subtype, TheServer, 1, res_icon, res_display, res_description, ColorTag.For(res_color).Internal, res_model,
-                    res_bound.ToLower() == "true", ItemStack.IntDatumFor(res_datum))
+                // TODO: Fix color parsing
+                ItemStack it = new ItemStack(res_type, res_subtype, TheServer, 1, res_icon, res_display, res_description, 
+                    System.Drawing.Color.White, res_model, res_bound.ToLower() == "true", ItemStack.IntDatumFor(res_datum))
                 {
                     Weight = Utilities.StringToFloat(res_weight),
                     Volume = Utilities.StringToFloat(res_volume)

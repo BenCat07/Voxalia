@@ -12,7 +12,6 @@ using System.Linq;
 using System.Text;
 using FreneticScript;
 using FreneticScript.CommandSystem;
-using Voxalia.ServerGame.TagSystem.TagObjects;
 using Voxalia.Shared;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
@@ -33,6 +32,8 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "/remote <commands>");
                 return;
             }
+            throw new NotImplementedException();
+            /*
             CommandQueue queue = CommandScript.SeparateCommands("command_line", entry.AllArguments(),
                 entry.Player.TheServer.Commands.CommandSystem, false).ToQueue(entry.Player.TheServer.Commands.CommandSystem);
             queue.SetVariable("player", new PlayerTag(entry.Player));
@@ -50,9 +51,9 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                         break;
                 }
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, entry.Player.TheServer.Commands.CommandSystem.TagSystem.ParseTagsFromText(message, bcolor,
-                    queue.CommandStack.Peek().Variables, DebugMode.FULL, (o) => { /* DO NOTHING */ }, true));
+                    queue.CommandStack.Peek().Variables, DebugMode.FULL, (o) => { /* DO NOTHING */ /* }, true));
             };
-            queue.Execute();
+            queue.Execute();*/
         }
     }
 }

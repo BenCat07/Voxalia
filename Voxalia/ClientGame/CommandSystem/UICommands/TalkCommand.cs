@@ -28,8 +28,9 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
             Arguments = "[text]";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as TalkCommand).TheClient;
             string text = "";
             if (entry.Arguments.Count > 0)
             {

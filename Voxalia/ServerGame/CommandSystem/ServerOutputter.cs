@@ -29,15 +29,13 @@ namespace Voxalia.ServerGame.CommandSystem
             SysConsole.WriteLine(text, "^r^7");
         }
 
-        public override void Good(string tagged_text, DebugMode mode)
+        public override void GoodOutput(string text)
         {
-            string text = TheServer.Commands.CommandSystem.TagSystem.ParseTagsFromText(tagged_text, TextStyle.Color_Outgood, null, mode, (o) => { throw new Exception("Tag exception: " + o); }, true);
             SysConsole.Output(OutputType.INFO, TextStyle.Color_Outgood + text);
         }
 
-        public override void Bad(string tagged_text, DebugMode mode)
+        public override void BadOutput(string text)
         {
-            string text = TheServer.Commands.CommandSystem.TagSystem.ParseTagsFromText(tagged_text, TextStyle.Color_Outbad, null, mode, (o) => { throw new Exception("Tag exception: " + o); }, true);
             SysConsole.Output(OutputType.WARNING, TextStyle.Color_Outbad + text);
         }
 

@@ -26,13 +26,14 @@ namespace Voxalia.ServerGame.CommandSystem.CommonCommands
             Arguments = "<message>";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
             if (entry.Arguments.Count < 1)
             {
                 ShowUsage(queue, entry);
                 return;
             }
+            Server TheServer = (entry.Command as SayCommand).TheServer;
             DateTime Now = DateTime.Now;
             // TODO: Better format (customizable!)
             TheServer.ChatMessage("^r^7[^d^5" + Utilities.Pad(Now.Hour.ToString(), '0', 2, true) + "^7:^5" + Utilities.Pad(Now.Minute.ToString(), '0', 2, true)

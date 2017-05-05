@@ -30,11 +30,13 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             Arguments = "'hold'/'throw'/'click'/'alt'/'drop' <slot number>";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as QuickItemCommand).TheClient;
             if (entry.Marker == 0 || entry.Marker == 3)
             {
                 queue.HandleError(entry, "Must use + or -");
+                return;
             }
             else if (TheClient.Player.ServerFlags.HasFlag(YourStatusFlags.RELOADING))
             {

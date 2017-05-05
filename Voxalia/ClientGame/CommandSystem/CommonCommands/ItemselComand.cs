@@ -30,8 +30,9 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             Arguments = "<slot number>";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as ItemselCommand).TheClient;
             if (entry.Arguments.Count < 1)
             {
                 entry.Bad(queue, "Must specify a slot number!");

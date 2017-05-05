@@ -515,7 +515,7 @@ namespace Voxalia.ClientGame.UISystem
             InverseBinds.Remove(key);
             if (bind != null)
             {
-                CommandScript script = CommandScript.SeparateCommands("bind_" + key, bind, Client.Central.Commands.CommandSystem, false);
+                CommandScript script = CommandScript.SeparateCommands("bind_" + key, bind, Client.Central.Commands.CommandSystem);
                 script.Debug = DebugMode.MINIMAL;
                 Binds[key] = script;
                 if (script.Created.Entries.Length == 1 && script.Created.Entries[0].Marker == 1)

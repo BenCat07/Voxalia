@@ -30,13 +30,14 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             Arguments = "<chunks/blocks/screen/shaders/audio/textures/all>"; // TODO: List input?
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
             if (entry.Arguments.Count < 1)
             {
                 ShowUsage(queue, entry);
                 return;
             }
+            Client TheClient = (entry.Command as ReloadGameCommand).TheClient;
             string arg = entry.GetArgument(queue, 0).ToLowerFast();
             bool success = false;
             bool is_all = arg == "all";

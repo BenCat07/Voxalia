@@ -25,13 +25,14 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
             Arguments = "<ip> <port>";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
             if (entry.Arguments.Count < 2)
             {
                 ShowUsage(queue, entry);
                 return;
             }
+            Client TheClient = (entry.Command as PingCommand).TheClient;
             string ip = entry.GetArgument(queue, 0);
             string port = entry.GetArgument(queue, 1);
             TheClient.Network.Ping(ip, port, (info) =>

@@ -143,9 +143,6 @@
     <Compile Include="ClientGame\CommandSystem\NetworkCommands\DisconnectCommand.cs" />
     <Compile Include="ClientGame\CommandSystem\NetworkCommands\StartlocalserverCommand.cs" />
     <Compile Include="ClientGame\CommandSystem\NetworkCommands\NetusageCommand.cs" />
-    <Compile Include="ClientGame\CommandSystem\TagBases\AudioTagBase.cs" />
-    <Compile Include="ClientGame\CommandSystem\TagBases\PlayerTagBase.cs" />
-    <Compile Include="ClientGame\CommandSystem\TagObjects\EntityTagObjects\PlayerTag.cs" />
     <Compile Include="ClientGame\CommandSystem\UICommands\ItemDownCommand.cs" />
     <Compile Include="ClientGame\CommandSystem\UICommands\ItemUpCommand.cs" />
     <Compile Include="ClientGame\CommandSystem\UICommands\ItemRightCommand.cs" />

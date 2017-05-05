@@ -29,8 +29,9 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             Arguments = "<soundname> [pitch] [volume] [location] [seek time in seconds]";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as PlayCommand).TheClient;
             if (entry.Arguments.Count < 1)
             {
                 ShowUsage(queue, entry);

@@ -31,18 +31,17 @@ namespace Voxalia.ClientGame.CommandSystem
             UIConsole.WriteLine(text);
         }
 
-        public override void Good(string tagged_text, DebugMode mode)
+        public override void GoodOutput(string text)
         {
-            string text = TheClient.Commands.CommandSystem.TagSystem.ParseTagsFromText(tagged_text, TextStyle.Color_Outgood, null, mode, (o) => { throw new Exception("Tag exception: " + o); }, true);
             UIConsole.WriteLine(TextStyle.Color_Outgood + text);
         }
 
-        public override void Bad(string tagged_text, DebugMode mode)
+        public override void BadOutput(string text)
         {
-            string text = TheClient.Commands.CommandSystem.TagSystem.ParseTagsFromText(tagged_text, TextStyle.Color_Outbad, null, mode, (o) => { throw new Exception("Tag exception: " + o); }, true);
             UIConsole.WriteLine(TextStyle.Color_Outbad + text);
         }
 
+        // TODO: Get an Argument[] here.
         public override void UnknownCommand(CommandQueue queue, string basecommand, string[] arguments)
         {
             if (TheClient.Network.IsAlive)
@@ -51,8 +50,8 @@ namespace Voxalia.ClientGame.CommandSystem
                 sb.Append(basecommand);
                 for (int i = 0; i < arguments.Length; i++)
                 {
-                    sb.Append("\n").Append(queue.ParseTags != TagParseMode.OFF ? TheClient.Commands.CommandSystem.TagSystem.ParseTagsFromText(arguments[i],
-                        TextStyle.Color_Simple, null, DebugMode.MINIMAL, (o) => { throw new Exception("Tag exception: " + o); }, true) : arguments[i]);
+                    // TODO: parsed Argument value!
+                    sb.Append("\n").Append(arguments[i]);
                 }
                 CommandPacketOut packet = new CommandPacketOut(sb.ToString());
                 TheClient.Network.SendPacket(packet);

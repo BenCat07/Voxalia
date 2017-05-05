@@ -27,8 +27,9 @@ namespace Voxalia.ClientGame.CommandSystem.GameCommands
             Arguments = "";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as InventoryCommand).TheClient;
             TheClient.ShowInventory();
         }
     }

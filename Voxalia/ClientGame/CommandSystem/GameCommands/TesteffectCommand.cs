@@ -30,13 +30,14 @@ namespace Voxalia.ClientGame.CommandSystem.GameCommands
             Arguments = "effect";
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
             if (entry.Arguments.Count < 1)
             {
                 ShowUsage(queue, entry);
                 return;
             }
+            Client TheClient = (entry.Command as TesteffectCommand).TheClient;
             Location start = TheClient.Player.GetEyePosition();
             Location forward = TheClient.Player.ForwardVector();
             Location end = start + forward * 5;

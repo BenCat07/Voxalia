@@ -31,8 +31,9 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
             MaximumArguments = 2;
         }
 
-        public override void Execute(CommandQueue queue, CommandEntry entry)
+        public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            Client TheClient = (entry.Command as BindCommand).TheClient;
             string key = entry.GetArgument(queue, 0);
             Key k = KeyHandler.GetKeyForName(key);
             if (entry.Arguments.Count == 1)
