@@ -15,28 +15,37 @@ using Voxalia.Shared.Collision;
 using System.Threading;
 using System.Globalization;
 using System.Reflection;
+using FreneticGameCore;
 
 namespace Voxalia.Shared
 {
     /// <summary>
     /// Main game program initializer.
     /// </summary>
-    public class VoxProgram
+    public class VoxProgram : Program
     {
         /// <summary>
         /// The name of the game.
         /// </summary>
-        public const string GameName = "Voxalia";
+        public const string VoxGameName = "Voxalia";
 
         /// <summary>
         /// The version of the game. Automatically read from file.
         /// </summary>
-        public static readonly string GameVersion = Assembly.GetEntryAssembly().GetName().Version.ToString();
+        public static readonly string VoxGameVersion = Assembly.GetCallingAssembly().GetName().Version.ToString();
 
         /// <summary>
         /// The description of the game version.
         /// </summary>
-        public const string GameVersionDescription = "Pre-Alpha";
+        public const string VoxGameVersionDescription = "Pre-Alpha";
+        
+        /// <summary>
+        /// Configures the program correctly.
+        /// </summary>
+        public VoxProgram()
+            : base(VoxGameName, VoxGameVersion, VoxGameVersionDescription)
+        {
+        }
 
         /// <summary>
         /// The web address for the primary global server that handles logging in.
@@ -46,11 +55,9 @@ namespace Voxalia.Shared
         /// <summary>
         /// This method should be called FIRST!
         /// </summary>
-        public static void PreInit()
+        public static void PreInitVox()
         {
-            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
+            PreInit(new VoxProgram());
         }
         
         /// <summary>

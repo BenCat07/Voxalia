@@ -55,7 +55,7 @@ namespace Voxalia
                 ShowWindow(ConsoleHandle, SW_HIDE);
 #endif
             }
-            VoxProgram.PreInit();
+            VoxProgram.PreInitVox();
             SysConsole.AllowCursor = false;
             SysConsole.Init();
             StringBuilder arger = new StringBuilder();

@@ -38,7 +38,7 @@ namespace Voxalia
         static void Main(string[] args)
         {
             ConsoleHandle = Process.GetCurrentProcess().MainWindowHandle;
-            VoxProgram.PreInit();
+            VoxProgram.PreInitVox();
             SysConsole.Init();
             VoxProgram.Init();
             try
