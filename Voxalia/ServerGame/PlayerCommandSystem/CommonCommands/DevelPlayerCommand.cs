@@ -336,6 +336,19 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 entry.Player.PlayerConfig.Set("web.passcode", Utilities.HashQuick(entry.Player.Name.ToLowerFast(), entry.InputArguments[1]));
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Set.");
             }
+            else if (arg0 == "myProperties")
+            {
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Property count: " + entry.Player.Properties.PropertyCount);
+                foreach (Property p in entry.Player.Properties.GetAllProperties())
+                {
+                    Dictionary<string, string> strs = new Dictionary<string, string>();
+                    entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Property[" + p.GetPropertyName() + "]: ");
+                    foreach (KeyValuePair<string, string> strentry in p.GetDebuggable())
+                    {
+                        entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "    " + strentry.Key + ": " + strentry.Value);
+                    }
+                }
+            }
             else if (arg0 == "spawnMessage" && entry.InputArguments.Count > 1)
             {
                 string mes = entry.InputArguments[1].Replace("\\n", "\n");

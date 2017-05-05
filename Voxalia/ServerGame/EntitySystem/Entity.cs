@@ -20,17 +20,6 @@ using FreneticGameCore;
 namespace Voxalia.ServerGame.EntitySystem
 {
     /// <summary>
-    /// Represents the properties of an entity.
-    /// </summary>
-    public class EntityProperties : PropertyHolder
-    {
-        /// <summary>
-        /// The entity that holds these properties.
-        /// </summary>
-        public Entity HoldingEntity;
-    }
-
-    /// <summary>
     /// Represents an object within the world.
     /// </summary>
     public abstract class Entity
