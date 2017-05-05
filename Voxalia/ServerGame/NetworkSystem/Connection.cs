@@ -230,33 +230,11 @@ namespace Voxalia.ServerGame.NetworkSystem
                             Array.Copy(rem_data, recd, rem_data.Length);
                         }
                         recdsofar -= len + 5;
-                        AbstractPacketIn packet;
-                        switch (packetID) // TODO: Packet registry?
+                        if (!TheServer.Networking.PacketHelper.TryGetValue(packetID, out Func<AbstractPacketIn> pconst))
                         {
-                            case ClientToServerPacket.PING:
-                                packet = new PingPacketIn();
-                                break;
-                            case ClientToServerPacket.KEYS:
-                                packet = new KeysPacketIn();
-                                break;
-                            case ClientToServerPacket.COMMAND:
-                                packet = new CommandPacketIn();
-                                break;
-                            case ClientToServerPacket.HOLD_ITEM:
-                                packet = new HoldItemPacketIn();
-                                break;
-                            case ClientToServerPacket.DISCONNECT:
-                                packet = new DisconnectPacketIn();
-                                break;
-                            case ClientToServerPacket.SET_STATUS:
-                                packet = new SetStatusPacketIn();
-                                break;
-                            case ClientToServerPacket.PLEASE_REDEFINE:
-                                packet = new PleaseRedefinePacketIn();
-                                break;
-                            default:
-                                throw new Exception("Invalid packet ID: " + packetID);
+                            throw new Exception("Invalid packet ID: " + packetID);
                         }
+                        AbstractPacketIn packet = pconst();
                         packet.Chunk = PE.ChunkNetwork == this;
                         packet.Player = PE;
                         DataReader dr = new DataReader(new DataStream(data));

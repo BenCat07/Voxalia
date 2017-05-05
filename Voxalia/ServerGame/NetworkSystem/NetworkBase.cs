@@ -15,6 +15,7 @@ using System.Threading;
 using Voxalia.Shared;
 using Open.Nat;
 using FreneticGameCore;
+using Voxalia.ServerGame.NetworkSystem.PacketsIn;
 
 namespace Voxalia.ServerGame.NetworkSystem
 {
@@ -30,11 +31,23 @@ namespace Voxalia.ServerGame.NetworkSystem
 
         public List<Connection> Connections;
 
+        /// <summary>
+        /// Mapping of Packet IDs to actual packet constructor objects.
+        /// </summary>
+        public Dictionary<ClientToServerPacket, Func<AbstractPacketIn>> PacketHelper = new Dictionary<ClientToServerPacket, Func<AbstractPacketIn>>();
+
         public NetworkBase(Server tserver)
         {
             TheServer = tserver;
             Strings = new NetStringManager(TheServer);
             Connections = new List<Connection>();
+            PacketHelper[ClientToServerPacket.PING] = () => new PingPacketIn();
+            PacketHelper[ClientToServerPacket.KEYS] = () => new KeysPacketIn();
+            PacketHelper[ClientToServerPacket.COMMAND] = () => new CommandPacketIn();
+            PacketHelper[ClientToServerPacket.HOLD_ITEM] = () => new HoldItemPacketIn();
+            PacketHelper[ClientToServerPacket.DISCONNECT] = () => new DisconnectPacketIn();
+            PacketHelper[ClientToServerPacket.SET_STATUS] = () => new SetStatusPacketIn();
+            PacketHelper[ClientToServerPacket.PLEASE_REDEFINE] = () => new PleaseRedefinePacketIn();
         }
 
         public void Init()
