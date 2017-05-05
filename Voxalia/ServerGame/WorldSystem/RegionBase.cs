@@ -403,7 +403,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 foreach (Entity e in GetEntitiesInRadius(pos, rad * 5)) // TODO: Physent-specific search method?
                 {
-                    if (e.Properties.TryGetProperty(out DamageableEntityProperty damageable))
+                    if (e.TryGetProperty(out DamageableEntityProperty damageable))
                     {
                         Location offs = e.GetPosition() - pos;
                         double dpower = ((rad * 5) - offs.Length()); // TODO: Efficiency? (Length is slow!)

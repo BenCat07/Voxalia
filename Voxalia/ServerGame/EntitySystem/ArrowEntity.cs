@@ -135,7 +135,7 @@ namespace Voxalia.ServerGame.EntitySystem
             if (args.Info.HitEnt != null)
             {
                 PhysicsEntity pe = (PhysicsEntity)args.Info.HitEnt.Tag;
-                if (pe.Properties.TryGetProperty(out DamageableEntityProperty damageable))
+                if (pe.TryGetProperty(out DamageableEntityProperty damageable))
                 {
                     damageable.Damage(Damage + DamageTimesVelocity * (double)len);
                 }

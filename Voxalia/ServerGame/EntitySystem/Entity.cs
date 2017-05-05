@@ -22,18 +22,13 @@ namespace Voxalia.ServerGame.EntitySystem
     /// <summary>
     /// Represents an object within the world.
     /// </summary>
-    public abstract class Entity
+    public abstract class Entity : PropertyHolder
     {
         /// <summary>
         /// The region that holds this entity.
         /// </summary>
         public Region TheRegion;
-
-        /// <summary>
-        /// This entity's properties.
-        /// </summary>
-        public readonly EntityProperties Properties;
-
+        
         /// <summary>
         /// Constructs the entity object.
         /// </summary>
@@ -44,7 +39,6 @@ namespace Voxalia.ServerGame.EntitySystem
             TheRegion = tregion;
             TheServer = tregion.TheServer;
             Ticks = tickme;
-            Properties = new EntityProperties() { HoldingEntity = this };
         }
 
         /// <summary>

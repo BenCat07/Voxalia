@@ -82,7 +82,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 return;
             }
             PhysicsEntity pe = (PhysicsEntity)((EntityCollidable)other).Entity.Tag;
-            if (pe.Properties.TryGetProperty(out DamageableEntityProperty damageable))
+            if (pe.TryGetProperty(out DamageableEntityProperty damageable))
             {
                 damageable.Damage(DamageAmt);
                 ApplyDamage = DamageDelay;

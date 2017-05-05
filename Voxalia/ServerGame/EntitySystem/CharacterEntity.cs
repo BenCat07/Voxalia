@@ -42,7 +42,7 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public DamageableEntityProperty Damageable()
         {
-            return Properties.GetOrAddProperty(GetDamageProperty);
+            return GetOrAddProperty(GetDamageProperty);
         }
 
         public override long GetRAMUsage()

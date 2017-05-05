@@ -99,7 +99,6 @@
     <Compile Include="ServerGame\EntitySystem\BlockGroupEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\CharacterEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\Entity.cs" />
-    <Compile Include="ServerGame\EntitySystem\EntityProperties.cs" />
     <Compile Include="ServerGame\EntitySystem\EntityPropertiesSystem\DamageableEntityProperty.cs" />
     <Compile Include="ServerGame\EntitySystem\HoverMessageEntity.cs" />
     <Compile Include="ServerGame\EntitySystem\PlaneEntity.cs" />

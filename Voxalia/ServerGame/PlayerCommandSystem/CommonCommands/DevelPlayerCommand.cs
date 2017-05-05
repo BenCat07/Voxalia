@@ -338,8 +338,8 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             }
             else if (arg0 == "myProperties")
             {
-                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Property count: " + entry.Player.Properties.PropertyCount);
-                foreach (Property p in entry.Player.Properties.GetAllProperties())
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Property count: " + entry.Player.PropertyCount);
+                foreach (Property p in entry.Player.GetAllProperties())
                 {
                     Dictionary<string, string> strs = new Dictionary<string, string>();
                     entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Property[" + p.GetPropertyName() + "]: ");

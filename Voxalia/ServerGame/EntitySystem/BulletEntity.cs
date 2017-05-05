@@ -66,7 +66,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 Vector3 impulse = GetVelocity().ToBVector() * Damage / 1000f;
                 physent.Body.ApplyImpulse(ref loc, ref impulse);
                 physent.Body.ActivityInformation.Activate();
-                if (physent.Properties.TryGetProperty(out DamageableEntityProperty damageable))
+                if (physent.TryGetProperty(out DamageableEntityProperty damageable))
                 {
                     damageable.Damage(Damage);
                 }
