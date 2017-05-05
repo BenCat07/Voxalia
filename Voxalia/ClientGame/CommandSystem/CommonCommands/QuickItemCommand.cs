@@ -18,7 +18,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
     /// <summary>
     /// A command to quickly switch and use a specific item.
     /// </summary>
-    class QuickItemCommand : AbstractCommand
+    public class QuickItemCommand : AbstractCommand
     {
         public Client TheClient;
 

@@ -18,7 +18,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
     /// <summary>
     /// A quick command to select an item.
     /// </summary>
-    class ItemselCommand : AbstractCommand
+    public class ItemselCommand : AbstractCommand
     {
         public Client TheClient;
 

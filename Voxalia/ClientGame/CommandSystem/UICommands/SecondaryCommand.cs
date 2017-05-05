@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to attack secondarily.
     /// </summary>
-    class SecondaryCommand : AbstractCommand
+    public class SecondaryCommand : AbstractCommand
     {
         public Client TheClient;
 

@@ -17,7 +17,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A quick command to quit the game.
     /// </summary>
-    class UnbindCommand : AbstractCommand
+    public class UnbindCommand : AbstractCommand
     {
         public Client TheClient;
 

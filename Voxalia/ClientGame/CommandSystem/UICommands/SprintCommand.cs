@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to run.
     /// </summary>
-    class SprintCommand : AbstractCommand
+    public class SprintCommand : AbstractCommand
     {
         public Client TheClient;
 

@@ -14,7 +14,7 @@ using FreneticGameCore;
 
 namespace Voxalia.ServerGame.CommandSystem.CommonCommands
 {
-    class SayCommand: AbstractCommand
+    public class SayCommand : AbstractCommand
     {
         public Server TheServer;
 

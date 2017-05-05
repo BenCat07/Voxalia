@@ -16,7 +16,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
     /// <summary>
     /// A quick command to switch to the next item.
     /// </summary>
-    class ItemnextCommand : AbstractCommand
+    public class ItemnextCommand : AbstractCommand
     {
         public Client TheClient;
 

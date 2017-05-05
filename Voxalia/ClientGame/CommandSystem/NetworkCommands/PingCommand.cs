@@ -13,7 +13,7 @@ using Voxalia.ClientGame.UISystem;
 
 namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
 {
-    class PingCommand: AbstractCommand
+    public class PingCommand : AbstractCommand
     {
         public Client TheClient;
 

@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
     /// <summary>
     /// A quick command to quit the game.
     /// </summary>
-    class QuitCommand: AbstractCommand
+    public class QuitCommand : AbstractCommand
     {
         public Client TheClient;
 

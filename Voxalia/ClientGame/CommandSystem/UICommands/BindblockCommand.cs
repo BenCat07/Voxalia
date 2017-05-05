@@ -19,7 +19,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A quick command to quit the game.
     /// </summary>
-    class BindblockCommand : AbstractCommand
+    public class BindblockCommand : AbstractCommand
     {
         public override void AdaptBlockFollowers(CommandEntry entry, List<CommandEntry> input, List<CommandEntry> fblock)
         {

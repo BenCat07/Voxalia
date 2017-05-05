@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to move rightward.
     /// </summary>
-    class RightwardCommand : AbstractCommand
+    public class RightwardCommand : AbstractCommand
     {
         public Client TheClient;
 

@@ -14,7 +14,7 @@ using Voxalia.ServerGame.EntitySystem;
 
 namespace Voxalia.ServerGame.CommandSystem.PlayerCommands
 {
-    class KickCommand: AbstractCommand
+    public class KickCommand : AbstractCommand
     {
         public Server TheServer;
 

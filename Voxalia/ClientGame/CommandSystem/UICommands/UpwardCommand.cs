@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to move upward (jump).
     /// </summary>
-    class UpwardCommand : AbstractCommand
+    public class UpwardCommand : AbstractCommand
     {
         public Client TheClient;
 

@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to crouch.
     /// </summary>
-    class MovedownCommand : AbstractCommand
+    public class MovedownCommand : AbstractCommand
     {
         public Client TheClient;
 

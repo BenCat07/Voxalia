@@ -11,7 +11,7 @@ using Voxalia.ClientGame.ClientMainSystem;
 
 namespace Voxalia.ClientGame.CommandSystem.UICommands
 {
-    class ItemdownCommand : AbstractCommand
+    public class ItemdownCommand : AbstractCommand
     {
         public Client TheClient;
         

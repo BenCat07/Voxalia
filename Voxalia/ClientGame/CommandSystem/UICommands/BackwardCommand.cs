@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to move backward.
     /// </summary>
-    class BackwardCommand : AbstractCommand
+    public class BackwardCommand : AbstractCommand
     {
         public Client TheClient;
 

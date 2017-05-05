@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to walk.
     /// </summary>
-    class WalkCommand : AbstractCommand
+    public class WalkCommand : AbstractCommand
     {
         public Client TheClient;
 

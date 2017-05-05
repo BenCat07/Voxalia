@@ -16,7 +16,7 @@ using Voxalia.Shared;
 
 namespace Voxalia.ServerGame.CommandSystem.FileCommands
 {
-    class AddpathCommand: AbstractCommand
+    public class AddpathCommand : AbstractCommand
     {
         public Server TheServer;
 

@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to attack.
     /// </summary>
-    class AttackCommand : AbstractCommand
+    public class AttackCommand : AbstractCommand
     {
         // TODO: PrimaryCommand?
 

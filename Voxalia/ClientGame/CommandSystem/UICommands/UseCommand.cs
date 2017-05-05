@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to use things.
     /// </summary>
-    class UseCommand : AbstractCommand
+    public class UseCommand : AbstractCommand
     {
         public Client TheClient;
 

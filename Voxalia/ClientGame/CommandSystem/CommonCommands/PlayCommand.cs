@@ -17,7 +17,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
     /// <summary>
     /// A quick command to play a sound effect.
     /// </summary>
-    class PlayCommand : AbstractCommand
+    public class PlayCommand : AbstractCommand
     {
         public Client TheClient;
 

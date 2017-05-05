@@ -11,7 +11,7 @@ using Voxalia.ClientGame.ClientMainSystem;
 
 namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
 {
-    class ConnectCommand: AbstractCommand
+    public class ConnectCommand : AbstractCommand
     {
         public Client TheClient;
 

@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
     /// <summary>
     /// A command to move forward.
     /// </summary>
-    class ForwardCommand : AbstractCommand
+    public class ForwardCommand : AbstractCommand
     {
         public Client TheClient;
 
