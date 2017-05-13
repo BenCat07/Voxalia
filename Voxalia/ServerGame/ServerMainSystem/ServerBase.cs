@@ -12,6 +12,7 @@ using System.Text;
 using Voxalia.Shared;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using Voxalia.ServerGame.CommandSystem;
 using Voxalia.ServerGame.NetworkSystem;
 using Voxalia.ServerGame.EntitySystem;
@@ -139,7 +140,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// <summary>
         /// Whether the server needs a shutdown immediately (Set by the method <see cref="ShutDown(Action)"/>).
         /// </summary>
-        public bool NeedShutdown = false;
+        private CancellationTokenSource NeedShutdown = new CancellationTokenSource();
 
         /// <summary>
         /// The action to fire when a shutdown completes (Set by the method <see cref="ShutDown(Action)"/>).
@@ -156,7 +157,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
             ShutdownCallback = callback;
             if (CurThread != Thread.CurrentThread)
             {
-                NeedShutdown = true; // TODO: Lock for this?
+                NeedShutdown.Cancel();
                 return;
             }
             ShuttingDown = true;
@@ -212,15 +213,18 @@ namespace Voxalia.ServerGame.ServerMainSystem
             ShutDownQuickly();
         }
 
+        private CancellationTokenSource NeedsQuickShutdown = new CancellationTokenSource();
+
         /// <summary>
         /// Tells the server to shut down, without saving anything.
+        /// Generally will ensure a shut down by the end of the tick!
         /// </summary>
         public void ShutDownQuickly()
         {
             if (CurThread != Thread.CurrentThread)
             {
-                // TODO: (Aborts) Task quick cancelling.
-                CurThread.Abort();
+                NeedsQuickShutdown.Cancel();
+                return;
             }
             ShuttingDown = true;
             foreach (World world in LoadedWorlds)
@@ -231,11 +235,6 @@ namespace Voxalia.ServerGame.ServerMainSystem
             if (ShutdownCallback != null)
             {
                 ShutdownCallback.Invoke();
-            }
-            if (CurThread == Thread.CurrentThread)
-            {
-                // TODO: (Aborts) This is an odd trick.
-                CurThread.Abort();
             }
         }
 
@@ -435,10 +434,16 @@ namespace Voxalia.ServerGame.ServerMainSystem
                     // As long as there's more delta built up than delta wanted, tick
                     while (TotalDelta > TargetDelta)
                     {
-                        if (NeedShutdown)
+                        if (NeedShutdown.IsCancellationRequested)
                         {
                             CurThread = Thread.CurrentThread;
                             ShutDown(ShutdownCallback);
+                            return;
+                        }
+                        else if (NeedsQuickShutdown.IsCancellationRequested)
+                        {
+                            CurThread = Thread.CurrentThread;
+                            ShutDownQuickly();
                             return;
                         }
                         lock (TickLock)

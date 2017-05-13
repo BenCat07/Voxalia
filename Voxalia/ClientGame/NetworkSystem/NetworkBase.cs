@@ -52,6 +52,8 @@ namespace Voxalia.ClientGame.NetworkSystem
 
         public Thread ConnectionThread;
 
+        public CancellationTokenSource ConnectionCanceller;
+
         public string LastIP;
 
         public string LastPort;
@@ -90,32 +92,16 @@ namespace Voxalia.ClientGame.NetworkSystem
             }
         }
 
-        public void Disconnect(Thread ConnectionThread, Socket ConnectionSocket, Socket ChunkSocket)
+        public void Disconnect(Thread ConnectionThread, CancellationTokenSource cancelMe, Socket ConnectionSocket, Socket ChunkSocket)
         {
             if (norep)
             {
                 return;
             }
             norep = true;
-            if (ConnectionThread != null && ConnectionThread.IsAlive)
+            if (ConnectionThread != null && ConnectionThread.IsAlive && cancelMe != null)
             {
-                try
-                {
-                    TheClient.Schedule.StartAsyncTask(() =>
-                    {
-                        // TODO: (Aborts) Replace this with standard cancellation tools.
-                        ConnectionThread.Abort();
-                    });
-                }
-                catch (Exception ex)
-                {
-                    if (ex is ThreadAbortException)
-                    {
-                        throw ex;
-                    }
-                    SysConsole.Output(OutputType.WARNING, "Disconnecting: " + ex.ToString());
-                }
-                ConnectionThread = null;
+                cancelMe.Cancel();
             }
             if (ConnectionSocket != null)
             {
@@ -151,7 +137,7 @@ namespace Voxalia.ClientGame.NetworkSystem
 
         public void Connect(string IP, string port, bool shortrender, string game)
         {
-            Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
+            Disconnect(ConnectionThread, ConnectionCanceller, ConnectionSocket, ChunkSocket);
             TheClient.Files.SetSaveDirLate(game == null ? null : "client_" + game);
             Strings.Strings.Clear();
             TheClient.Resetregion();
@@ -499,10 +485,15 @@ namespace Voxalia.ClientGame.NetworkSystem
             TheClient.Schedule.StartAsyncTask(() =>
             {
                 ConnectionThread = Thread.CurrentThread;
+                CancellationTokenSource cts = ConnectionCanceller = new CancellationTokenSource();
                 while (true)
                 {
                     try
                     {
+                        if (cts.IsCancellationRequested)
+                        {
+                            return;
+                        }
                         if (!Tick())
                         {
                             return;
@@ -551,7 +542,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                 }
                 SysConsole.Output(OutputType.ERROR, "Forcibly disconnected from server: " + ex.GetType().Name + ": " + ex.Message);
                 SysConsole.Output(OutputType.DEBUG, ex.ToString());
-                Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
+                Disconnect(ConnectionThread, ConnectionCanceller, ConnectionSocket, ChunkSocket);
                 return false;
             }
         }
@@ -585,7 +576,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                 }
                 SysConsole.Output(OutputType.WARNING, "Forcibly disconnected from server: " + ex.GetType().Name + ": " + ex.Message);
                 SysConsole.Output(OutputType.DEBUG, ex.ToString());
-                Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
+                Disconnect(ConnectionThread, ConnectionCanceller, ConnectionSocket, ChunkSocket);
             }
         }
 
@@ -606,7 +597,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                     throw ex;
                 }
                 SysConsole.Output(OutputType.WARNING, "Forcibly disconnected from server: " + ex.GetType().Name + ": " + ex.Message);
-                Disconnect(ConnectionThread, ConnectionSocket, ChunkSocket);
+                Disconnect(ConnectionThread, ConnectionCanceller, ConnectionSocket, ChunkSocket);
             }
         }
 

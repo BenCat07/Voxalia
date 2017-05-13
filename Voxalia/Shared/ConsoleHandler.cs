@@ -52,7 +52,8 @@ namespace Voxalia.Shared
         public static void Close()
         {
             // TODO: (Aborts) Find cleaner method than aborting this! Task cancellation magic somehow!
-            thread.Abort();
+            thread?.Abort();
+            thread = null;
         }
 
         static void ListenLoop()

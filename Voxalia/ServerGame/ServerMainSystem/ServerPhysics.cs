@@ -65,9 +65,11 @@ namespace Voxalia.ServerGame.ServerMainSystem
             {
                 return null;
             }
-            World world = new World();
-            world.Name = nl;
-            world.TheServer = this;
+            World world = new World()
+            {
+                Name = nl,
+                TheServer = this
+            };
             WorldLoadEventArgs e2 = new WorldLoadEventArgs() { TheWorld = world };
             OnWorldLoadEvent.Fire(e2);
             if (e.Cancelled)
@@ -138,8 +140,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         {
             foreach (World world in LoadedWorlds)
             {
-                Entity ent;
-                if (world.MainRegion.Entities.TryGetValue(eid, out ent))
+                if (world.MainRegion.Entities.TryGetValue(eid, out Entity ent))
                 {
                     return ent;
                 }
