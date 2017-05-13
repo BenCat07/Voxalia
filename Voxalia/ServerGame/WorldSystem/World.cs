@@ -351,7 +351,7 @@ namespace Voxalia.ServerGame.WorldSystem
             MainRegion.UnloadFully();
             MainRegion = null;
             UnloadCallback?.Invoke();
-            // TODO: Should we really just be aborting the current thread?
+            // TODO: (Aborts) Should we really just be aborting the current thread?
             Execution.Abort();
             Execution = null;
         }

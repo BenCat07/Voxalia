@@ -219,6 +219,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         {
             if (CurThread != Thread.CurrentThread)
             {
+                // TODO: (Aborts) Task quick cancelling.
                 CurThread.Abort();
             }
             ShuttingDown = true;
@@ -233,6 +234,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
             if (CurThread == Thread.CurrentThread)
             {
+                // TODO: (Aborts) This is an odd trick.
                 CurThread.Abort();
             }
         }

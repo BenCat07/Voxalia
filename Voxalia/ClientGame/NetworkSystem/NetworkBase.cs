@@ -103,6 +103,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                 {
                     TheClient.Schedule.StartAsyncTask(() =>
                     {
+                        // TODO: (Aborts) Replace this with standard cancellation tools.
                         ConnectionThread.Abort();
                     });
                 }
