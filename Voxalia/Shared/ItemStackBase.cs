@@ -210,7 +210,7 @@ namespace Voxalia.Shared
             Name = name;
         }
 
-        public void Load(string name, string secondary_name, int count, string tex, string display, string descrip, System.Drawing.Color color, string model, int datum)
+        public void Load(string name, string secondary_name, int count, string tex, string display, string descrip, Color color, string model, int datum)
         {
             SetName(name);
             SecondaryName = secondary_name;
@@ -230,7 +230,7 @@ namespace Voxalia.Shared
             Weight = dr.ReadFloat();
             Volume = dr.ReadFloat();
             Temperature = dr.ReadFloat();
-            DrawColor = System.Drawing.Color.FromArgb(dr.ReadInt());
+            DrawColor = Color.FromArgb(dr.ReadInt());
             SetName(dr.ReadFullString());
             string secondary_name = dr.ReadFullString();
             SecondaryName = secondary_name.Length == 0 ? null : secondary_name;
@@ -313,7 +313,7 @@ namespace Voxalia.Shared
         {
             return Name + "[secondary=" + (SecondaryName ?? "{NULL}") + ";display=" + DisplayName + ";count=" + Count + ";renderascomponent=" + RenderAsComponent + ";componentrenderoffset=" + ComponentRenderOffset.ToSimpleString()
                 + ";description=" + Description + ";texture=" + GetTextureName() + ";model=" + GetModelName() + ";weight=" + Weight + ";volume=" + Volume + ";temperature=" + Temperature
-                + ";drawcolor=" + DrawColor.R / 255f + "," + DrawColor.G / 255f + "," + DrawColor.B / 255f + "," + DrawColor.A / 255f + ";datum=" + Datum + ";shared=" + SharedStr() + ";components=" + ComponentString() + "]";
+                + ";drawcolor=" + DrawColor.ToColorString() + ";datum=" + Datum + ";shared=" + SharedStr() + ";components=" + ComponentString() + "]";
             // TODO: Shared color tag?
         }
     }

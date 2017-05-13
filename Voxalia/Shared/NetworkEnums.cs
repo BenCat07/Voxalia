@@ -269,4 +269,23 @@ namespace Voxalia.Shared
         UNSPECIFIED = 6,
         COUNT = 7
     }
+
+    /// <summary>
+    /// Types of items.
+    /// </summary>
+    public enum ItemType : byte
+    {
+        HAND = 0,
+        BASIC_TOOLS = 1,
+        DEVICES = 2,
+        BLOCKS = 3,
+        FOOD = 4,
+        SMALL_MELEE_WEAPONS = 5,
+        LARGE_MELEE_WEAPONS = 6,
+        LIGHT_RANGED_WEAPONS = 7,
+        HEAVY_RANGED_WEAPONS = 8,
+        THROWABLES = 9,
+        COMPONENT_OBJECTS = 10,
+        OTHER = 11
+    }
 }

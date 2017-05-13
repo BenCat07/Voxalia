@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using FreneticGameCore;
 
 namespace Voxalia.Shared
 {
@@ -103,19 +104,46 @@ namespace Voxalia.Shared
             return 1.0;
         }
 
+        public static Color ColorForText(string txt)
+        {
+            byte b = ForName(txt, 255);
+            if (b != 255)
+            {
+                return ForByte(b);
+            }
+            string[] spl = txt.Split(',');
+            if (spl.Length == 3)
+            {
+                return Color.FromArgb(Utilities.StringToInt(spl[0]),
+                    Utilities.StringToInt(spl[1]),
+                    Utilities.StringToInt(spl[2]));
+            }
+            if (spl.Length == 4)
+            {
+                return Color.FromArgb(Utilities.StringToInt(spl[3]),
+                    Utilities.StringToInt(spl[0]),
+                    Utilities.StringToInt(spl[1]),
+                    Utilities.StringToInt(spl[2]));
+            }
+            return ForByte(0);
+        }
+
+        public static string ToColorString(this Color c)
+        {
+            return (c.R / 255f) + "," + (c.G / 255f) + "," + (c.B / 255f) + "," + (c.A / 255f);
+        }
+
         public static Color ForByte(byte input)
         {
-            int baseinp = input;
-            return KnownColorsArray[baseinp];
+            return KnownColorsArray[input];
         }
 
         public static string NameForByte(byte input)
         {
-            int baseinp = input;
-            return KnownColorNamesArray[baseinp];
+            return KnownColorNamesArray[input];
         }
         
-        public static byte ForName(string name)
+        public static byte ForName(string name, byte def = 0)
         {
             if (byte.TryParse(name, out byte val))
             {
@@ -126,7 +154,7 @@ namespace Voxalia.Shared
             {
                 return val;
             }
-            return 0;
+            return def;
         }
 
         static int inc = 0;

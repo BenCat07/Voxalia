@@ -42,7 +42,7 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public ModelEntity RenderedModel = null;
 
-        public System.Drawing.Color GetColor()
+        public Color GetColor()
         {
             return DrawColor;
         }

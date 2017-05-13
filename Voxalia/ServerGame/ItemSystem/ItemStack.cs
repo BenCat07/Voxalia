@@ -233,7 +233,7 @@ namespace Voxalia.ServerGame.ItemSystem
             return TagParser.Escape(Name) + "[secondary=" + (SecondaryName == null ? "" : EscapeTagBase.Escape(SecondaryName)) + ";display=" + EscapeTagBase.Escape(DisplayName) + ";count=" + Count
                 + ";weight=" + Weight + ";volume=" + Volume + ";temperature=" + Temperature + ";renderascomponent=" + (RenderAsComponent ? "true" : "false") + ";componentrenderoffset=" + ComponentRenderOffset.ToSimpleString()
                 + ";description=" + EscapeTagBase.Escape(Description) + ";texture=" + EscapeTagBase.Escape(GetTextureName()) + ";model=" + EscapeTagBase.Escape(GetModelName()) + ";bound=" + (IsBound ? "true" : "false")
-                + ";drawcolor=" + DrawColor.ToString() + ";datum=" + Datum + ";shared=" + SharedStr() + ";local=" + EscapedLocalStr() + ";components=" + ComponentEscapedString() + "]";
+                + ";drawcolor=" + DrawColor.ToColorString() + ";datum=" + Datum + ";shared=" + SharedStr() + ";local=" + EscapedLocalStr() + ";components=" + ComponentEscapedString() + "]";
         }
 
         public override string ToString()
@@ -323,9 +323,9 @@ namespace Voxalia.ServerGame.ItemSystem
                     case "bound":
                         bound = tval == "true";
                         break;
-                    //case "drawcolor":
-                    //    color = (ColorTag.For(tval) ?? new ColorTag(color)).Internal;
-                    //    break;
+                    case "drawcolor":
+                        color = Colors.ColorForText(tval);
+                        break;
                     case "datum":
                         datum = IntDatumFor(tval);
                         break;
