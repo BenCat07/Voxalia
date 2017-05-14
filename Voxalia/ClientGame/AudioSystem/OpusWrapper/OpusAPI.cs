@@ -18,7 +18,7 @@ namespace Voxalia.ClientGame.AudioSystem.OpusWrapper
     /// <summary>
     /// Wraps the Opus API.
     /// </summary>
-    public class OpusAPI_Linux
+    internal class OpusAPI_Linux
     {
         const string lib = "libopus.so.0";
 
@@ -50,7 +50,7 @@ namespace Voxalia.ClientGame.AudioSystem.OpusWrapper
     /// <summary>
     /// Wraps the Opus API.
     /// </summary>
-    public class OpusAPI_Windows
+    internal class OpusAPI_Windows
     {
         [DllImport("opus.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr opus_encoder_create(int Fs, int channels, int application, out IntPtr error);
@@ -87,8 +87,7 @@ namespace Voxalia.ClientGame.AudioSystem.OpusWrapper
         {
             try
             {
-                IntPtr error;
-                IntPtr temp = OpusAPI_Windows.opus_encoder_create(8000, 1, (int)Application.Voip, out error);
+                IntPtr temp = OpusAPI_Windows.opus_encoder_create(8000, 1, (int)Application.Voip, out IntPtr error);
                 if ((Errors)error != Errors.OK)
                 {
                     throw new Exception("Exception occured while creating encoder");

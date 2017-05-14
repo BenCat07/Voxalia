@@ -762,7 +762,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 PrimaryMatrix_OffsetFor3D = view2 * proj2;
                 PrimaryMatrixd = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view) * ClientUtilities.ConvertToD(proj);
                 PrimaryMatrix_OffsetFor3Dd = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view2) * ClientUtilities.ConvertToD(proj2);
-                Matrix4 projo = TheClient.VR.GetProjection(true, 1f, 5000f);
+                Matrix4 projo = TheClient.VR.GetProjection(true, 10f, 5000f);
                 OutViewMatrix = view * projo;
                 outviewD = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(-CameraPos)) * ClientUtilities.ConvertToD(view) * ClientUtilities.ConvertToD(projo);
                 // TODO: Transform VR by cammod?
@@ -778,14 +778,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     Matrix4 view2 = Matrix4.LookAt(ClientUtilities.Convert(-cameraAdjust), ClientUtilities.Convert(-cameraAdjust + camforward), ClientUtilities.Convert(camup));
                     PrimaryMatrix_OffsetFor3D = view2 * proj;
                 }
-                Matrix4 proj_out = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF), (float)Width / (float)Height, 1, 5000f); // TODO: View3D-level vars?
+                Matrix4 proj_out = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF), (float)Width / (float)Height, 10f, 5000f); // TODO: View3D-level vars?
                 OutViewMatrix = view * proj_out;
                 Matrix4d projd = Matrix4d.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF),
                     (float)Width / (float)Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()); // TODO: View3D-level vars?
                 Location bxd = TheClient.CVars.r_3d_enable.ValueB ? (CameraPos + cameraAdjust) : CameraPos;
                 Matrix4d viewd = Matrix4d.LookAt(ClientUtilities.ConvertD(bxd), ClientUtilities.ConvertD(bxd + camforward), ClientUtilities.ConvertD(camup));
                 PrimaryMatrixd = viewd * projd;
-                Matrix4d proj_outd = Matrix4d.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF), (float)Width / (float)Height, 1, 5000f); // TODO: View3D-level vars?
+                Matrix4d proj_outd = Matrix4d.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(TheClient.CVars.r_fov.ValueF), (float)Width / (float)Height, 10f, 5000f); // TODO: View3D-level vars?
                 outviewD = viewd * proj_outd;
                 PrimaryMatrix_OffsetFor3Dd = Matrix4d.Identity;
                 if (TheClient.CVars.r_3d_enable.ValueB)

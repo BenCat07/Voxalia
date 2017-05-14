@@ -113,6 +113,29 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                             entry.Info(queue, "Chunk is null!");
                             break;
                         }
+                        Vector3i chunk_pos = ch.WorldPosition;
+                        ChunkSLODHelper slod = TheClient.TheRegion.GetSLODHelp(ch.WorldPosition);
+                        if (slod == null)
+                        {
+                            entry.Info(queue, "No SLOD.");
+                        }
+                        else
+                        {
+                            bool isgen = slod._VBO != null && slod._VBO.generated;
+                            entry.Info(queue, "SLOD: "+ slod.Coordinate + ", live chunks contained: " + slod.Users + ", verts: " + slod.FullBlock.Vertices.Count + ", generated: " + isgen);
+                            foreach (KeyValuePair<Vector3i, Chunk> entryx in TheClient.TheRegion.LoadedChunks)
+                            {
+                                if (entryx.Value.PosMultiplier < 5)
+                                {
+                                    continue;
+                                }
+                                Vector3i slodposser = new Vector3i((int)Math.Floor(entryx.Key.X / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(entryx.Key.Y / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(entryx.Key.Z / (float)Constants.CHUNKS_PER_SLOD));
+                                if (slodposser == slod.Coordinate)
+                                {
+                                    entry.Info(queue, "Chunk at " + entryx.Key + " is held");
+                                }
+                            }
+                        }
                         entry.Info(queue, "Plants: " + ch.Plant_C + ", generated as ID: " + ch.Plant_VAO);
                         int c = 0;
                         long verts = 0;

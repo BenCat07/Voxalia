@@ -332,23 +332,34 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public Dictionary<Vector3i, ChunkSLODHelper> SLODs = new Dictionary<Vector3i, ChunkSLODHelper>();
 
-        public ChunkSLODHelper GetSLODHelp(Vector3i chunk_pos)
+        public ChunkSLODHelper GetSLODHelp(Vector3i chunk_pos, bool generate = true)
         {
-            Vector3i slodpos = new Vector3i(chunk_pos.X / Constants.CHUNKS_PER_SLOD, chunk_pos.Y / Constants.CHUNKS_PER_SLOD, chunk_pos.Z / Constants.CHUNKS_PER_SLOD);
+            Vector3i slodpos = new Vector3i((int)Math.Floor(chunk_pos.X / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Y / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Z / (float)Constants.CHUNKS_PER_SLOD));
             if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
                 return slod;
             }
-            return SLODs[slodpos] = new ChunkSLODHelper() { Coordinate = slodpos, OwningRegion = this };
+            if (generate)
+            {
+                return SLODs[slodpos] = new ChunkSLODHelper() { Coordinate = slodpos, OwningRegion = this };
+            }
+            return null;
         }
 
-        public void RecalculatSLOD(Vector3i chunk_pos)
+        public void RecalculateSLOD(Vector3i chunk_pos)
         {
-            Vector3i slodpos = new Vector3i(chunk_pos.X / Constants.CHUNKS_PER_SLOD, chunk_pos.Y / Constants.CHUNKS_PER_SLOD, chunk_pos.Z / Constants.CHUNKS_PER_SLOD);
-            if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
+            Vector3i slodpos = new Vector3i((int)Math.Floor(chunk_pos.X / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Y / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Z / (float)Constants.CHUNKS_PER_SLOD));
+            RecalcSLODExact(slodpos);
+        }
+        
+        public void RecalcSLODExact(Vector3i slodpos)
+        {
+            if (!SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
-                slod.FullBlock = new ChunkRenderHelper(512);
+                return;
             }
+            slod.Users = 0;
+            slod.FullBlock = new ChunkRenderHelper(512);
             int count = 0;
             foreach (KeyValuePair<Vector3i, Chunk> entry in LoadedChunks)
             {
@@ -356,10 +367,10 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     continue;
                 }
-                count++;
-                Vector3i slodposser = new Vector3i(entry.Key.X / Constants.CHUNKS_PER_SLOD, entry.Key.Y / Constants.CHUNKS_PER_SLOD, entry.Key.Z / Constants.CHUNKS_PER_SLOD);
+                Vector3i slodposser = new Vector3i((int)Math.Floor(entry.Key.X / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(entry.Key.Y / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(entry.Key.Z / (float)Constants.CHUNKS_PER_SLOD));
                 if (slodposser == slodpos)
                 {
+                    count++;
                     entry.Value.CreateVBO();
                 }
             }
@@ -371,6 +382,28 @@ namespace Voxalia.ClientGame.WorldSystem
                 }
                 slod._VBO = null;
                 SLODs.Remove(slodpos);
+            }
+            else
+            {
+                Action a = null;
+                a = () =>
+                {
+                    if (slod.Claims > 0)
+                    {
+                        TheClient.Schedule.ScheduleSyncTask(a, 5);
+                        return;
+                    }
+                    if (slod.FullBlock.Vertices.Count == 0)
+                    {
+                        if (slod._VBO != null && slod._VBO.generated)
+                        {
+                            slod._VBO.Destroy();
+                        }
+                        slod._VBO = null;
+                        SLODs.Remove(slodpos);
+                    }
+                };
+                TheClient.Schedule.ScheduleSyncTask(a, 5);
             }
         }
 

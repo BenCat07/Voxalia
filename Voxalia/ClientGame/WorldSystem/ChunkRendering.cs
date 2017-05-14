@@ -172,11 +172,22 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             Action a = () =>
             {
+                OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
+                {
+                    if (crh != null)
+                    {
+                        crh.Claims++;
+                    }
+                });
                 CancelTokenSource = new CancellationTokenSource();
                 CancelToken = CancelTokenSource.Token;
                 VBOHInternal(c_zp, c_zm, c_yp, c_ym, c_xp, c_xm, c_zpxp, c_zpxm, c_zpyp, c_zpym, c_xpyp, c_xpym, c_xmyp, c_xmym, potentials, plants, shaped, false, bua, crh, smooth);
                 if (CancelToken.IsCancellationRequested)
                 {
+                    if (crh != null)
+                    {
+                        crh.Claims--;
+                    }
                     return;
                 }
                 if (crh == null)
@@ -189,6 +200,10 @@ namespace Voxalia.ClientGame.WorldSystem
                 }
                 OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
                 {
+                    if (crh != null)
+                    {
+                        crh.Claims--;
+                    }
                     if (CancelToken.IsCancellationRequested)
                     {
                         return;
@@ -254,10 +269,13 @@ namespace Voxalia.ClientGame.WorldSystem
             public List<Vector4> colorses = new List<Vector4>();
             public List<Vector2> tcses = new List<Vector2>();
         }
-        
+
         void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym,
             Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym, List<Chunk> potentials, bool plants, bool shaped, bool transp, BlockUpperArea bua, ChunkSLODHelper crh, bool smooth)
         {
+            Vector3 addr = new Vector3(WorldPosition.X - (int)Math.Floor(WorldPosition.X / (float)Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
+                WorldPosition.Y - (int)Math.Floor(WorldPosition.Y / (float)Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
+                WorldPosition.Z - (int)Math.Floor(WorldPosition.Z / (float)Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD) * CHUNK_SIZE;
             try
             {
                 if (crh != null && smooth)
@@ -520,9 +538,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                     Vector3 vti_use = vt;
                                     if (crh != null)
                                     {
-                                        vti_use += new Vector3(WorldPosition.X - (WorldPosition.X / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
-                                            WorldPosition.Y - (WorldPosition.Y / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
-                                            WorldPosition.Z - (WorldPosition.Z / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD) * CHUNK_SIZE;
+                                        vti_use += addr;
                                     }
                                     rh.Vertices.Add(vti_use);
                                     Vector3 nt = new Vector3((float)normsi[i].X, (float)normsi[i].Y, (float)normsi[i].Z);
@@ -586,7 +602,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                         {
                                             vt += new Vector3(WorldPosition.X - (WorldPosition.X / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
                                                 WorldPosition.Y - (WorldPosition.Y / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
-                                                WorldPosition.Z - (WorldPosition.Z / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD);
+                                                WorldPosition.Z - (WorldPosition.Z / Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD) * CHUNK_SIZE;
                                         }
                                         rh.Vertices.Add(vt);
                                         int tx = tf + i;
@@ -932,6 +948,10 @@ namespace Voxalia.ClientGame.WorldSystem
         public Region OwningRegion;
 
         public ChunkVBO _VBO;
+
+        public int Claims = 0;
+
+        public int Users = 0;
         
         public void Render()
         {
@@ -952,6 +972,7 @@ namespace Voxalia.ClientGame.WorldSystem
         public void Compile()
         {
             NeedsComp = true;
+            Users++;
         }
 
         public void CompileInternal()

@@ -212,14 +212,30 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Network.UsagesLastSecond[i] = Network.UsagesThisSecond[i];
                 Network.UsagesThisSecond[i] = 0;
             }
-            foreach (ChunkSLODHelper slod in TheRegion.SLODs.Values)
+            ops_extra++;
+            List<ChunkSLODHelper> toFix = ops_extra > 3 ? new List<ChunkSLODHelper>() : null;
+            foreach (ChunkSLODHelper slod in new List<ChunkSLODHelper>(TheRegion.SLODs.Values))
             {
                 if (slod.NeedsComp)
                 {
                     slod.CompileInternal();
+                    if (slod._VBO == null)
+                    {
+                        TheRegion.SLODs.Remove(slod.Coordinate);
+                    }
+                }
+                else if (ops_extra > 3 && ((slod.Coordinate.ToLocation() + new Location(0.5, 0.5, 0.5)) * Constants.CHUNK_SLOD_WIDTH).DistanceSquared(Player.GetPosition()) < Constants.CHUNK_SLOD_WIDTH * Constants.CHUNK_SLOD_WIDTH * 2)
+                {
+                    TheRegion.RecalcSLODExact(slod.Coordinate);
                 }
             }
+            if (ops_extra > 3)
+            {
+                ops_extra = 0;
+            }
         }
+
+        int ops_extra = 0;
 
         /// <summary>
         /// Once per second spike counter. Used to reset the spike timings (debug display).

@@ -95,7 +95,7 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             if (excess && PosMultiplier >= 5)
             {
-                OwningRegion.RecalculatSLOD(WorldPosition);
+                OwningRegion.RecalculateSLOD(WorldPosition);
             }
             if (FCO != null && IsAdded)
             {
