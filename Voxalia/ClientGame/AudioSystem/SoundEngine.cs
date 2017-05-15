@@ -566,7 +566,7 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public double TimeDeaf = 0.0;
 
-        public SoundEffect LoadVorbisSound(DataStream stream, string name)
+        public SoundEffect LoadVorbisSound(System.IO.Stream stream, string name)
         {
             OggDecodeStream oggds = new OggDecodeStream(stream);
             return LoadSound(new DataStream(oggds.decodedStream.ToArray()), name);

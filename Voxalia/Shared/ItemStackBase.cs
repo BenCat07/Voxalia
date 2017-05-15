@@ -62,6 +62,8 @@ namespace Voxalia.Shared
         /// </summary>
         public bool RenderAsComponent = true;
 
+        public ItemType IType = ItemType.OTHER;
+
         /// <summary>
         /// Where, relative to an item, this component should render.
         /// </summary>
@@ -159,6 +161,7 @@ namespace Voxalia.Shared
             dw.WriteFloat((float)ComponentRenderOffset.X);
             dw.WriteFloat((float)ComponentRenderOffset.Y);
             dw.WriteFloat((float)ComponentRenderOffset.Z);
+            dw.WriteByte((byte)IType);
             dw.WriteInt(SharedAttributes.Count);
             foreach (KeyValuePair<string, TemplateObject> entry in SharedAttributes)
             {
@@ -243,6 +246,7 @@ namespace Voxalia.Shared
             ComponentRenderOffset.X = dr.ReadFloat();
             ComponentRenderOffset.Y = dr.ReadFloat();
             ComponentRenderOffset.Z = dr.ReadFloat();
+            IType = (ItemType)dr.ReadByte();
             int attribs = dr.ReadInt();
             for (int i = 0; i < attribs; i++)
             {
