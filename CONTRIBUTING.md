@@ -8,7 +8,8 @@ See the [ISSUE_TEMPLATE](/ISSUE_TEMPLATE) file for details on posting issues.
 ## Pull Requests
 
 For pull requests:
-- You MUST: own the code you submit OR it is MIT or compatible licensed.
+- You MUST: own the code you submit OR it is free/open/safe to use, EG it is MIT licensed.
+	- If your code is under any pre-existing license, you MUST note it in the pull request.
 - Any and all code you submit is subject to the mini-license below.
 - In general, you should confirm your PR is functional in any ways that it may vary.
 	- EG if your code adds a system call, it should be tested across multiple operating systems.
@@ -44,7 +45,7 @@ If you later decide you don't want us using your code - you may make a polite re
 
 ### You agree by contributing:
 
-* That you have read this document.
-* to not attempt to "revoke rights to your code" or any similar action.
-* That you have the right to publicly contribute any assets/code given. (IE, no contributing someone else's code without their permission)
-
+- That you have read and agree to this document.
+- To not attempt to "revoke rights to your code" or any similar action.
+- That you have the right to publicly contribute any assets/code given. (IE, no contributing someone else's code without their permission)
+- That the code submitted is either your own work, dedicated now to this project, OR it is under a license specified directly in the contribution.
