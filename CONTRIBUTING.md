@@ -5,6 +5,10 @@ Contribution to Voxalia
 
 See the [ISSUE_TEMPLATE](/ISSUE_TEMPLATE) file for details on posting issues.
 
+## Signing
+
+Please sign [the Contributor License Agreement](https://www.clahub.com/agreements/FreneticLLC/Voxalia).
+
 ## Pull Requests
 
 For pull requests:
