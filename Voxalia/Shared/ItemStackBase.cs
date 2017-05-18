@@ -317,8 +317,7 @@ namespace Voxalia.Shared
         {
             return Name + "[secondary=" + (SecondaryName ?? "{NULL}") + ";display=" + DisplayName + ";count=" + Count + ";renderascomponent=" + RenderAsComponent + ";componentrenderoffset=" + ComponentRenderOffset.ToSimpleString()
                 + ";description=" + Description + ";texture=" + GetTextureName() + ";model=" + GetModelName() + ";weight=" + Weight + ";volume=" + Volume + ";temperature=" + Temperature
-                + ";drawcolor=" + DrawColor.ToColorString() + ";datum=" + Datum + ";shared=" + SharedStr() + ";components=" + ComponentString() + "]";
-            // TODO: Shared color tag?
+                + ";drawcolor=" + DrawColor.ToColorString() + ";datum=" + Datum + ";shared=" + SharedStr() + ";components=" + ComponentString() + ";type=" + IType + "]";
         }
     }
 }
