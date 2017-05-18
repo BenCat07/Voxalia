@@ -13,6 +13,8 @@ assembly_info:
 platform: x64
 configuration: Release
 before_build:
+  - git submodule init
+  - git submodule update --recursive
   - nuget restore Voxalia.sln
 build:
   project: Voxalia.sln
