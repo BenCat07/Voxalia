@@ -675,6 +675,7 @@ namespace Voxalia.ClientGame.WorldSystem
             GL.BindTexture(TextureTarget.Texture2DArray, TheClient.GrassTextureID);
             GL.Uniform1(6, (float)GlobalTickTimeLocal);
             GL.Uniform3(7, ClientUtilities.Convert(ActualWind));
+            GL.Uniform1(8, TheClient.CVars.r_plantdistance.ValueF * TheClient.CVars.r_plantdistance.ValueF);
             TheClient.Rendering.SetColor(GetSunAdjust());
             foreach (Chunk chunk in chToRender)
             {

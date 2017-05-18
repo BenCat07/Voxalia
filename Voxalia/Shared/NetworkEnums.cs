@@ -16,15 +16,15 @@ namespace Voxalia.Shared
     [Flags]
     public enum YourStatusFlags : byte
     {
-        NONE = 0,
-        RELOADING = 1,
-        NEEDS_RELOAD = 2,
-        NO_ROTATE = 4,
-        INSECURE_MOVEMENT = 8,
-        NON_SOLID = 16,
-        THIRTYTWO = 32,
-        SIXTYFOUR = 64,
-        ONETWENTYEIGHT = 128
+        NONE                = 0b00000000,
+        RELOADING           = 0b00000001,
+        NEEDS_RELOAD        = 0b00000010,
+        NO_ROTATE           = 0b00000100,
+        INSECURE_MOVEMENT   = 0b00001000,
+        NON_SOLID           = 0b00010000,
+        EXTRA1              = 0b00100000,
+        EXTRA2              = 0b01000000,
+        EXTRA3              = 0b10000000
     }
 
     /// <summary>
@@ -138,17 +138,18 @@ namespace Voxalia.Shared
     /// <summary>
     /// Keys that can be pressed.
     /// </summary>
+    [Flags]
     public enum KeysPacketData : ushort
     {
-        UPWARD = 1,
-        CLICK = 2,
-        ALTCLICK = 4,
-        DOWNWARD = 8,
-        USE = 16,
-        ITEMLEFT = 32,
-        ITEMRIGHT = 64,
-        ITEMUP = 128,
-        ITEMDOWN = 256
+        UPWARD      = 0b000000000001,
+        CLICK       = 0b000000000010,
+        ALTCLICK    = 0b000000000100,
+        DOWNWARD    = 0b000000001000,
+        USE         = 0b000000010000,
+        ITEMLEFT    = 0b000000100000,
+        ITEMRIGHT   = 0b000001000000,
+        ITEMUP      = 0b000010000000,
+        ITEMDOWN    = 0b000100000000
     }
     
     /// <summary>

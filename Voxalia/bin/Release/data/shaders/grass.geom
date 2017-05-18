@@ -21,6 +21,7 @@ layout (location = 5) uniform float should_sqrt = 0.0;
 #endif
 layout (location = 6) uniform float time = 0.0;
 layout (location = 7) uniform vec3 wind = vec3(0.0);
+layout (location = 8) uniform float render_distance_limit = 50.0 * 50.0;
 
 in struct vox_out
 {
@@ -86,7 +87,7 @@ vec4 final_fix(in vec4 pos)
 void main()
 {
 	vec3 pos = gl_in[0].gl_Position.xyz;
-	if (dot(pos.xy, pos.xy) > (50.0 * 50.0)) // TODO: Configurable grass render range cap!
+	if (dot(pos.xy, pos.xy) > render_distance_limit) // TODO: Configurable grass render range cap!
 	{
 		return;
 	}
