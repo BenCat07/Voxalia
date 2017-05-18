@@ -551,11 +551,11 @@ namespace Voxalia.Shared
     [Flags]
     public enum MaterialSolidity : byte
     {
-        NONSOLID = 1,
-        FULLSOLID = 2,
-        LIQUID = 4,
-        GAS = 8,
-        SPECIAL = 16,
+        NONSOLID = 0b000001,
+        FULLSOLID = 0b000010,
+        LIQUID = 0b000100,
+        GAS = 0b001000,
+        SPECIAL = 0b010000,
         ANY = FULLSOLID | LIQUID | GAS | SPECIAL
     }
 
