@@ -1,6 +1,6 @@
 version: 0.1.1.{build}
 max_jobs: 1
-image: Visual Studio 2015
+image: Visual Studio 2017
 init:
   - git config --global core.autocrlf true
 matrix:
