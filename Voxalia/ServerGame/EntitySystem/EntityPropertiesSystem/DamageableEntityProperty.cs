@@ -19,14 +19,14 @@ namespace Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem
         [PropertyAutoSaveable]
         public double MaxHealth = 100;
 
-        public class DeathEventArgs : EventArgs
+        public class DeathEventArgs : FreneticEventArgs
         {
             public static DeathEventArgs EmptyDeath = new DeathEventArgs();
         }
 
         public readonly FreneticScriptEventHandler<DeathEventArgs> EffectiveDeathEvent = new FreneticScriptEventHandler<DeathEventArgs>();
         
-        public class HealthSetEventArgs : EventArgs
+        public class HealthSetEventArgs : FreneticEventArgs
         {
             public double AttemptedValue;
         }

@@ -794,9 +794,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     PrimaryMatrix_OffsetFor3Dd = view2d * projd;
                 }
             }
-            LongFrustum = new Frustum(GraphicsUtil.ConvertD(outviewD));
-            camFrust = new Frustum(GraphicsUtil.ConvertD(PrimaryMatrixd));
-            cf2 = new Frustum(GraphicsUtil.ConvertD(PrimaryMatrix_OffsetFor3Dd));
+            LongFrustum = new Frustum(outviewD.ConvertD());
+            camFrust = new Frustum(PrimaryMatrixd.ConvertD());
+            cf2 = new Frustum(PrimaryMatrix_OffsetFor3Dd.ConvertD());
             CFrust = camFrust;
             CheckError("AfterSetup");
         }
@@ -1211,7 +1211,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     }
                                     else
                                     {
-                                        CFrust = new Frustum(GraphicsUtil.ConvertD(ClientUtilities.ConvertToD(Lights[i].InternalLights[x].GetMatrix()))); // TODO: One-step conversion!
+                                        CFrust = new Frustum(ClientUtilities.ConvertToD(Lights[i].InternalLights[x].GetMatrix()).ConvertD()); // TODO: One-step conversion!
                                     }
                                     CheckError("Pre-Prerender - Shadows - " + i);
                                     CameraPos = ClientUtilities.ConvertD(Lights[i].InternalLights[x].eye);

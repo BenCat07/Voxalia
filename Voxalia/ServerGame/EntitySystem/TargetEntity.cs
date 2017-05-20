@@ -37,7 +37,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Items.cItem = 1;
             Items.Items[0].Info.PrepItem(this, Items.Items[0]);
             ShouldShine = true;
-            Damageable().EffectiveDeathEvent.Add((p, e) =>
+            Damageable().EffectiveDeathEvent.Add((e) =>
             {
                 if (Removed)
                 {

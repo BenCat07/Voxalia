@@ -40,7 +40,7 @@ namespace Voxalia.ServerGame.EntitySystem
             PathFindCloseEnough = 1f;
             SetMass(10);
             model = "mobs/slimes/slime";
-            Damageable().EffectiveDeathEvent.Add((p, e) =>
+            Damageable().EffectiveDeathEvent.Add((e) =>
             {
                 // TODO: Death effect!
                 RemoveMe();

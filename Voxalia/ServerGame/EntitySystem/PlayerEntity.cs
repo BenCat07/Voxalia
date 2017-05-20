@@ -26,6 +26,7 @@ using FreneticGameCore;
 using LiteDB;
 using FreneticDataSyntax;
 using FreneticGameCore.Collision;
+using FreneticGameCore.EntitySystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -444,11 +445,11 @@ namespace Voxalia.ServerGame.EntitySystem
             mod_scale = 1.5f;
             Damageable().SetMaxHealth(100);
             Damageable().SetHealth(100);
-            Damageable().HealthSetPostEvent.Add((p, e) =>
+            Damageable().HealthSetPostEvent.Add((e) =>
             {
                 SendStatus();
             }, 0);
-            Damageable().EffectiveDeathEvent.Add((p, e) =>
+            Damageable().EffectiveDeathEvent.Add((e) =>
             {
                 Damageable().SetHealth(Damageable().GetMaxHealth());
                 Teleport(TheRegion.TheWorld.SpawnPoint);

@@ -169,7 +169,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
     }
 
     // TODO: Move to an event helper area.
-    public class WorldLoadEventArgs : EventArgs
+    public class WorldLoadEventArgs : FreneticEventArgs
     {
         public bool Cancelled = false;
 
@@ -177,7 +177,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
     }
 
     // TODO: Move to an event helper area.
-    public class WorldLoadPreEventArgs : EventArgs
+    public class WorldLoadPreEventArgs : FreneticEventArgs
     {
         public bool Cancelled = false;
 
@@ -185,7 +185,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
     }
 
     // TODO: Move to an event helper area.
-    public class WorldLoadPostEventArgs : EventArgs
+    public class WorldLoadPostEventArgs : FreneticEventArgs
     {
         public World TheWorld = null;
     }
