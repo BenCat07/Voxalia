@@ -18,6 +18,7 @@ using Voxalia.ServerGame.ItemSystem;
 using BEPUutilities;
 using FreneticGameCore;
 using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.EntitySystem
 {

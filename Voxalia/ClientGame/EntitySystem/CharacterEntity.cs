@@ -38,6 +38,7 @@ using Voxalia.ClientGame.JointSystem;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Objects;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

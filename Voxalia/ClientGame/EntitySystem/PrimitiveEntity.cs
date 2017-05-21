@@ -13,6 +13,7 @@ using Voxalia.ClientGame.WorldSystem;
 using Voxalia.Shared.Collision;
 using OpenTK;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ClientGame.EntitySystem
 {

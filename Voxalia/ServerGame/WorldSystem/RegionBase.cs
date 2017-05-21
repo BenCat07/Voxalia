@@ -21,10 +21,10 @@ using BEPUutilities.Threading;
 using Voxalia.ServerGame.WorldSystem.SphereGenerator;
 using Voxalia.ServerGame.WorldSystem.SimpleGenerator;
 using System.Threading;
-using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.OtherSystems;
 using FreneticGameCore;
 using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.WorldSystem
 {

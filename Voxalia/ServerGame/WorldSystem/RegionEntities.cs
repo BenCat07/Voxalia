@@ -30,6 +30,7 @@ using Voxalia.ServerGame.ItemSystem.CommonItems;
 using FreneticScript.TagHandlers;
 using FreneticScript.TagHandlers.Objects;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.WorldSystem
 {

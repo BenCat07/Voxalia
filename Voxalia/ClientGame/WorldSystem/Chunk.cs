@@ -17,6 +17,7 @@ using Voxalia.ClientGame.GraphicsSystems;
 using OpenTK.Graphics.OpenGL4;
 using System.Runtime.CompilerServices;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ClientGame.WorldSystem
 {

@@ -26,6 +26,7 @@ using BEPUphysics.Materials;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUutilities.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.Shared.Collision
 {
@@ -80,7 +81,7 @@ namespace Voxalia.Shared.Collision
                 }
             }
             broadPhaseOverlap = new BroadPhaseOverlap(convex, mesh, broadPhaseOverlap.CollisionRule);
-            UpdateMaterialProperties(convex.Entity != null ? convex.Entity.Material : null, mesh.Entity != null ? mesh.Entity.Material: null);
+            UpdateMaterialProperties(convex.Entity?.Material, mesh.Entity?.Material);
             base.Initialize(entryA, entryB);
             noRecurse = false;
         }
@@ -101,14 +102,13 @@ namespace Voxalia.Shared.Collision
             for (int i = 0; i < overlaps.Count; i++)
             {
                 Vector3i pos = overlaps.Elements[i];
-                Vector3 offs;
-                ReusableGenericCollidable<ConvexShape> colBox = new ReusableGenericCollidable<ConvexShape>(mesh.ChunkShape.ShapeAt(pos.X, pos.Y, pos.Z, out offs));
+                ReusableGenericCollidable<ConvexShape> colBox = new ReusableGenericCollidable<ConvexShape>(mesh.ChunkShape.ShapeAt(pos.X, pos.Y, pos.Z, out Vector3 offs));
                 colBox.SetEntity(mesh.Entity);
                 Vector3 input = new Vector3(pos.X + offs.X, pos.Y + offs.Y, pos.Z + offs.Z);
                 Vector3 transfd = Quaternion.Transform(input, rt.Orientation);
                 RigidTransform outp = new RigidTransform(transfd + rt.Position, rt.Orientation);
                 colBox.WorldTransform = outp;
-                TryToAdd(colBox, convex, mesh.Entity != null ? mesh.Entity.Material : null, convex.Entity != null ? convex.Entity.Material : null);
+                TryToAdd(colBox, convex, mesh.Entity?.Material, convex.Entity?.Material);
             }
             overlaps.Dispose();
         }

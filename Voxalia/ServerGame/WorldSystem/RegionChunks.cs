@@ -16,6 +16,7 @@ using System.Threading;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.OtherSystems;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.WorldSystem
 {

@@ -21,6 +21,7 @@ using BEPUutilities.DataStructures;
 using BEPUphysics.CollisionTests.Manifolds;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.CollisionTests;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.Shared.Collision
 {
@@ -60,7 +61,7 @@ namespace Voxalia.Shared.Collision
             contactIndicesToRemove = new RawList<int>(4);
         }
 
-        public RawList<Contact> ctcts
+        public RawList<Contact> Ctcts
         {
             get
             {
@@ -72,8 +73,7 @@ namespace Voxalia.Shared.Collision
         {
             // TODO: Efficiency!
             GeneralConvexPairTester pair = testerPool.Take();
-            Vector3 offs;
-            ReusableGenericCollidable<ConvexShape> boxCollidable = new ReusableGenericCollidable<ConvexShape>((ConvexShape)mesh.ChunkShape.ShapeAt(position.X, position.Y, position.Z, out offs));
+            ReusableGenericCollidable<ConvexShape> boxCollidable = new ReusableGenericCollidable<ConvexShape>(mesh.ChunkShape.ShapeAt(position.X, position.Y, position.Z, out Vector3 offs));
             pair.Initialize(convex, boxCollidable);
             boxCollidable.WorldTransform = new RigidTransform(new Vector3(
                 mesh.Position.X + position.X + offs.X,
@@ -113,8 +113,7 @@ namespace Voxalia.Shared.Collision
             var candidatesToAdd = new QuickList<ContactData>(BufferPools<ContactData>.Thread, BufferPool<int>.GetPoolIndex(overlaps.Count));
             for (int i = 0; i < overlaps.Count; i++)
             {
-                GeneralConvexPairTester manifold;
-                if (!ActivePairs.TryGetValue(overlaps.Elements[i], out manifold))
+                if (!ActivePairs.TryGetValue(overlaps.Elements[i], out GeneralConvexPairTester manifold))
                 {
                     manifold = GetPair(ref overlaps.Elements[i]);
                 }
@@ -123,8 +122,7 @@ namespace Voxalia.Shared.Collision
                     ActivePairs.FastRemove(overlaps.Elements[i]);
                 }
                 activePairsBackBuffer.Add(overlaps.Elements[i], manifold);
-                ContactData contactCandidate;
-                if (manifold.GenerateContactCandidate(out contactCandidate))
+                if (manifold.GenerateContactCandidate(out ContactData contactCandidate))
                 {
                     candidatesToAdd.Add(ref contactCandidate);
                 }

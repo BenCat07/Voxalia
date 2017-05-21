@@ -73,7 +73,6 @@
     <Compile Include="Shared\ModelManagement\Catmull.cs" />
     <Compile Include="Shared\Collision\FlyingDiscConstraint.cs" />
     <Compile Include="Shared\Collision\MCCMCCPairHandler.cs" />
-    <Compile Include="Shared\Collision\Vector2i.cs" />
     <Compile Include="Shared\Collision\WheelStepUpConstraint.cs" />
     <Compile Include="Shared\Colors.cs" />
     <Compile Include="Shared\EntityType.cs" />
@@ -92,7 +91,6 @@
     <Compile Include="Shared\Collision\MobileChunkCollidable.cs" />
     <Compile Include="Shared\Collision\MobileChunkShape.cs" />
     <Compile Include="Shared\Collision\ReusableGenericCollidable.cs" />
-    <Compile Include="Shared\Collision\Vector3i.cs" />
     <Compile Include="Shared\AnimationEngine.cs" />
     <Compile Include="Shared\BlockShapeRegistry.cs" />
     <Compile Include="Shared\BlockShapes\BSD83.cs" />
@@ -117,7 +115,6 @@
     <Compile Include="Shared\Collision\FullChunkObject.cs" />
     <Compile Include="Shared\Collision\FullChunkShape.cs" />
     <Compile Include="Shared\ItemStackBase.cs" />
-    <Compile Include="Shared\Collision\CollisionUtil.cs" />
     <Compile Include="Shared\ConsoleHandler.cs" />
     <Compile Include="Shared\Material.cs" />
     <Compile Include="Shared\PingInfo.cs" />

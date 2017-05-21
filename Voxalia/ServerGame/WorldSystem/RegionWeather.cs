@@ -15,6 +15,7 @@ using Voxalia.ServerGame.EntitySystem;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared.Collision;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.WorldSystem
 {

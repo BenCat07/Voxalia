@@ -14,6 +14,7 @@ using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using System;
 using BEPUutilities.DataStructures;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.Shared.Collision
 {

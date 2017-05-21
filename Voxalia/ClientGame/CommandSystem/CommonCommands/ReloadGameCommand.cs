@@ -15,6 +15,7 @@ using OpenTK;
 using Voxalia.Shared;
 using FreneticGameCore;
 using Voxalia.Shared.Collision;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {

@@ -15,6 +15,7 @@ using Voxalia.Shared.Collision;
 using LiteDB;
 using FreneticGameCore;
 using Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.EntitySystem
 {

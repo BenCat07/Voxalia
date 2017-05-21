@@ -17,6 +17,7 @@ using BEPUutilities;
 using Voxalia.Shared.ModelManagement;
 using Voxalia.Shared.Collision;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.Shared
 {

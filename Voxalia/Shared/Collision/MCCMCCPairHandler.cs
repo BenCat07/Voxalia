@@ -26,6 +26,7 @@ using BEPUphysics.Materials;
 using BEPUphysics.BroadPhaseSystems;
 using BEPUutilities.ResourceManagement;
 using BEPUphysics.CollisionShapes.ConvexShapes;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.Shared.Collision
 {
@@ -80,7 +81,7 @@ namespace Voxalia.Shared.Collision
                 }
             }
             broadPhaseOverlap = new BroadPhaseOverlap(mobile, mesh, broadPhaseOverlap.CollisionRule);
-            UpdateMaterialProperties(mobile.Entity != null ? mobile.Entity.Material : null, mesh.Material);
+            UpdateMaterialProperties(mobile.Entity?.Material, mesh.Material);
             base.Initialize(entryA, entryB);
             noRecurse = false;
         }
@@ -101,8 +102,7 @@ namespace Voxalia.Shared.Collision
             for (int i = 0; i < overlaps.Count; i++)
             {
                 Vector3i pos = overlaps.Elements[i];
-                Vector3 offs;
-                ReusableGenericCollidable<ConvexShape> colBox = new ReusableGenericCollidable<ConvexShape>(mesh.ChunkShape.ShapeAt(pos.X, pos.Y, pos.Z, out offs));
+                ReusableGenericCollidable<ConvexShape> colBox = new ReusableGenericCollidable<ConvexShape>(mesh.ChunkShape.ShapeAt(pos.X, pos.Y, pos.Z, out Vector3 offs));
                 Vector3 input = new Vector3(pos.X + offs.X, pos.Y + offs.Y, pos.Z + offs.Z);
                 RigidTransform outp = new RigidTransform(input + mesh.Position);
                 colBox.WorldTransform = outp;
@@ -112,14 +112,13 @@ namespace Voxalia.Shared.Collision
                 for (int x = 0; x < overlaps2.Count; x++)
                 {
                     Vector3i pos2 = overlaps2.Elements[x];
-                    Vector3 offs2;
-                    ReusableGenericCollidable<ConvexShape> colBox2 = new ReusableGenericCollidable<ConvexShape>(mobile.ChunkShape.ShapeAt(pos2.X, pos2.Y, pos2.Z, out offs2));
+                    ReusableGenericCollidable<ConvexShape> colBox2 = new ReusableGenericCollidable<ConvexShape>(mobile.ChunkShape.ShapeAt(pos2.X, pos2.Y, pos2.Z, out Vector3 offs2));
                     colBox2.SetEntity(mobile.Entity);
                     Vector3 input2 = new Vector3(pos2.X + offs2.X, pos2.Y + offs2.Y, pos2.Z + offs2.Z);
                     Vector3 transfd2 = Quaternion.Transform(input2, rtMobile.Orientation);
                     RigidTransform outp2 = new RigidTransform(transfd2 + rtMobile.Position, rtMobile.Orientation);
                     colBox2.WorldTransform = outp2;
-                    TryToAdd(colBox, colBox2, mesh.Material, mobile.Entity != null ? mobile.Entity.Material : null);
+                    TryToAdd(colBox, colBox2, mesh.Material, mobile.Entity?.Material);
                 }
                 overlaps2.Dispose();
             }

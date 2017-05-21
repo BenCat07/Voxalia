@@ -24,6 +24,7 @@ using BEPUphysics.Constraints;
 using BEPUphysics.Constraints.SingleEntity;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.EntitySystem
 {

@@ -20,6 +20,7 @@ using Voxalia.ServerGame.NetworkSystem;
 using LiteDB;
 using Voxalia.ServerGame.WorldSystem.SphereGenerator;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.EntitySystem
 {

@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using Voxalia.Shared.Collision;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.WorldSystem
 {

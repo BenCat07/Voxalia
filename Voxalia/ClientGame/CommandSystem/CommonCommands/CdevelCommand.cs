@@ -24,6 +24,7 @@ using Voxalia.ClientGame.OtherSystems;
 using OpenTK;
 using BEPUphysics;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 using Voxalia.ClientGame.ComputeSystem;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
