@@ -94,7 +94,6 @@
     <Compile Include="Shared\Collision\MobileChunkShape.cs" />
     <Compile Include="Shared\Collision\ReusableGenericCollidable.cs" />
     <Compile Include="Shared\Collision\Vector3i.cs" />
-    <Compile Include="Shared\LanguageEngine.cs" />
     <Compile Include="Shared\Model3D.cs" />
     <Compile Include="Shared\AnimationEngine.cs" />
     <Compile Include="Shared\BlockShapeRegistry.cs" />
@@ -153,6 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="data\info\text\voxalia_en_us.fds">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FreneticGameEngine\FreneticDataSyntax\FreneticDataSyntax\FreneticDataSyntax.csproj">
