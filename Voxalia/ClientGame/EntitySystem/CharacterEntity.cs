@@ -254,7 +254,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return false;
             }
-            return TheRegion.Collision.ShouldCollide(entry);
+            return CollisionUtil.ShouldCollide(entry);
         }
 
         public Dictionary<string, Matrix> SavedAdjustments = new Dictionary<string, Matrix>();

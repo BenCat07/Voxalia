@@ -195,7 +195,7 @@ namespace Voxalia.ServerGame.WorldSystem
             Vector3 sweep = new Vector3(0, 0, 0.01f);
             foreach (BroadPhaseEntry entry in entries)
             {
-                if (entry is EntityCollidable && Collision.ShouldCollide(entry) &&
+                if (entry is EntityCollidable && CollisionUtil.ShouldCollide(entry) &&
                     entry.CollisionRules.Group != CollisionUtil.Player &&
                     // NOTE: Convex cast here to ensure the object is truly 'solid' in the box area, rather than just having an overlapping bounding-box edge.
                     entry.ConvexCast(box, ref start, ref sweep, out RayHit rh))

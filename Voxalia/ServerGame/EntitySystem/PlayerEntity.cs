@@ -592,7 +592,7 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 return false;
             }
-            return TheRegion.Collision.ShouldCollide(entry);
+            return CollisionUtil.ShouldCollide(entry);
         }
 
         /// <summary>
@@ -606,7 +606,7 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 return false;
             }
-            return TheRegion.Collision.ShouldCollide(entry);
+            return CollisionUtil.ShouldCollide(entry);
         }
 
         /// <summary>

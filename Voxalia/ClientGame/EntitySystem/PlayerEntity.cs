@@ -102,7 +102,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return false;
             }
-            return TheRegion.Collision.ShouldCollide(entry);
+            return CollisionUtil.ShouldCollide(entry);
         }
 
         public bool InVehicle = false;

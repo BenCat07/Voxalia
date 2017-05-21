@@ -96,7 +96,7 @@ namespace Voxalia.Shared.Collision
                 }
             }
             broadPhaseOverlap = new BroadPhaseOverlap(convex, mesh, broadPhaseOverlap.CollisionRule);
-            UpdateMaterialProperties(convex.Entity != null ? convex.Entity.Material : null, mesh.Material);
+            UpdateMaterialProperties(convex.Entity?.Material, mesh.Material);
             base.Initialize(entryA, entryB);
             noRecurse = false;
         }
@@ -125,9 +125,8 @@ namespace Voxalia.Shared.Collision
                     {
                         GeneralConvexPairTester pair = contactManifold.ActivePairs.Values[i];
                         ReusableGenericCollidable<ConvexShape> boxCollidable = (ReusableGenericCollidable<ConvexShape>)pair.CollidableB;
-                        RayHit rayHit;
                         RigidTransform worldTransform = boxCollidable.WorldTransform;
-                        if (GJKToolbox.CCDSphereCast(new Ray(convex.WorldTransform.Position, velocity), minimumRadius, boxCollidable.Shape, ref worldTransform, timeOfImpact, out rayHit) &&
+                        if (GJKToolbox.CCDSphereCast(new Ray(convex.WorldTransform.Position, velocity), minimumRadius, boxCollidable.Shape, ref worldTransform, timeOfImpact, out RayHit rayHit) &&
                             rayHit.T > Toolbox.BigEpsilon)
                         {
                             timeOfImpact = rayHit.T;

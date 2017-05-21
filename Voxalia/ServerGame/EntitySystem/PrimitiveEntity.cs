@@ -76,7 +76,7 @@ namespace Voxalia.ServerGame.EntitySystem
                     return false;
                 }
             }
-            return TheRegion.Collision.ShouldCollide(entry);
+            return CollisionUtil.ShouldCollide(entry);
         }
         
         public double netdeltat = 0;

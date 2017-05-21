@@ -55,7 +55,7 @@ namespace Voxalia.Shared.Collision
             {
                 return false;
             }
-            return Collision.ShouldCollide(entry);
+            return CollisionUtil.ShouldCollide(entry);
         }
 
         public override void Update(double dt)

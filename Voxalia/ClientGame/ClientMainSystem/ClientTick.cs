@@ -386,7 +386,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     return false;
                 }
             }
-            return TheRegion.Collision.ShouldCollide(entry);
+            return CollisionUtil.ShouldCollide(entry);
         }
 
         /// <summary>

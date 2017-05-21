@@ -18,8 +18,14 @@ using FreneticGameCore;
 
 namespace Voxalia.Shared.Collision
 {
+    /// <summary>
+    /// Represents the results of a collision trace.
+    /// </summary>
     public class CollisionResult
     {
+        /// <summary>
+        /// Whether it hit anything.
+        /// </summary>
         public bool Hit;
 
         /// <summary>
@@ -27,8 +33,14 @@ namespace Voxalia.Shared.Collision
         /// </summary>
         public Location Normal;
 
+        /// <summary>
+        /// The end location.
+        /// </summary>
         public Location Position;
 
+        /// <summary>
+        /// The hit entity, if any.
+        /// </summary>
         public Entity HitEnt;
     }
 
@@ -37,34 +49,48 @@ namespace Voxalia.Shared.Collision
     /// </summary>
     public class CollisionUtil
     {
+        /// <summary>
+        /// The space associated with this utility.
+        /// </summary>
         public Space World;
 
+        /// <summary>
+        /// The non-solid group.
+        /// </summary>
         public static CollisionGroup NonSolid = new CollisionGroup();
-        
+
+        /// <summary>
+        /// The solid group.
+        /// </summary>
         public static CollisionGroup Solid = new CollisionGroup();
 
+        /// <summary>
+        /// The player group.
+        /// </summary>
         public static CollisionGroup Player = new CollisionGroup();
 
+        /// <summary>
+        /// The item group.
+        /// </summary>
         public static CollisionGroup Item = new CollisionGroup();
 
+        /// <summary>
+        /// The water group.
+        /// </summary>
         public static CollisionGroup Water = new CollisionGroup();
 
+        /// <summary>
+        /// The world-solid group.
+        /// </summary>
         public static CollisionGroup WorldSolid = new CollisionGroup();
 
+        /// <summary>
+        /// The character group.
+        /// </summary>
         public static CollisionGroup Character = new CollisionGroup();
 
-        public bool ShouldCollide(BroadPhaseEntry entry)
+        static CollisionUtil()
         {
-            if (entry.CollisionRules.Group == NonSolid || entry.CollisionRules.Group == Water)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        public CollisionUtil(Space world)
-        {
-            World = world;
             // NonSolid Vs. Solid,NonSolid,WorldSolid (All)
             CollisionGroup.DefineCollisionRule(NonSolid, WorldSolid, CollisionRule.NoBroadPhase);
             CollisionGroup.DefineCollisionRule(WorldSolid, NonSolid, CollisionRule.NoBroadPhase);
@@ -96,6 +122,37 @@ namespace Voxalia.Shared.Collision
             CollisionGroup.DefineCollisionRule(Item, Character, CollisionRule.NoBroadPhase);
         }
 
+        /// <summary>
+        /// Checks if an entry should collide at all ever.
+        /// </summary>
+        /// <param name="entry">The entry.</param>
+        /// <returns>Whether it should collide.</returns>
+        public static bool ShouldCollide(BroadPhaseEntry entry)
+        {
+            if (entry.CollisionRules.Group == NonSolid || entry.CollisionRules.Group == Water)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Constructs the utility.
+        /// </summary>
+        /// <param name="world">The physics world.</param>
+        public CollisionUtil(Space world)
+        {
+            World = world;
+        }
+
+        /// <summary>
+        /// Performs a cuboid line trace.
+        /// </summary>
+        /// <param name="halfsize">Half the size of the box.</param>
+        /// <param name="start">The start location.</param>
+        /// <param name="end">The end location.</param>
+        /// <param name="filter">The collision filter, if any.</param>
+        /// <returns>Results.</returns>
         public CollisionResult CuboidLineTrace(Location halfsize, Location start, Location end, Func<BroadPhaseEntry, bool> filter = null)
         {
             BoxShape shape = new BoxShape((double)halfsize.X * 2f, (double)halfsize.Y * 2f, (double)halfsize.Z * 2f);

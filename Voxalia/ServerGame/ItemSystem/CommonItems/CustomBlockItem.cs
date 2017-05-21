@@ -40,8 +40,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             PlayerEntity player = (PlayerEntity)entity;
             Location eye = player.ItemSource();
             Location forw = player.ItemDir;
-            RayCastResult rcr;
-            bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, 5, MaterialSolidity.ANY, player.IgnoreThis, out rcr);
+            bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, 5, MaterialSolidity.ANY, player.IgnoreThis, out RayCastResult rcr);
             if (h)
             {
                 if (rcr.HitObject != null && rcr.HitObject is EntityCollidable && ((EntityCollidable)rcr.HitObject).Entity != null)
@@ -56,7 +55,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                     if (player.TheRegion.IsAllowedToPlaceIn(player, block, mat))
                     {
                         CollisionResult hit = player.TheRegion.Collision.CuboidLineTrace(new Location(0.45, 0.45, 0.45), block + new Location(0.5),
-                            block + new Location(0.5, 0.5, 0.501), player.TheRegion.Collision.ShouldCollide);
+                            block + new Location(0.5, 0.5, 0.501), CollisionUtil.ShouldCollide);
                         if (!hit.Hit)
                         {
                             BlockInternal bi = BlockInternal.FromItemDatum(item.Datum);
