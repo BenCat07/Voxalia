@@ -15,7 +15,6 @@ namespace Voxalia.Shared
 {
     /// <summary>
     /// Handles command line input.
-    /// TODO: Make non-static.
     /// </summary>
     public class ConsoleHandler
     {
