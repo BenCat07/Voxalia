@@ -93,7 +93,6 @@
     <Compile Include="Shared\Collision\MobileChunkShape.cs" />
     <Compile Include="Shared\Collision\ReusableGenericCollidable.cs" />
     <Compile Include="Shared\Collision\Vector3i.cs" />
-    <Compile Include="Shared\Model3D.cs" />
     <Compile Include="Shared\AnimationEngine.cs" />
     <Compile Include="Shared\BlockShapeRegistry.cs" />
     <Compile Include="Shared\BlockShapes\BSD83.cs" />
@@ -121,7 +120,6 @@
     <Compile Include="Shared\Collision\CollisionUtil.cs" />
     <Compile Include="Shared\ConsoleHandler.cs" />
     <Compile Include="Shared\Material.cs" />
-    <Compile Include="Shared\ModelHandler.cs" />
     <Compile Include="Shared\PingInfo.cs" />
     <Compile Include="Shared\VoxProgram.cs" />
     <Compile Include="Shared\NetworkEnums.cs" />

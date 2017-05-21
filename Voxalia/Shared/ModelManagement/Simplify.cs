@@ -16,7 +16,7 @@ using BEPUutilities;
 namespace Voxalia.Shared.ModelManagement
 {
     // this class is to simplify some things from the original C++ code to work easier in C#
-    public class ListHelper<T>
+    class ListHelper<T>
     {
         public List<T> Internal = new List<T>();
 
@@ -59,7 +59,7 @@ namespace Voxalia.Shared.ModelManagement
     // Original license was MIT with copyright:
     // (C) by Sven Forstmann in 2014
 
-    public class SymetricMatrix
+    class SymetricMatrix
     {
         // Constructor
 
@@ -129,7 +129,7 @@ namespace Voxalia.Shared.ModelManagement
 
 
     // Global Variables & Strctures
-    public struct Triangle
+    struct Triangle
     {
         public Triangle(int a, int b, int c)
         {
@@ -147,7 +147,7 @@ namespace Voxalia.Shared.ModelManagement
         public Vector3 n;
     };
 
-    public struct Vertex
+    struct Vertex
     {
         public Vector3 p;
         public int tstart;
@@ -156,17 +156,20 @@ namespace Voxalia.Shared.ModelManagement
         public int border;
     }
 
-    public struct Ref
+    struct Ref
     {
         public int tid;
         public int tvertex;
     }
 
+    /// <summary>
+    /// Class for simplifying a mesh.
+    /// </summary>
     public class Simplify
     {
-        public ListHelper<Triangle> triangles = new ListHelper<Triangle>();
-        public ListHelper<Vertex> vertices = new ListHelper<Vertex>();
-        public ListHelper<Ref> refs = new ListHelper<Ref>();
+        ListHelper<Triangle> triangles = new ListHelper<Triangle>();
+        ListHelper<Vertex> vertices = new ListHelper<Vertex>();
+        ListHelper<Ref> refs = new ListHelper<Ref>();
 
         // Main simplification function 
         //
