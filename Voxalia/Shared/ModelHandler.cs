@@ -24,6 +24,7 @@ namespace Voxalia.Shared
         /// <summary>
         /// Loads a model from .FMD (Frenetic Model Data) input.
         /// </summary>
+        /// <param name="data">The input FMD data.</param>
         public Model3D LoadModel(byte[] data)
         {
             // TODO: Remove VMD option!
@@ -109,6 +110,12 @@ namespace Voxalia.Shared
             return mod;
         }
 
+        /// <summary>
+        /// Reads a single node from a model.
+        /// </summary>
+        /// <param name="root">The root node.</param>
+        /// <param name="dr">The data reader.</param>
+        /// <returns>The node.</returns>
         public Model3DNode ReadSingleNode(Model3DNode root, DataReader dr)
         {
             Model3DNode n = new Model3DNode() { Parent = root };
@@ -124,6 +131,11 @@ namespace Voxalia.Shared
             return n;
         }
 
+        /// <summary>
+        /// Reads a matrix.
+        /// </summary>
+        /// <param name="reader">The data reader.</param>
+        /// <returns>The matrix.</returns>
         public Matrix ReadMat(DataReader reader)
         {
             double a1 = reader.ReadFloat();
@@ -146,6 +158,11 @@ namespace Voxalia.Shared
             //return new Matrix(a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4);
         }
 
+        /// <summary>
+        /// Gets all vertices in a model.
+        /// </summary>
+        /// <param name="input">The model.</param>
+        /// <returns>The vertices.</returns>
         public List<Vector3> GetVertices(Model3D input)
         {
             List<Vector3> vertices = new List<Vector3>(input.Meshes.Count * 100);
@@ -159,6 +176,11 @@ namespace Voxalia.Shared
             return vertices;
         }
 
+        /// <summary>
+        /// Gets all COLLISION ENABLED vertices of a model.
+        /// </summary>
+        /// <param name="input">The model.</param>
+        /// <returns>The collision vertices.</returns>
         public List<Vector3> GetCollisionVertices(Model3D input)
         {
             List<Vector3> vertices = new List<Vector3>(input.Meshes.Count * 100);
@@ -184,6 +206,12 @@ namespace Voxalia.Shared
             return vertices;
         }
 
+        /// <summary>
+        /// Converts a mesh to a BEPU perfect mesh.
+        /// </summary>
+        /// <param name="input">The model.</param>
+        /// <param name="verts">The vertice count if needed.</param>
+        /// <returns>The BEPU mesh.</returns>
         public MobileMeshShape MeshToBepu(Model3D input, out int verts)
         {
             List<Vector3> vertices = GetCollisionVertices(input);
@@ -196,6 +224,12 @@ namespace Voxalia.Shared
             return new MobileMeshShape(vertices.ToArray(), indices.ToArray(), AffineTransform.Identity, MobileMeshSolidity.DoubleSided);
         }
 
+        /// <summary>
+        /// Converts a mesh to a BEPU convex mesh.
+        /// </summary>
+        /// <param name="input">The model.</param>
+        /// <param name="verts">The vertice count if needed.</param>
+        /// <returns>The BEPU mesh.</returns>
         public ConvexHullShape MeshToBepuConvex(Model3D input, out int verts)
         {
             List<Vector3> vertices = GetCollisionVertices(input);
