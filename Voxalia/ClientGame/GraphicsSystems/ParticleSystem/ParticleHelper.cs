@@ -15,6 +15,7 @@ using Voxalia.ClientGame.ClientMainSystem;
 using BEPUutilities;
 using FreneticGameCore;
 using FreneticGameGraphics;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 {

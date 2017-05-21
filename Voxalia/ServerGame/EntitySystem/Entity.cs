@@ -40,7 +40,10 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             TheRegion = tregion;
             TheServer = tregion.TheServer;
+            OnTick += Tick;
         }
+
+        public abstract void Tick();
 
         /// <summary>
         /// Gets an estimation of how much RAM an entity object uses.

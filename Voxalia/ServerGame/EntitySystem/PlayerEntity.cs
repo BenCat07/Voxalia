@@ -743,7 +743,7 @@ namespace Voxalia.ServerGame.EntitySystem
         double opstt = 0;
 
         /// <summary>
-        /// Implements <see cref="BasicEntity.Tick"/>
+        /// Implements <see cref="Entity.Tick"/>
         /// </summary>
         public override void Tick()
         {

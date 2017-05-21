@@ -16,6 +16,7 @@ using System.Linq;
 using Voxalia.ClientGame.OtherSystems;
 using FreneticGameCore;
 using FreneticGameGraphics;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

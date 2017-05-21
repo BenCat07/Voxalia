@@ -20,6 +20,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using FreneticGameCore;
 using FreneticGameGraphics;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

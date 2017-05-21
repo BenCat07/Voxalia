@@ -14,6 +14,7 @@ using OpenTK.Graphics;
 using System.Linq;
 using FreneticGameCore;
 using FreneticGameGraphics;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.UISystem
 {

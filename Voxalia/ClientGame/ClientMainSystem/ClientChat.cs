@@ -20,6 +20,7 @@ using Voxalia.ClientGame.NetworkSystem.PacketsOut;
 using OpenTK;
 using FreneticGameCore;
 using FreneticGameGraphics;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {

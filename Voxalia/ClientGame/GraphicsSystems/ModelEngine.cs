@@ -20,6 +20,7 @@ using Voxalia.Shared.Collision;
 using FreneticGameCore;
 using FreneticGameGraphics;
 using FreneticGameCore.Collision;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {

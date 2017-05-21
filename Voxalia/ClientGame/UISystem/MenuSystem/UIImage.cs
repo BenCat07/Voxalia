@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Voxalia.ClientGame.ClientMainSystem;
 using Voxalia.ClientGame.GraphicsSystems;
 using FreneticGameGraphics;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.UISystem.MenuSystem
 {

@@ -15,6 +15,7 @@ using OpenTK.Graphics.OpenGL4;
 using Voxalia.ClientGame.OtherSystems;
 using FreneticGameCore;
 using FreneticGameGraphics;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 {
