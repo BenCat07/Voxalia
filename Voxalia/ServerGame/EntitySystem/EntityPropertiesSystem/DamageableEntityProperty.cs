@@ -12,11 +12,11 @@ namespace Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem
     public class DamageableEntityProperty : Property
     {
         [PropertyDebuggable]
-        [PropertyAutoSaveable]
+        [PropertyAutoSavable]
         public double Health = 100;
 
         [PropertyDebuggable]
-        [PropertyAutoSaveable]
+        [PropertyAutoSavable]
         public double MaxHealth = 100;
 
         public class DeathEventArgs : FreneticEventArgs

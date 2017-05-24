@@ -553,6 +553,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 Quaternion quat = new Quaternion(oquat.X, oquat.Y, oquat.Z, oquat.W);
                 Vector3 face = -Quaternion.Transform(Vector3.UnitZ, quat);
                 Direction = Utilities.VectorToAngles(new Location(face));
+                Direction.Yaw += 180;
                 //OpenTK.Vector3 headSpot = TheClient.VR.BasicHeadMat.ExtractTranslation();
                 if (TheClient.VR.Left != null)
                 {
@@ -560,6 +561,7 @@ namespace Voxalia.ClientGame.EntitySystem
                     {
                         Location lforw = TheClient.VR.Left.ForwardVector();
                         Location ldir = Utilities.VectorToAngles(lforw);
+                        ldir.Yaw += 180;
                         double goalyaw = ldir.Yaw - Direction.Yaw;
                         Vector2 resmove = new Vector2(Math.Sin(goalyaw * Utilities.PI180), Math.Cos(goalyaw * Utilities.PI180));
                         double len = resmove.Length();

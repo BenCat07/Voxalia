@@ -94,6 +94,7 @@ namespace Voxalia.ServerGame.EntitySystem
                     Location pos = GetEyePosition();
                     Location rel = (target - pos).Normalize();
                     Direction = Utilities.VectorToAngles(rel);
+                    Direction.Yaw += 180;
                     Items.Items[0].Info.Click(this, Items.Items[0]);
                     Items.Items[0].Info.ReleaseClick(this, Items.Items[0]);
                 }

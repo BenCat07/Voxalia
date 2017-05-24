@@ -150,7 +150,7 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                                         BEPUutilities.Vector3 rel = ((toAdd.Position - Position).Normalize().ToBVector());
                                         BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref rel, ref bforw, out BEPUutilities.Quaternion quat);
                                         float angle = (float)quat.AxisAngleFor(bup);
-
+                                        angle += (float)Math.PI; // TODO: Sanity!
                                         if (angle > (float)Math.PI)
                                         {
                                             angle -= (float)Math.PI * 2f;

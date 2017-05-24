@@ -36,7 +36,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <param name="tregion">The region it will be in.</param>
         /// <param name="tickme">Whether it ticks at all ever.</param>
         public Entity(Region tregion, bool tickme)
-            : base(tickme)
+            : base(null, tickme)
         {
             TheRegion = tregion;
             TheServer = tregion.TheServer;
