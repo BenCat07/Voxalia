@@ -1573,8 +1573,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public int Dec_VBO_Col = -1;
         public int Dec_VBO_Tcs = -1;
         public int DecTextureID = -1;
-
-        // TODO: Decal normal texture!
+        public int DecNTextureID = -1;
 
         public const int DecTextureWidth = 64; // TODO: Configurable!
         public const int DecTextureCount = 128; // TODO: Configurable!
@@ -1599,6 +1598,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             GL.BindTexture(TextureTarget.Texture2DArray, 0);
+            DecNTextureID = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2DArray, DecNTextureID);
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, 1, SizedInternalFormat.Rgba8, DecTextureWidth, DecTextureWidth, DecTextureCount);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+            GL.BindTexture(TextureTarget.Texture2DArray, 0);
         }
 
         public int DecalGetTextureID(string f)
@@ -1615,6 +1622,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     DecalTextureLocations[f] = i;
                     GL.BindTexture(TextureTarget.Texture2DArray, DecTextureID);
                     Textures.LoadTextureIntoArray(f, i, DecTextureWidth);
+                    GL.BindTexture(TextureTarget.Texture2DArray, DecNTextureID);
+                    Textures.LoadTextureIntoArray(f + "_nrm", i, DecTextureWidth);
                     GL.BindTexture(TextureTarget.Texture2DArray, 0);
                     return i;
                 }
@@ -1650,6 +1659,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             // TODO: Expiration goes here? Set isMore true if any expired.
             //GL.PolygonOffset(-1, -2);
             GL.Disable(EnableCap.CullFace);
+            GL.ActiveTexture(TextureUnit.Texture1);
+            GL.BindTexture(TextureTarget.Texture2DArray, DecNTextureID);
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2DArray, DecTextureID);
             //GL.Enable(EnableCap.PolygonOffsetFill);
