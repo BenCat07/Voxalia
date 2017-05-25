@@ -1574,6 +1574,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public int Dec_VBO_Tcs = -1;
         public int DecTextureID = -1;
 
+        // TODO: Decal normal texture!
+
         public const int DecTextureWidth = 64; // TODO: Configurable!
         public const int DecTextureCount = 128; // TODO: Configurable!
 
@@ -1621,11 +1623,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             return 0;
         }
 
-        public List<Tuple<Location, Vector3, Vector4, Vector2, double>> Decals = new List<Tuple<Location, Vector3, Vector4, Vector2, double>>();
+        public List<DecalInfo> Decals = new List<DecalInfo>();
 
         public void AddDecal(Location pos, Location ang, Vector4 color, float scale, string texture, double time)
         {
-            Decals.Add(new Tuple<Location, Vector3, Vector4, Vector2, double>(pos, ClientUtilities.Convert(ang), color, new Vector2(scale, DecalGetTextureID(texture)), time));
+            Decals.Add(new DecalInfo() { Position = pos, NormalDirection = ClientUtilities.Convert(ang), Color = color, Scale = scale, TextureDecalID = DecalGetTextureID(texture), RemainingTime = time });
             // TODO: Actually implement the time? >= 0 fades out, < 0 is there til chunk unload!
         }
 
@@ -1663,10 +1665,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 uint[] ind = new uint[Decals.Count];
                 for (int i = 0; i < Decals.Count; i++)
                 {
-                    pos[i] = ClientUtilities.Convert(Decals[i].Item1 - view.RenderRelative);
-                    nrm[i] = Decals[i].Item2;
-                    col[i] = Decals[i].Item3;
-                    tcs[i] = Decals[i].Item4;
+                    pos[i] = ClientUtilities.Convert(Decals[i].Position - view.RenderRelative);
+                    nrm[i] = Decals[i].NormalDirection;
+                    col[i] = Decals[i].Color;
+                    tcs[i] = new Vector2(Decals[i].Scale, Decals[i].TextureDecalID);
                     ind[i] = (uint)i;
                 }
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Dec_VBO_Pos);

@@ -94,7 +94,6 @@ void main()
 	fi.texcoord = texcoords;
 	fi.thv = thv;
 	fi.thw = thw;
-	vec4 normo = mv_mat_simple * vec4(normal, 1.0);
 	vec3 tf_normal = (mv_mat_simple * vec4(normal, 0.0)).xyz;
 	vec3 tf_tangent = (mv_mat_simple * vec4(tangent, 0.0)).xyz;
 	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent, normal), 0.0)).xyz;
@@ -108,7 +107,7 @@ void main()
 #if MCM_GEOM_ACTIVE
 	f.texcoord = texcoords.xy;
 	vec4 normo = mv_mat_simple * vec4(normal, 1.0);
-	f.tbn = transpose(mat3(vec3(0.0), vec3(0.0), normal)); // TODO: Improve for decals?!
+	f.tbn = transpose(mat3(vec3(0.0), vec3(0.0), normo.xyz)); // TODO: Improve for decals?!
 	f.color = color * v_color;
 	gl_Position = mv_matrix * vec4(position, 1.0);
 #else // MCM_GEOM_ACTIVE

@@ -261,6 +261,18 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         }
                         break;
                     }
+                case "traceDecalTarg":
+                    {
+                        Location pos = TheClient.Player.GetEyePosition();
+                        Location forw = TheClient.Player.ForwardVector();
+                        if (TheClient.TheRegion.SpecialCaseRayTrace(pos, forw, 50.0f, MaterialSolidity.FULLSOLID, TheClient.Player.IgnoreThis, out RayCastResult rcr))
+                        {
+                            Location nrm = new Location(rcr.HitData.Normal).Normalize();
+                            TheClient.AddDecal(new Location(rcr.HitData.Location) + nrm * 0.005, nrm, Vector4.One, 1f, "decal_target", 15);
+                            entry.Info(queue, "Marked at normal " + nrm);
+                        }
+                        break;
+                    }
                 case "soundCount":
                     {
                         entry.Info(queue, "Sound effects: " + TheClient.Sounds.Effects.Count + ", playing now: " + TheClient.Sounds.PlayingNow.Count);
