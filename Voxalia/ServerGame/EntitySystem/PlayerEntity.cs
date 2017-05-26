@@ -476,7 +476,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Items.GiveItem(new ItemStack("flashantilight", TheServer, 1, "items/common/flashlight_ico", "Flashantilight", "Lights things down!", Color.White, "items/common/flashlight", false, 0));
             Items.GiveItem(new ItemStack("sun_angler", TheServer, 1, "items/tools/sun_angler", "Sun Angler", "Moves the sun itself!", Color.White, "items/tools/sun_angler", false, 0));
             Items.GiveItem(new ItemStack("breadcrumb", TheServer, 1, "items/common/breadcrumbs", "Bread Crumbs", "Finds the way back, even over the river and through the woods!", Color.White, "items/common/breadcrumbs", false, 0));
-            for (int i = 1; i < MaterialHelpers.ALL_MATS.Count; i++)
+            for (int i = 2; i < MaterialHelpers.ALL_MATS.Count; i++)
             {
                 if (MaterialHelpers.IsValid((Material)i))
                 {

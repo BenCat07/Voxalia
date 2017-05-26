@@ -96,7 +96,7 @@ void main()
 		}
 		else
 		{
-			tcolor *= texture(tex, vec3(f.texcoord.xy, 0));
+			tcolor *= mix(vec4(texture(tex, vec3(f.texcoord.xy, 0)).xyz, 1.0), vec4(1.0), (f.tcol.x - 0.3) * 3.0);
 		}
 	}
 	else
