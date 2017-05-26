@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxaliaBrowser", "Voxalia\V
 		{57BFCD1D-03E3-48E6-ACEF-70A46B1E8C1A} = {57BFCD1D-03E3-48E6-ACEF-70A46B1E8C1A}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxaliaTests", "VoxaliaTests\VoxaliaTests.csproj", "{BC791A53-E852-4E99-90F9-4E9CF3138C14}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FGETests", "FreneticGameEngine\FGETests\FGETests.csproj", "{BC791A53-E852-4E99-90F9-4E9CF3138C14}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FreneticGameCore", "FreneticGameEngine\FreneticGameCore\FreneticGameCore.csproj", "{C608FD6D-FB74-4A0B-AFFE-D24AC7DEB3E3}"
 EndProject

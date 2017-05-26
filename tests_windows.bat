@@ -1,1 +1,1 @@
-"packages/NUnit.ConsoleRunner.3.6.0/tools/nunit3-console.exe" VoxaliaTests/bin/Release/VoxaliaTests.dll
+"packages/NUnit.ConsoleRunner.3.6.1/tools/nunit3-console.exe" FreneticGameEngine/FGETests/bin/Release/FGETests.dll
