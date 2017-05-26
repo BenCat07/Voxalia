@@ -68,6 +68,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Shared\BlockInternal.cs" />
     <Compile Include="Shared\Constants.cs" />
     <Compile Include="Shared\ModelManagement\Catmull.cs" />

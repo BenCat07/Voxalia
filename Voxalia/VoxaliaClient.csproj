@@ -97,6 +97,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ClientGame\AudioSystem\ActiveSound.cs" />
     <Compile Include="ClientGame\AudioSystem\Enforcer\AudioEnforcer.cs" />
     <Compile Include="ClientGame\AudioSystem\Enforcer\AudioState.cs" />

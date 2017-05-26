@@ -141,7 +141,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.CLIENTINIT, "Generating window...");
             DisplayDevice dd = DisplayDevice.Default;
             Window = new GameWindow(CVars.r_width.ValueI, CVars.r_height.ValueI, new GraphicsMode(24, 24, 0, 0),
-                VoxProgram.GameName + " v" + VoxProgram.GameVersion + " (" + VoxProgram.GameVersionDescription + ")", GameWindowFlags.Default, dd, 4, 3, GraphicsContextFlags.ForwardCompatible);
+                Program.GameName + " v" + Program.GameVersion + " (" + Program.GameVersionDescription + ")", GameWindowFlags.Default, dd, 4, 3, GraphicsContextFlags.ForwardCompatible);
             Window.Load += new EventHandler<EventArgs>(Window_Load);
             Window.RenderFrame += new EventHandler<FrameEventArgs>(Window_RenderFrame);
             Window.Mouse.Move += new EventHandler<MouseMoveEventArgs>(MouseHandler.Window_MouseMove);
