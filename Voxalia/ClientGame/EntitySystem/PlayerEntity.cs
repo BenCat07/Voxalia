@@ -347,6 +347,7 @@ namespace Voxalia.ClientGame.EntitySystem
         double tpitch = 0;
 
         public bool PVRJump;
+        public bool PVRCrouch;
         public bool PVRPrimary;
         public bool PVRSecondary;
         public bool PVRUse;
@@ -588,10 +589,20 @@ namespace Voxalia.ClientGame.EntitySystem
                     }
                     if (TheClient.VR.Left.Pressed.HasFlag(VRButtons.SIDE_GRIP))
                     {
+                        Downward = true;
+                        PVRCrouch = true;
+                    }
+                    else if (PVRCrouch)
+                    {
+                        Downward = false;
+                        PVRCrouch = false;
+                    }
+                    if (TheClient.VR.Left.Pressed.HasFlag(VRButtons.MENU_BUTTON))
+                    {
                         Upward = true;
                         PVRJump = true;
                     }
-                    else
+                    else if (PVRJump)
                     {
                         Upward = false;
                         PVRJump = false;
