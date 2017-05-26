@@ -906,13 +906,13 @@ namespace Voxalia.ServerGame.WorldSystem
             // TODO: Efficiency!
             min = min.GetBlockLocation();
             max = max.GetUpperBlockBorder();
-            for (int x = (int)min.X; x < max.X; x++)
+            for (long x = (long)min.X; x < max.X; x++)
             {
-                for (int y = (int)min.Y; y < max.Y; y++)
+                for (long y = (long)min.Y; y < max.Y; y++)
                 {
-                    for (int z = (int)min.Z; z < max.Z; z++)
+                    for (long z = (long)min.Z; z < max.Z; z++)
                     {
-                        if (((Material)GetBlockInternal_NoLoad(min + new Location(x, y, z)).BlockMaterial).GetSolidity() == MaterialSolidity.LIQUID)
+                        if (((Material)GetBlockInternal_NoLoad(new Location((double)x, y, z)).BlockMaterial).GetSolidity() == MaterialSolidity.LIQUID)
                         {
                             return true;
                         }

@@ -18,19 +18,10 @@ using BEPUutilities;
 using BEPUphysics;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.BroadPhaseEntries;
-using BEPUphysics.BroadPhaseSystems;
-using BEPUphysics.OtherSpaceStages;
-using BEPUphysics.UpdateableSystems;
-using BEPUphysics.NarrowPhaseSystems.Pairs;
-using BEPUphysics.PositionUpdating;
-using BEPUphysics.NarrowPhaseSystems;
-using BEPUphysics.Constraints;
 using BEPUphysics.Constraints.SingleEntity;
-using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.OtherSystems;
-using Voxalia.Shared.Collision;
 using BEPUphysics.Character;
 using FreneticScript;
 using Voxalia.ClientGame.ClientMainSystem;
@@ -64,6 +55,52 @@ namespace Voxalia.ClientGame.EntitySystem
             if (Body != null)
             {
                 Body.CollisionInformation.CollisionRules.Group = CGroup;
+            }
+        }
+
+        public bool IsSwimlogic = false;
+
+        public void SwimForce(Vector3 inp)
+        {
+            if (inp.LengthSquared() == 0)
+            {
+                return;
+            }
+            inp.Normalize();
+            inp *= CBody.StandingSpeed * 5;
+            Body.ApplyLinearImpulse(ref inp);
+        }
+
+        public void SetForSwim(double damp, Vector3 grav)
+        {
+            IsSwimlogic = true;
+            Body.LinearDamping = damp;
+            Body.Gravity = grav;
+        }
+
+        public void SetForGround()
+        {
+            IsSwimlogic = false;
+            Body.LinearDamping = 0;
+            Body.Gravity = Body.Space.ForceUpdater.Gravity;
+        }
+
+        public override void Tick()
+        {
+            base.Tick();
+            Location pos = GetPosition();
+            Location rad = new Location(CBody.BodyRadius, CBody.BodyRadius, 0);
+            double halfeye = CBHHeight * (CBody.StanceManager.CurrentStance == Stance.Standing ? 1.8 : 1.5) * 0.5;
+            bool uw1 = TheRegion.InWater(pos - rad, pos + rad + new Location(0, 0, halfeye));
+            bool uw2 = TheRegion.InWater(pos - rad + new Location(0, 0, halfeye), pos + rad + new Location(0, 0, halfeye * 2));
+            if (uw1 || uw2)
+            {
+                double mult = uw1 ? (uw2 ? 0.6 : 0.3) : 0.3;
+                SetForSwim(mult, Body.Space.ForceUpdater.Gravity * (1.0 - mult));
+            }
+            else
+            {
+                SetForGround();
             }
         }
 

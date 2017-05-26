@@ -235,6 +235,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             if (min.IsNaN() || min.IsInfinite() || max.IsNaN() || max.IsInfinite())
             {
                 SysConsole.Output(OutputType.WARNING, "Invalid line box from " + min + " to " + max);
+                SysConsole.Output(OutputType.DEBUG, Environment.StackTrace);
                 return;
             }
             GL.ActiveTexture(TextureUnit.Texture0);

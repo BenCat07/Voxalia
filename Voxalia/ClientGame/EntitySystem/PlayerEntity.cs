@@ -238,6 +238,19 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 cc.StanceManager.DesiredStance = DesiredStance;
             }
+            if (IsSwimlogic)
+            {
+                Location forw = Utilities.RotateVector(new Location(movement.X, movement.Y, 0), Direction.Yaw * Utilities.PI180, Direction.Pitch * Utilities.PI180);
+                if (Upward)
+                {
+                    forw.Z = 1;
+                }
+                else if (Downward)
+                {
+                    forw.Z = -1;
+                }
+                SwimForce(forw.ToBVector());
+            }
         }
 
         public void FlyForth(CharacterController cc, double delta)

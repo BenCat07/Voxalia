@@ -337,9 +337,20 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 PlayerEyePosition = Player.ItemSource();
                 Location forw = Player.ItemDir();
                 bool h = TheRegion.SpecialCaseRayTrace(PlayerEyePosition, forw, 100, MaterialSolidity.ANY, IgnorePlayer, out RayCastResult rcr);
-                CameraFinalTarget = h ? new Location(rcr.HitData.Location) - new Location(rcr.HitData.Normal).Normalize() * 0.01: PlayerEyePosition + forw * 100;
+                Location loc = new Location(rcr.HitData.Location);
+                Location nrm = new Location(rcr.HitData.Normal);
+                h = h && !loc.IsInfinite() && !loc.IsNaN() && nrm.LengthSquared() > 0;
+                if (h)
+                {
+                    nrm = nrm.Normalize();
+                }
+                CameraFinalTarget = h ? loc - nrm * 0.01: PlayerEyePosition + forw * 100;
                 CameraImpactNormal = h ? new Location(rcr.HitData.Normal).Normalize() : Location.Zero;
                 CameraDistance = h ? rcr.HitData.T: 100;
+                if (CameraDistance <= 0.01)
+                {
+                    CameraDistance = 0.01;
+                }
                 double cping = Math.Max(LastPingValue, GlobalTickTimeLocal - LastPingTime);
                 AveragePings.Push(new KeyValuePair<double, double>(GlobalTickTimeLocal, cping));
                 while ((GlobalTickTimeLocal - AveragePings.Peek().Key) > 1)
