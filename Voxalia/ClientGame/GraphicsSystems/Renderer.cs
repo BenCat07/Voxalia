@@ -224,9 +224,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public TextureEngine Engine;
         public ShaderEngine Shaders;
-
-        public bool bbreak = true;
-
+        
         /// <summary>
         /// Renders a line box.
         /// </summary>
@@ -241,7 +239,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.ActiveTexture(TextureUnit.Texture0);
             Engine.White.Bind();
             View3D.CheckError("RenderLineBox: BindTexture");
-            Location halfsize = (max - min) / 2;
+            Location halfsize = (max - min) * 0.5;
             if ((min + halfsize) == Location.Zero)
             {
                 return; // ???
@@ -253,10 +251,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             if (Math.Abs(min.X) < 1 || Math.Abs(min.Y) < 1 || Math.Abs(min.Z) < 1)
             {
                 return; // ???
-            }
-            if (bbreak)
-            {
-                return; // TODO: Fix!
             }
             Matrix4d mat = Matrix4d.Scale(ClientUtilities.ConvertD(halfsize))
             * (rot != null && rot.HasValue ? rot.Value : Matrix4d.Identity)

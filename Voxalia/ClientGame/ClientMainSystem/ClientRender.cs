@@ -2040,15 +2040,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 if (CVars.u_highlight_placeblock.ValueB)
                 {
                     Rendering.SetColor(Color4.Cyan);
+                    Rendering.SetMinimumLight(1.0f);
                     Location cft2 = cpos2.GetBlockLocation();
                     Rendering.RenderLineBox(cft2, cft2 + Location.One);
                 }
                 Rendering.SetColor(Color4.White);
             }
-            if (MainWorldView.FBOid == FBOID.MAIN)
-            {
-                Rendering.SetMinimumLight(0f);
-            }
+            Rendering.SetMinimumLight(0f);
             View3D.CheckError("Rendering - 2.75");
             if (CVars.n_debugmovement.ValueB)
             {
