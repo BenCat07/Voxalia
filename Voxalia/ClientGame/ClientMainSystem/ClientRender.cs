@@ -1855,10 +1855,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             continue;
                         }
                         TheRegion.ShadowCasters[i].Render();
+#if DEBUG
                         if (View3D.CheckError("Rendering - 0 - DynShadows: " + i))
                         {
                             SysConsole.Output(OutputType.DEBUG, "Caught: " + TheRegion.ShadowCasters[i]);
                         }
+#endif
                     }
                     View3D.CheckError("Rendering - 0 - DynShadows");
                     List<Entity> entsRender = new List<Entity>();
@@ -1866,7 +1868,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     foreach (Entity ent in entsRender)
                     {
                         ent.Render();
+#if DEBUG
                         View3D.CheckError("Rendering - 0 - TranspShadow - Specific: " + ent.ToString());
+#endif
                     }
                 }
                 else
@@ -1876,7 +1880,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     foreach (Chunk ch in TheRegion.LoadedChunks.Values)
                     {
                         ch.Render();
+#if DEBUG
                         View3D.CheckError("Rendering - 0 - StaticShadow:Chunks - Layer: " + ch.WorldPosition.Z);
+#endif
                     }
                     SetEnts();
                     for (int i = 0; i < TheRegion.GenShadowCasters.Length; i++)
@@ -1921,7 +1927,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     foreach (Entity ent in ents)
                     {
                         ent.Render();
+#if DEBUG
                         View3D.CheckError("Rendering - 0 - Transp - Specific: " + ent.ToString());
+#endif
                     }
                     View3D.CheckError("Rendering - 0 - Transp");
                 }
@@ -1945,7 +1953,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     foreach (Entity ent in ents)
                     {
                         ent.Render();
+#if DEBUG
                         View3D.CheckError("Rendering - 0 - Specific: " + ent.ToString());
+#endif
                     }
                     View3D.CheckError("Rendering - 0 - Main");
                     TheRegion.RenderPlants();
@@ -2044,13 +2054,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 Rendering.SetColor(Color4.Red);
                 GL.LineWidth(5);
+#if DEBUG
                 int i = 0;
+#endif
                 foreach (Chunk chunk in TheRegion.LoadedChunks.Values)
                 {
                     if ((chunk._VBOSolid == null || !chunk._VBOSolid.generated) && (chunk._VBOTransp == null || !chunk._VBOTransp.generated) && !chunk.IsAir)
                     {
                         Rendering.RenderLineBox(chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE, (chunk.WorldPosition.ToLocation() + Location.One) * Chunk.CHUNK_SIZE);
+#if DEBUG
                         View3D.CheckError("Rendering - 2.8: " + i++);
+#endif
                     }
                 }
                 GL.LineWidth(1);

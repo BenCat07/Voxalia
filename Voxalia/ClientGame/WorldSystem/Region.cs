@@ -899,16 +899,16 @@ namespace Voxalia.ClientGame.WorldSystem
                     for (int i = 0; i < GenShadowCasters.Length; i++) // TODO: Accelerate somehow! This is too slow!
                     {
                         PhysicsEntity pe = GenShadowCasters[i];
-                        if (pe.GenBlockShadows && pe.ShadowCenter.DistanceSquared_Flat(pos) < pe.ShadowRadiusSquaredXY)
+                        if (pe.GenBlockShadows && pe.ShadowCastShape.Max.Z > pos.Z && pe.ShadowCenter.DistanceSquared_Flat(pos) < pe.ShadowRadiusSquaredXY)
                         {
                             light -= 0.05f;
-                            if (pe.ShadowMainDupe.Intersects(bb))
-                            {
-                                light = 0;
-                                break;
-                            }
                             if (pe.ShadowCastShape.Intersects(bb))
                             {
+                                if (pe.ShadowMainDupe.Intersects(bb))
+                                {
+                                    light = 0;
+                                    break;
+                                }
                                 light -= 0.1f;
                             }
                             if (light <= 0)

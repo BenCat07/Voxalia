@@ -432,6 +432,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 PlantRenderHelper[] ph_s = new PlantRenderHelper[CSize];
                 for (int i = 0; i < CSize; i++)
                 {
+                    // TODO: Choose good capacity based on logical analysis
                     rh_s[i] = new ChunkRenderHelper(128);
                     ph_s[i] = new PlantRenderHelper();
                 }

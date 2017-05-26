@@ -191,6 +191,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     for (int i = 0; i < tasks.Count; i++)
                     {
                         tasks[i].Wait();
+                        // TODO: Pre-sized array logic instead of lists
                         pos.AddRange(datas[i].Poses);
                         col.AddRange(datas[i].Cols);
                         tcs.AddRange(datas[i].TCs);
