@@ -274,6 +274,11 @@ namespace Voxalia.ClientGame.WorldSystem
         void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym,
             Chunk c_xpyp, Chunk c_xpym, Chunk c_xmyp, Chunk c_xmym, List<Chunk> potentials, bool plants, bool shaped, bool transp, BlockUpperArea bua, ChunkSLODHelper crh, bool smooth)
         {
+            Dictionary<Vector3i, Chunk> pots = new Dictionary<Vector3i, Chunk>(potentials.Count + 10);
+            for (int i = 0; i < potentials.Count; i++)
+            {
+                pots[potentials[i].WorldPosition] = potentials[i];
+            }
             Vector3 addr = new Vector3(WorldPosition.X - (int)Math.Floor(WorldPosition.X / (float)Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
                 WorldPosition.Y - (int)Math.Floor(WorldPosition.Y / (float)Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD,
                 WorldPosition.Z - (int)Math.Floor(WorldPosition.Z / (float)Constants.CHUNKS_PER_SLOD) * Constants.CHUNKS_PER_SLOD) * CHUNK_SIZE;
@@ -575,7 +580,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                     {
                                         reldat = 100;
                                     }
-                                    Location lcol = OwningRegion.GetLightAmountForSkyValue(blockPos, ClientUtilities.Convert(vt) + WorldPosition.ToLocation() * CHUNK_SIZE, ClientUtilities.Convert(nt), potentials, reldat / 255f);
+                                    Location lcol = OwningRegion.GetLightAmountForSkyValue(blockPos, ClientUtilities.Convert(vt) + WorldPosition.ToLocation() * CHUNK_SIZE, ClientUtilities.Convert(nt), potentials, pots, reldat / 255f);
                                     rh.Cols.Add(new Vector4((float)lcol.X, (float)lcol.Y, (float)lcol.Z, 1));
                                     rh.TCols.Add(OwningRegion.TheClient.Rendering.AdaptColor(wp + ClientUtilities.ConvertToD(vt), Colors.ForByte(c.BlockPaint)));
                                     if (ths != null && ths.Item1 != null)
@@ -630,7 +635,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                 if (plants && c.Material.GetPlant() != null && !zp.Material.IsOpaque() && zp.Material.GetSolidity() == MaterialSolidity.NONSOLID)
                                 {
                                     Location skylight = OwningRegion.GetLightAmountForSkyValue(blockPos, new Location(WorldPosition.X * Chunk.CHUNK_SIZE + x + 0.5, WorldPosition.Y * Chunk.CHUNK_SIZE + y + 0.5,
-                                        WorldPosition.Z * Chunk.CHUNK_SIZE + z + 1.0), Location.UnitZ, potentials, zp.BlockLocalData / 255f);
+                                        WorldPosition.Z * Chunk.CHUNK_SIZE + z + 1.0), Location.UnitZ, potentials, pots, zp.BlockLocalData / 255f);
                                     bool even = c.Material.PlantShouldProduceEvenRows();
                                     MTRandom rand = null;
                                     if (!even)

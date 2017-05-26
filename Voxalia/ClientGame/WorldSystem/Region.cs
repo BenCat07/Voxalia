@@ -968,13 +968,8 @@ namespace Voxalia.ClientGame.WorldSystem
             return (col / Math.Max(col.X, Math.Max(col.Y, col.Z))) * cap;
         }
 
-        public Location GetBlockLight(Location blockPos, Location pos, Location norm, List<Chunk> potentials)
+        public Location GetBlockLight(Location blockPos, Location pos, Location norm, List<Chunk> potentials, Dictionary<Vector3i, Chunk> pots)
         {
-            Dictionary<Vector3i, Chunk> pots = new Dictionary<Vector3i, Chunk>(potentials.Count + 10);
-            for (int i = 0; i < potentials.Count; i++)
-            {
-                pots[potentials[i].WorldPosition] = potentials[i];
-            }
             Location lit = Location.Zero;
             for (int i = 0; i < potentials.Count; i++)
             {
@@ -1029,10 +1024,11 @@ namespace Voxalia.ClientGame.WorldSystem
             new Vector3i(1, 1, -1), new Vector3i(1, 1, 0), new Vector3i(1, 1, 1)
         };
 
-        public Location GetLightAmountForSkyValue(Location blockPos, Location pos, Location norm, List<Chunk> potentials, float skyPrecalc)
+        public Location GetLightAmountForSkyValue(Location blockPos, Location pos, Location norm, List<Chunk> potentials, Dictionary<Vector3i, Chunk> pots, float skyPrecalc)
         {
             if (potentials == null)
             {
+                pots = new Dictionary<Vector3i, Chunk>(32);
                 SysConsole.Output(OutputType.WARNING, "Region - GetLightAmountForSkyValue : null potentials! Correcting...");
                 potentials = new List<Chunk>();
                 Vector3i pos_c = ChunkLocFor(pos);
@@ -1042,19 +1038,20 @@ namespace Voxalia.ClientGame.WorldSystem
                     if (tch != null)
                     {
                         potentials.Add(tch);
+                        pots[tch.WorldPosition] = tch;
                     }
                 }
             }
             Location amb = GetAmbient();
             Location sky = SkyMod(pos, norm, skyPrecalc);
-            Location blk = GetBlockLight(blockPos, pos, norm, potentials);
+            Location blk = GetBlockLight(blockPos, pos, norm, potentials, pots);
             Location.AddThree(ref amb, ref sky, ref blk, out Location res);
             return res;
         }
 
         public OpenTK.Vector4 GetLightAmountAdjusted(Location blockPos, Location pos, Location norm)
         {
-            OpenTK.Vector4 vec = new OpenTK.Vector4(ClientUtilities.Convert(GetLightAmount(blockPos, pos, norm, null)), 1.0f) * GetSunAdjust();
+            OpenTK.Vector4 vec = new OpenTK.Vector4(ClientUtilities.Convert(GetLightAmount(blockPos, pos, norm, null, null)), 1.0f) * GetSunAdjust();
             if (TheClient.CVars.r_fast.ValueB)
             {
                 return Regularize(vec);
@@ -1062,10 +1059,11 @@ namespace Voxalia.ClientGame.WorldSystem
             return RegularizeBig(vec, 5f);
         }
 
-        public Location GetLightAmount(Location blockPos, Location pos, Location norm, List<Chunk> potentials)
+        public Location GetLightAmount(Location blockPos, Location pos, Location norm, List<Chunk> potentials, Dictionary<Vector3i, Chunk> pots)
         {
             if (potentials == null)
             {
+                pots = new Dictionary<Vector3i, Chunk>(32);
                 potentials = new List<Chunk>();
                 Vector3i pos_c = ChunkLocFor(pos);
                 for (int i = 0; i < RelativeChunks.Length; i++)
@@ -1074,12 +1072,13 @@ namespace Voxalia.ClientGame.WorldSystem
                     if (tch != null)
                     {
                         potentials.Add(tch);
+                        pots[tch.WorldPosition] = tch;
                     }
                 }
             }
             Location amb = GetAmbient();
             Location sky = GetSkyLight(pos, norm);
-            Location blk = GetBlockLight(blockPos, pos, norm, potentials);
+            Location blk = GetBlockLight(blockPos, pos, norm, potentials, pots);
             if (TheClient.CVars.r_fast.ValueB)
             {
                 blk = Regularize(blk);
