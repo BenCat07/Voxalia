@@ -134,7 +134,7 @@ void main()
 		}
 		else
 		{
-			col *= vec4(texture(s, vec3(fi.texcoord.xy, 0)).xyz, 1.0);
+			col *= mix(vec4(texture(s, vec3(fi.texcoord.xy, 0)).xyz, 1.0), vec4(1.0), (fi.tcol.x - 0.3) * 3.0);
 		}
 	}
 	else

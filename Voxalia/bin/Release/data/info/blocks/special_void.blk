@@ -1,0 +1,10 @@
+Name=Special_Void
+Solidity=NONSOLID
+Opaque=false
+RendersAtAll=false
+FogAlpha=0
+BreakTime=Infinity
+LightDamage=0
+Breaker=NON_BREAKABLE
+BreaksFromOtherTools=false
+TextureBasic=blocks/cracks2

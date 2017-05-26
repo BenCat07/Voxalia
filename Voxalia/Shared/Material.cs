@@ -18,8 +18,14 @@ namespace Voxalia.Shared
     /// </summary>
     public enum Material: ushort
     {
+        /// <summary>
+        /// Empty 'air' block.
+        /// </summary>
         AIR = 0,
-        STONE = 1,
+        /// <summary>
+        /// A special material, marks 'void' area.
+        /// </summary>
+        SPECIAL_VOID = 1,
         GRASS_FOREST_TALL = 2,
         DIRT = 3,
         WATER = 4,
@@ -58,10 +64,11 @@ namespace Voxalia.Shared
         BRICKS = 37,
         FIRE = 38,
         GRASS_PLAINS = 39,
+        STONE = 40,
         /// <summary>
         /// How many materials there are by default. Only for use with direct handling of this enumeration (shouldn't happen often.)
         /// </summary>
-        NUM_DEFAULT = 40,
+        NUM_DEFAULT = 41,
         /// <summary>
         /// How many materials there theoretically can be.
         /// </summary>
