@@ -1927,8 +1927,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 else if (view.FBOid.IsMainSolid())
                 {
+                    View3D.CheckError("Rendering - 0 - Pre");
                     SetEnts();
                     TheRegion.MainRender();
+                    View3D.CheckError("Rendering - 0 - Main - RegionMain");
                     List<Entity> entsRender = CVars.r_drawents.ValueB ? new List<Entity>(TheRegion.Entities) : new List<Entity>();
                     if (view.FBOid != FBOID.DYNAMIC_SHADOWS)
                     {
@@ -1937,11 +1939,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             entsRender.Add(new ChunkEntity(ch));
                         }
                     }
+                    View3D.CheckError("Rendering - 0 - Prepped");
                     Location pos = Player.GetPosition();
                     IEnumerable<Entity> ents = entsRender.OrderBy((e) => e.GetPosition().DistanceSquared(MainWorldView.RenderRelative));
                     foreach (Entity ent in ents)
                     {
                         ent.Render();
+                        View3D.CheckError("Rendering - 0 - Specific: " + ent.ToString());
                     }
                     View3D.CheckError("Rendering - 0 - Main");
                     TheRegion.RenderPlants();
