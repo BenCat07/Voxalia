@@ -398,8 +398,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             LODHelp = new ModelLODHelper(this);
             SysConsole.Output(OutputType.CLIENTINIT, "Loading general graphics settings...");
             CVars.r_vsync.OnChanged += OnVsyncChanged;
-            OnVsyncChanged(CVars.r_vsync, null);
+            OnVsyncChanged(CVars.r_vsync, EventArgs.Empty);
             CVars.r_cloudshadows.OnChanged += OnCloudShadowChanged;
+            CVars.r_transpll.OnChanged += OnLLChanged;
+            OnLLChanged(CVars.r_transpll, EventArgs.Empty);
             View3D.CheckError("Load - General Graphics");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading UI engine...");
             UIConsole.InitConsole(); // TODO: make this non-static
