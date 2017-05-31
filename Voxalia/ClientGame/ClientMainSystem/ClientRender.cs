@@ -2275,6 +2275,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 if (!sub3d && CVars.u_debug.ValueB)
                 {
+                    Location cpos = CameraFinalTarget - (CameraImpactNormal * 0.01f);
+                    cpos = cpos.GetBlockLocation();
                     FontSets.Standard.DrawColoredText(FontSets.Standard.SplitAppropriately("^!^e^7gFPS(calc): " + (1f / gDelta).ToString(timeformat_fps2) + ", gFPS(actual): " + gFPS + ", gFPS(range): " + gFPS_Min + " to " + gFPS_Max
                         + "\nHeld Item: " + GetItemForSlot(QuickBarPos).ToString()
                         + "\nTimes -> Physics: " + TheRegion.PhysTime.ToString(timeformat) + ", Shadows: " + MainWorldView.ShadowTime.ToString(timeformat)
@@ -2286,7 +2288,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         + "\nChunks loaded: " + TheRegion.LoadedChunks.Count + ", Chunks rendering currently: " + TheRegion.RenderingNow.Count + ", chunks waiting: " + TheRegion.NeedsRendering.Count + ", Entities loaded: " + TheRegion.Entities.Count
                         + "\nChunks prepping currently: " + TheRegion.PreppingNow.Count + ", chunks waiting for prep: " + TheRegion.PrepChunks.Count + ", SLOD chunk sets loaded: " + TheRegion.SLODs.Count
                         + "\nPosition: " + Player.GetPosition().ToBasicString() + ", velocity: " + Player.GetVelocity().ToBasicString() + ", direction: " + Player.Direction.ToBasicString()
-                        + "\nExposure: " + MainWorldView.MainEXP,
+                        + "\nExposure: " + MainWorldView.MainEXP + ", Target Block: " + cpos + ", Target Block Type: " + TheRegion.GetBlockMaterial(cpos),
                         Window.Width - 10), new Location(0, 0, 0), Window.Height, 1, false, "^r^!^e^7");
                 }
                 int center = Window.Width / 2;
