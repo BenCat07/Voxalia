@@ -111,8 +111,8 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <returns>Whether there was a collision.</returns>
         public bool SpecialCaseConvexTrace(ConvexShape shape, Location start, Location dir, double len, MaterialSolidity considerSolid, Func<BroadPhaseEntry, bool> filter, out RayCastResult rayHit)
         {
-            RigidTransform rt = new RigidTransform(start.ToBVector(), BEPUutilities.Quaternion.Identity);
-            BEPUutilities.Vector3 sweep = (dir * len).ToBVector();
+            RigidTransform rt = new RigidTransform(start.ToBVector(), Quaternion.Identity);
+            Vector3 sweep = (dir * len).ToBVector();
             RayCastResult best = new RayCastResult(new RayHit() { T = len }, null);
             bool hA = false;
             if (considerSolid.HasFlag(MaterialSolidity.FULLSOLID))
