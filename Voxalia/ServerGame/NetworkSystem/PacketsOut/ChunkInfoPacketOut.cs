@@ -42,7 +42,6 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
                 return;
             }
             ID = ServerToClientPacket.CHUNK_INFO;
-            Data = slod;
             DataStream ds = new DataStream(slod.Length + 16);
             DataWriter dw = new DataWriter(ds);
             dw.WriteInt(cpos.X);
@@ -103,7 +102,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
                 Utilities.IntToBytes(chunk.WorldPosition.Z).CopyTo(Data, 8);
                 return;
             }
-            byte[] gdata = FileHandler.Compress(data_orig);
+            byte[] gdata = lod == 15 ? data_orig : FileHandler.Compress(data_orig);
             DataStream ds = new DataStream(gdata.Length + 16);
             DataWriter dw = new DataWriter(ds);
             dw.WriteInt(chunk.WorldPosition.X);
