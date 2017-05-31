@@ -616,6 +616,11 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     return;
                 }
+                // TODO: If chunk previously could read downward, then still render downward (once, then forget that info)!
+                if (!ch.Reachability[(int)ChunkReachability.ZP_ZM])
+                {
+                    return;
+                }
                 Chunk below = GetChunk(ch.WorldPosition + new Vector3i(0, 0, -1));
                 if (below != null)
                 {
