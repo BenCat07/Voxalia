@@ -987,14 +987,15 @@ namespace Voxalia.ClientGame.WorldSystem
                     double range = arr[k].Value.GetLightEmitRange();
                     if (distsq < range * range)
                     {
+                        Location tPos = pos + norm * 0.5;
                         double dist = Math.Sqrt(distsq);
-                        Location rel_norm = (relCoord - pos) * (1.0 / dist);
+                        Location rel_norm = (relCoord - tPos) * (1.0 / dist);
                         Location o_p = pos.GetBlockLocation();
                         Location o_bp = blockPos.GetBlockLocation();
                         Location o_end = relCoord.GetBlockLocation();
-                        /*for (int b = 0; b < dist; b++)
+                        for (int b = 0; b < dist; b++)
                         {
-                            Location p = (pos + rel_norm * b).GetBlockLocation();
+                            Location p = (tPos + rel_norm * b).GetBlockLocation();
                             if (p.DistanceSquared(o_p) < 1.0 || p.DistanceSquared(o_end) < 1.0 || p.DistanceSquared(o_bp) < 1.0)
                             {
                                 continue;
@@ -1003,10 +1004,10 @@ namespace Voxalia.ClientGame.WorldSystem
                             {
                                 goto skip;
                             }
-                        }*/
+                        }
                         double norm_lit = dist < 2.0 ? 1.0 : Math.Max(norm.Dot(rel_norm), 0.25);
                         lit += arr[k].Value.GetLightEmit() * Math.Max(Math.Min(1.0 - (dist / range), 1.0), 0.0) * norm_lit;
-                        //skip:
+                        skip:
                         continue;
                     }
                 }
