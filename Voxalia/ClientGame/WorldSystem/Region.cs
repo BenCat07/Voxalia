@@ -654,8 +654,8 @@ namespace Voxalia.ClientGame.WorldSystem
                 TheClient.s_forw_grass = TheClient.s_forw_grass.Bind();
                 GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
                 GL.Uniform4(12, new OpenTK.Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
-                GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
-                GL.Uniform1(14, TheClient.ZFar());
+                GL.Uniform2(13, new OpenTK.Vector2(TheClient.CVars.r_znear.ValueF, TheClient.CVars.r_znear.ValueF));
+                GL.Uniform2(14, new OpenTK.Vector2(TheClient.ZFar(), TheClient.ZFar()));
                 GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
             }
             else if (TheClient.MainWorldView.FBOid == FBOID.MAIN)

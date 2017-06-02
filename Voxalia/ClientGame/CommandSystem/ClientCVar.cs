@@ -130,7 +130,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_exposure = Register("r_exposure", "1.5", CVarFlag.Numeric, "What value to scale the lighting by.");
             r_grayscale = Register("r_grayscale", "false", CVarFlag.Boolean, "Whether to grayscale the view.");
             r_vrscale = Register("r_vrscale", "1", CVarFlag.Numeric, "What scale to put everything at in VR mode.");
-            r_fog = Register("r_fog", "false", CVarFlag.Boolean, "Whether render fog should be defaultly enabled at distance.");
+            r_fog = Register("r_fog", "true", CVarFlag.Boolean, "Whether render fog should be enabled at distance.");
             r_forward_normals = Register("r_forward_normals", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether forward mode rendering should calculate normal-map effects.");
             r_forward_lights = Register("r_forward_lights", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether forward mode rendering should calculate live lighting effects.");
             r_forward_shadows = Register("r_forward_shadows", "false", CVarFlag.Boolean | CVarFlag.Delayed, "Whether forward mode rendering should calculate dynamic shadow effects.");

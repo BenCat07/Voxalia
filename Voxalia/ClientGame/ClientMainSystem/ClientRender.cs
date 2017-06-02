@@ -1218,8 +1218,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Rendering.SetColor(Color4.White);
             Rendering.SetMinimumLight(0);
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
+            if (MainWorldView.FBOid.IsForward())
+            {
+                GL.Uniform2(14, new Vector2(30f, 5000f));
+            }
             SetVox();
             GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
+            if (MainWorldView.FBOid.IsForward())
+            {
+                GL.Uniform2(13, new Vector2(30f, 30f));
+                GL.Uniform2(14, new Vector2(30f, 5000f));
+            }
             View3D.CheckError("Rendering - Sky - PostPrep");
             foreach (ChunkSLODHelper ch in TheRegion.SLODs.Values)
             {
@@ -1232,6 +1241,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
             }
             View3D.CheckError("Rendering - Sky - Slods");
+            SetEnts();
+            if (MainWorldView.FBOid.IsForward())
+            {
+                GL.Uniform2(14, new Vector2(CVars.r_znear.ValueF, ZFar()));
+            }
+            GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
+            SetVox();
+            if (MainWorldView.FBOid.IsForward())
+            {
+                GL.Uniform2(14, new Vector2(CVars.r_znear.ValueF, ZFar()));
+            }
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
             View3D.CheckError("Rendering - Sky - Clear");

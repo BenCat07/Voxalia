@@ -201,11 +201,6 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
                 {
                     TheClient.s_forw_particles = TheClient.s_forw_particles.Bind();
-                    GL.Uniform4(4, new Vector4(TheClient.MainWorldView.Width, TheClient.MainWorldView.Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
-                    GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
-                    GL.Uniform4(12, new Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
-                    GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
-                    GL.Uniform1(14, TheClient.ZFar());
                 }
                 else if (TheClient.MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
                 {
