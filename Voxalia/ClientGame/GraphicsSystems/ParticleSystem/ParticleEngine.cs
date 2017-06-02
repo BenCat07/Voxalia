@@ -122,7 +122,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 List<Vector3> pos = new List<Vector3>();
                 List<Vector4> col = new List<Vector4>();
                 List<Vector2> tcs = new List<Vector2>();
-                // TODO: If this gets too big, try to async it? Parallel.ForEach or similar could speed it up, in that situation! Would require a logic adjustment though.
+                // TODO: If this gets too big, try to async it? Parallel.ForEach or similar could speed it up, in that situation! Would require a logic adjustment though. (See cloud section!)
                 for (int i = 0; i < ActiveEffects.Count; i++)
                 {
                     if (ActiveEffects[i].Type == ParticleEffectType.SQUARE)
