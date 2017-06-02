@@ -1221,7 +1221,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                         CFrust = new Frustum(ClientUtilities.ConvertToD(Lights[i].InternalLights[x].GetMatrix()).ConvertD()); // TODO: One-step conversion!
                                     }
                                     CheckError("Pre-Prerender - Shadows - " + i);
-                                    CameraPos = ClientUtilities.ConvertD(Lights[i].InternalLights[x].eye);
+                                    CameraPos = ClientUtilities.ConvertD(Lights[i].InternalLights[x].eye) - campos;
                                     TheClient.s_shadowvox = TheClient.s_shadowvox.Bind();
                                     SetMatrix(2, Matrix4d.Identity);
                                     Lights[i].InternalLights[x].SetProj();
