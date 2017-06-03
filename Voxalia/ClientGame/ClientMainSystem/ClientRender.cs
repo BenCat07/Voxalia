@@ -1226,7 +1226,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
             if (MainWorldView.FBOid.IsForward())
             {
-                GL.Uniform2(13, new Vector2(30f, 30f));
                 GL.Uniform2(14, new Vector2(30f, 5000f));
             }
             View3D.CheckError("Rendering - Sky - PostPrep");
@@ -1995,6 +1994,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     }
                     View3D.CheckError("Rendering - 0 - Main");
                     TheRegion.RenderPlants();
+                    View3D.CheckError("Rendering - 0 - Plants");
                 }
                 else if (CVars.r_drawents.ValueB)
                 {
@@ -2040,6 +2040,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     Rendering.SetMinimumLight(1f);
                 }
+                View3D.CheckError("Rendering - 0 - EndF");
             }
             View3D.CheckError("Rendering - 1");
             SetEnts();

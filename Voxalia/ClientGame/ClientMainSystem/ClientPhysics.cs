@@ -191,6 +191,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         public Vector3i SunChunkPos = new Vector3i(int.MaxValue, int.MaxValue, int.MaxValue);
 
+        private Location pSunAng = Location.Zero;
+
         /// <summary>
         /// Ticks the region, including all primary calculations and lighting updates.
         /// </summary>
@@ -200,7 +202,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (rTicks >= CVars.r_shadowpace.ValueI)
             {
                 Vector3i playerChunkPos = TheRegion.ChunkLocFor(Player.GetPosition());
-                if (playerChunkPos != SunChunkPos) // TODO: Or sun/planet angle changed!
+                if (playerChunkPos != SunChunkPos || Math.Abs((SunAngle - pSunAng).BiggestValue()) > 0.1f)
                 {
                     SunChunkPos = playerChunkPos;
                     Location corPos = (SunChunkPos.ToLocation() * Constants.CHUNK_WIDTH) + new Location(Constants.CHUNK_WIDTH * 0.5);
