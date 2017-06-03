@@ -39,6 +39,23 @@ namespace Voxalia.ServerGame.WorldSystem
         }
 
         /// <summary>
+        /// This set of chunks is pushed at end of physics update.
+        /// </summary>
+        public HashSet<Chunk> PhysUpdatedPush = new HashSet<Chunk>();
+
+        /// <summary>
+        /// Run this after a set of physics updates has occured.
+        /// </summary>
+        public void PostPhysics()
+        {
+            foreach (Chunk ch in PhysUpdatedPush)
+            {
+                ChunkUpdateForAll(ch);
+            }
+            PhysUpdatedPush.Clear();
+        }
+
+        /// <summary>
         /// Sets a block and triggers physics around it.
         /// </summary>
         /// <param name="block">The block location.</param>
@@ -48,7 +65,8 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <param name="damage">Te damage to set to.</param>
         public void PhysicsSetBlock(Location block, Material mat, byte dat = 0, byte paint = 0, BlockDamage damage = BlockDamage.NONE)
         {
-            SetBlockMaterial(block, mat, dat, paint, (byte)(BlockFlags.EDITED | BlockFlags.NEEDS_RECALC), damage);
+            PhysUpdatedPush.Add(LoadChunk(ChunkLocFor(block)));
+            SetBlockMaterial(block, mat, dat, paint, (byte)(BlockFlags.EDITED | BlockFlags.NEEDS_RECALC), damage, false);
             PhysBlockAnnounce(block);
             if (mat.GetSolidity() != MaterialSolidity.FULLSOLID)
             {

@@ -122,12 +122,12 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 List<Vector3> pos = new List<Vector3>();
                 List<Vector4> col = new List<Vector4>();
                 List<Vector2> tcs = new List<Vector2>();
-                // TODO: If this gets too big, try to async it? Parallel.ForEach or similar could speed it up, in that situation! Would require a logic adjustment though.
+                // TODO: If this gets too big, try to async it? Parallel.ForEach or similar could speed it up, in that situation! Would require a logic adjustment though. (See cloud section!)
                 for (int i = 0; i < ActiveEffects.Count; i++)
                 {
                     if (ActiveEffects[i].Type == ParticleEffectType.SQUARE)
                     {
-                        double dist = ActiveEffects[i].Start(ActiveEffects[i]).DistanceSquared(TheClient.MainWorldView.CameraPos);
+                        double dist = ActiveEffects[i].Start(ActiveEffects[i]).DistanceSquared(TheClient.MainWorldView.RenderRelative);
                         if (dist < mindsq || dist >= maxdsq)
                         {
                             continue;
@@ -135,7 +135,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                         Tuple<Location, Vector4, Vector2> dets = ActiveEffects[i].GetDetails();
                         if (dets != null)
                         {
-                            pos.Add(ClientUtilities.Convert(dets.Item1 - TheClient.MainWorldView.CameraPos));
+                            pos.Add(ClientUtilities.Convert(dets.Item1 - TheClient.MainWorldView.RenderRelative));
                             if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
                             {
                                 col.Add(Vector4.Min(dets.Item2, Vector4.One));
@@ -175,12 +175,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                             pd.TCs = new Vector2[cloud.Points.Count];
                             for (int i = 0; i < cloud.Points.Count; i++)
                             {
-                                Location ppos = (cloud.Position + cloud.Points[i]) - TheClient.MainWorldView.CameraPos;
-                                double dist = ppos.DistanceSquared(TheClient.MainWorldView.CameraPos);
-                                if (dist < mindsq || dist >= maxdsq)
-                                {
-                                    // TODO: Fix this. List? -> continue;
-                                }
+                                Location ppos = (cloud.Position + cloud.Points[i]) - TheClient.MainWorldView.RenderRelative;
                                 pd.Poses[i] = ClientUtilities.Convert(ppos);
                                 pd.Cols[i] = Vector4.One; // TODO: Colored clouds?
                                 pd.TCs[i] = new Vector2(cloud.Sizes[i], cloudID);
@@ -201,11 +196,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
                 {
                     TheClient.s_forw_particles = TheClient.s_forw_particles.Bind();
-                    GL.Uniform4(4, new Vector4(TheClient.MainWorldView.Width, TheClient.MainWorldView.Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
-                    GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
-                    GL.Uniform4(12, new Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
-                    GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
-                    GL.Uniform1(14, TheClient.ZFar());
+                    GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
                 }
                 else if (TheClient.MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
                 {
@@ -238,9 +229,9 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     }
                     GL.ActiveTexture(TextureUnit.Texture1);
                     GL.BindTexture(TextureTarget.Texture2D, TheClient.MainWorldView.RS4P.DepthTexture);
+                    GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
                 }
                 View3D.CheckError("Rendering - Particles - 1");
-                GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
                 Matrix4 ident = Matrix4.Identity;
                 GL.UniformMatrix4(2, false, ref ident);
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -256,11 +247,11 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 View3D.CheckError("Rendering - Particles - 2");
                 Part_C = posind.Length;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Part_VBO_Pos);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * OpenTK.Vector3.SizeInBytes), posset, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * Vector3.SizeInBytes), posset, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Part_VBO_Tcs);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(texcoords.Length * OpenTK.Vector2.SizeInBytes), texcoords, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(texcoords.Length * Vector2.SizeInBytes), texcoords, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Part_VBO_Col);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colorset.Length * OpenTK.Vector4.SizeInBytes), colorset, BufferUsageHint.StaticDraw);
+                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colorset.Length * Vector4.SizeInBytes), colorset, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ElementArrayBuffer, Part_VBO_Ind);
                 GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(posind.Length * sizeof(uint)), posind, BufferUsageHint.StaticDraw);
                 GL.BindVertexArray(Part_VAO);

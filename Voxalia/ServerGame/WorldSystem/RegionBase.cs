@@ -212,6 +212,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
+            PostPhysics();
             opsat += Delta;
             while (opsat > 1.0)
             {

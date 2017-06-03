@@ -616,6 +616,11 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     return;
                 }
+                // TODO: If chunk previously could read downward, then still render downward (once, then forget that info)!
+                if (!ch.Reachability[(int)ChunkReachability.ZP_ZM])
+                {
+                    return;
+                }
                 Chunk below = GetChunk(ch.WorldPosition + new Vector3i(0, 0, -1));
                 if (below != null)
                 {
@@ -649,8 +654,8 @@ namespace Voxalia.ClientGame.WorldSystem
                 TheClient.s_forw_grass = TheClient.s_forw_grass.Bind();
                 GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
                 GL.Uniform4(12, new OpenTK.Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
-                GL.Uniform1(13, TheClient.CVars.r_znear.ValueF);
-                GL.Uniform1(14, TheClient.ZFar());
+                GL.Uniform2(13, new OpenTK.Vector2(TheClient.CVars.r_znear.ValueF, TheClient.CVars.r_znear.ValueF));
+                GL.Uniform2(14, new OpenTK.Vector2(TheClient.ZFar(), TheClient.ZFar()));
                 GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
             }
             else if (TheClient.MainWorldView.FBOid == FBOID.MAIN)
@@ -982,14 +987,15 @@ namespace Voxalia.ClientGame.WorldSystem
                     double range = arr[k].Value.GetLightEmitRange();
                     if (distsq < range * range)
                     {
+                        Location tPos = pos + norm * 0.5;
                         double dist = Math.Sqrt(distsq);
-                        Location rel_norm = (relCoord - pos) * (1.0 / dist);
+                        Location rel_norm = (relCoord - tPos) * (1.0 / dist);
                         Location o_p = pos.GetBlockLocation();
                         Location o_bp = blockPos.GetBlockLocation();
                         Location o_end = relCoord.GetBlockLocation();
                         for (int b = 0; b < dist; b++)
                         {
-                            Location p = (pos + rel_norm * b).GetBlockLocation();
+                            Location p = (tPos + rel_norm * b).GetBlockLocation();
                             if (p.DistanceSquared(o_p) < 1.0 || p.DistanceSquared(o_end) < 1.0 || p.DistanceSquared(o_bp) < 1.0)
                             {
                                 continue;
@@ -999,7 +1005,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                 goto skip;
                             }
                         }
-                        double norm_lit = dist < 2.0 ? 1.0 : Math.Max(norm.Dot(rel_norm), 0.0);
+                        double norm_lit = dist < 2.0 ? 1.0 : Math.Max(norm.Dot(rel_norm), 0.25);
                         lit += arr[k].Value.GetLightEmit() * Math.Max(Math.Min(1.0 - (dist / range), 1.0), 0.0) * norm_lit;
                         skip:
                         continue;

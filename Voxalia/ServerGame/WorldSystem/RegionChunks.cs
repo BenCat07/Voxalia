@@ -497,6 +497,10 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        /// <summary>
+        /// Updates a chunk for all players that can see it.
+        /// </summary>
+        /// <param name="chk">The relevant chunk.</param>
         public void ChunkUpdateForAll(Chunk chk)
         {
             for (int i = 0; i < Players.Count; i++)

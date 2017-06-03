@@ -21,7 +21,7 @@ For pull requests:
 - USUALLY, your pull request should fix an open issue.
 	- If there is no issue for it, please open one.
 	- If issues for it have been closed with a refusal statement, ensure you want to be making a PR at all before bothering with it. Generally, refused issues means PRs are also refused.
-		- The exception to this is when an issue is only partially related to what you're doing, or the issue was refused on grounds irrelevantized by your adaptation of it.
+		- The exception to this is when an issue is only partially related to what you're doing, or you believe in good faith that the issue was refused on grounds made irrelevant by your adaptation of it.
 			- In these cases, please open a new issue.
 
 ## Code Style / Formatting

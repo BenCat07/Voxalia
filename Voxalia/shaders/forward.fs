@@ -79,8 +79,8 @@ layout (location = 4) uniform vec4 screen_size = vec4(1024, 1024, 0.1, 1000.0);
 layout (location = 10) uniform vec3 sunlightDir = vec3(0.0, 0.0, -1.0);
 layout (location = 11) uniform vec3 maximum_light = vec3(0.9, 0.9, 0.9);
 layout (location = 12) uniform vec4 fogCol = vec4(0.0);
-layout (location = 13) uniform float znear = 1.0;
-layout (location = 14) uniform float zfar = 1000.0;
+layout (location = 13) uniform float fogDist = 1.0 / 100000.0;
+layout (location = 14) uniform vec2 zdist = vec2(1.0, 1000.0);
 layout (location = 15) uniform float lights_used = 0.0;
 layout (location = 16) uniform float minimum_light = 0.2;
 #if MCM_LIGHTS
@@ -93,13 +93,13 @@ layout (location = 1) out vec3 nrml;
 
 float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a linear distance (still from 0.0 to 1.0).
 {
-	return (2.0 * znear) / (zfar + znear - rinput * (zfar - znear));
+	return (2.0 * zdist.x) / (zdist.y + zdist.x - rinput * (zdist.y - zdist.x));
 }
 
 void applyFog()
 {
-	float dist = linearizeDepth(gl_FragCoord.z);
-	float fogMod = dist * exp(fogCol.w) * fogCol.w;
+	float dist = pow(dot(fi.pos, fi.pos) * fogDist, 0.6);
+	float fogMod = min(dist * exp(fogCol.w) * fogCol.w, 1.5);
 	float fmz = min(fogMod, 1.0);
 	color.xyz = min(color.xyz * (1.0 - fmz) + fogCol.xyz * fmz + vec3(fogMod - fmz), vec3(1.0));
 }
