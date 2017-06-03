@@ -56,9 +56,6 @@
     <Reference Include="BEPUutilities">
       <HintPath>..\FreneticGameEngine\FreneticGameCore\BEPUutilities.dll</HintPath>
     </Reference>
-    <Reference Include="Cloo">
-      <HintPath>.\Cloo.dll</HintPath>
-    </Reference>
     <Reference Include="csogg">
       <HintPath>csogg.dll</HintPath>
     </Reference>

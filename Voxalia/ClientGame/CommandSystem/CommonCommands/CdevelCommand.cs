@@ -25,7 +25,6 @@ using OpenTK;
 using BEPUphysics;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
-using Voxalia.ClientGame.ComputeSystem;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 
@@ -278,12 +277,6 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                 case "soundCount":
                     {
                         entry.Info(queue, "Sound effects: " + TheClient.Sounds.Effects.Count + ", playing now: " + TheClient.Sounds.PlayingNow.Count);
-                        break;
-                    }
-                case "testCl":
-                    {
-                        OpenCLTest cltes = new OpenCLTest() { TheClient = TheClient };
-                        cltes.Test();
                         break;
                     }
                 case "testCompute":
