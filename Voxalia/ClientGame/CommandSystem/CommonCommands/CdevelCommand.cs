@@ -26,6 +26,8 @@ using BEPUphysics;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
 using Voxalia.ClientGame.ComputeSystem;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {
@@ -282,6 +284,80 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                     {
                         OpenCLTest cltes = new OpenCLTest() { TheClient = TheClient };
                         cltes.Test();
+                        break;
+                    }
+                case "testCompute":
+                    {
+                        // Grab chunk
+                        Chunk ch = TheClient.TheRegion.GetChunk(TheClient.TheRegion.ChunkLocFor(TheClient.Player.GetPosition()));
+                        if (ch == null)
+                        {
+                            throw new Exception("Chunk is null!");
+                        }
+                        // Create voxel buffer data
+                        int VoxelBuffer = GL.GenBuffer();
+                        int[] temp = new int[ch.CSize * ch.CSize * ch.CSize * 4];
+                        for (int i = 0; i < temp.Length; i += 4)
+                        {
+                            BlockInternal bi = ch.BlocksInternal[i / 4];
+                            temp[i + 0] = bi._BlockMaterialInternal;
+                            temp[i + 1] = bi.BlockLocalData;
+                            temp[i + 2] = bi._BlockPaintInternal;
+                            temp[i + 3] = bi._BlockPaintInternal;
+                        }
+                        GL.BindBuffer(BufferTarget.ShaderStorageBuffer, VoxelBuffer);
+                        GL.BufferData(BufferTarget.ShaderStorageBuffer, temp.Length * sizeof(int), temp, BufferUsageHint.StaticDraw);
+                        View3D.CheckError("Compute - Prep 0");
+                        // Compile shader
+                        string ftxt = TheClient.Shaders.Includes(System.IO.File.ReadAllText("shaders/test.comp"));
+                        int shd = GL.CreateShader(ShaderType.ComputeShader);
+                        GL.ShaderSource(shd, ftxt);
+                        GL.CompileShader(shd);
+                        string SHD_Info = GL.GetShaderInfoLog(shd);
+                        GL.GetShader(shd, ShaderParameter.CompileStatus, out int SHD_Status);
+                        if (SHD_Status != 1)
+                        {
+                            throw new Exception("Error creating ComputeShader. Error status: " + SHD_Status + ", info: " +SHD_Info);
+                        }
+                        int program = GL.CreateProgram();
+                        GL.AttachShader(program, shd);
+                        GL.LinkProgram(program);
+                        string str = GL.GetProgramInfoLog(program);
+                        if (str.Length != 0)
+                        {
+                            SysConsole.Output(OutputType.INFO, "Linked shader with message: '" + str + "'" + " -- FOR -- " + ftxt);
+                        }
+                        GL.DeleteShader(shd);
+                        // Create a results buffer
+                        int resBuf = GL.GenBuffer();
+                        GL.BindBuffer(BufferTarget.AtomicCounterBuffer, resBuf);
+                        uint[] resses = new uint[1];
+                        GL.BufferData(BufferTarget.AtomicCounterBuffer, sizeof(int), resses, BufferUsageHint.StreamRead);
+                        GL.BindBuffer(BufferTarget.AtomicCounterBuffer, 0);
+                        View3D.CheckError("Compute - Prep A");
+                        // Run the shader
+                        GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, VoxelBuffer);
+                        GL.BindBufferBase(BufferRangeTarget.AtomicCounterBuffer, 2, resBuf);
+                        GL.UseProgram(program);
+                        GL.DispatchCompute(ch.CSize, ch.CSize, ch.CSize);
+                        GL.UseProgram(0);
+                        GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
+                        GL.BindBufferBase(BufferRangeTarget.AtomicCounterBuffer, 2, 0);
+                        View3D.CheckError("Compute - Run");
+                        // Gather results
+                        GL.Finish();
+                        GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
+                        GL.BindBuffer(BufferTarget.AtomicCounterBuffer, resBuf);
+                        GL.GetBufferSubData(BufferTarget.AtomicCounterBuffer, IntPtr.Zero, sizeof(int), resses);
+                        entry.Good(queue, "Got: " + resses[0] + " for chunk " + ch.WorldPosition + ", " + ch.CSize);
+                        GL.BindBuffer(BufferTarget.AtomicCounterBuffer, 0);
+                        View3D.CheckError("Compute - Read");
+                        // Clean up buffers
+                        GL.DeleteBuffer(VoxelBuffer);
+                        GL.DeleteBuffer(resBuf);
+                        // Clean up shader
+                        GL.DeleteProgram(program);
+                        View3D.CheckError("Compute - Shutdown");
                         break;
                     }
                 default:
