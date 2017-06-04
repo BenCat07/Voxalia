@@ -1,0 +1,71 @@
+#version 430
+
+layout(binding = 0, r32f) uniform readonly image2D texture_ids;
+
+layout(shared, binding = 1) buffer voxels
+{
+	uvec4[] posses;
+};
+
+layout(shared, binding = 2) buffer vertID
+{
+	uint[] vertsid;
+};
+
+layout(shared, binding = 3) buffer b_position
+{
+	vec4[] f_position;
+};
+layout(shared, binding = 4) buffer b_normal
+{
+	vec4[] f_normal;
+};
+layout(shared, binding = 5) buffer b_texcoord
+{
+	vec4[] f_texcoord;
+};
+layout(shared, binding = 6) buffer b_tangent
+{
+	vec4[] f_tangent;
+};
+layout(shared, binding = 7) buffer b_color
+{
+	vec4[] f_color;
+};
+layout(shared, binding = 8) buffer b_tcol
+{
+	vec4[] f_tcol;
+};
+layout(shared, binding = 9) buffer b_thv
+{
+	vec4[] f_thv;
+};
+layout(shared, binding = 10) buffer b_thw
+{
+	vec4[] f_thw;
+};
+layout(shared, binding = 11) buffer b_indices
+{
+	uint[] f_indices;
+};
+
+// TODO: Texture share helper!
+/*
+layout (location = 5) in vec4 tcol;
+layout (location = 6) in vec4 thv;
+layout (location = 7) in vec4 thw;
+layout (location = 8) in vec4 thv2;
+layout (location = 9) in vec4 thw2;
+*/
+
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in; // TODO: Fix!
+
+#define CRUNCHABLE 1
+#include vox_helper.inc
+
+void main()
+{
+	int counted = count_visible_verts(gl_GlobalInvocationID);
+	uint start = atomicAdd(vertsid[0], counted);
+	crunch_verts(gl_GlobalInvocationID, start);
+}

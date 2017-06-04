@@ -18,17 +18,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
 {
     public class ChunkVBO
     {
-        uint _VertexVBO;
-        uint _IndexVBO;
-        uint _NormalVBO;
-        uint _TexCoordVBO;
-        uint _ColorVBO;
-        uint _TCOLVBO;
-        uint _THVVBO;
-        uint _THWVBO;
-        uint _THV2VBO;
-        uint _THW2VBO;
-        uint _TangentVBO;
+        public uint _VertexVBO;
+        public uint _IndexVBO;
+        public uint _NormalVBO;
+        public uint _TexCoordVBO;
+        public uint _ColorVBO;
+        public uint _TCOLVBO;
+        public uint _THVVBO;
+        public uint _THWVBO;
+        public uint _THV2VBO;
+        public uint _THW2VBO;
+        public uint _TangentVBO;
         public int _VAO = -1;
 
         public Texture Tex;
@@ -98,6 +98,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public bool generated = false;
 
+        public bool reusable = true;
+
         public void Destroy()
         {
             if (generated)
@@ -151,8 +153,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             // TODO: Other arrays?
         }
 
-        bool colors;
-        bool tcols;
+        public bool colors;
+        public bool tcols;
 
         public Vector3[] verts = null;
         public uint[] indices = null;
@@ -238,7 +240,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public void GenerateOrUpdate()
         {
-            if (generated)
+            if (generated && reusable)
             {
                 UpdateBuffer();
             }
@@ -371,23 +373,23 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 this.tcols = true;
                 GL.GenBuffers(1, out _TCOLVBO);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _TCOLVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(tcols.Length * Vector4.SizeInBytes), tcols, BufferMode);
+                GL.BufferData(BufferTarget.ArrayBuffer, (tcols.Length * Vector4.SizeInBytes), tcols, BufferMode);
                 LastVRAM += tcols.Length * Vector4.SizeInBytes;
                 GL.GenBuffers(1, out _THVVBO);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _THVVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thvs.Length * Vector4.SizeInBytes), thvs, BufferMode);
+                GL.BufferData(BufferTarget.ArrayBuffer, (thvs.Length * Vector4.SizeInBytes), thvs, BufferMode);
                 LastVRAM += thvs.Length * Vector4.SizeInBytes;
                 GL.GenBuffers(1, out _THWVBO);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _THWVBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thws.Length * Vector4.SizeInBytes), thws, BufferMode);
+                GL.BufferData(BufferTarget.ArrayBuffer, (thws.Length * Vector4.SizeInBytes), thws, BufferMode);
                 LastVRAM += thws.Length * Vector4.SizeInBytes;
                 GL.GenBuffers(1, out _THV2VBO);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _THV2VBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thvs2.Length * Vector4.SizeInBytes), thvs2, BufferMode);
+                GL.BufferData(BufferTarget.ArrayBuffer, (thvs2.Length * Vector4.SizeInBytes), thvs2, BufferMode);
                 LastVRAM += thvs2.Length * Vector4.SizeInBytes;
                 GL.GenBuffers(1, out _THW2VBO);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, _THW2VBO);
-                GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(thws2.Length * Vector4.SizeInBytes), thws2, BufferMode);
+                GL.BufferData(BufferTarget.ArrayBuffer, (thws2.Length * Vector4.SizeInBytes), thws2, BufferMode);
                 LastVRAM += thws2.Length * Vector4.SizeInBytes;
             }
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
