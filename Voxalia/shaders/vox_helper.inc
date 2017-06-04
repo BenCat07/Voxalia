@@ -1,6 +1,10 @@
 
 // Helper for Voxels START
 
+// Requires glnoise.inc
+float snoise(in vec3 v);
+float snoise2(in vec3 v);
+
 uint blockID(in uvec3 pos)
 {
 	return pos.z * gl_NumWorkGroups.x * gl_NumWorkGroups.y + pos.y * gl_NumWorkGroups.x + pos.x;
@@ -60,6 +64,17 @@ int count_visible_verts(in uvec3 pos)
 }
 
 #if CRUNCHABLE
+float tex_for(in uint mat, in vec3 fpos, in int tp)
+{
+	float count = imageLoad(texture_ids, ivec2(mat, tp * 7)).x;
+	if (count < 1.5)
+	{
+		return imageLoad(texture_ids, ivec2(mat, 1 + tp * 7)).x;
+	}
+	int id = int(snoise2(fpos) * count);
+	return imageLoad(texture_ids, ivec2(mat, 1 + id + tp * 7)).x;
+}
+
 void crunch_verts(in uvec3 pos, in uint start)
 {
 	// TODO: Shapes support?
@@ -96,7 +111,7 @@ void crunch_verts(in uvec3 pos, in uint start)
 			f_thv[start + i] = vec4(0.0);
 			f_thw[start + i] = vec4(0.0);
 		}
-		float texID = imageLoad(texture_ids, ivec2(curBLK.x, 2)).x;
+		float texID = tex_for(curBLK.x, fpos, 2);
 		f_texcoord[start + 0] = vec4(1.0, 0.0, texID, 0.0);
 		f_texcoord[start + 1] = vec4(1.0, 1.0, texID, 0.0);
 		f_texcoord[start + 2] = vec4(0.0, 1.0, texID, 0.0);
@@ -124,7 +139,7 @@ void crunch_verts(in uvec3 pos, in uint start)
 			f_thv[start + i] = vec4(0.0);
 			f_thw[start + i] = vec4(0.0);
 		}
-		float texID = imageLoad(texture_ids, ivec2(curBLK.x, 4)).x;
+		float texID = tex_for(curBLK.x, fpos, 4);
 		f_texcoord[start + 0] = vec4(1.0, 1.0, texID, 0.0);
 		f_texcoord[start + 1] = vec4(0.0, 1.0, texID, 0.0);
 		f_texcoord[start + 2] = vec4(0.0, 0.0, texID, 0.0);
@@ -152,7 +167,7 @@ void crunch_verts(in uvec3 pos, in uint start)
 			f_thv[start + i] = vec4(0.0);
 			f_thw[start + i] = vec4(0.0);
 		}
-		float texID = imageLoad(texture_ids, ivec2(curBLK.x, 3)).x;
+		float texID = tex_for(curBLK.x, fpos, 3);
 		f_texcoord[start + 0] = vec4(1.0, 1.0, texID, 0.0);
 		f_texcoord[start + 1] = vec4(0.0, 1.0, texID, 0.0);
 		f_texcoord[start + 2] = vec4(0.0, 0.0, texID, 0.0);
@@ -180,7 +195,7 @@ void crunch_verts(in uvec3 pos, in uint start)
 			f_thv[start + i] = vec4(0.0);
 			f_thw[start + i] = vec4(0.0);
 		}
-		float texID = imageLoad(texture_ids, ivec2(curBLK.x, 5)).x;
+		float texID = tex_for(curBLK.x, fpos, 5);
 		f_texcoord[start + 0] = vec4(1.0, 0.0, texID, 0.0);
 		f_texcoord[start + 1] = vec4(1.0, 1.0, texID, 0.0);
 		f_texcoord[start + 2] = vec4(0.0, 1.0, texID, 0.0);
@@ -207,7 +222,7 @@ void crunch_verts(in uvec3 pos, in uint start)
 			f_thv[start + i] = vec4(0.0);
 			f_thw[start + i] = vec4(0.0);
 		}
-		float texID = imageLoad(texture_ids, ivec2(curBLK.x, 0)).x;
+		float texID = tex_for(curBLK.x, fpos, 0);
 		f_texcoord[start + 0] = vec4(0.0, 1.0, texID, 0.0);
 		f_texcoord[start + 1] = vec4(1.0, 1.0, texID, 0.0);
 		f_texcoord[start + 2] = vec4(0.0, 0.0, texID, 0.0);
@@ -234,7 +249,7 @@ void crunch_verts(in uvec3 pos, in uint start)
 			f_thv[start + i] = vec4(0.0);
 			f_thw[start + i] = vec4(0.0);
 		}
-		float texID = imageLoad(texture_ids, ivec2(curBLK.x, 1)).x;
+		float texID = tex_for(curBLK.x, fpos, 1);
 		f_texcoord[start + 0] = vec4(0.0, 0.0, texID, 0.0);
 		f_texcoord[start + 1] = vec4(1.0, 1.0, texID, 0.0);
 		f_texcoord[start + 2] = vec4(0.0, 1.0, texID, 0.0);

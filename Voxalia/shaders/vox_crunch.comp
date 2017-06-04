@@ -69,3 +69,5 @@ void main()
 	uint start = atomicAdd(vertsid[0], counted);
 	crunch_verts(gl_GlobalInvocationID, start);
 }
+
+#include glnoise.inc

@@ -50,9 +50,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Vector4[] BoneWeights = new Vector4[6];
             Vector4[] BoneIDs2 = new Vector4[6];
             Vector4[] BoneWeights2 = new Vector4[6];
+            Vector3[] tangs = new Vector3[6];
             for (uint n = 0; n < 6; n++)
             {
                 inds[n] = n;
+                tangs[n] = new Vector3(1, 0, 0);
                 norms[n] = new Vector3(0, 0, 1);
                 cols[n] = new Vector4(1, 1, 1, 1);
                 BoneIDs[n] = new Vector4(0, 0, 0, 0);
@@ -77,6 +79,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Vertices = vecs.ToList(),
                 Indices = inds.ToList(),
                 Normals = norms.ToList(),
+                Tangents = tangs.ToList(),
                 TexCoords = texs.ToList(),
                 Colors = cols.ToList(),
                 BoneIDs = BoneIDs.ToList(),
@@ -98,7 +101,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             for (uint u = 0; u < 2; u++)
             {
                 inds[u] = u;
-                tangs[u] = new Vector3(0f, 0f, 0f);
+                tangs[u] = new Vector3(1f, 0f, 0f);
             }
             for (int n = 0; n < 2; n++)
             {
@@ -128,6 +131,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Vertices = vecs.ToList(),
                 Indices = inds.ToList(),
                 Normals = norms.ToList(),
+                Tangents = tangs.ToList(),
                 TexCoords = texs.ToList(),
                 Colors = cols.ToList(),
                 BoneIDs = BoneIDs.ToList(),
@@ -206,6 +210,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Vertices = vecs.ToList(),
                 Indices = inds.ToList(),
                 Normals = norms.ToList(),
+                Tangents = tangs.ToList(),
                 TexCoords = texs.ToList(),
                 Colors = cols.ToList(),
                 BoneIDs = BoneIDs.ToList(),

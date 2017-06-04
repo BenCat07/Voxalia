@@ -30,23 +30,29 @@ namespace Voxalia.ClientGame.OtherSystems
             Program_Counter = TheClient.Shaders.CompileCompute("vox_count");
             Program_Cruncher = TheClient.Shaders.CompileCompute("vox_crunch");
             View3D.CheckError("Compute - Startup - Shaders");
-            int levels = TheClient.CVars.r_block_mipmaps.ValueB ? 4 : 1;
-            float[] df = new float[MaterialHelpers.ALL_MATS.Count * 6];
+            float[] df = new float[MaterialHelpers.ALL_MATS.Count * 7 * 6];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
             {
                 for (int x = 0; x < 6; x++)
                 {
-                    df[x * MaterialHelpers.ALL_MATS.Count + i] = MaterialHelpers.ALL_MATS[i].TID[x][0]; // TODO: Represent full range of random options somehow? Maybe make the texture taller via multiplication by max height of this value?
+                    int cnt = Math.Min(6, MaterialHelpers.ALL_MATS[i].TID[x].Length);
+                    for (int y = 0; y < cnt; y++)
+                    {
+                        df[(1 + y + x * 7) * MaterialHelpers.ALL_MATS.Count + i] = MaterialHelpers.ALL_MATS[i].TID[x][y];
+                    }
+                    df[(x * 7) * MaterialHelpers.ALL_MATS.Count + i] = cnt;
                 }
             }
             Texture_IDs = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Texture_IDs);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, MaterialHelpers.ALL_MATS.Count, 6, 0, PixelFormat.Red, PixelType.Float, df);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, MaterialHelpers.ALL_MATS.Count, 6 * 7, 0, PixelFormat.Red, PixelType.Float, df);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             GL.BindTexture(TextureTarget.Texture2D, 0);
+            GL.Finish();
+            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             View3D.CheckError("Compute - Startup - Texture");
         }
 
@@ -137,12 +143,10 @@ namespace Voxalia.ClientGame.OtherSystems
             // Compute!
             GL.UseProgram(Program_Cruncher);
             GL.BindImageTexture(0, Texture_IDs, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
-            GL.Finish();
-            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             GL.DispatchCompute(ch.CSize, ch.CSize, ch.CSize);
             GL.UseProgram(0);
-            GL.Finish();
-            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
+            //GL.Finish();
+            //GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             View3D.CheckError("Compute - Crunch");
             // Unbind new buffers
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
@@ -158,6 +162,7 @@ namespace Voxalia.ClientGame.OtherSystems
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 11, 0);
             View3D.CheckError("Compute - End Buffs");
             // OPTIONAL, REMOVE ME:
+#if EXTRA_DEBUG
             {
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[8]);
                 uint[] rd = new uint[16];
@@ -190,6 +195,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 SysConsole.Output(OutputType.DEBUG, "Found " + resses[0]);
             }
+#endif
             // Prep VAO
             int vao = GL.GenVertexArray();
             GL.BindVertexArray(vao);
