@@ -288,7 +288,17 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         }
                         VoxelComputeEngine vce = new VoxelComputeEngine();
                         vce.Init(TheClient);
-                        entry.Good(queue, "Got: " + vce.Calc(ch));
+                        vce.Calc(ch);
+                        entry.Good(queue, "Took: " + vce.sw1.ElapsedMilliseconds + " / " + vce.sw2.ElapsedMilliseconds + " / " + vce.sw3.ElapsedMilliseconds);
+                        vce.Destroy();
+                        break;
+                    }
+                case "testComputeAll":
+                    {
+                        VoxelComputeEngine vce = new VoxelComputeEngine();
+                        vce.Init(TheClient);
+                        vce.Calc(TheClient.TheRegion.LoadedChunks.Values.ToArray());
+                        entry.Good(queue, "Took: " + vce.sw1.ElapsedMilliseconds + " / " + vce.sw2.ElapsedMilliseconds + " / " + vce.sw3.ElapsedMilliseconds);
                         vce.Destroy();
                         break;
                     }

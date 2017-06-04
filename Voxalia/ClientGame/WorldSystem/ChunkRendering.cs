@@ -28,6 +28,14 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public ChunkVBO _VBOTransp = null;
 
+        public int[] VoxelDataForRender = null;
+
+        public int CountForRender = -1;
+
+        public int Render_VoxelBuffer = -1;
+
+        public int Render_ResBuf = -1;
+
         // TODO: Possibly store world locations rather than local block locs?
         public KeyValuePair<Vector3i, Material>[] Lits = new KeyValuePair<Vector3i, Material>[0];
 
