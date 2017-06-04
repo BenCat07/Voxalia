@@ -289,7 +289,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         VoxelComputeEngine vce = new VoxelComputeEngine();
                         vce.Init(TheClient);
                         vce.Calc(ch);
-                        entry.Good(queue, "Took: " + vce.sw1.ElapsedMilliseconds + " (" + vce.sw1a.ElapsedMilliseconds + " / " + vce.sw2.ElapsedMilliseconds + " / " + vce.sw3.ElapsedMilliseconds);
+                        entry.Good(queue, "Took: " + vce.sw1.ElapsedMilliseconds + " (" + vce.sw1a.ElapsedMilliseconds + ") / " + vce.sw2.ElapsedMilliseconds + " / " + vce.sw3.ElapsedMilliseconds);
                         vce.Destroy();
                         break;
                     }

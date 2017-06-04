@@ -1,0 +1,60 @@
+#version 430 core
+
+layout(shared, binding = 0) buffer voxels
+{
+	uvec4[] posses;
+};
+
+layout(shared, binding = 1) buffer voxelsC
+{
+	uvec4[] possesC;
+};
+layout(shared, binding = 2) buffer voxelsXP
+{
+	uvec4[] possesXP;
+};
+layout(shared, binding = 3) buffer voxelsXM
+{
+	uvec4[] possesXM;
+};
+layout(shared, binding = 4) buffer voxelsYP
+{
+	uvec4[] possesYP;
+};
+layout(shared, binding = 5) buffer voxelsYM
+{
+	uvec4[] possesYM;
+};
+layout(shared, binding = 6) buffer voxelsZP
+{
+	uvec4[] possesZP;
+};
+layout(shared, binding = 7) buffer voxelsZM
+{
+	uvec4[] possesZM;
+};
+
+layout(local_size_x = MCM_VOX_COUNT, local_size_y = 1, local_size_z = MCM_VOX_COUNT) in;
+
+uint blockID(in uvec3 pos)
+{
+	return pos.z * (gl_WorkGroupSize.x * gl_NumWorkGroups.y) + pos.y * gl_WorkGroupSize.x + pos.x;
+}
+
+uint blkSize()
+{
+	return gl_WorkGroupSize.x * gl_NumWorkGroups.y * gl_WorkGroupSize.z;
+}
+
+void main()
+{
+	uint id = blockID(gl_GlobalInvocationID);
+	uint count = blkSize();
+	posses[id] = possesC[id];
+	posses[count * 1 + id] = possesXM[id];
+	posses[count * 2 + id] = possesXP[id];
+	posses[count * 3 + id] = possesYM[id];
+	posses[count * 4 + id] = possesYP[id];
+	posses[count * 5 + id] = possesZM[id];
+	posses[count * 6 + id] = possesZP[id];
+}

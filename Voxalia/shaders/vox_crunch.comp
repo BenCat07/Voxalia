@@ -32,6 +32,7 @@ layout(shared, binding = 7) buffer b_color
 {
 	vec4[] f_color;
 };
+// TODO: past this point = Separate pass, due to OpenGL SSBO binding limits?
 layout(shared, binding = 8) buffer b_tcol
 {
 	vec4[] f_tcol;
@@ -49,11 +50,8 @@ layout(shared, binding = 11) buffer b_indices
 	uint[] f_indices;
 };
 
-// TODO: Texture share helper!
+// TODO: Other texture share helper!
 /*
-layout (location = 5) in vec4 tcol;
-layout (location = 6) in vec4 thv;
-layout (location = 7) in vec4 thw;
 layout (location = 8) in vec4 thv2;
 layout (location = 9) in vec4 thw2;
 */

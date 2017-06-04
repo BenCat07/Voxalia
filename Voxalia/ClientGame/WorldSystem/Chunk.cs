@@ -103,6 +103,16 @@ namespace Voxalia.ClientGame.WorldSystem
                 OwningRegion.RemoveChunkQuiet(FCO);
                 IsAdded = false;
             }
+            if (Render_VoxelBuffer != null)
+            {
+                for (int i = 0; i < Render_VoxelBuffer.Length; i++)
+                {
+                    if (Render_VoxelBuffer[i] > 0)
+                    {
+                        GL.DeleteBuffer(Render_VoxelBuffer[i]);
+                    }
+                }
+            }
             DestroyVBO(_VBOSolid);
             DestroyVBO(_VBOTransp);
             _VBOSolid = null;
