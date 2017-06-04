@@ -40,13 +40,13 @@ namespace Voxalia.ClientGame.OtherSystems
                 }
             }
             Texture_IDs = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2DArray, Texture_IDs);
+            GL.BindTexture(TextureTarget.Texture2D, Texture_IDs);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, MaterialHelpers.ALL_MATS.Count, 6, 0, PixelFormat.Red, PixelType.Float, df);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-            GL.BindTexture(TextureTarget.Texture2DArray, 0);
+            GL.BindTexture(TextureTarget.Texture2D, 0);
             View3D.CheckError("Compute - Startup - Texture");
         }
 
@@ -137,6 +137,8 @@ namespace Voxalia.ClientGame.OtherSystems
             // Compute!
             GL.UseProgram(Program_Cruncher);
             GL.BindImageTexture(0, Texture_IDs, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
+            GL.Finish();
+            GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
             GL.DispatchCompute(ch.CSize, ch.CSize, ch.CSize);
             GL.UseProgram(0);
             GL.Finish();
