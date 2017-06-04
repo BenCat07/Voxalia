@@ -5,7 +5,15 @@ layout(shared, binding = 1) buffer voxels
 	uvec4[] posses;
 };
 
-layout(binding = 2, offset = 0) uniform atomic_uint posCount;
+layout(shared, binding = 2) buffer counterBuffer
+{
+	uint[] counterval;
+};
+
+layout(shared, binding = 3) buffer indexmarkers
+{
+	uint[] indexmark;
+};
 
 layout(local_size_x = MCM_VOX_COUNT, local_size_y = 1, local_size_z = MCM_VOX_COUNT) in;
 
@@ -14,8 +22,12 @@ layout(local_size_x = MCM_VOX_COUNT, local_size_y = 1, local_size_z = MCM_VOX_CO
 void main()
 {
 	int counted = count_visible_verts(gl_GlobalInvocationID);
-	for (int i = 0; i < counted; i++)
+	if (counted > 0)
 	{
-		atomicCounterIncrement(posCount);
+		indexmark[blockID(gl_GlobalInvocationID)] = atomicAdd(counterval[0], counted) + 1;
+	}
+	else
+	{
+		indexmark[blockID(gl_GlobalInvocationID)] = 0;
 	}
 }

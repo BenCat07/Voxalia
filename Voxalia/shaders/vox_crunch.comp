@@ -6,12 +6,46 @@ layout(shared, binding = 1) buffer voxels
 {
 	uvec4[] posses;
 };
-
-layout(shared, binding = 2) buffer vertID
+layout(shared, binding = 2) buffer b_indexmarkers
 {
-	uint[] vertsid;
+	uint[] f_indexmark;
 };
 
+#if MODE_THREE
+layout(shared, binding = 3) buffer b_thv
+{
+	vec4[] f_thv;
+};
+layout(shared, binding = 4) buffer b_thw
+{
+	vec4[] f_thw;
+};
+// TODO: Add set 2 of TH data
+/*
+layout(shared, binding = 5) buffer b_thv2
+{
+	vec4[] f_thv2;
+};
+layout(shared, binding = 6) buffer b_thw2
+{
+	vec4[] f_thw2;
+};
+*/
+#else
+#if MODE_TWO
+layout(shared, binding = 3) buffer b_color
+{
+	vec4[] f_color;
+};
+layout(shared, binding = 4) buffer b_tcol
+{
+	vec4[] f_tcol;
+};
+layout(shared, binding = 5) buffer b_indices
+{
+	uint[] f_indices;
+};
+#else // MODE_ONE
 layout(shared, binding = 3) buffer b_position
 {
 	vec4[] f_position;
@@ -28,33 +62,10 @@ layout(shared, binding = 6) buffer b_tangent
 {
 	vec4[] f_tangent;
 };
-layout(shared, binding = 7) buffer b_color
-{
-	vec4[] f_color;
-};
-// TODO: past this point = Separate pass, due to OpenGL SSBO binding limits?
-layout(shared, binding = 8) buffer b_tcol
-{
-	vec4[] f_tcol;
-};
-layout(shared, binding = 9) buffer b_thv
-{
-	vec4[] f_thv;
-};
-layout(shared, binding = 10) buffer b_thw
-{
-	vec4[] f_thw;
-};
-layout(shared, binding = 11) buffer b_indices
-{
-	uint[] f_indices;
-};
+#endif
+#endif
 
-// TODO: Other texture share helper!
-/*
-layout (location = 8) in vec4 thv2;
-layout (location = 9) in vec4 thw2;
-*/
+// TODO: block shape data buffer!
 
 layout(local_size_x = MCM_VOX_COUNT, local_size_y = 1, local_size_z = MCM_VOX_COUNT) in;
 
@@ -63,9 +74,11 @@ layout(local_size_x = MCM_VOX_COUNT, local_size_y = 1, local_size_z = MCM_VOX_CO
 
 void main()
 {
-	int counted = count_visible_verts(gl_GlobalInvocationID);
-	uint start = atomicAdd(vertsid[0], counted);
-	crunch_verts(gl_GlobalInvocationID, start);
+	uint start = f_indexmark[blockID(gl_GlobalInvocationID)];
+	if (start != 0)
+	{
+		crunch_verts(gl_GlobalInvocationID, start - 1);
+	}
 }
 
 #include glnoise.inc
