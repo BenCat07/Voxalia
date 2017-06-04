@@ -23,7 +23,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Biomes
 
         public override double AirDensity()
         {
-            return 0.7f;
+            return 0.3f;
         }
     }
 }

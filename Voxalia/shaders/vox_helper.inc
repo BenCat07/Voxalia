@@ -5,6 +5,11 @@
 float snoise(in vec3 v);
 float snoise2(in vec3 v);
 
+uint blkSize()
+{
+	return gl_NumWorkGroups.x * gl_NumWorkGroups.y * gl_NumWorkGroups.z;
+}
+
 uint blockID(in uvec3 pos)
 {
 	return pos.z * gl_NumWorkGroups.x * gl_NumWorkGroups.y + pos.y * gl_NumWorkGroups.x + pos.x;
@@ -29,12 +34,12 @@ int count_visible_verts(in uvec3 pos)
 	{
 		return 0;
 	}
-	uvec4 cbXP = pos.x + 1 == gl_NumWorkGroups.x ? uvec4(0) : posses[blockID(uvec3(pos.x + 1, pos.y, pos.z))];
-	uvec4 cbXM = pos.x == 0 ? uvec4(0) : posses[blockID(uvec3(pos.x - 1, pos.y, pos.z))];
-	uvec4 cbYP = pos.y + 1 == gl_NumWorkGroups.y ? uvec4(0) : posses[blockID(uvec3(pos.x, pos.y + 1, pos.z))];
-	uvec4 cbYM = pos.y == 0 ? uvec4(0) : posses[blockID(uvec3(pos.x, pos.y - 1, pos.z))];
-	uvec4 cbZP = pos.z + 1 == gl_NumWorkGroups.z ? uvec4(0) : posses[blockID(uvec3(pos.x, pos.y, pos.z + 1))];
-	uvec4 cbZM = pos.z == 0 ? uvec4(0) : posses[blockID(uvec3(pos.x , pos.y, pos.z - 1))];
+	uvec4 cbXP = pos.x + 1 == gl_NumWorkGroups.x ? posses[blkSize() * 2 + blockID(uvec3(0, pos.y, pos.z))] : posses[blockID(uvec3(pos.x + 1, pos.y, pos.z))];
+	uvec4 cbXM = pos.x == 0 ? posses[blkSize() * 1 + blockID(uvec3(gl_NumWorkGroups.x - 1, pos.y, pos.z))] : posses[blockID(uvec3(pos.x - 1, pos.y, pos.z))];
+	uvec4 cbYP = pos.y + 1 == gl_NumWorkGroups.y ? posses[blkSize() * 4 + blockID(uvec3(pos.x, 0, pos.z))] : posses[blockID(uvec3(pos.x, pos.y + 1, pos.z))];
+	uvec4 cbYM = pos.y == 0 ? posses[blkSize() * 3 + blockID(uvec3(pos.x, gl_NumWorkGroups.y - 1, pos.z))] : posses[blockID(uvec3(pos.x, pos.y - 1, pos.z))];
+	uvec4 cbZP = pos.z + 1 == gl_NumWorkGroups.z ? posses[blkSize() * 6 + blockID(uvec3(pos.x, pos.y, 0))] : posses[blockID(uvec3(pos.x, pos.y, pos.z + 1))];
+	uvec4 cbZM = pos.z == 0 ? posses[blkSize() * 5 + blockID(uvec3(pos.x, pos.y, gl_NumWorkGroups.z - 1))] : posses[blockID(uvec3(pos.x, pos.y, pos.z - 1))];
 	int res = 0;
 	if (!isOpaque(cbXP))
 	{
@@ -84,12 +89,12 @@ void crunch_verts(in uvec3 pos, in uint start)
 	{
 		return;
 	}
-	uvec4 cbXP = pos.x + 1 == gl_NumWorkGroups.x ? uvec4(0) : posses[blockID(uvec3(pos.x + 1, pos.y, pos.z))];
-	uvec4 cbXM = pos.x == 0 ? uvec4(0) : posses[blockID(uvec3(pos.x - 1, pos.y, pos.z))];
-	uvec4 cbYP = pos.y + 1 == gl_NumWorkGroups.y ? uvec4(0) : posses[blockID(uvec3(pos.x, pos.y + 1, pos.z))];
-	uvec4 cbYM = pos.y == 0 ? uvec4(0) : posses[blockID(uvec3(pos.x, pos.y - 1, pos.z))];
-	uvec4 cbZP = pos.z + 1 == gl_NumWorkGroups.z ? uvec4(0) : posses[blockID(uvec3(pos.x, pos.y, pos.z + 1))];
-	uvec4 cbZM = pos.z == 0 ? uvec4(0) : posses[blockID(uvec3(pos.x , pos.y, pos.z - 1))];
+	uvec4 cbXP = pos.x + 1 == gl_NumWorkGroups.x ? posses[blkSize() * 2 + blockID(uvec3(0, pos.y, pos.z))] : posses[blockID(uvec3(pos.x + 1, pos.y, pos.z))];
+	uvec4 cbXM = pos.x == 0 ? posses[blkSize() * 1 + blockID(uvec3(gl_NumWorkGroups.x - 1, pos.y, pos.z))] : posses[blockID(uvec3(pos.x - 1, pos.y, pos.z))];
+	uvec4 cbYP = pos.y + 1 == gl_NumWorkGroups.y ? posses[blkSize() * 4 + blockID(uvec3(pos.x, 0, pos.z))] : posses[blockID(uvec3(pos.x, pos.y + 1, pos.z))];
+	uvec4 cbYM = pos.y == 0 ? posses[blkSize() * 3 + blockID(uvec3(pos.x, gl_NumWorkGroups.y - 1, pos.z))] : posses[blockID(uvec3(pos.x, pos.y - 1, pos.z))];
+	uvec4 cbZP = pos.z + 1 == gl_NumWorkGroups.z ? posses[blkSize() * 6 + blockID(uvec3(pos.x, pos.y, 0))] : posses[blockID(uvec3(pos.x, pos.y, pos.z + 1))];
+	uvec4 cbZM = pos.z == 0 ? posses[blkSize() * 5 + blockID(uvec3(pos.x, pos.y, gl_NumWorkGroups.z - 1))] : posses[blockID(uvec3(pos.x, pos.y, pos.z - 1))];
 	int res = 0;
 	vec3 fpos = vec3(pos);
 	if (!isOpaque(cbXP))

@@ -48,7 +48,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 
         public virtual double AirDensity()
         {
-            return 0.8f;
+            return 0.2f;
         }
 
         public override Material GetZeroOrLowerMat()

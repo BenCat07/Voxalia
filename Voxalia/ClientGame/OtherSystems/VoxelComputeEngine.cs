@@ -11,6 +11,7 @@ using OpenTK.Graphics;
 using FreneticGameCore;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ClientGame.OtherSystems
 {
@@ -56,20 +57,40 @@ namespace Voxalia.ClientGame.OtherSystems
             View3D.CheckError("Compute - Startup - Texture");
         }
 
+        public static readonly Vector3i[] Relatives = new Vector3i[]
+        {
+            new Vector3i(0, 0, 0),
+            new Vector3i(-1, 0, 0), new Vector3i(1, 0, 0),
+            new Vector3i(0, -1, 0), new Vector3i(0, 1, 0),
+            new Vector3i(0, 0, -1), new Vector3i(0, 0, 1)
+        };
+
         const BufferUsageHint hintter = BufferUsageHint.DynamicRead;
 
         public int Calc(Chunk ch)
         {
             // Create voxel buffer data
             int VoxelBuffer = GL.GenBuffer();
-            int[] temp = new int[ch.CSize * ch.CSize * ch.CSize * 4];
-            for (int i = 0; i < temp.Length; i += 4)
+            int len = ch.CSize * ch.CSize * ch.CSize * 4;
+            int[] temp = new int[len * 7];
+            for (int x = 0; x < Relatives.Length; x++)
             {
-                BlockInternal bi = ch.BlocksInternal[i / 4];
-                temp[i + 0] = bi._BlockMaterialInternal;
-                temp[i + 1] = bi.BlockLocalData;
-                temp[i + 2] = bi.BlockData;
-                temp[i + 3] = bi._BlockPaintInternal;
+                Chunk rel = x == 0 ? ch : TheClient.TheRegion.GetChunk(ch.WorldPosition + Relatives[x]);
+                for (int rz = 0; rz < ch.CSize; rz++)
+                {
+                    for (int ry = 0; ry < ch.CSize; ry++)
+                    {
+                        for (int rx = 0; rx < ch.CSize; rx++)
+                        {
+                            BlockInternal bi = rel == null ? new BlockInternal((ushort)Material.STONE, 0, 0, 0) : ch.GetLODRelative(rel, rx, ry, rz);
+                            int ind = (rz * (ch.CSize * ch.CSize) + ry * ch.CSize + rx) * 4;
+                            temp[x * len + ind + 0] = bi._BlockMaterialInternal;
+                            temp[x * len + ind + 1] = bi.BlockLocalData;
+                            temp[x * len + ind + 2] = bi.BlockData;
+                            temp[x * len + ind + 3] = bi._BlockPaintInternal;
+                        }
+                    }
+                }
             }
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, VoxelBuffer);
             GL.BufferData(BufferTarget.ShaderStorageBuffer, temp.Length * sizeof(int), temp, BufferUsageHint.StaticDraw);

@@ -29,7 +29,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Biomes
 
         public override Material BaseBlock()
         {
-            return base.BaseBlock();
+            return Material.SANDSTONE;
         }
     }
 }

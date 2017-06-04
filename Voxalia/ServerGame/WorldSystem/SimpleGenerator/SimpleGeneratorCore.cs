@@ -228,13 +228,13 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         public bool CanBeSolid(int seed3, int seed4, int seed5, int x, int y, int z, SimpleBiome biome)
         {
             // TODO: better non-simplex code?!
-            double val = SimplexNoise.Generate((double)seed3 + (x / SolidityMapSize), (double)seed4 + (y / SolidityMapSize), (double)seed5 + (z / SolidityMapSize));
-            return val < biome.AirDensity();
+            double val = SimplexNoise.Generate(seed3 + (x / SolidityMapSize), seed4 + (y / SolidityMapSize), seed5 + (z / SolidityMapSize));
+            return val > biome.AirDensity();
         }
 
         public double GetHeightQuick(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y)
         {
-            double mheight = SimplexNoise.Generate((double)seed4 + (x / MountainHeightMapSize), (double)seed3 + (y / MountainHeightMapSize)) * 2f - 1f;
+            double mheight = SimplexNoise.Generate(seed4 + (x / MountainHeightMapSize), seed3 + (y / MountainHeightMapSize)) * 2f - 1f;
             if (mheight > 0.9)
             {
                 mheight = (mheight - 0.9) * 7000f;
@@ -243,8 +243,8 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 mheight = (mheight + 0.9) * 4000f;
             }
-            double lheight = SimplexNoise.Generate((double)seed2 + (x / GlobalHeightMapSize), (double)Seed + (y / GlobalHeightMapSize)) * 50f - 10f;
-            double height = SimplexNoise.Generate((double)Seed + (x / LocalHeightMapSize), (double)seed2 + (y / LocalHeightMapSize)) * 6f - 3f;
+            double lheight = SimplexNoise.Generate(seed2 + (x / GlobalHeightMapSize), Seed + (y / GlobalHeightMapSize)) * 50f - 10f;
+            double height = SimplexNoise.Generate(Seed + (x / LocalHeightMapSize), seed2 + (y / LocalHeightMapSize)) * 6f - 3f;
             return mheight + lheight + height;
         }
         
@@ -391,7 +391,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                             byte shape = 0;
                             if (typex != Material.AIR)
                             {
-                                shape = OreShapes[new Random((int)((hheight + cx + cy + cpos.Z + z) * 5)).Next(OreShapes.Length)];
+                                shape = OreShapes[new MTRandom(39, (ulong)((hheight + cx + cy + cpos.Z + z) * 5)).Next(OreShapes.Length)];
                             }
                             //bool choice = SimplexNoise.Generate(cx / 10f, cy / 10f, ((double)cpos.Z + z) / 10f) >= 0.5f;
                             chunk.BlocksInternal[chunk.BlockIndex(x, y, z)] = new BlockInternal((ushort)(typex == Material.AIR ? (/*choice ? basb2 : */basb) : typex), shape, 0, 0);

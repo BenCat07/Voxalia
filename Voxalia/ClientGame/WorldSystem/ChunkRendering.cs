@@ -234,7 +234,7 @@ namespace Voxalia.ClientGame.WorldSystem
         new Vector3i(-1, 1, 0), new Vector3i(0, -1, 1), new Vector3i(-1, 0, 1), new Vector3i(1, 1, 1), new Vector3i(-1, 1, 1), new Vector3i(1, -1, 1), new Vector3i(1, 1, -1), new Vector3i(-1, -1, 1),
         new Vector3i(-1, 1, -1), new Vector3i(1, -1, -1) };
 
-        BlockInternal GetLODRelative(Chunk c, int x, int y, int z)
+        public BlockInternal GetLODRelative(Chunk c, int x, int y, int z)
         {
             if (c.PosMultiplier == PosMultiplier)
             {
