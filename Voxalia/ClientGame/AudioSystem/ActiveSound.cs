@@ -168,6 +168,12 @@ namespace Voxalia.ClientGame.AudioSystem
 
         public void Seek(float f)
         {
+            if (Engine.AudioInternal != null)
+            {
+                int samp = (int)(AudioInternal.Clip.Data.Length * f);
+                AudioInternal.CurrentSample = samp - samp % 4;
+                return;
+            }
             // TODO: Enforcer!
             if (Src < 0)
             {
@@ -228,6 +234,7 @@ namespace Voxalia.ClientGame.AudioSystem
         {
             if (Engine.AudioInternal != null)
             {
+                AudioInternal.State = AudioState.STOP;
                 return;
             }
             if (Src < 0)
