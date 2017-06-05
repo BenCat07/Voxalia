@@ -184,7 +184,7 @@ namespace Voxalia.ClientGame.AudioSystem
             DeafLoop.LastUse = TheClient.GlobalTickTimeLocal;
             for (int i = 0; i < PlayingNow.Count; i++)
             {
-                if (!PlayingNow[i].Exists || PlayingNow[i].Src < 0 || (AudioInternal == null ? AL.GetSourceState(PlayingNow[i].Src) == ALSourceState.Stopped : PlayingNow[i].AudioInternal.State == AudioState.DONE))
+                if (!PlayingNow[i].Exists || (AudioInternal == null && PlayingNow[i].Src < 0) || (AudioInternal == null ? AL.GetSourceState(PlayingNow[i].Src) == ALSourceState.Stopped : PlayingNow[i].AudioInternal.State == AudioState.DONE))
                 {
                     PlayingNow[i].Destroy();
                     if (AudioInternal == null)
