@@ -286,20 +286,24 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                         {
                             throw new Exception("Chunk is null!");
                         }
-                        VoxelComputeEngine vce = new VoxelComputeEngine();
-                        vce.Init(TheClient);
-                        vce.Calc(ch);
-                        entry.Good(queue, "Took: " + vce.sw1.ElapsedMilliseconds + " (" + vce.sw1a.ElapsedMilliseconds + ") / " + vce.sw2.ElapsedMilliseconds + " / " + vce.sw3.ElapsedMilliseconds);
-                        vce.Destroy();
+                        TheClient.VoxelComputer.sw1.Reset();
+                        TheClient.VoxelComputer.sw1a.Reset();
+                        TheClient.VoxelComputer.sw2.Reset();
+                        TheClient.VoxelComputer.sw3.Reset();
+                        TheClient.VoxelComputer.Calc(ch);
+                        entry.Good(queue, "Took: " + TheClient.VoxelComputer.sw1.ElapsedMilliseconds + " (" + TheClient.VoxelComputer.sw1a.ElapsedMilliseconds + ") / "
+                            + TheClient.VoxelComputer.sw2.ElapsedMilliseconds + " / " + TheClient.VoxelComputer.sw3.ElapsedMilliseconds);
                         break;
                     }
                 case "testComputeAll":
                     {
-                        VoxelComputeEngine vce = new VoxelComputeEngine();
-                        vce.Init(TheClient);
-                        vce.Calc(TheClient.TheRegion.LoadedChunks.Values.ToArray());
-                        entry.Good(queue, "Took: " + vce.sw1.ElapsedMilliseconds + " (" + vce.sw1a.ElapsedMilliseconds + ") / " + vce.sw2.ElapsedMilliseconds + " / " + vce.sw3.ElapsedMilliseconds);
-                        vce.Destroy();
+                        TheClient.VoxelComputer.sw1.Reset();
+                        TheClient.VoxelComputer.sw1a.Reset();
+                        TheClient.VoxelComputer.sw2.Reset();
+                        TheClient.VoxelComputer.sw3.Reset();
+                        TheClient.VoxelComputer.Calc(TheClient.TheRegion.LoadedChunks.Values.ToArray());
+                        entry.Good(queue, "Took: " + TheClient.VoxelComputer.sw1.ElapsedMilliseconds + " (" + TheClient.VoxelComputer.sw1a.ElapsedMilliseconds + ") / "
+                            + TheClient.VoxelComputer.sw2.ElapsedMilliseconds + " / " + TheClient.VoxelComputer.sw3.ElapsedMilliseconds);
                         break;
                     }
                 default:

@@ -30,6 +30,7 @@ using Voxalia.ClientGame.UISystem.MenuSystem;
 using FreneticGameCore;
 using FreneticGameGraphics;
 using FreneticGameGraphics.GraphicsHelpers;
+using Voxalia.ClientGame.OtherSystems;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -117,6 +118,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// All systems necessary to support VR (Virtual Reality).
         /// </summary>
         public VRSupport VR;
+
+        /// <summary>
+        /// The system that turns voxel grids to renderable data.
+        /// </summary>
+        public VoxelComputeEngine VoxelComputer;
 
         /// <summary>
         /// Start up and run the server.
@@ -430,6 +436,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Network = new NetworkBase(this);
             RegisterDefaultEntityTypes();
             View3D.CheckError("Load - Net");
+            PassLoadScreen();
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading Voxel computer...");
+            VoxelComputer = new VoxelComputeEngine();
+            VoxelComputer.Init(this);
             PassLoadScreen();
             SysConsole.Output(OutputType.CLIENTINIT, "Playing background music...");
             BackgroundMusic();
