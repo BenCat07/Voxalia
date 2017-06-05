@@ -555,7 +555,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public static bool CheckError(string loc)
         {
             bool b = false;
-#if !DEBUG
+#if DEBUG
             ErrorCode ec = GL.GetError();
             while (ec != ErrorCode.NoError)
             {
