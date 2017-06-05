@@ -75,6 +75,31 @@ float tex_for(in uint mat, in vec3 fpos, in int tp)
 	return imageLoad(texture_ids, ivec2(mat, 1 + id + tp * 7)).x;
 }
 
+float swap_tex(in uint mat, in vec3 fpos, in float zer)
+{
+	if (zer == tex_for(5, fpos, 0))
+	{
+		return tex_for(mat, fpos, 0);
+	}
+	if (zer == tex_for(5, fpos, 1))
+	{
+		return tex_for(mat, fpos, 1);
+	}
+	if (zer == tex_for(5, fpos, 2))
+	{
+		return tex_for(mat, fpos, 2);
+	}
+	if (zer == tex_for(5, fpos, 3))
+	{
+		return tex_for(mat, fpos, 3);
+	}
+	if (zer == tex_for(5, fpos, 4))
+	{
+		return tex_for(mat, fpos, 4);
+	}
+	return tex_for(mat, fpos, 5);
+}
+
 void crunch_verts(in uvec3 pos, in uint start)
 {
 	// TODO: Shapes support?
@@ -84,6 +109,7 @@ void crunch_verts(in uvec3 pos, in uint start)
 	vec3 fpos = vec3(pos);
 	int shInd = int(shapeIndex(curBLK, pos));
 	int vertCount = int(f_shapes[shInd]);
+	uint mat = blockMat(curBLK.x);
 	for (int i = 0; i < vertCount; i += 3)
 	{
 		int it3 = i;
@@ -108,9 +134,9 @@ void crunch_verts(in uvec3 pos, in uint start)
 		f_normal[start + it3 + 1] =  vec4(n2, 0.0);
 		f_normal[start + it3 + 2] =  vec4(n3, 0.0);
 		// TODO: Correct TextureIDs
-		f_texcoord[start + it3 + 0] = vec4(t1, 0.0);
-		f_texcoord[start + it3 + 1] = vec4(t2, 0.0);
-		f_texcoord[start + it3 + 2] = vec4(t3, 0.0);
+		f_texcoord[start + it3 + 0] = vec4(t1.xy, swap_tex(mat, fpos, t1.z), 0.0);
+		f_texcoord[start + it3 + 1] = vec4(t2.xy, swap_tex(mat, fpos, t2.z), 0.0);
+		f_texcoord[start + it3 + 2] = vec4(t3.xy, swap_tex(mat, fpos, t3.z), 0.0);
 		vec3 dv1 = v2 - v1;
 		vec3 dv2 = v3 - v1;
 		vec3 dt1 = t2 - t1;

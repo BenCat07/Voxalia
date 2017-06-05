@@ -132,7 +132,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     BlockShapeSubDetails bssd = BlockShapeRegistry.BSD[shape].Damaged[damage].BSSD;
                     for (int subDat = 0; subDat < 64; subDat++)
                     {
-                        coord = shape * (64 * 4) + subDat * 4 + damage;
+                        //coord = shape * (64 * 4) + subDat * 4 + damage;
                         int cnt = bssd.Verts[subDat].Count;
                         resX[coord] = BitConverter.ToSingle(BitConverter.GetBytes(cnt), 0);
                         for (int subvert = 0; subvert < cnt; subvert++)
@@ -291,7 +291,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, sizeof(uint), resses);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 ch.CountForRender = (int)resses[0];
-                Console.WriteLine("Found: " + ch.CountForRender);
+                //Console.WriteLine("Found: " + ch.CountForRender);
             }
             sw2.Stop();
             sw3.Start();
@@ -362,7 +362,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, 0);
                 View3D.CheckError("Compute - End Buffs");
                 // OPTIONAL, REMOVE ME:
-#if !EXTRA_DEBUG
+#if EXTRA_DEBUG
                 {
                     GL.Finish();
                     GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
