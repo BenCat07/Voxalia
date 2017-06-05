@@ -505,12 +505,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 sw.Stop();
                 long ms = sw.ElapsedMilliseconds;
                 sw.Start();
-                if (ms > 5000 && !annc)
+                if (ms > 10000 && !annc)
                 {
                     annc = true;
                     SysConsole.Output(OutputType.WARNING, "Taking weirdly long, did something fail?!");
                 }
-                if (ms > 10000)
+                if (ms > 20000)
                 {
                     SysConsole.Output(OutputType.CLIENTINIT, "Timed out while trying to connect to menu server! Failing!");
                     Window.Close();
