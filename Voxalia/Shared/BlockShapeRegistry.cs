@@ -45,9 +45,10 @@ namespace Voxalia.Shared
                 return;
             }
             inited = true;
-            for (int i = 0; i < 256; i++)
+            BSD[0] = new BSD0();
+            for (int i = 1; i < 256; i++)
             {
-                BSD[i] = new BSD0();
+                BSD[i] = BSD[0];
             }
             Register(0, new BSD0(), "default", "block", "standard", "cube", "plain");
             BSD[1] = new BSD01_5(0.84f);
@@ -137,7 +138,7 @@ namespace Voxalia.Shared
             }
             for (int i = 0; i < 256; i++)
             {
-                if (i > 0 && BSD[i] is BSD0)
+                if (i > 0 && BSD[i] == BSD[0])
                 {
                     continue;
                 }
@@ -265,19 +266,13 @@ namespace Voxalia.Shared
         public BlockSideCoverage AbleToFill_YP = BlockSideCoverage.NONE;
         public BlockSideCoverage AbleToFill_YM = BlockSideCoverage.NONE;
 
-        public BlockShapeSubDetails BSSD = new BlockShapeSubDetails();
+        public BlockShapeSubDetails BSSD;
 
         public BlockDamage DamageMode = BlockDamage.NONE;
 
         public void Preparse(int[] rlok)
         {
             DB_RLOK = rlok;
-            for (int i = 0; i < 64; i++)
-            {
-                BSSD.Verts[i] = GetVertices(Vector3.Zero, (i & 1) == 1, (i & 2) == 2, (i & 4) == 4, (i & 8) == 8, (i & 16) == 16, (i & 32) == 32);
-                BSSD.Norms[i] = GetNormals(Vector3.Zero, (i & 1) == 1, (i & 2) == 2, (i & 4) == 4, (i & 8) == 8, (i & 16) == 16, (i & 32) == 32);
-                BSSD.TCrds[i] = GetTCoords(Vector3.Zero, Material.DEBUG, (i & 1) == 1, (i & 2) == 2, (i & 4) == 4, (i & 8) == 8, (i & 16) == 16, (i & 32) == 32).ToArray();
-            }
             FinishParse();
             Damaged = new BlockShapeDetails[4];
             BlockShapeDetails prev = this;
@@ -294,6 +289,13 @@ namespace Voxalia.Shared
 
         public void FinishParse()
         {
+            BSSD = new BlockShapeSubDetails();
+            for (int i = 0; i < 64; i++)
+            {
+                BSSD.Verts[i] = GetVertices(Vector3.Zero, (i & 1) == 1, (i & 2) == 2, (i & 4) == 4, (i & 8) == 8, (i & 16) == 16, (i & 32) == 32);
+                BSSD.Norms[i] = GetNormals(Vector3.Zero, (i & 1) == 1, (i & 2) == 2, (i & 4) == 4, (i & 8) == 8, (i & 16) == 16, (i & 32) == 32);
+                BSSD.TCrds[i] = GetTCoords(Vector3.Zero, Material.DEBUG, (i & 1) == 1, (i & 2) == 2, (i & 4) == 4, (i & 8) == 8, (i & 16) == 16, (i & 32) == 32).ToArray();
+            }
             EntityShape es = GetShape(DamageMode, out Location offset, false);
             Coll = es.GetCollidableInstance();
             Coll.LocalPosition = offset.ToBVector();

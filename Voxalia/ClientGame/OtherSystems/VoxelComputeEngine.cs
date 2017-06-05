@@ -32,6 +32,8 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public int[] Program_Combo = new int[Reppers.Length];
 
+        public int Buf_Shapes = 0;
+
         public static readonly Dictionary<int, int> lookuper = new Dictionary<int, int>(128)
         {
             { 30, 0 },
@@ -103,6 +105,57 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, btemp.Length * sizeof(int), btemp, BufferUsageHint.StaticDraw);
             }
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+            View3D.CheckError("Compute - Startup - Empty Buffers");
+            float[] buf = new float[256 * 64 * 4];
+            int coord = buf.Length;
+            for (int shape = 0; shape < 256; shape++)
+            {
+                for (int damage = 0; damage < 4; damage++)
+                {
+                    BlockShapeSubDetails bssd = BlockShapeRegistry.BSD[shape].Damaged[damage].BSSD;
+                    for (int subDat = 0; subDat < 64; subDat++)
+                    {
+                        int id = shape * (64 * 4) + subDat * 4 + damage;
+                        int len = bssd.Verts[subDat].Count * 9 + 1;
+                        buf[id] = BitConverter.ToSingle(BitConverter.GetBytes(coord), 0);
+                        coord += len;
+                    }
+                }
+            }
+            float[] resX = new float[buf.Length + coord];
+            buf.CopyTo(resX, 0);
+            coord = buf.Length;
+            for (int shape = 0; shape < 256; shape++)
+            {
+                for (int damage = 0; damage < 4; damage++)
+                {
+                    BlockShapeSubDetails bssd = BlockShapeRegistry.BSD[shape].Damaged[damage].BSSD;
+                    for (int subDat = 0; subDat < 64; subDat++)
+                    {
+                        coord = shape * (64 * 4) + subDat * 4 + damage;
+                        int cnt = bssd.Verts[subDat].Count;
+                        resX[coord] = BitConverter.ToSingle(BitConverter.GetBytes(cnt), 0);
+                        for (int subvert = 0; subvert < cnt; subvert++)
+                        {
+                            resX[coord + 1 + cnt * 0 + subvert * 3 + 0] = (float)bssd.Verts[subDat][subvert].X;
+                            resX[coord + 1 + cnt * 0 + subvert * 3 + 1] = (float)bssd.Verts[subDat][subvert].Y;
+                            resX[coord + 1 + cnt * 0 + subvert * 3 + 2] = (float)bssd.Verts[subDat][subvert].Z;
+                            resX[coord + 1 + cnt * 3 + subvert * 3 + 0] = (float)bssd.Norms[subDat][subvert].X;
+                            resX[coord + 1 + cnt * 3 + subvert * 3 + 1] = (float)bssd.Norms[subDat][subvert].Y;
+                            resX[coord + 1 + cnt * 3 + subvert * 3 + 2] = (float)bssd.Norms[subDat][subvert].Z;
+                            resX[coord + 1 + cnt * 6 + subvert * 3 + 0] = (float)bssd.TCrds[subDat][subvert].X;
+                            resX[coord + 1 + cnt * 6 + subvert * 3 + 1] = (float)bssd.TCrds[subDat][subvert].Y;
+                            resX[coord + 1 + cnt * 6 + subvert * 3 + 2] = (float)bssd.TCrds[subDat][subvert].Z;
+                        }
+                        coord += cnt * 9 + 1;
+                    }
+                }
+            }
+            Buf_Shapes = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, Buf_Shapes);
+            GL.BufferData(BufferTarget.ShaderStorageBuffer, resX.Length * sizeof(float), resX, BufferUsageHint.StaticRead);
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+            View3D.CheckError("Compute - Startup - Shape Buffer");
         }
 
         public static readonly Vector3i[] Relatives = new Vector3i[]
@@ -218,12 +271,14 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, ch.Render_FBB);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, resBuf);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, ch.Render_IndBuf);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, Buf_Shapes);
                 GL.DispatchCompute(1, ch.CSize, 1);
                 ch.Render_ResBuf = resBuf;
             }
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, 0);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, 0);
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, 0);
             GL.UseProgram(0);
             View3D.CheckError("Compute - Run");
             // Gather results
@@ -236,6 +291,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, sizeof(uint), resses);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 ch.CountForRender = (int)resses[0];
+                Console.WriteLine("Found: " + ch.CountForRender);
             }
             sw2.Stop();
             sw3.Start();
@@ -272,6 +328,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 View3D.CheckError("Compute - New Buffers");
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, ch.Render_FBB);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, ch.Render_IndBuf);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, Buf_Shapes);
                 // Run computation MODE_ONE
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[0]);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[1]);
@@ -305,7 +362,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, 0);
                 View3D.CheckError("Compute - End Buffs");
                 // OPTIONAL, REMOVE ME:
-#if EXTRA_DEBUG
+#if !EXTRA_DEBUG
                 {
                     GL.Finish();
                     GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
@@ -413,6 +470,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.DeleteProgram(Program_Cruncher2[i]);
                 GL.DeleteProgram(Program_Cruncher3[i]);
             }
+            GL.DeleteBuffer(Buf_Shapes);
             View3D.CheckError("Compute - Shutdown");
         }
     }

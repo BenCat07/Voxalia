@@ -65,6 +65,11 @@ layout(shared, binding = 6) buffer b_tangent
 #endif
 #endif
 
+layout(shared, binding = 7) buffer b_shapes
+{
+	uint[] f_shapes;
+};
+
 // TODO: block shape data buffer!
 
 layout(local_size_x = MCM_VOX_COUNT, local_size_y = 1, local_size_z = MCM_VOX_COUNT) in;
