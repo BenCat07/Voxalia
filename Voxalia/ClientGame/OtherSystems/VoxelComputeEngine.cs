@@ -329,6 +329,21 @@ namespace Voxalia.ClientGame.OtherSystems
                 Chunk ch = chs[chz];
                 byte[] minimum_needed = null;// new byte[resd * Vector4.SizeInBytes];
                 int resd = ch.CountForRender;
+                if (resd == 0)
+                {
+                    ch._VBOSolid?.Destroy();
+                    ch._VBOTransp?.Destroy();
+                    ch._VBOSolid = null;
+                    ch._VBOTransp = null;
+                    // Clean up buffers
+                    GL.DeleteBuffer(ch.Render_ResBuf);
+                    GL.DeleteBuffer(ch.Render_FBB);
+                    GL.DeleteBuffer(ch.Render_IndBuf);
+                    ch.Render_ResBuf = 0;
+                    ch.Render_IndBuf = 0;
+                    ch.Render_BufsRel = null;
+                    continue;
+                }
                 uint[] newBufs = new uint[9];
                 GL.GenBuffers(9, newBufs);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[0]);
