@@ -438,8 +438,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
             View3D.CheckError("Load - Net");
             PassLoadScreen();
             SysConsole.Output(OutputType.CLIENTINIT, "Loading Voxel computer...");
-            VoxelComputer = new VoxelComputeEngine();
-            VoxelComputer.Init(this);
+            try
+            {
+                VoxelComputer = new VoxelComputeEngine();
+                VoxelComputer.Init(this);
+            }
+            catch (Exception ex)
+            {
+                SysConsole.Output(ex);
+            }
             PassLoadScreen();
             SysConsole.Output(OutputType.CLIENTINIT, "Playing background music...");
             BackgroundMusic();

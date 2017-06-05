@@ -30,9 +30,37 @@ bool rendersAtAll(in uvec4 blk)
 	return blockMat(blk.x) != 0;
 }
 
-bool isOpaque(in uvec4 blk)
+bool matIsOpaque(in uint mat)
 {
-	return blockMat(blk.x) != 0;
+	// TODO
+	return mat != 0;
+}
+
+bool shapeCovers(in uint shapeRel, in uint shapeC, in uint sideC)
+{
+	uint t_c = uint(uintBitsToFloat(f_shapes[shapeC * 12 + sideC]));
+	uint t_rel = uint(uintBitsToFloat(f_shapes[shapeRel * 12 + 6 + (sideC % 2 == 0 ? sideC + 1 : sideC - 1)]));
+	if (t_c == 3)
+	{
+		return 0 == 1;
+	}
+	if (t_rel == 0)
+	{
+		return 0 == 1;
+	}
+	if (t_rel == 2)
+	{
+		return t_c == 2;
+	}
+	return t_rel == 1;
+}
+
+bool isOpaque(in uvec4 blk, in uvec4 curBLK, in uint sideC)
+{
+	uint mat = blockMat(blk.x);
+	// TODO: paint color check!
+	return blockDamage(blk.x) == 0 && (matIsOpaque(mat) || mat == blockMat(curBLK.x))
+			&& shapeCovers(blk.z, curBLK.z, sideC);
 }
 
 uint shapeIndex(in uvec4 curBLK, in uvec3 pos)
@@ -43,10 +71,10 @@ uint shapeIndex(in uvec4 curBLK, in uvec3 pos)
 	uvec4 cbYM = pos.y == 0 ? posses[blkSize() * 3 + blockID(uvec3(pos.x, gl_NumWorkGroups.y - 1, pos.z))] : posses[blockID(uvec3(pos.x, pos.y - 1, pos.z))];
 	uvec4 cbZP = pos.z + 1 == gl_WorkGroupSize.z ? posses[blkSize() * 6 + blockID(uvec3(pos.x, pos.y, 0))] : posses[blockID(uvec3(pos.x, pos.y, pos.z + 1))];
 	uvec4 cbZM = pos.z == 0 ? posses[blkSize() * 5 + blockID(uvec3(pos.x, pos.y, gl_WorkGroupSize.z - 1))] : posses[blockID(uvec3(pos.x, pos.y, pos.z - 1))];
-	uint sh_subdat = (isOpaque(cbXP) ? 1 : 0) | (isOpaque(cbXM) ? 2 : 0)
-				   | (isOpaque(cbYP) ? 4 : 0)| (isOpaque(cbYM) ? 8 : 0)
-				   | (isOpaque(cbZP) ? 16 : 0)| (isOpaque(cbZM) ? 32 : 0);
-	uint tid = curBLK.z * (64 * 4) + sh_subdat * 4 + blockDamage(curBLK.x);
+	uint sh_subdat = (isOpaque(cbXP, curBLK, 0) ? 1 : 0) | (isOpaque(cbXM, curBLK, 1) ? 2 : 0)
+				   | (isOpaque(cbYP, curBLK, 2) ? 4 : 0) | (isOpaque(cbYM, curBLK, 3) ? 8 : 0)
+				   | (isOpaque(cbZP, curBLK, 4) ? 16 : 0)| (isOpaque(cbZM, curBLK, 5) ? 32 : 0);
+	uint tid = (256 * 12) + curBLK.z * (64 * 4) + sh_subdat * 4 + blockDamage(curBLK.x);
 	return f_shapes[tid];
 }
 

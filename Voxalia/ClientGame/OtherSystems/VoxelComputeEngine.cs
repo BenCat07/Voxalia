@@ -45,6 +45,8 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public int[] EmptyChunkRep = new int[Reppers.Length];
 
+        public int ZeroChunkRep;
+
         public void Init(Client tclient)
         {
             TheClient = tclient;
@@ -104,9 +106,29 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, EmptyChunkRep[i]);
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, btemp.Length * sizeof(int), btemp, BufferUsageHint.StaticDraw);
             }
+            ZeroChunkRep = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ZeroChunkRep);
+            GL.BufferData(BufferTarget.ShaderStorageBuffer, (Constants.CHUNK_BLOCK_COUNT) * sizeof(int), IntPtr.Zero, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
             View3D.CheckError("Compute - Startup - Empty Buffers");
-            float[] buf = new float[256 * 64 * 4];
+            float[] preBuf = new float[256 * 12];
+            for (int i = 0; i < 256; i++)
+            {
+                preBuf[i * 12 + 0] = (float)BlockShapeRegistry.BSD[i].RequiresToFill_XP + 0.01f;
+                preBuf[i * 12 + 1] = (float)BlockShapeRegistry.BSD[i].RequiresToFill_XM + 0.01f;
+                preBuf[i * 12 + 2] = (float)BlockShapeRegistry.BSD[i].RequiresToFill_YP + 0.01f;
+                preBuf[i * 12 + 3] = (float)BlockShapeRegistry.BSD[i].RequiresToFill_YM + 0.01f;
+                preBuf[i * 12 + 4] = (float)BlockShapeRegistry.BSD[i].RequiresToFill_ZP + 0.01f;
+                preBuf[i * 12 + 5] = (float)BlockShapeRegistry.BSD[i].RequiresToFill_ZM + 0.01f;
+                preBuf[i * 12 + 6] = (float)BlockShapeRegistry.BSD[i].AbleToFill_XP + 0.01f;
+                preBuf[i * 12 + 7] = (float)BlockShapeRegistry.BSD[i].AbleToFill_XM + 0.01f;
+                preBuf[i * 12 + 8] = (float)BlockShapeRegistry.BSD[i].AbleToFill_YP + 0.01f;
+                preBuf[i * 12 + 9] = (float)BlockShapeRegistry.BSD[i].AbleToFill_YM + 0.01f;
+                preBuf[i * 12 + 10] = (float)BlockShapeRegistry.BSD[i].AbleToFill_ZP + 0.01f;
+                preBuf[i * 12 + 11] = (float)BlockShapeRegistry.BSD[i].AbleToFill_ZM + 0.01f;
+            }
+            float[] buf = new float[preBuf.Length + 256 * 64 * 4];
+            preBuf.CopyTo(buf, 0);
             int coord = buf.Length;
             for (int shape = 0; shape < 256; shape++)
             {
@@ -115,7 +137,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     BlockShapeSubDetails bssd = BlockShapeRegistry.BSD[shape].Damaged[damage].BSSD;
                     for (int subDat = 0; subDat < 64; subDat++)
                     {
-                        int id = shape * (64 * 4) + subDat * 4 + damage;
+                        int id = preBuf.Length + shape * (64 * 4) + subDat * 4 + damage;
                         int len = bssd.Verts[subDat].Count * 9 + 1;
                         buf[id] = BitConverter.ToSingle(BitConverter.GetBytes(coord), 0);
                         coord += len;
@@ -132,7 +154,6 @@ namespace Voxalia.ClientGame.OtherSystems
                     BlockShapeSubDetails bssd = BlockShapeRegistry.BSD[shape].Damaged[damage].BSSD;
                     for (int subDat = 0; subDat < 64; subDat++)
                     {
-                        //coord = shape * (64 * 4) + subDat * 4 + damage;
                         int cnt = bssd.Verts[subDat].Count;
                         resX[coord] = BitConverter.ToSingle(BitConverter.GetBytes(cnt), 0);
                         for (int subvert = 0; subvert < cnt; subvert++)
@@ -162,7 +183,7 @@ namespace Voxalia.ClientGame.OtherSystems
         {
             new Vector3i(0, 0, 0),
             new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0),
-            new Vector3i(0,-1, 0), new Vector3i(0, -1, 0),
+            new Vector3i(0, 1, 0), new Vector3i(0, -1, 0),
             new Vector3i(0, 0, 1), new Vector3i(0, 0, -1)
         };
 
@@ -172,6 +193,9 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public void Calc(params Chunk[] chs)
         {
+            int maxRad = TheClient.CVars.r_renderdist.ValueI;
+            Vector3i centerChunk = TheClient.TheRegion.ChunkLocFor(TheClient.Player.GetPosition());
+            centerChunk = new Vector3i(-centerChunk.X, -centerChunk.Y, -centerChunk.Z);
             sw1.Start();
             // Create voxel buffer data
             for (int chz = 0; chz < chs.Length; chz++)
@@ -185,9 +209,11 @@ namespace Voxalia.ClientGame.OtherSystems
                     int[] btemp;
                     if (rel == null)
                     {
-                        ch.Render_BufsRel[x] = EmptyChunkRep[lookuper[ch.CSize]];
+                        Vector3i reldist = ch.WorldPosition + Relatives[x] + centerChunk;
+                        ch.Render_BufsRel[x] = (Math.Abs(reldist.X) < maxRad && Math.Abs(reldist.Y) < maxRad && Math.Abs(reldist.Z) < maxRad)
+                            ? ZeroChunkRep : EmptyChunkRep[lookuper[ch.CSize]];
                     }
-                    else if (rel.Render_VoxelBuffer == null || rel.Render_VoxelBuffer[lookuper[ch.CSize]] <= 0)
+                    else if (x == 0 || rel.Render_VoxelBuffer == null || rel.Render_VoxelBuffer[lookuper[ch.CSize]] <= 0)
                     {
                         btemp = new int[len];
                         for (int rz = 0; rz < ch.CSize; rz++)
