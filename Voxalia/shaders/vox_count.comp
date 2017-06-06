@@ -1,5 +1,7 @@
 #version 430 core
 
+layout(binding = 0, r32f) uniform readonly image2D texture_ids;
+
 layout(shared, binding = 1) buffer voxels
 {
 	uvec4[] posses;

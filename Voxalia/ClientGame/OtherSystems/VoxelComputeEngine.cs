@@ -30,6 +30,12 @@ namespace Voxalia.ClientGame.OtherSystems
         public int[] Program_Cruncher2 = new int[Reppers.Length];
         public int[] Program_Cruncher3 = new int[Reppers.Length];
 
+        public int[] Program_CounterTRANSP = new int[Reppers.Length];
+
+        public int[] Program_CruncherTRANSP1 = new int[Reppers.Length];
+        public int[] Program_CruncherTRANSP2 = new int[Reppers.Length];
+        public int[] Program_CruncherTRANSP3 = new int[Reppers.Length];
+
         public int[] Program_Combo = new int[Reppers.Length];
 
         public int Buf_Shapes = 0;
@@ -52,14 +58,18 @@ namespace Voxalia.ClientGame.OtherSystems
             TheClient = tclient;
             for (int i = 0; i < Reppers.Length; i++)
             {
-                Program_Counter[i] = TheClient.Shaders.CompileCompute("vox_count", "#define MCM_VOX_COUNT " + Reppers[i] + "\n");
-                Program_Cruncher1[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_ONE 1\n");
-                Program_Cruncher2[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_TWO 1\n");
-                Program_Cruncher3[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_THREE 1\n");
+                Program_Counter[i] = TheClient.Shaders.CompileCompute("vox_count", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MCM_SOLIDONLY 1\n");
+                Program_Cruncher1[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_ONE 1\n#define MCM_SOLIDONLY 1\n");
+                Program_Cruncher2[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_TWO 1\n#define MCM_SOLIDONLY 1\n");
+                Program_Cruncher3[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_THREE 1\n#define MCM_SOLIDONLY 1\n");
+                Program_CounterTRANSP[i] = TheClient.Shaders.CompileCompute("vox_count", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MCM_TRANSP 1\n");
+                Program_CruncherTRANSP1[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_ONE 1\n#define MCM_TRANSP 1\n");
+                Program_CruncherTRANSP2[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_TWO 1\n#define MCM_TRANSP 1\n");
+                Program_CruncherTRANSP3[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_THREE 1\n#define MCM_TRANSP 1\n");
                 Program_Combo[i] = TheClient.Shaders.CompileCompute("vox_combo", "#define MCM_VOX_COUNT " + Reppers[i] + "\n");
             }
             View3D.CheckError("Compute - Startup - Shaders");
-            float[] df = new float[MaterialHelpers.ALL_MATS.Count * 7 * 6];
+            float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 3)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
             {
                 for (int x = 0; x < 6; x++)
@@ -71,10 +81,13 @@ namespace Voxalia.ClientGame.OtherSystems
                     }
                     df[(x * 7) * MaterialHelpers.ALL_MATS.Count + i] = cnt;
                 }
+                df[(6 * 7 + 0) * MaterialHelpers.ALL_MATS.Count + i] = MaterialHelpers.ALL_MATS[i].RendersAtAll ? 1 : 0;
+                df[(6 * 7 + 1) * MaterialHelpers.ALL_MATS.Count + i] = MaterialHelpers.ALL_MATS[i].Opaque ? 1 : 0;
+                df[(6 * 7 + 2) * MaterialHelpers.ALL_MATS.Count + i] = MaterialHelpers.ALL_MATS[i].AnyOpaque ? 1 : 0;
             }
             Texture_IDs = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Texture_IDs);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, MaterialHelpers.ALL_MATS.Count, 6 * 7, 0, PixelFormat.Red, PixelType.Float, df);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, MaterialHelpers.ALL_MATS.Count, 6 * 7 + 3, 0, PixelFormat.Red, PixelType.Float, df);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
@@ -279,6 +292,7 @@ namespace Voxalia.ClientGame.OtherSystems
             sw1.Stop();
             sw2.Start();
             View3D.CheckError("Compute - Prep 0");
+            GL.BindImageTexture(0, Texture_IDs, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
             // Create a results buffer
             for (int chz = 0; chz < chs.Length; chz++)
             {
@@ -293,6 +307,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 uint[] resses = new uint[1];
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, sizeof(uint), resses, hintter);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+                View3D.CheckError("Compute - Run - Setup A");
                 // Run the shader
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, ch.Render_FBB);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, resBuf);
@@ -300,6 +315,24 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, Buf_Shapes);
                 GL.DispatchCompute(1, ch.CSize, 1);
                 ch.Render_ResBuf = resBuf;
+                View3D.CheckError("Compute - Run - Ran A");
+                // TRANSPARENT MODE:
+                ch.Render_IndBufTRANSP = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_IndBufTRANSP);
+                GL.BufferData(BufferTarget.ShaderStorageBuffer, ch.CSize * ch.CSize * ch.CSize * sizeof(uint), IntPtr.Zero, hintter);
+                int resBufTRANSP = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, resBufTRANSP);
+                uint[] ressesTRANSP = new uint[1];
+                GL.BufferData(BufferTarget.ShaderStorageBuffer, sizeof(uint), ressesTRANSP, hintter);
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+                GL.UseProgram(Program_CounterTRANSP[lookuper[ch.CSize]]);
+                View3D.CheckError("Compute - Run - Setup B");
+                // Run the shader
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, resBufTRANSP);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, ch.Render_IndBufTRANSP);
+                GL.DispatchCompute(1, ch.CSize, 1);
+                ch.Render_ResBufTRANSP = resBufTRANSP;
+                View3D.CheckError("Compute - Run - Ran B");
             }
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, 0);
@@ -312,181 +345,179 @@ namespace Voxalia.ClientGame.OtherSystems
             for (int chz = 0; chz < chs.Length; chz++)
             {
                 uint[] resses = new uint[1];
+                uint[] ressesTRANSP = new uint[1];
                 Chunk ch = chs[chz];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_ResBuf);
                 GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, sizeof(uint), resses);
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_ResBufTRANSP);
+                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, sizeof(uint), ressesTRANSP);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 ch.CountForRender = (int)resses[0];
-                //Console.WriteLine("Found: " + ch.CountForRender);
+                ch.CountForRenderTRANSP = (int)ressesTRANSP[0];
+                Console.WriteLine("Found: " + ch.CountForRender + ", transp: " + ch.CountForRenderTRANSP);
             }
             sw2.Stop();
             sw3.Start();
             View3D.CheckError("Compute - Read Count");
             // Start new buffers
-            GL.BindImageTexture(0, Texture_IDs, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
             for (int chz = 0; chz < chs.Length; chz++)
             {
                 Chunk ch = chs[chz];
                 byte[] minimum_needed = null;// new byte[resd * Vector4.SizeInBytes];
-                int resd = ch.CountForRender;
-                if (resd == 0)
+                int resdSOLID = ch.CountForRender;
+                int resdTRANSP = ch.CountForRenderTRANSP;
+                if (resdSOLID == 0)
                 {
                     ch._VBOSolid?.Destroy();
-                    ch._VBOTransp?.Destroy();
                     ch._VBOSolid = null;
-                    ch._VBOTransp = null;
                     // Clean up buffers
                     GL.DeleteBuffer(ch.Render_ResBuf);
-                    GL.DeleteBuffer(ch.Render_FBB);
                     GL.DeleteBuffer(ch.Render_IndBuf);
-                    ch.Render_ResBuf = 0;
                     ch.Render_IndBuf = 0;
+                    ch.Render_ResBuf = 0;
+                }
+                if (resdTRANSP == 0)
+                {
+                    ch._VBOTransp?.Destroy();
+                    ch._VBOTransp = null;
+                    // Clean up buffers
+                    GL.DeleteBuffer(ch.Render_ResBufTRANSP);
+                    GL.DeleteBuffer(ch.Render_IndBufTRANSP);
+                    ch.Render_IndBufTRANSP = 0;
+                    ch.Render_ResBufTRANSP = 0;
+                }
+                if (resdSOLID == 0 && resdTRANSP == 0)
+                {
+                    GL.DeleteBuffer(ch.Render_FBB);
                     ch.Render_BufsRel = null;
                     continue;
                 }
-                uint[] newBufs = new uint[9];
-                GL.GenBuffers(9, newBufs);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[0]);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[1]);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[2]);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[3]);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[4]);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[5]);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[6]);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[7]);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[8]);
-                GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * sizeof(uint), minimum_needed, hintter);
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-                View3D.CheckError("Compute - New Buffers");
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, ch.Render_FBB);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, ch.Render_IndBuf);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, Buf_Shapes);
-                // Run computation MODE_ONE
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[0]);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[1]);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[2]);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, newBufs[3]);
-                GL.UseProgram(Program_Cruncher1[lookuper[ch.CSize]]);
-                GL.DispatchCompute(1, ch.CSize, 1);
-                // Run computation MODE_TWO
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[4]);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[5]);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[8]);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, 0);
-                GL.UseProgram(Program_Cruncher2[lookuper[ch.CSize]]);
-                GL.DispatchCompute(1, ch.CSize, 1);
-                // Run computation MODE_THREE
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[6]);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[7]);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, 0);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, 0);
-                GL.UseProgram(Program_Cruncher3[lookuper[ch.CSize]]);
-                GL.DispatchCompute(1, ch.CSize, 1);
-                GL.UseProgram(0);
-                View3D.CheckError("Compute - Crunch");
-                // Unbind new buffers
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, 0);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, 0);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, 0);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, 0);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, 0);
-                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, 0);
-                View3D.CheckError("Compute - End Buffs");
-                // OPTIONAL, REMOVE ME:
-#if EXTRA_DEBUG
+                Action<bool> calc = (transp) =>
                 {
-                    GL.Finish();
-                    GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
-                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[8]);
-                    uint[] rd = new uint[16];
-                    GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, rd.Length * sizeof(uint), rd);
-                    for (int i = 0; i < rd.Length; i++)
+                    int resd = transp ? resdTRANSP : resdSOLID;
+                    if (resd == 0)
                     {
-                        SysConsole.Output(OutputType.DEBUG, "" + rd[i]);
+                        return;
                     }
+                    uint[] newBufs = new uint[9];
+                    GL.GenBuffers(9, newBufs);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[0]);
-                    Vector4[] rd2 = new Vector4[16];
-                    GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, rd2.Length * Vector4.SizeInBytes, rd2);
-                    for (int i = 0; i < rd2.Length; i++)
-                    {
-                        SysConsole.Output(OutputType.DEBUG, "" + rd2[i]);
-                    }
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[1]);
-                    GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, rd2.Length * Vector4.SizeInBytes, rd2);
-                    for (int i = 0; i < rd2.Length; i++)
-                    {
-                        SysConsole.Output(OutputType.DEBUG, "" + rd2[i]);
-                    }
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[2]);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[3]);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[4]);
-                    GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, rd2.Length * Vector4.SizeInBytes, rd2);
-                    for (int i = 0; i < rd2.Length; i++)
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[5]);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[6]);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[7]);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[8]);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * sizeof(uint), minimum_needed, hintter);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+                    View3D.CheckError("Compute - New Buffers");
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, ch.Render_FBB);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, transp ? ch.Render_IndBufTRANSP : ch.Render_IndBuf);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, Buf_Shapes);
+                    // Run computation MODE_ONE
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[0]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[1]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[2]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, newBufs[3]);
+                    GL.UseProgram(transp ? Program_CruncherTRANSP1[lookuper[ch.CSize]] : Program_Cruncher1[lookuper[ch.CSize]]);
+                    GL.DispatchCompute(1, ch.CSize, 1);
+                    // Run computation MODE_TWO
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[4]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[5]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[8]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, 0);
+                    GL.UseProgram(transp ? Program_CruncherTRANSP2[lookuper[ch.CSize]] : Program_Cruncher2[lookuper[ch.CSize]]);
+                    GL.DispatchCompute(1, ch.CSize, 1);
+                    // Run computation MODE_THREE
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[6]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[7]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, 0);
+                    GL.UseProgram(transp ? Program_CruncherTRANSP3[lookuper[ch.CSize]] : Program_Cruncher3[lookuper[ch.CSize]]);
+                    GL.DispatchCompute(1, ch.CSize, 1);
+                    GL.UseProgram(0);
+                    View3D.CheckError("Compute - Crunch");
+                    // Unbind new buffers
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, 0);
+                    View3D.CheckError("Compute - End Buffs");
+                    // Prep VAO
+                    int vao = GL.GenVertexArray();
+                    GL.BindVertexArray(vao);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[0]);
+                    GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[1]);
+                    GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[2]);
+                    GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[3]);
+                    GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[4]);
+                    GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[5]);
+                    GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[6]);
+                    GL.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[7]);
+                    GL.VertexAttribPointer(7, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.EnableVertexAttribArray(0);
+                    GL.EnableVertexAttribArray(1);
+                    GL.EnableVertexAttribArray(2);
+                    GL.EnableVertexAttribArray(3);
+                    GL.EnableVertexAttribArray(4);
+                    GL.EnableVertexAttribArray(5);
+                    GL.EnableVertexAttribArray(6);
+                    GL.EnableVertexAttribArray(7);
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, newBufs[8]);
+                    GL.BindVertexArray(0);
+                    // Move buffers to chunk VBO
+                    ChunkVBO vbo = new ChunkVBO()
                     {
-                        SysConsole.Output(OutputType.DEBUG, "" + rd2[i]);
+                        generated = true,
+                        _VertexVBO = newBufs[0],
+                        _NormalVBO = newBufs[1],
+                        _TexCoordVBO = newBufs[2],
+                        _TangentVBO = newBufs[3],
+                        _ColorVBO = newBufs[4],
+                        _TCOLVBO = newBufs[5],
+                        _THVVBO = newBufs[6],
+                        _THWVBO = newBufs[7],
+                        _IndexVBO = newBufs[8],
+                        _VAO = vao,
+                        vC = resd,
+                        colors = true,
+                        tcols = true,
+                        reusable = false
+                    };
+                    if (transp)
+                    {
+                        ch._VBOTransp?.Destroy();
+                        ch._VBOTransp = vbo;
                     }
-                }
-#endif
-                // Prep VAO
-                int vao = GL.GenVertexArray();
-                GL.BindVertexArray(vao);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[0]);
-                GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[1]);
-                GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[2]);
-                GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[3]);
-                GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[4]);
-                GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[5]);
-                GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[6]);
-                GL.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[7]);
-                GL.VertexAttribPointer(7, 4, VertexAttribPointerType.Float, false, 0, 0);
-                GL.EnableVertexAttribArray(0);
-                GL.EnableVertexAttribArray(1);
-                GL.EnableVertexAttribArray(2);
-                GL.EnableVertexAttribArray(3);
-                GL.EnableVertexAttribArray(4);
-                GL.EnableVertexAttribArray(5);
-                GL.EnableVertexAttribArray(6);
-                GL.EnableVertexAttribArray(7);
-                GL.BindBuffer(BufferTarget.ElementArrayBuffer, newBufs[8]);
-                GL.BindVertexArray(0);
-                // Move buffers to chunk VBO
-                ch._VBOSolid?.Destroy();
-                ch._VBOTransp?.Destroy();
-                ChunkVBO vbo = new ChunkVBO()
-                {
-                    generated = true,
-                    _VertexVBO = newBufs[0],
-                    _NormalVBO = newBufs[1],
-                    _TexCoordVBO = newBufs[2],
-                    _TangentVBO = newBufs[3],
-                    _ColorVBO = newBufs[4],
-                    _TCOLVBO = newBufs[5],
-                    _THVVBO = newBufs[6],
-                    _THWVBO = newBufs[7],
-                    _IndexVBO = newBufs[8],
-                    _VAO = vao,
-                    vC = resd,
-                    colors = true,
-                    tcols = true,
-                    reusable = false
+                    else
+                    {
+                        ch._VBOSolid?.Destroy();
+                        ch._VBOSolid = vbo;
+                    }
                 };
-                ch._VBOSolid = vbo;
-                ch._VBOTransp = vbo;
+                calc(true);
+                calc(false);
                 // Clean up buffers
                 GL.DeleteBuffer(ch.Render_ResBuf);
                 GL.DeleteBuffer(ch.Render_FBB);
@@ -494,6 +525,10 @@ namespace Voxalia.ClientGame.OtherSystems
                 ch.Render_ResBuf = 0;
                 ch.Render_IndBuf = 0;
                 ch.Render_BufsRel = null;
+                GL.DeleteBuffer(ch.Render_ResBufTRANSP);
+                GL.DeleteBuffer(ch.Render_IndBufTRANSP);
+                ch.Render_ResBufTRANSP = 0;
+                ch.Render_IndBufTRANSP = 0;
             }
             GL.BindImageTexture(0, 0, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
             View3D.CheckError("Compute - Finalize");

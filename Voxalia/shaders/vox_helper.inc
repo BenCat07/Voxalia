@@ -97,15 +97,20 @@ uint blockDamage(in uint matID)
 		return (matID & (16384 | (16384 * 2))) / (16384);
 }
 
-bool rendersAtAll(in uvec4 blk)
+bool rendersAtAll(in uint mat)
 {
-	return blockMat(blk.x) != 0;
+	return imageLoad(texture_ids, ivec2(blockMat(mat), 6 * 7)).x > 0.5;
+}
+
+bool matHasAnyOpaque(in uint mat)
+{
+	return imageLoad(texture_ids, ivec2(blockMat(mat), 6 * 7 + 2)).x > 0.5;
 }
 
 bool matIsOpaque(in uint mat)
 {
-	// TODO
-	return mat != 0;
+	// TODO: Transparent painted blocks are NOT opaque!
+	return imageLoad(texture_ids, ivec2(blockMat(mat), 6 * 7 + 1)).x > 0.5;
 }
 
 bool shapeCovers(in uint shapeRel, in uint shapeC, in uint sideC)
@@ -152,13 +157,25 @@ uint shapeIndex(in uvec4 curBLK, in uvec3 pos)
 
 int count_visible_verts(in uvec3 pos)
 {
-	// TODO: Shapes support?
 	uint id = blockID(pos);
 	uvec4 curBLK = posses[id];
-	if (!rendersAtAll(curBLK))
+	if (!rendersAtAll(curBLK.x))
 	{
 		return 0;
 	}
+#if MCM_SOLIDONLY
+	if (!matHasAnyOpaque(curBLK.x))
+	{
+		return 0;
+	}
+#else
+#if MCM_TRANSP
+	if (matIsOpaque(curBLK.x))
+	{
+		return 0;
+	}
+#endif
+#endif
 	uint shInd = shapeIndex(curBLK, pos);
 	return int(f_shapes[shInd]);
 }
