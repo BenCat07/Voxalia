@@ -5,6 +5,78 @@
 float snoise(in vec3 v);
 float snoise2(in vec3 v);
 
+const vec4 tcolors_val[] = vec4[](
+	vec4(1.0, 1.0, 1.0, 1.0), // WHITE = 0
+	vec4(0.02, 0.02, 0.02, 1.0), // BLACK = 1
+	vec4(0.0, 1.0, 0.0, 1.0), // GREEN = 2
+	vec4(0.0, 0.0, 1.0, 1.0), // BLUE = 3
+	vec4(1.0, 0.0, 0.0, 1.0), // RED = 4
+	vec4(1.0, 0.0, 1.0, 1.0), // MAGENTA = 5
+	vec4(1.0, 1.0, 0.0, 1.0), // YELLOW = 6
+	vec4(0.0, 1.0, 1.0, 1.0), // CYAN = 7
+	vec4(0.0, 0.5, 0.0, 1.0), // DARK_GREEN = 8
+	vec4(0.0, 0.0, 0.5, 1.0), // DARK_BLUE = 9
+	vec4(0.5, 0.0, 0.0, 1.0), // DARK_RED = 10
+	vec4(0.5, 1.0, 0.5, 1.0), // LIGHT_GREEN = 11
+	vec4(0.5, 0.5, 1.0, 1.0), // LIGHT_BLUE = 12
+	vec4(1.0, 0.5, 0.5, 1.0), // LIGHT_RED = 13
+	vec4(0.5, 0.5, 0.5, 1.0), // GRAY = 14
+	vec4(0.75, 0.75, 0.75, 1.0), // LIGHT_GRAY = 15
+	vec4(0.25, 0.25, 0.25, 1.0), // DARK_GRAY = 16
+	vec4(0.5, 0.0, 0.5, 1.0), // DARK_MAGENTA = 17
+	vec4(0.5, 0.5, 0.0, 1.0), // DARK_YELLOW = 18
+	vec4(0.0, 0.5, 0.5, 1.0), // DARK_CYAN = 19
+	vec4(1.0, 0.5, 1.0, 1.0), // LIGHT_MAGENTA = 20
+	vec4(1.0, 1.0, 0.5, 1.0), // LIGHT_YELLOW = 21
+	vec4(0.5, 1.0, 1.0, 1.0), // LIGHT_CYAN = 22
+	vec4(1.0, 0.5, 0.0, 1.0), // ORANGE = 23
+	vec4(0.5, 0.25, 0.0, 1.0), // BROWN = 24
+	vec4(0.5, 0.0, 1.0, 1.0), // PURPLE = 25
+	vec4(1.0, 0.5, 1.0, 1.0), // PINK = 26
+	vec4(0.5, 1.0, 0.0, 1.0), // LIME = 27
+	vec4(0.0, 0.5, 1.0, 1.0), // SKY_BLUE = 28
+	vec4(0.125, 0.125, 0.125, 1.0), // VERY_DARK_GRAY = 29
+	vec4(1.25, 1.25, 1.25, 1.0), // SLIGHTLY_BRIGHT = 30
+	vec4(1.5, 1.5, 1.5, 1.0), // BRIGHT = 31
+	vec4(2.0, 2.0, 2.0, 1.0), // VERY_BRIGHT = 32
+	vec4(0.0, 1.0, 0.0, 0.5), // TRANSPARENT_GREEN = 33
+	vec4(0.0, 0.0, 1.0, 0.5), // TRANSPARENT_BLUE = 34
+	vec4(1.0, 0.0, 0.0, 0.5), // TRANSPARENT_RED = 35
+	vec4(1.0, 0.0, 1.0, 0.5), // TRANSPARENT_MAGENTA = 36
+	vec4(1.0, 1.0, 0.0, 0.5), // TRANSPARENT_YELLOW = 37
+	vec4(0.0, 1.0, 1.0, 0.5), // TRANSPARENT_CYAN = 38
+	vec4(1.0, 1.0, 1.0, 0.75), // SLIGHTLY_TRANSPARENT = 39
+	vec4(1.0, 1.0, 1.0, 0.5), // TRANSPARENT = 40
+	vec4(1.0, 1.0, 1.0, 0.25), // VERY_TRANSPARENT = 41
+	vec4(0.0, 1.0, 0.0, 0.01), // LIGHT_STROBE_GREEN = 42
+	vec4(0.0, 0.0, 1.0, 0.01), // LIGHT_STROBE_BLUE = 43
+	vec4(1.0, 0.0, 0.0, 0.01), // LIGHT_STROBE_RED = 44
+	vec4(1.0, 0.0, 1.0, 0.01), // LIGHT_STROBE_MAGENTA = 45
+	vec4(1.0, 1.0, 0.0, 0.01), // LIGHT_STROBE_YELLOW = 46
+	vec4(0.0, 1.0, 1.0, 0.01), // LIGHT_STROBE_CYAN = 47
+	vec4(1.0, 1.0, 1.0, 0.0), // STROBE_WHITE = 48
+	vec4(0.0, 1.0, 0.0, 0.0), // STROBE_GREEN = 49
+	vec4(0.0, 0.0, 1.0, 0.0), // STROBE_BLUE = 50
+	vec4(1.0, 0.0, 0.0, 0.0), // STROBE_RED = 51
+	vec4(1.0, 0.0, 1.0, 0.0), // STROBE_MAGENTA = 52
+	vec4(1.0, 1.0, 0.0, 0.0), // STROBE_YELLOW = 53
+	vec4(0.0, 1.0, 1.0, 0.0), // STROBE_CYAN = 54
+	vec4(0.0, 0.0, 0.0, 0.0), // MAGIC = 55
+	vec4(0.5, 0.0, 0.0, 0.0), // OLD_MAGIC = 56
+	vec4(0.5, 0.0, 0.5, 0.0), // RAINBOW = 57
+	vec4(0.0, 0.5, 0.0, 0.0), // BLUR = 58
+	vec4(0.4, 0.5, 0.5, 0.0), // CRACKS = 59
+	vec4(0.31, 0.5, 0.5, 0.0), // CRACKS_LIGHT = 60
+	vec4(0.5, 0.5, 0.5, 0.0), // CRACKS_DARK = 61
+	vec4(0.5, 0.5, (145.0 / 255.0), 0.0), // INVERT = 62
+	vec4((145.0 / 255.0), 0.5, 0.5, 0.0) // SHINE = 63
+);
+
+uint blockPaint(in uint bpnt)
+{
+	return bpnt & 63;
+}
+
 uint blkSize()
 {
 	return gl_WorkGroupSize.x * gl_NumWorkGroups.y * gl_WorkGroupSize.z;
@@ -175,15 +247,16 @@ void crunch_verts(in uvec3 pos, in uint start)
 		f_tangent[start + it3 + 2] = vec4(tng, 0.0);
 #endif
 #if MODE_TWO
+		vec4 r_tcol = tcolors_val[blockPaint(curBLK.w)];
 		f_indices[start + it3] = start + it3;
 		f_color[start + it3] = vec4(1.0);
-		f_tcol[start + it3] = vec4(1.0);
+		f_tcol[start + it3] = r_tcol;
 		f_indices[start + it3 + 1] = start + it3 + 1;
 		f_color[start + it3 + 1] = vec4(1.0);
-		f_tcol[start + it3 + 1] = vec4(1.0);
+		f_tcol[start + it3 + 1] = r_tcol;
 		f_indices[start + it3 + 2] = start + it3 + 2;
 		f_color[start + it3 + 2] = vec4(1.0);
-		f_tcol[start + it3 + 2] = vec4(1.0);
+		f_tcol[start + it3 + 2] = r_tcol;
 #endif
 #if MODE_THREE
 		// TODO: Actual values!

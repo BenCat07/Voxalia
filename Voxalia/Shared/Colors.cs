@@ -51,6 +51,7 @@ namespace Voxalia.Shared
         public static Color LIME = Color.FromArgb(128, 255, 0);
         public static Color SKY_BLUE = Color.FromArgb(0, 128, 255);
         public static Color VERY_DARK_GRAY = Color.FromArgb(32, 32, 32);
+        // Placeholder 1-3
         public static Color TRANSPARENT_GREEN = Color.FromArgb(127, 0, 255, 0);
         public static Color TRANSPARENT_BLUE = Color.FromArgb(127, 0, 0, 255);
         public static Color TRANSPARENT_RED = Color.FromArgb(127, 255, 0, 0);
@@ -206,9 +207,9 @@ namespace Voxalia.Shared
             Register("LIME", LIME);
             Register("SKY_BLUE", SKY_BLUE);
             Register("VERY_DARK_GRAY", VERY_DARK_GRAY);
-            Register("PLACEHOLDER_3", WHITE);
-            Register("PLACEHOLDER_2", WHITE);
-            Register("PLACEHOLDER_1", WHITE);
+            Register("SLIGHTLY_BRIGHT", WHITE); // TODO: SLIGHTLY_BRIGHT ? (1.5)
+            Register("BRIGHT", WHITE); // BRIGHT ? (2.0)
+            Register("VERY_BRIGHT", WHITE); // VERY_BRIGHT ? (1.25)
             TRANS1 = Register("TRANSPARENT_GREEN", TRANSPARENT_GREEN);
             Register("TRANSPARENT_BLUE", TRANSPARENT_BLUE);
             Register("TRANSPARENT_RED", TRANSPARENT_RED);
