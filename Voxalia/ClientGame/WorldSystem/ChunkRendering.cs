@@ -35,6 +35,8 @@ namespace Voxalia.ClientGame.WorldSystem
         public int Render_ResBuf = -1;
 
         public int Render_IndBuf = -1;
+
+        public int Render_LightBuf = -1;
         
         public int Render_ResBufTRANSP = -1;
 

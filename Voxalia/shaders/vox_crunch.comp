@@ -45,6 +45,10 @@ layout(shared, binding = 5) buffer b_indices
 {
 	uint[] f_indices;
 };
+layout(shared, binding = 6) buffer b_lightinfos
+{
+	uint[] f_lightinfos;
+};
 #else // MODE_ONE
 layout(shared, binding = 3) buffer b_position
 {

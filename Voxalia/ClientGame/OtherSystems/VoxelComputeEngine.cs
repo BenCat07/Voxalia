@@ -38,6 +38,8 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public int[] Program_Combo = new int[Reppers.Length];
 
+        public int Program_Lights;
+
         public int Buf_Shapes = 0;
 
         public static readonly Dictionary<int, int> lookuper = new Dictionary<int, int>(128)
@@ -68,8 +70,9 @@ namespace Voxalia.ClientGame.OtherSystems
                 Program_CruncherTRANSP3[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_THREE 1\n#define MCM_TRANSP 1\n");
                 Program_Combo[i] = TheClient.Shaders.CompileCompute("vox_combo", "#define MCM_VOX_COUNT " + Reppers[i] + "\n");
             }
+            Program_Lights = TheClient.Shaders.CompileCompute("vox_lights", "#define MCM_VOX_COUNT " + Constants.CHUNK_WIDTH + "\n");
             View3D.CheckError("Compute - Startup - Shaders");
-            float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 3)];
+            float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 7)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
             {
                 for (int x = 0; x < 6; x++)
@@ -84,10 +87,14 @@ namespace Voxalia.ClientGame.OtherSystems
                 df[(6 * 7 + 0) * MaterialHelpers.ALL_MATS.Count + i] = MaterialHelpers.ALL_MATS[i].RendersAtAll ? 1 : 0;
                 df[(6 * 7 + 1) * MaterialHelpers.ALL_MATS.Count + i] = MaterialHelpers.ALL_MATS[i].Opaque ? 1 : 0;
                 df[(6 * 7 + 2) * MaterialHelpers.ALL_MATS.Count + i] = MaterialHelpers.ALL_MATS[i].AnyOpaque ? 1 : 0;
+                df[(6 * 7 + 3) * MaterialHelpers.ALL_MATS.Count + i] = (float)MaterialHelpers.ALL_MATS[i].LightEmit.X;
+                df[(6 * 7 + 4) * MaterialHelpers.ALL_MATS.Count + i] = (float)MaterialHelpers.ALL_MATS[i].LightEmit.X;
+                df[(6 * 7 + 5) * MaterialHelpers.ALL_MATS.Count + i] = (float)MaterialHelpers.ALL_MATS[i].LightEmit.X;
+                df[(6 * 7 + 6) * MaterialHelpers.ALL_MATS.Count + i] = (float)MaterialHelpers.ALL_MATS[i].LightEmitRange;
             }
             Texture_IDs = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, Texture_IDs);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, MaterialHelpers.ALL_MATS.Count, 6 * 7 + 3, 0, PixelFormat.Red, PixelType.Float, df);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, MaterialHelpers.ALL_MATS.Count, 6 * 7 + 7, 0, PixelFormat.Red, PixelType.Float, df);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
@@ -333,6 +340,19 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.DispatchCompute(1, ch.CSize, 1);
                 ch.Render_ResBufTRANSP = resBufTRANSP;
                 View3D.CheckError("Compute - Run - Ran B");
+                if (ch.CSize == Constants.CHUNK_WIDTH)
+                {
+                    ch.Render_LightBuf = GL.GenBuffer();
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_LightBuf);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, (256 * 7 + 1) * sizeof(uint), IntPtr.Zero, hintter);
+                    uint[] zeroes = new uint[1];
+                    GL.BufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, 1, zeroes);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, ch.Render_LightBuf);
+                    GL.UseProgram(Program_Lights);
+                    GL.DispatchCompute(1, Constants.CHUNK_WIDTH * 7, 1);
+                }
+                View3D.CheckError("Compute - Run - Ran Lights");
             }
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, 0);
@@ -354,7 +374,13 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 ch.CountForRender = (int)resses[0];
                 ch.CountForRenderTRANSP = (int)ressesTRANSP[0];
-                //Console.WriteLine("Found: " + ch.CountForRender + ", transp: " + ch.CountForRenderTRANSP);
+                // TODO: REMOVE BELOW SECTION:
+                Console.WriteLine("Found: " + ch.CountForRender + ", transp: " + ch.CountForRenderTRANSP);
+                uint[] tLits = new uint[10];
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_LightBuf);
+                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, tLits.Length * sizeof(uint), tLits);
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+                Console.WriteLine(String.Join(",", tLits));
             }
             sw2.Stop();
             sw3.Start();
@@ -436,7 +462,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[4]);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[5]);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[8]);
-                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, ch.CSize == Constants.CHUNK_WIDTH ? ch.Render_LightBuf : ZeroChunkRep);
                     GL.UseProgram(transp ? Program_CruncherTRANSP2[lookuper[ch.CSize]] : Program_Cruncher2[lookuper[ch.CSize]]);
                     GL.DispatchCompute(1, ch.CSize, 1);
                     // Run computation MODE_THREE
@@ -529,6 +555,11 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.DeleteBuffer(ch.Render_IndBufTRANSP);
                 ch.Render_ResBufTRANSP = 0;
                 ch.Render_IndBufTRANSP = 0;
+                if (ch.CSize == Constants.CHUNK_WIDTH)
+                {
+                    GL.DeleteBuffer(ch.Render_LightBuf);
+                    ch.Render_LightBuf = 0;
+                }
             }
             GL.BindImageTexture(0, 0, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
             View3D.CheckError("Compute - Finalize");

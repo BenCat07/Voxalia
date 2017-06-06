@@ -17,6 +17,11 @@ layout(shared, binding = 3) buffer indexmarkers
 	uint[] indexmark;
 };
 
+layout(shared, binding = 4) buffer b_lightinfo
+{
+	uint[] f_lightinfos;
+};
+
 layout(shared, binding = 7) buffer b_shapes
 {
 	uint[] f_shapes;

@@ -113,6 +113,8 @@ bool matIsOpaque(in uint mat)
 	return imageLoad(texture_ids, ivec2(blockMat(mat), 6 * 7 + 1)).x > 0.5;
 }
 
+#if MCM_LIGHTS
+#else
 bool shapeCovers(in uint shapeRel, in uint shapeC, in uint sideC)
 {
 	uint t_c = uint(uintBitsToFloat(f_shapes[shapeC * 12 + sideC]));
@@ -154,6 +156,16 @@ uint shapeIndex(in uvec4 curBLK, in uvec3 pos)
 	uint tid = (256 * 12) + curBLK.z * (64 * 4) + sh_subdat * 4 + blockDamage(curBLK.x);
 	return f_shapes[tid];
 }
+#endif
+
+#if MCM_LIGHTS
+vec4 getLightFor(in uint mat)
+{
+	mat = blockMat(mat);
+	return vec4(imageLoad(texture_ids, ivec2(mat, 6 * 7 + 3)).x, imageLoad(texture_ids, ivec2(mat, 6 * 7 + 4)).x,
+			imageLoad(texture_ids, ivec2(mat, 6 * 7 + 5)).x, imageLoad(texture_ids, ivec2(mat, 6 * 7 + 6)).x);
+}
+#else
 
 int count_visible_verts(in uvec3 pos)
 {
@@ -179,6 +191,7 @@ int count_visible_verts(in uvec3 pos)
 	uint shInd = shapeIndex(curBLK, pos);
 	return int(f_shapes[shInd]);
 }
+#endif
 
 #if CRUNCHABLE
 float tex_for(in uint mat, in vec3 fpos, in int tp)
@@ -255,6 +268,30 @@ uvec4 getAtRel(in uvec3 pos)
 	return posses[blkSize() * mult + blockID(dup)];
 }
 
+#if MODE_TWO
+vec3 lightsFromBlocksFor(in vec3 fpos, in vec3 fnorm)
+{
+	uint max = min(f_lightinfos[0], 256);
+	vec3 absPos = fpos + vec3(MCM_VOX_COUNT, MCM_VOX_COUNT, MCM_VOX_COUNT);
+	vec3 colRel = vec3(0.0);
+	for (uint i = 0; i < max; i++)
+	{
+		uint idT = i * 7 + 1;
+		uvec3 posAbs = uvec3(f_lightinfos[idT + 0], f_lightinfos[idT + 1], f_lightinfos[idT + 2]);
+		float dist = uintBitsToFloat(f_lightinfos[idT + 6]);
+		vec3 relDist = absPos - vec3(posAbs);
+		float distSq = dot(relDist, relDist);
+		if (dist * dist >= distSq)
+		{
+			vec3 col = vec3(uintBitsToFloat(f_lightinfos[idT + 0]), uintBitsToFloat(f_lightinfos[idT + 1]), uintBitsToFloat(f_lightinfos[idT + 2]));
+			// TODO: Modify by normal vector, blocks-in-the-way, etc.
+			colRel += col * (1.0 - (sqrt(distSq) / dist));
+		}
+	}
+	return colRel;
+}
+#endif
+
 void crunch_verts(in uvec3 pos, in uint start)
 {
 	// TODO: Shapes support?
@@ -269,15 +306,15 @@ void crunch_verts(in uvec3 pos, in uint start)
 	{
 		int it3 = i;
 		int o_i = i * 3;
-		int inder = shInd + 1 + vertCount * 3 + o_i;
+		int inder = shInd + 1 + vertCount * 0 + o_i;
+		vec3 v1 = fpos + vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
+		vec3 v2 = fpos + vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));
+		vec3 v3 = fpos + vec3(uintBitsToFloat(f_shapes[inder + 6]), uintBitsToFloat(f_shapes[inder + 7]), uintBitsToFloat(f_shapes[inder + 8]));
+		inder = shInd + 1 + vertCount * 3 + o_i;
 		vec3 n1 = vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
 		vec3 n2 = vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));
 		vec3 n3 = vec3(uintBitsToFloat(f_shapes[inder + 6]), uintBitsToFloat(f_shapes[inder + 7]), uintBitsToFloat(f_shapes[inder + 8]));
 #if MODE_ONE
-		inder = shInd + 1 + vertCount * 0 + o_i;
-		vec3 v1 = fpos + vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
-		vec3 v2 = fpos + vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));
-		vec3 v3 = fpos + vec3(uintBitsToFloat(f_shapes[inder + 6]), uintBitsToFloat(f_shapes[inder + 7]), uintBitsToFloat(f_shapes[inder + 8]));
 		inder = shInd + 1 + vertCount * 6 + o_i;
 		vec3 t1 = vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
 		vec3 t2 = vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));
@@ -302,25 +339,24 @@ void crunch_verts(in uvec3 pos, in uint start)
 		f_tangent[start + it3 + 2] = vec4(tng, 0.0);
 #endif
 #if MODE_TWO
-		const vec3 ambient = vec3(0.0);
 		uvec4 p_c = n1.z < 0.0 ? curBLK : (n1.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
 				(n1.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
 				(n1.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :
 				(n1.y < -0.6 ? getAtRel(uvec3(pos.x, pos.y - 1, pos.z + 1)) :
 				getAtRel(uvec3(pos.x, pos.y, pos.z + 1))))));
-		f_color[start + it3 + 0] = vec4(min(vec3(float(p_c.y) / 255.0) + ambient, vec3(1.0)), 1.0);
+		f_color[start + it3 + 0] = vec4(vec3(float(p_c.y) / 255.0) + lightsFromBlocksFor(v1, n1), 1.0);
 		p_c = n2.z < 0.0 ? curBLK : (n2.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
 				(n2.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
 				(n2.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :
 				(n2.y < -0.6 ? getAtRel(uvec3(pos.x, pos.y - 1, pos.z + 1)) :
 				getAtRel(uvec3(pos.x, pos.y, pos.z + 1))))));
-		f_color[start + it3 + 1] = vec4(min(vec3(float(p_c.y) / 255.0) + ambient, vec3(1.0)), 1.0);
+		f_color[start + it3 + 1] = vec4(vec3(float(p_c.y) / 255.0) + lightsFromBlocksFor(v2, n2), 1.0);
 		p_c = n3.z < 0.0 ? curBLK : (n3.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
 				(n3.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
 				(n3.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :
 				(n3.y < -0.6 ? getAtRel(uvec3(pos.x, pos.y - 1, pos.z + 1)) :
 				getAtRel(uvec3(pos.x, pos.y, pos.z + 1))))));
-		f_color[start + it3 + 2] = vec4(min(vec3(float(p_c.y) / 255.0) + ambient, vec3(1.0)), 1.0);
+		f_color[start + it3 + 2] = vec4(vec3(float(p_c.y) / 255.0) + lightsFromBlocksFor(v3, n3), 1.0);
 		vec4 r_tcol = tcolors_val[blockPaint(curBLK.w)];
 		f_indices[start + it3] = start + it3;
 		f_tcol[start + it3] = r_tcol;
