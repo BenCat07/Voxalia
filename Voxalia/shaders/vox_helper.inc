@@ -217,6 +217,44 @@ float swap_tex(in uint mat, in vec3 fpos, in float zer)
 	return tex_for(mat, fpos, 5);
 }
 
+uvec4 getAtRel(in uvec3 pos)
+{
+	uvec3 dup = pos;
+	int mult = 0;
+	// TODO: Account for literal corner cases! (ZPXP, etc.)
+	if (pos.x >= gl_WorkGroupSize.x)
+	{
+		mult = 2;
+		dup.x -= gl_WorkGroupSize.x;
+	}
+	if (pos.y >= gl_NumWorkGroups.y)
+	{
+		mult = 4;
+		dup.y -= gl_NumWorkGroups.y;
+	}
+	if (pos.z >= gl_WorkGroupSize.z)
+	{
+		mult = 6;
+		dup.z -= gl_WorkGroupSize.z;
+	}
+	if (pos.x < 0)
+	{
+		mult = 1;
+		dup.x += gl_WorkGroupSize.x;
+	}
+	if (pos.y < 0)
+	{
+		mult = 3;
+		dup.y += gl_NumWorkGroups.y;
+	}
+	if (pos.z < 0)
+	{
+		mult = 5;
+		dup.z += gl_WorkGroupSize.z;
+	}
+	return posses[blkSize() * mult + blockID(dup)];
+}
+
 void crunch_verts(in uvec3 pos, in uint start)
 {
 	// TODO: Shapes support?
@@ -231,22 +269,22 @@ void crunch_verts(in uvec3 pos, in uint start)
 	{
 		int it3 = i;
 		int o_i = i * 3;
-#if MODE_ONE
-		int inder = shInd + 1 + vertCount * 0 + o_i;
-		vec3 v1 = vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
-		vec3 v2 = vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));
-		vec3 v3 = vec3(uintBitsToFloat(f_shapes[inder + 6]), uintBitsToFloat(f_shapes[inder + 7]), uintBitsToFloat(f_shapes[inder + 8]));
-		inder = shInd + 1 + vertCount * 3 + o_i;
+		int inder = shInd + 1 + vertCount * 3 + o_i;
 		vec3 n1 = vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
 		vec3 n2 = vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));
 		vec3 n3 = vec3(uintBitsToFloat(f_shapes[inder + 6]), uintBitsToFloat(f_shapes[inder + 7]), uintBitsToFloat(f_shapes[inder + 8]));
+#if MODE_ONE
+		inder = shInd + 1 + vertCount * 0 + o_i;
+		vec3 v1 = fpos + vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
+		vec3 v2 = fpos + vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));
+		vec3 v3 = fpos + vec3(uintBitsToFloat(f_shapes[inder + 6]), uintBitsToFloat(f_shapes[inder + 7]), uintBitsToFloat(f_shapes[inder + 8]));
 		inder = shInd + 1 + vertCount * 6 + o_i;
 		vec3 t1 = vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
 		vec3 t2 = vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));
 		vec3 t3 = vec3(uintBitsToFloat(f_shapes[inder + 6]), uintBitsToFloat(f_shapes[inder + 7]), uintBitsToFloat(f_shapes[inder + 8]));
-		f_position[start + it3 + 0] = vec4(fpos + v1, 0.0);
-		f_position[start + it3 + 1] = vec4(fpos + v2, 0.0);
-		f_position[start + it3 + 2] = vec4(fpos + v3, 0.0);
+		f_position[start + it3 + 0] = vec4(v1, 0.0);
+		f_position[start + it3 + 1] = vec4(v2, 0.0);
+		f_position[start + it3 + 2] = vec4(v3, 0.0);
 		f_normal[start + it3 + 0] =  vec4(n1, 0.0);
 		f_normal[start + it3 + 1] =  vec4(n2, 0.0);
 		f_normal[start + it3 + 2] =  vec4(n3, 0.0);
@@ -264,15 +302,31 @@ void crunch_verts(in uvec3 pos, in uint start)
 		f_tangent[start + it3 + 2] = vec4(tng, 0.0);
 #endif
 #if MODE_TWO
+		const vec3 ambient = vec3(0.2); // TODO: Read from somewhere!
+		uvec4 p_c = n1.z < 0.0 ? curBLK : (n1.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
+				(n1.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
+				(n1.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :
+				(n1.y < -0.6 ? getAtRel(uvec3(pos.x, pos.y - 1, pos.z + 1)) :
+				getAtRel(uvec3(pos.x, pos.y, pos.z + 1))))));
+		f_color[start + it3 + 0] = vec4(min(vec3(float(p_c.y) / 255.0) + ambient, vec3(1.0)), 1.0);
+		p_c = n2.z < 0.0 ? curBLK : (n2.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
+				(n2.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
+				(n2.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :
+				(n2.y < -0.6 ? getAtRel(uvec3(pos.x, pos.y - 1, pos.z + 1)) :
+				getAtRel(uvec3(pos.x, pos.y, pos.z + 1))))));
+		f_color[start + it3 + 1] = vec4(min(vec3(float(p_c.y) / 255.0) + ambient, vec3(1.0)), 1.0);
+		p_c = n3.z < 0.0 ? curBLK : (n3.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
+				(n3.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
+				(n3.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :
+				(n3.y < -0.6 ? getAtRel(uvec3(pos.x, pos.y - 1, pos.z + 1)) :
+				getAtRel(uvec3(pos.x, pos.y, pos.z + 1))))));
+		f_color[start + it3 + 2] = vec4(min(vec3(float(p_c.y) / 255.0) + ambient, vec3(1.0)), 1.0);
 		vec4 r_tcol = tcolors_val[blockPaint(curBLK.w)];
 		f_indices[start + it3] = start + it3;
-		f_color[start + it3] = vec4(1.0);
 		f_tcol[start + it3] = r_tcol;
 		f_indices[start + it3 + 1] = start + it3 + 1;
-		f_color[start + it3 + 1] = vec4(1.0);
 		f_tcol[start + it3 + 1] = r_tcol;
 		f_indices[start + it3 + 2] = start + it3 + 2;
-		f_color[start + it3 + 2] = vec4(1.0);
 		f_tcol[start + it3 + 2] = r_tcol;
 #endif
 #if MODE_THREE

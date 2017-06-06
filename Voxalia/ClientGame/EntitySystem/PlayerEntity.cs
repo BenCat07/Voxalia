@@ -193,7 +193,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 if (LagRateLimit > 2.5)
                 {
                     LagRateLimit = 0.0;
-                    SysConsole.Output(OutputType.WARNING, "Lagging: Movement tracker full (" + CurrentMovePacketID + ", " + GTTs[CurrentMovePacketID] + ")"); // TODO: Rate-limit this
+                    SysConsole.Output(OutputType.WARNING, "Lagging: Movement tracker full (" + CurrentMovePacketID + ", " + GTTs[CurrentMovePacketID] + ")");
                 }
                 return;
             }

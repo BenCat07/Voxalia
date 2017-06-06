@@ -595,6 +595,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                         reldat = zp.BlockLocalData;
                                     }
                                     // TODO: better darkness system!
+                                    // TODO: Move BUA setup out of this method? (To be compatible with Compute engine!)
                                     if (reldat > 200 && bua != null && bua.Darken(x, y, wpi.Z + (z + 2) * PosMultiplier))
                                     {
                                         reldat = 100;
