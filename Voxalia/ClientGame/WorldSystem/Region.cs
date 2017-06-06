@@ -1047,11 +1047,10 @@ namespace Voxalia.ClientGame.WorldSystem
                     }
                 }
             }
-            Location amb = GetAmbient();
+            //Location amb = GetAmbient();
             Location sky = SkyMod(pos, norm, skyPrecalc);
             Location blk = GetBlockLight(blockPos, pos, norm, potentials, pots);
-            Location.AddThree(ref amb, ref sky, ref blk, out Location res);
-            return res;
+            return sky + blk;
         }
 
         public OpenTK.Vector4 GetLightAmountAdjusted(Location blockPos, Location pos, Location norm)
@@ -1081,7 +1080,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     }
                 }
             }
-            Location amb = GetAmbient();
+            //Location amb = GetAmbient();
             Location sky = GetSkyLight(pos, norm);
             Location blk = GetBlockLight(blockPos, pos, norm, potentials, pots);
             if (TheClient.CVars.r_fast.ValueB)
@@ -1092,7 +1091,7 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 blk = RegularizeBig(blk, 5);
             }
-            return amb + sky + blk;
+            return sky + blk;
         }
         
         public List<KeyValuePair<Vector3i, Action>> PrepChunks = new List<KeyValuePair<Vector3i, Action>>();

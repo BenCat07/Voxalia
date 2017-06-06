@@ -302,7 +302,7 @@ void crunch_verts(in uvec3 pos, in uint start)
 		f_tangent[start + it3 + 2] = vec4(tng, 0.0);
 #endif
 #if MODE_TWO
-		const vec3 ambient = vec3(0.2); // TODO: Read from somewhere!
+		const vec3 ambient = vec3(0.0);
 		uvec4 p_c = n1.z < 0.0 ? curBLK : (n1.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
 				(n1.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
 				(n1.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :

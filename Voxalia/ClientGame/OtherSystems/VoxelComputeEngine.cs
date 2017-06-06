@@ -354,7 +354,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 ch.CountForRender = (int)resses[0];
                 ch.CountForRenderTRANSP = (int)ressesTRANSP[0];
-                Console.WriteLine("Found: " + ch.CountForRender + ", transp: " + ch.CountForRenderTRANSP);
+                //Console.WriteLine("Found: " + ch.CountForRender + ", transp: " + ch.CountForRenderTRANSP);
             }
             sw2.Stop();
             sw3.Start();
