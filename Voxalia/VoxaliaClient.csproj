@@ -382,9 +382,6 @@
     <None Include="shaders\vox_combo.comp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="shaders\vox_lights.comp">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="shaders\vox_helper.inc">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

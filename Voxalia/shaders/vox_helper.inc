@@ -271,8 +271,8 @@ uvec4 getAtRel(in uvec3 pos)
 #if MODE_TWO
 vec3 lightsFromBlocksFor(in vec3 fpos, in vec3 fnorm)
 {
-	uint max = min(f_lightinfos[0], 256);
-	vec3 absPos = fpos + vec3(MCM_VOX_COUNT, MCM_VOX_COUNT, MCM_VOX_COUNT);
+	uint max = f_lightinfos[0];
+	vec3 absPos = fpos;// + vec3(MCM_VOX_COUNT, MCM_VOX_COUNT, MCM_VOX_COUNT);
 	vec3 colRel = vec3(0.0);
 	for (uint i = 0; i < max; i++)
 	{
@@ -283,7 +283,7 @@ vec3 lightsFromBlocksFor(in vec3 fpos, in vec3 fnorm)
 		float distSq = dot(relDist, relDist);
 		if (dist * dist >= distSq)
 		{
-			vec3 col = vec3(uintBitsToFloat(f_lightinfos[idT + 0]), uintBitsToFloat(f_lightinfos[idT + 1]), uintBitsToFloat(f_lightinfos[idT + 2]));
+			vec3 col = vec3(uintBitsToFloat(f_lightinfos[idT + 3]), uintBitsToFloat(f_lightinfos[idT + 4]), uintBitsToFloat(f_lightinfos[idT + 5]));
 			// TODO: Modify by normal vector, blocks-in-the-way, etc.
 			colRel += col * (1.0 - (sqrt(distSq) / dist));
 		}
