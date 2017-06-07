@@ -62,6 +62,9 @@ namespace Voxalia.Shared
         /// </summary>
         public bool RenderAsComponent = true;
 
+        /// <summary>
+        /// The type of this item (affects sorting and inventory management).
+        /// </summary>
         public ItemType IType = ItemType.OTHER;
 
         /// <summary>
@@ -69,6 +72,10 @@ namespace Voxalia.Shared
         /// </summary>
         public Location ComponentRenderOffset = Location.Zero;
 
+        /// <summary>
+        /// Add an item component to this item.
+        /// </summary>
+        /// <param name="item">The item component to add.</param>
         public void AddComponent(ItemStackBase item)
         {
             if (this == item || HasComponentDeep(item))
@@ -79,6 +86,11 @@ namespace Voxalia.Shared
             Components.Add(item);
         }
 
+        /// <summary>
+        /// Gets whether the component exists on the item anywhere, even down sub-component layers.
+        /// </summary>
+        /// <param name="item">The item component.</param>
+        /// <returns>Whether it's held by this item.</returns>
         public bool HasComponentDeep(ItemStackBase item)
         {
             foreach (ItemStackBase itb in Components)
@@ -135,14 +147,34 @@ namespace Voxalia.Shared
             }
         }
 
+        /// <summary>
+        /// Gets the texture name.
+        /// </summary>
+        /// <returns>Texture name.</returns>
         public abstract string GetTextureName();
-
+        
+        /// <summary>
+        /// Sets the texture name.
+        /// </summary>
+        /// <param name="name">The texture name.</param>
         public abstract void SetTextureName(string name);
 
+        /// <summary>
+        /// Gets the model name.
+        /// </summary>
+        /// <returns>Model name.</returns>
         public abstract string GetModelName();
 
+        /// <summary>
+        /// Sets the model name.
+        /// </summary>
+        /// <param name="name">The model name.</param>
         public abstract void SetModelName(string name);
 
+        /// <summary>
+        /// Writes the basic set of item stack bytes to a DataWriter.
+        /// </summary>
+        /// <param name="dw">The DataWriter.</param>
         public void WriteBasicBytes(DataWriter dw)
         {
             dw.WriteInt(Count);
@@ -195,6 +227,10 @@ namespace Voxalia.Shared
             }
         }
 
+        /// <summary>
+        /// Converts this item to a byte array in full form.
+        /// </summary>
+        /// <returns>The byte array.</returns>
         public byte[] ToBytes()
         {
             DataStream ds = new DataStream(1000);
@@ -208,11 +244,27 @@ namespace Voxalia.Shared
             return ds.ToArray();
         }
 
+        /// <summary>
+        /// Sets the name of the item.
+        /// </summary>
+        /// <param name="name">The item name.</param>
         public virtual void SetName(string name)
         {
             Name = name;
         }
 
+        /// <summary>
+        /// Loads an item from data.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="secondary_name">The secondary name, if any.</param>
+        /// <param name="count">The count of items in this stack.</param>
+        /// <param name="tex">The texture name.</param>
+        /// <param name="display">The display name.</param>
+        /// <param name="descrip">The description.</param>
+        /// <param name="color">The color.</param>
+        /// <param name="model">The model.</param>
+        /// <param name="datum">The 'datum' value.</param>
         public void Load(string name, string secondary_name, int count, string tex, string display, string descrip, Color color, string model, int datum)
         {
             SetName(name);
@@ -226,6 +278,11 @@ namespace Voxalia.Shared
             DrawColor = color;
         }
 
+        /// <summary>
+        /// Loads an item from a data reader, using a function to get a new item based on bytes (for components).
+        /// </summary>
+        /// <param name="dr">The data reader.</param>
+        /// <param name="getItem">The item getter function.</param>
         public void Load(DataReader dr, Func<byte[], ItemStackBase> getItem)
         {
             Count = dr.ReadInt();
@@ -276,6 +333,10 @@ namespace Voxalia.Shared
             }
         }
         
+        /// <summary>
+        /// Gets a simple output string for this item's shared attributes.
+        /// </summary>
+        /// <returns>The string.</returns>
         public string SharedStr()
         {
             StringBuilder sb = new StringBuilder();
@@ -301,6 +362,10 @@ namespace Voxalia.Shared
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Gets a string of all the components on this item.
+        /// </summary>
+        /// <returns>The component string.</returns>
         public string ComponentString()
         {
             StringBuilder sb = new StringBuilder();
@@ -313,6 +378,10 @@ namespace Voxalia.Shared
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Converts this item to a string representation.
+        /// </summary>
+        /// <returns>The string.</returns>
         public override string ToString()
         {
             return Name + "[secondary=" + (SecondaryName ?? "{NULL}") + ";display=" + DisplayName + ";count=" + Count + ";renderascomponent=" + RenderAsComponent + ";componentrenderoffset=" + ComponentRenderOffset.ToSimpleString()
