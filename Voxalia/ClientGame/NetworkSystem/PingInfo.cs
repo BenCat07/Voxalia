@@ -12,14 +12,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Voxalia.Shared
+namespace Voxalia.ClientGame.NetworkSystem
 {
+    /// <summary>
+    /// Represents information on a server ping.
+    /// </summary>
     public class PingInfo
     {
+        /// <summary>
+        /// Whether the ping succeeded (the server is present).
+        /// </summary>
         public bool Success;
 
+        /// <summary>
+        /// The ping message (server MOTD generally).
+        /// </summary>
         public string Message;
 
+        /// <summary>
+        /// The ping time in milliseconds.
+        /// </summary>
         public long Ping;
     }
 }

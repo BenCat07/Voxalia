@@ -94,6 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientGame\NetworkSystem\PingInfo.cs" />
     <Compile Include="ClientGame\OtherSystems\VoxelComputeEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ClientGame\AudioSystem\ActiveSound.cs" />
