@@ -149,12 +149,17 @@ namespace Voxalia.ClientGame.WorldSystem
         /// <summary>
         /// Internal region call only.
         /// </summary>
-        public void MakeVBONow(bool compMe = true)
+        public void MakeVBONow(bool compMe = true, bool wasSucceeded = false)
         {
             if (SucceededBy != null)
             {
-                SucceededBy.MakeVBONow();
+                Destroy();
+                SucceededBy.MakeVBONow(compMe, true);
                 return;
+            }
+            if (wasSucceeded)
+            {
+                OwningRegion.LoadedChunks[WorldPosition] = this;
             }
             IsNew = false;
             bool plants = PosMultiplier == 1 && OwningRegion.TheClient.CVars.r_plants.ValueB;
