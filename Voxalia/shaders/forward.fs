@@ -113,6 +113,7 @@ void main()
 {
 	vec4 col = textureLod(s, fi.texcoord, textureQueryLod(s, fi.texcoord.xy).x);
 #if MCM_VOX
+	float extra_specular = 0.0;
 	float rhBlur = 0.0;
 	if (fi.tcol.w == 0.0 && fi.tcol.x == 0.0 && fi.tcol.z == 0.0 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7)
 	{
@@ -130,7 +131,7 @@ void main()
 		}
 		else if (fi.tcol.x > 0.51)
 		{
-			col *= fi.tcol;
+			extra_specular = 1.0;
 		}
 		else
 		{
@@ -143,7 +144,7 @@ void main()
 	}
 #if MCM_LIGHTS
 	vec4 hintter = texture(htex, fi.texcoord);
-	float specularStrength = hintter.x;
+	float specularStrength = hintter.x + extra_specular;
 #endif // MCM_LIGHTS
 #else // MCM_VOX
 #if MCM_LIGHTS
