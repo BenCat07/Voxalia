@@ -1126,6 +1126,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     int done = 0;
                     List<Chunk> compers = new List<Chunk>();
                     List<Vector3i> removes = new List<Vector3i>();
+                    int forgotten = 0;
                     while (NeedsRendering.Count > removed && done < cap && RenderingNow.Count < 200)
                     {
                         Vector3i temp = NeedsRendering[removed++];
@@ -1147,6 +1148,10 @@ namespace Voxalia.ClientGame.WorldSystem
                             {
                                 removes.Add(temp);
                             }
+                            else
+                            {
+                                forgotten++;
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -1164,6 +1169,10 @@ namespace Voxalia.ClientGame.WorldSystem
                         {
                             NeedsRendering.Remove(vec);
                         }
+                    }
+                    if (forgotten >= cap)
+                    {
+                        crn_ctr += 1.0;
                     }
                 }
             }
