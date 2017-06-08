@@ -163,6 +163,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     int cloudID = GetTextureID("effects/clouds/cloud2"); // TODO: Cache!
                     List<Task> tasks = new List<Task>(TheClient.TheRegion.Clouds.Count); // This could be an array.
                     List<ParticleData> datas = new List<ParticleData>(tasks.Capacity);
+                    bool lessClouds = TheClient.CVars.r_less_clouds.ValueB;
                     foreach (Cloud tcl in TheClient.TheRegion.Clouds)
                     {
                         Cloud cloud = tcl;
@@ -170,10 +171,19 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                         datas.Add(pd);
                         tasks.Add(Task.Factory.StartNew(() =>
                         {
-                            pd.Poses = new Vector3[cloud.Points.Count];
-                            pd.Cols = new Vector4[cloud.Points.Count];
-                            pd.TCs = new Vector2[cloud.Points.Count];
-                            for (int i = 0; i < cloud.Points.Count; i++)
+                            if (lessClouds)
+                            {
+                                pd.Poses = new Vector3[cloud.Points.Count / 3];
+                                pd.Cols = new Vector4[cloud.Points.Count / 3];
+                                pd.TCs = new Vector2[cloud.Points.Count / 3];
+                            }
+                            else
+                            {
+                                pd.Poses = new Vector3[cloud.Points.Count];
+                                pd.Cols = new Vector4[cloud.Points.Count];
+                                pd.TCs = new Vector2[cloud.Points.Count];
+                            }
+                            for (int i = 0; i < pd.Poses.Length; i++)
                             {
                                 Location ppos = (cloud.Position + cloud.Points[i]) - TheClient.MainWorldView.RenderRelative;
                                 pd.Poses[i] = ClientUtilities.Convert(ppos);

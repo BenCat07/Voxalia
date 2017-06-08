@@ -32,7 +32,7 @@ namespace Voxalia.ServerGame.CommandSystem
         /// <summary>
         /// Game CVars
         /// </summary>
-        public CVar g_fps, g_maxheight, g_minheight, g_maxdist, g_maxrenderdist, g_maxlodrenderdist;
+        public CVar g_fps, g_maxheight, g_minheight, g_maxdist, g_maxrenderdist, g_maxlodrenderdist, g_save;
 
         /// <summary>
         /// Network CVars
@@ -56,6 +56,7 @@ namespace Voxalia.ServerGame.CommandSystem
             s_debug = Register("s_debug", "true", CVarFlag.Boolean, "Whether to output debug information.");
             // Game CVars
             //g_timescale = Register("g_timescale", "1", CVarFlag.Numeric, "The current game time scaling value.");
+            g_save = Register("g_save", "true", CVarFlag.Boolean, "Whether to save world changes to disk."); // TODO: Also per-world!
             g_fps = Register("g_fps", "30", CVarFlag.Numeric, "What framerate to use.");
             g_maxheight = Register("g_maxheight", "5000", CVarFlag.Numeric, "What the highest possible Z coordinate should be (for building)."); // TODO: Also per-world?
             g_minheight = Register("g_minheight", "-5000", CVarFlag.Numeric, "What the lowest possible Z coordinate should be (for building)."); // TODO: Also per-world?

@@ -357,6 +357,14 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
                 return;
             }
+            if (!OwningRegion.TheServer.CVars.g_save.ValueB)
+            {
+                if (callback != null)
+                {
+                    callback.Invoke();
+                }
+                return;
+            }
             if (LastEdited == -1)
             {
                 BsonDocument ents = GetEntitySaveData();
