@@ -154,12 +154,34 @@ namespace Voxalia.ClientGame.WorldSystem
                 SucceededBy.MakeVBONow();
                 return;
             }
+            bool plants = PosMultiplier == 1 && OwningRegion.TheClient.CVars.r_plants.ValueB;
+            Chunk c_zp = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, 0, 1));
+            List<Chunk> potentials = new List<Chunk>();
+            for (int i = 0; i < Region.RelativeChunks.Length; i++)
+            {
+                Chunk tch = OwningRegion.GetChunk(WorldPosition + Region.RelativeChunks[i]);
+                if (tch != null)
+                {
+                    potentials.Add(tch);
+                }
+            }
             if (OwningRegion.TheClient.CVars.r_compute.ValueB && CSize == CHUNK_SIZE) // TODO: Handle SLODs
             {
                 OwningRegion.TheClient.VoxelComputer.Calc(this);
+                if (plants)
+                {
+                    Dictionary<Vector3i, Chunk> pots = new Dictionary<Vector3i, Chunk>();
+                    foreach (Chunk ch in potentials)
+                    {
+                        pots.Add(ch.WorldPosition, ch);
+                    }
+                    OwningRegion.TheClient.Schedule.StartAsyncTask(() =>
+                    {
+                        HandlePlants(c_zp, potentials, pots);
+                    });
+                }
                 return;
             }
-            Chunk c_zp = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, 0, 1));
             Chunk c_zm = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, 0, -1));
             Chunk c_yp = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, 1, 0));
             Chunk c_ym = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, -1, 0));
@@ -173,16 +195,6 @@ namespace Voxalia.ClientGame.WorldSystem
             Chunk c_xpym = OwningRegion.GetChunk(WorldPosition + new Vector3i(1, -1, 0));
             Chunk c_xmyp = OwningRegion.GetChunk(WorldPosition + new Vector3i(-1, 1, 0));
             Chunk c_xmym = OwningRegion.GetChunk(WorldPosition + new Vector3i(-1, -1, 0));
-            List<Chunk> potentials = new List<Chunk>();
-            for (int i = 0; i < Region.RelativeChunks.Length; i++)
-            {
-                Chunk tch = OwningRegion.GetChunk(WorldPosition + Region.RelativeChunks[i]);
-                if (tch != null)
-                {
-                    potentials.Add(tch);
-                }
-            }
-            bool plants = PosMultiplier == 1 && OwningRegion.TheClient.CVars.r_plants.ValueB;
             bool shaped = OwningRegion.TheClient.CVars.r_noblockshapes.ValueB || PosMultiplier >= 5;
             bool smooth = OwningRegion.TheClient.CVars.r_slodsmoothing.ValueB;
             if (!OwningRegion.UpperAreas.TryGetValue(new Vector2i(WorldPosition.X, WorldPosition.Y), out BlockUpperArea bua))
@@ -292,6 +304,107 @@ namespace Voxalia.ClientGame.WorldSystem
             public List<Vector3> poses = new List<Vector3>();
             public List<Vector4> colorses = new List<Vector4>();
             public List<Vector2> tcses = new List<Vector2>();
+        }
+
+        public void HandlePlants(Chunk c_zp, List<Chunk> potentials, Dictionary<Vector3i, Chunk> pots)
+        {
+            BlockInternal t_air = new BlockInternal((ushort)Material.AIR, 0, 0, 255);
+            PlantRenderHelper ph2 = new PlantRenderHelper();
+            Location chunkpos = WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
+            for (int x = 0; x < CSize; x++)
+            {
+                for (int y = 0; y < CSize; y++)
+                {
+                    for (int z = 0; z < CSize; z++)
+                    {
+                        BlockInternal c = GetBlockAt(x, y, z);
+                        if (c.Material.GetPlant() == null)
+                        {
+                            continue;
+                        }
+                        BlockInternal zp = z + 1 < CSize ? GetBlockAt(x, y, z + 1) : (c_zp == null ? t_air : GetLODRelative(c_zp, x, y, z + 1 - CSize));
+                        if (!zp.Material.IsOpaque() && zp.Material.GetSolidity() == MaterialSolidity.NONSOLID)
+                        {
+                            Location blockPos = new Location(x, y, z) + chunkpos;
+                            Location skylight = OwningRegion.GetLightAmountForSkyValue(blockPos, new Location(WorldPosition.X * Chunk.CHUNK_SIZE + x + 0.5, WorldPosition.Y * Chunk.CHUNK_SIZE + y + 0.5,
+                                WorldPosition.Z * Chunk.CHUNK_SIZE + z + 1.0), Location.UnitZ, potentials, pots, zp.BlockLocalData / 255f);
+                            bool even = c.Material.PlantShouldProduceEvenRows();
+                            MTRandom rand = null;
+                            if (!even)
+                            {
+                                ulong seed = (ulong)(WorldPosition.X * Chunk.CHUNK_SIZE + x + WorldPosition.Y * Chunk.CHUNK_SIZE + y + WorldPosition.Z * Chunk.CHUNK_SIZE + z);
+                                rand = new MTRandom(39, seed);
+                            }
+                            float mult = c.Material.GetPlantMultiplier();
+                            float inv = c.Material.GetPlantMultiplierInverse() * 0.9f;
+                            for (int plx = 0; plx < mult; plx++)
+                            {
+                                for (int ply = 0; ply < mult; ply++)
+                                {
+                                    double rxx = inv * plx + 0.1;
+                                    double ryy = inv * ply + 0.1;
+                                    if (!even)
+                                    {
+                                        double modder = inv;
+                                        rxx += rand.NextDouble() * modder;
+                                        ryy += rand.NextDouble() * modder;
+                                    }
+                                    if (!BlockShapeRegistry.BSD[c.BlockData].Coll.RayCast(new BEPUutilities.Ray(new BEPUutilities.Vector3(rxx, ryy, 3), new BEPUutilities.Vector3(0, 0, -1)), 5, out BEPUutilities.RayHit rayhit))
+                                    {
+                                        rayhit.Location = new BEPUutilities.Vector3(rxx, ryy, 1.0);
+                                    }
+                                    ph2.poses.Add(new Vector3(x + (float)rayhit.Location.X, y + (float)rayhit.Location.Y, z + (float)rayhit.Location.Z));
+                                    ph2.colorses.Add(new Vector4((float)skylight.X, (float)skylight.Y, (float)skylight.Z, 1.0f));
+                                    ph2.tcses.Add(new Vector2(c.Material.GetPlantScale(), OwningRegion.TheClient.GrassMatSet[(int)c.Material]));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            Vector3[] posset = ph2.poses.ToArray();
+            Vector4[] colorset = ph2.colorses.ToArray();
+            Vector2[] texcoordsset = ph2.tcses.ToArray();
+            uint[] posind = new uint[posset.Length];
+            for (uint i = 0; i < posind.Length; i++)
+            {
+                posind[i] = i;
+            }
+            OwningRegion.TheClient.Schedule.ScheduleSyncTask(() =>
+            {
+                UploadPlants(posind, colorset, texcoordsset, posset);
+            });
+        }
+
+        public void UploadPlants(uint[] posind, Vector4[] colorset, Vector2[] texcoordsset, Vector3[] posset)
+        {
+            DestroyPlants();
+            Plant_VAO = GL.GenVertexArray();
+            Plant_VBO_Ind = GL.GenBuffer();
+            Plant_VBO_Pos = GL.GenBuffer();
+            Plant_VBO_Col = GL.GenBuffer();
+            Plant_VBO_Tcs = GL.GenBuffer();
+            Plant_C = posind.Length;
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * Vector3.SizeInBytes), posset, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(texcoordsset.Length * Vector2.SizeInBytes), texcoordsset, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colorset.Length * Vector4.SizeInBytes), colorset, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, Plant_VBO_Ind);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(posind.Length * sizeof(uint)), posind, BufferUsageHint.StaticDraw);
+            GL.BindVertexArray(Plant_VAO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.EnableVertexAttribArray(0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, 0);
+            GL.EnableVertexAttribArray(2);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
+            GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.EnableVertexAttribArray(4);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, Plant_VBO_Ind);
+            GL.BindVertexArray(0);
         }
 
         void VBOHInternal(Chunk c_zp, Chunk c_zm, Chunk c_yp, Chunk c_ym, Chunk c_xp, Chunk c_xm, Chunk c_zpxp, Chunk c_zpxm, Chunk c_zpyp, Chunk c_zpym,
@@ -868,33 +981,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     tVBO.CleanLists();
                     if (plants)
                     {
-                        DestroyPlants();
-                        Plant_VAO = GL.GenVertexArray();
-                        Plant_VBO_Ind = GL.GenBuffer();
-                        Plant_VBO_Pos = GL.GenBuffer();
-                        Plant_VBO_Col = GL.GenBuffer();
-                        Plant_VBO_Tcs = GL.GenBuffer();
-                        Plant_C = posind.Length;
-                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
-                        GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * OpenTK.Vector3.SizeInBytes), posset, BufferUsageHint.StaticDraw);
-                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
-                        GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(texcoordsset.Length * OpenTK.Vector2.SizeInBytes), texcoordsset, BufferUsageHint.StaticDraw);
-                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
-                        GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colorset.Length * OpenTK.Vector4.SizeInBytes), colorset, BufferUsageHint.StaticDraw);
-                        GL.BindBuffer(BufferTarget.ElementArrayBuffer, Plant_VBO_Ind);
-                        GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(posind.Length * sizeof(uint)), posind, BufferUsageHint.StaticDraw);
-                        GL.BindVertexArray(Plant_VAO);
-                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
-                        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-                        GL.EnableVertexAttribArray(0);
-                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
-                        GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, 0);
-                        GL.EnableVertexAttribArray(2);
-                        GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
-                        GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
-                        GL.EnableVertexAttribArray(4);
-                        GL.BindBuffer(BufferTarget.ElementArrayBuffer, Plant_VBO_Ind);
-                        GL.BindVertexArray(0);
+                        UploadPlants(posind, colorset, texcoordsset, posset);
                     }
                 });
                 OwningRegion.DoneRendering(this);
