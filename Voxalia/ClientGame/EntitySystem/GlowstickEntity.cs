@@ -61,7 +61,7 @@ namespace Voxalia.ClientGame.EntitySystem
         public override void SpawnBody()
         {
             light = new PointLight(GetPosition(), 64, 15, new Location(GColor.R, GColor.G, GColor.B) * Brightness);
-            light.SetCastShadows(false);
+            //light.SetCastShadows(false);
             TheClient.MainWorldView.Lights.Add(light);
             base.SpawnBody();
         }

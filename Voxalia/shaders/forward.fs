@@ -71,7 +71,7 @@ in struct vox_fout
 #endif
 } fi;
 
-const int LIGHTS_MAX = 20;
+const int LIGHTS_MAX = 38;
 
 // ...
 layout (location = 4) uniform vec4 screen_size = vec4(1024, 1024, 0.1, 1000.0);
@@ -85,7 +85,7 @@ layout (location = 15) uniform float lights_used = 0.0;
 layout (location = 16) uniform float minimum_light = 0.2;
 #if MCM_LIGHTS
 layout (location = 20) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
-layout (location = 40) uniform mat4 light_data_array[LIGHTS_MAX];
+layout (location = 58) uniform mat4 light_data_array[LIGHTS_MAX];
 #endif
 
 layout (location = 0) out vec4 color;
@@ -224,6 +224,17 @@ void main()
 		}
 		// TODO: maybe HD well blurred shadows?
 #if MCM_SHADOWS
+		float shadowID = float(i);
+		float mdX = 1.0, mdY = 1.0, rdX = 0.0, rdY = 0.0;
+		if (i >= 10)
+		{
+			shadowID = float((i - 10) / 4);
+			int ltCO = (n - 10) % 4;
+			rdY = float(ltCO / 2) * 0.5;
+			rdX = float(ltCO % 2) * 0.5;
+			mdX = 0.5;
+			mdY = 0.5;
+		}
 #if 1 // TODO: MCM_SHADOW_BLURRING?
 		float depth = 1.0;
 		if (is_point == 0)
@@ -234,7 +245,7 @@ void main()
 				for (float y = -1.0; y <= 1.0; y += 0.5)
 				{
 					loops++;
-					float rd = texture(shadowtex, vec3(fs.x + x * tex_size, fs.y + y * tex_size, float(i))).r; // Calculate the depth of the pixel.
+					float rd = texture(shadowtex, vec3((fs.x + x * tex_size) * mdX + rdX, (fs.y + y * tex_size) * mdY + rdY, shadowID)).r; // Calculate the depth of the pixel.
 					depth += (rd >= (fs.z - 0.001) ? 1.0 : 0.0);
 				}
 			}
@@ -244,7 +255,7 @@ void main()
 		float depth = 1.0;
 		if (is_point == 0)
 		{
-			float rd = texture(shadowtex, vec3(fs.x, fs.y, float(i))).r; // Calculate the depth of the pixel.
+			float rd = texture(shadowtex, vec3(fs.x * mdX + rdX, fs.y * mdY + rdY, shadowID)).r; // Calculate the depth of the pixel.
 			depth = (rd >= (fs.z - 0.001) ? 1.0 : 0.0); // If we have a bad graphics card, just quickly get a 0 or 1 depth value. This will be pixelated (hard) shadows!
 		}
 #endif

@@ -206,7 +206,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.DeleteFramebuffer(hdrfbo);
                 GL.DeleteTexture(hdrtex);
                 CheckError("Load - View3D - Light - Deletes - 2");
-                GL.DeleteFramebuffers(LIGHTS_MAX + 1, fbo_shadow);
+                GL.DeleteFramebuffers(SHADOW_BITS_MAX + 1, fbo_shadow);
                 CheckError("Load - View3D - Light - Deletes - 3");
                 GL.DeleteTexture(fbo_shadow_color);
                 GL.DeleteTexture(fbo_shadow_tex);
@@ -269,7 +269,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             int sq = ShadowTexSize();
             fbo_shadow_tex = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, fbo_shadow_tex);
-            GL.TexImage3D(TextureTarget.Texture2DArray, 0, PixelInternalFormat.DepthComponent, sq, sq, LIGHTS_MAX + 1, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
+            GL.TexImage3D(TextureTarget.Texture2DArray, 0, PixelInternalFormat.DepthComponent, sq, sq, SHADOW_BITS_MAX + 1, 0, PixelFormat.DepthComponent, PixelType.Float, IntPtr.Zero);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
@@ -284,8 +284,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
             GL.BindTexture(TextureTarget.Texture2D, 0);
             CheckError("Load - View3D - Light - ShadowColor");
-            GL.GenFramebuffers(LIGHTS_MAX + 1, fbo_shadow);
-            for (int i = 0; i < LIGHTS_MAX + 1; i++)
+            GL.GenFramebuffers(SHADOW_BITS_MAX + 1, fbo_shadow);
+            for (int i = 0; i < SHADOW_BITS_MAX + 1; i++)
             {
                 BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[i]);
                 GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, fbo_shadow_tex, 0, i);
@@ -322,7 +322,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         int fbo_decal_depth = -1;
         int fbo_decal_tex = -1;
 
-        int[] fbo_shadow = new int[LIGHTS_MAX + 1];
+        int[] fbo_shadow = new int[SHADOW_BITS_MAX + 1];
         int fbo_shadow_tex = -1;
         int fbo_shadow_color = -1;
 
@@ -878,6 +878,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     {
                                         continue;
                                     }
+                                    int sp = ShadowTexSize();
+                                    if (c >= 10)
+                                    {
+                                        sp /= 2;
+                                    }
                                     Matrix4 smat = Lights[i].InternalLights[x].GetMatrix();
                                     Vector3d eyep = Lights[i].InternalLights[x].eye - ClientUtilities.ConvertD(CameraPos);
                                     Vector3 col = Lights[i].InternalLights[x].color * (float)maxrangemult;
@@ -890,7 +895,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                         Lights[i].InternalLights[x] is LightOrtho ? LightMaximum : (Lights[i].InternalLights[0].maxrange <= 0 ? LightMaximum : Lights[i].InternalLights[0].maxrange), // light_radius
                                         0f, 0f, 0f, // eye_pos
                                         Lights[i] is SpotLight ? 1.0f : 0.0f, // light_type
-                                        1f / ShadowTexSize(), // tex_size
+                                        1f / sp, // tex_size
                                         0.0f // Unused.
                                         );
                                     for (int mx = 0; mx < 4; mx++)
@@ -1186,7 +1191,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 int n = 0;
                 Frustum tcf = CFrust;
                 int sp = ShadowTexSize();
-                GL.Viewport(0, 0, sp, sp);
+                int ssp = sp / 2;
                 for (int i = 0; i < Lights.Count; i++)
                 {
                     if (Lights[i] is SkyLight || camFrust == null || camFrust.ContainsSphere(Lights[i].EyePos, Lights[i].MaxDistance))
@@ -1211,7 +1216,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     {
                                         continue;
                                     }
-                                    BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
                                     if (Lights[i].InternalLights[x] is LightOrtho)
                                     {
                                         CFrust = null;
@@ -1219,6 +1223,27 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     else
                                     {
                                         CFrust = new Frustum(ClientUtilities.ConvertToD(Lights[i].InternalLights[x].GetMatrix()).ConvertD()); // TODO: One-step conversion!
+                                    }
+                                    int lTID = n;
+                                    int widX = sp;
+                                    int widY = sp;
+                                    int ltX = 0;
+                                    int ltY = 0;
+                                    if (n >= 10)
+                                    {
+                                        lTID = (n - 10) / 4;
+                                        int ltCO = (n - 10) % 4;
+                                        ltY = ltCO / 2;
+                                        ltX = ltCO % 2;
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[lTID]);
+                                        GL.Viewport(ssp * ltX, ssp * ltY, ssp, ssp);
+                                        widX = ssp;
+                                        widY = ssp;
+                                    }
+                                    else
+                                    {
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[lTID]);
+                                        GL.Viewport(0, 0, sp, sp);
                                     }
                                     CheckError("Pre-Prerender - Shadows - " + i);
                                     CameraPos = ClientUtilities.ConvertD(Lights[i].InternalLights[x].eye) - campos;
@@ -1269,9 +1294,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                             CheckError("Prerender - Shadows - " + i);
                                             Render3D(this);
                                         }
-                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[lTID]);
                                         GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, sky.FBO);
-                                        GL.BlitFramebuffer(0, 0, sky.TexWidth, sky.TexWidth, 0, 0, sp, sp, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                                        GL.BlitFramebuffer(0, 0, sky.TexWidth, sky.TexWidth, ltX, ltY, widX, widY, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
                                         GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
                                         if (TheClient.CVars.r_dynamicshadows.ValueB)
                                         {
@@ -1282,13 +1307,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     }
                                     else if (!Lights[i].InternalLights[x].CastShadows)
                                     {
-                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[lTID]);
                                         GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
                                         GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
                                     }
                                     else
                                     {
-                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[n]);
+                                        BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[lTID]);
                                         GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
                                         GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
                                         FBOid = FBOID.SHADOWS;
@@ -1501,7 +1526,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public Frustum camFrust;
 
-        const int LIGHTS_MAX = 20;
+        const int SHADOW_BITS_MAX = 17;
+
+        const int LIGHTS_MAX = 38;
 
         public void RenderPass_Lights()
         {
