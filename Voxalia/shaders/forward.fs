@@ -229,7 +229,7 @@ void main()
 		if (i >= 10)
 		{
 			shadowID = float((i - 10) / 4);
-			int ltCO = (n - 10) % 4;
+			int ltCO = (i - 10) % 4;
 			rdY = float(ltCO / 2) * 0.5;
 			rdX = float(ltCO % 2) * 0.5;
 			mdX = 0.5;
