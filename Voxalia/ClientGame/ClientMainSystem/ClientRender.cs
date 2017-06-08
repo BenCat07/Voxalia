@@ -1239,6 +1239,19 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ch.Render();
                 }
             }
+            foreach (Chunk ch in TheRegion.LoadedChunks.Values)
+            {
+                if (ch.PosMultiplier < 5)
+                {
+                    continue;
+                }
+                Location min = ch.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
+                Location max = min + new Location(Chunk.CHUNK_SIZE);
+                if ((MainWorldView.CFrust == null || MainWorldView.LongFrustum == null || MainWorldView.LongFrustum.ContainsBox(min, max)))
+                {
+                    ch.Render();
+                }
+            }
             View3D.CheckError("Rendering - Sky - Slods");
             SetEnts();
             if (MainWorldView.FBOid.IsForward())

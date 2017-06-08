@@ -1125,8 +1125,8 @@ namespace Voxalia.ClientGame.WorldSystem
                                 {
                                     done++;
                                 }
-                                ch.MakeVBONow();
                                 RenderingNow.Add(temp);
+                                ch.MakeVBONow();
                             }
                         }
                         catch (Exception ex)

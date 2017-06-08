@@ -310,9 +310,9 @@ void crunch_verts(in uvec3 pos, in uint start)
 		int it3 = i;
 		int o_i = i * 3;
 		int inder = shInd + 1 + vertCount * 0 + o_i;
-		vec3 v1 = fpos + vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
-		vec3 v2 = fpos + vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));
-		vec3 v3 = fpos + vec3(uintBitsToFloat(f_shapes[inder + 6]), uintBitsToFloat(f_shapes[inder + 7]), uintBitsToFloat(f_shapes[inder + 8]));
+		vec3 v1 = (fpos + vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]))) * (30.0 / MCM_VOX_COUNT);
+		vec3 v2 = (fpos + vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]))) * (30.0 / MCM_VOX_COUNT);
+		vec3 v3 = (fpos + vec3(uintBitsToFloat(f_shapes[inder + 6]), uintBitsToFloat(f_shapes[inder + 7]), uintBitsToFloat(f_shapes[inder + 8]))) * (30.0 / MCM_VOX_COUNT);
 		inder = shInd + 1 + vertCount * 3 + o_i;
 		vec3 n1 = vec3(uintBitsToFloat(f_shapes[inder]), uintBitsToFloat(f_shapes[inder + 1]), uintBitsToFloat(f_shapes[inder + 2]));
 		vec3 n2 = vec3(uintBitsToFloat(f_shapes[inder + 3]), uintBitsToFloat(f_shapes[inder + 4]), uintBitsToFloat(f_shapes[inder + 5]));

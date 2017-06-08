@@ -165,7 +165,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     potentials.Add(tch);
                 }
             }
-            if (OwningRegion.TheClient.CVars.r_compute.ValueB && CSize == CHUNK_SIZE) // TODO: Handle SLODs
+            if (OwningRegion.TheClient.CVars.r_compute.ValueB)
             {
                 OwningRegion.TheClient.VoxelComputer.Calc(this);
                 if (plants)
@@ -180,6 +180,7 @@ namespace Voxalia.ClientGame.WorldSystem
                         HandlePlants(c_zp, potentials, pots);
                     });
                 }
+                OwningRegion.DoneRendering(this);
                 return;
             }
             Chunk c_zm = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, 0, -1));
@@ -310,7 +311,7 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             BlockInternal t_air = new BlockInternal((ushort)Material.AIR, 0, 0, 255);
             PlantRenderHelper ph2 = new PlantRenderHelper();
-            Location chunkpos = WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
+            Location chunkpos = WorldPosition.ToLocation() * CHUNK_SIZE;
             for (int x = 0; x < CSize; x++)
             {
                 for (int y = 0; y < CSize; y++)
@@ -326,13 +327,13 @@ namespace Voxalia.ClientGame.WorldSystem
                         if (!zp.Material.IsOpaque() && zp.Material.GetSolidity() == MaterialSolidity.NONSOLID)
                         {
                             Location blockPos = new Location(x, y, z) + chunkpos;
-                            Location skylight = OwningRegion.GetLightAmountForSkyValue(blockPos, new Location(WorldPosition.X * Chunk.CHUNK_SIZE + x + 0.5, WorldPosition.Y * Chunk.CHUNK_SIZE + y + 0.5,
+                            Location skylight = OwningRegion.GetLightAmountForSkyValue(blockPos, new Location(WorldPosition.X * CHUNK_SIZE + x + 0.5, WorldPosition.Y * CHUNK_SIZE + y + 0.5,
                                 WorldPosition.Z * Chunk.CHUNK_SIZE + z + 1.0), Location.UnitZ, potentials, pots, zp.BlockLocalData / 255f);
                             bool even = c.Material.PlantShouldProduceEvenRows();
                             MTRandom rand = null;
                             if (!even)
                             {
-                                ulong seed = (ulong)(WorldPosition.X * Chunk.CHUNK_SIZE + x + WorldPosition.Y * Chunk.CHUNK_SIZE + y + WorldPosition.Z * Chunk.CHUNK_SIZE + z);
+                                ulong seed = (ulong)(WorldPosition.X * CHUNK_SIZE + x + WorldPosition.Y * CHUNK_SIZE + y + WorldPosition.Z * CHUNK_SIZE + z);
                                 rand = new MTRandom(39, seed);
                             }
                             float mult = c.Material.GetPlantMultiplier();
