@@ -154,6 +154,11 @@ namespace Voxalia.ClientGame.WorldSystem
                 SucceededBy.MakeVBONow();
                 return;
             }
+            if (OwningRegion.TheClient.CVars.r_compute.ValueB && CSize == CHUNK_SIZE) // TODO: Handle SLODs
+            {
+                OwningRegion.TheClient.VoxelComputer.Calc(this);
+                return;
+            }
             Chunk c_zp = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, 0, 1));
             Chunk c_zm = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, 0, -1));
             Chunk c_yp = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, 1, 0));

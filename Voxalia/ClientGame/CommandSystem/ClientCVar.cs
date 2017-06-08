@@ -41,7 +41,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_good_graphics, r_skybox, r_lensflare, r_blocktexturelinear, r_blocktexturewidth, r_toonify, r_transplighting, r_transpshadows,
             r_3d_enable, r_fast, r_chunksatonce, r_chunkoverrender, r_transpll, r_noblockshapes, r_treeshadows,
             r_godrays, r_hdr, r_clouds, r_motionblur, r_plants, r_exposure, r_grayscale, r_vrscale,
-            r_forward_normals, r_forward_lights, r_forward_shadows,
+            r_forward_normals, r_forward_lights, r_forward_shadows, r_compute,
             r_block_mipmaps, r_slodsmoothing, r_modeldistance, r_plantdistance;
 
         // Audio CVars
@@ -130,6 +130,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_exposure = Register("r_exposure", "1.5", CVarFlag.Numeric, "What value to scale the lighting by.");
             r_grayscale = Register("r_grayscale", "false", CVarFlag.Boolean, "Whether to grayscale the view.");
             r_vrscale = Register("r_vrscale", "1", CVarFlag.Numeric, "What scale to put everything at in VR mode.");
+            r_compute = Register("r_compute", "true", CVarFlag.Boolean, "Whether to render chunks using the Voxel Compute Shader engine.");
             r_fog = Register("r_fog", "true", CVarFlag.Boolean, "Whether render fog should be enabled at distance.");
             r_forward_normals = Register("r_forward_normals", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether forward mode rendering should calculate normal-map effects.");
             r_forward_lights = Register("r_forward_lights", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether forward mode rendering should calculate live lighting effects.");
