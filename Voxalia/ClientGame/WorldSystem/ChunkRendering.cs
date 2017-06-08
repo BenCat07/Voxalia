@@ -46,6 +46,8 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public int Render_FBB = -1;
 
+        public bool IsNew = true;
+
         // TODO: Possibly store world locations rather than local block locs?
         public KeyValuePair<Vector3i, Material>[] Lits = new KeyValuePair<Vector3i, Material>[0];
 
@@ -147,13 +149,14 @@ namespace Voxalia.ClientGame.WorldSystem
         /// <summary>
         /// Internal region call only.
         /// </summary>
-        public void MakeVBONow()
+        public void MakeVBONow(bool compMe = true)
         {
             if (SucceededBy != null)
             {
                 SucceededBy.MakeVBONow();
                 return;
             }
+            IsNew = false;
             bool plants = PosMultiplier == 1 && OwningRegion.TheClient.CVars.r_plants.ValueB;
             Chunk c_zp = OwningRegion.GetChunk(WorldPosition + new Vector3i(0, 0, 1));
             List<Chunk> potentials = new List<Chunk>();
@@ -167,7 +170,10 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             if (OwningRegion.TheClient.CVars.r_compute.ValueB)
             {
-                OwningRegion.TheClient.VoxelComputer.Calc(this);
+                if (compMe)
+                {
+                    OwningRegion.TheClient.VoxelComputer.Calc(this);
+                }
                 if (plants)
                 {
                     Dictionary<Vector3i, Chunk> pots = new Dictionary<Vector3i, Chunk>();

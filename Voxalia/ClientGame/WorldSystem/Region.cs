@@ -418,7 +418,7 @@ namespace Voxalia.ClientGame.WorldSystem
             temp.Z = (int)Math.Floor(pos.Z / Chunk.CHUNK_SIZE);
             return temp;
         }
-
+        
         public Chunk LoadChunk(Vector3i pos, int posMult)
         {
             if (LoadedChunks.TryGetValue(pos, out Chunk chunk))
@@ -439,6 +439,7 @@ namespace Voxalia.ClientGame.WorldSystem
                         _VBOSolid = null,
                         _VBOTransp = null,
                         WorldPosition = pos,
+                        IsNew = true
                     };
                     chunk.OnRendered = () =>
                     {
@@ -454,7 +455,8 @@ namespace Voxalia.ClientGame.WorldSystem
                 chunk = new Chunk(posMult)
                 {
                     OwningRegion = this,
-                    WorldPosition = pos
+                    WorldPosition = pos,
+                    IsNew = true
                 };
                 LoadedChunks.Add(pos, chunk);
             }
@@ -1102,10 +1104,19 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public HashSet<Vector3i> PreppingNow = new HashSet<Vector3i>();
 
+        double crn_ctr = 0;
+
         public void CheckForRenderNeed()
         {
             lock (RenderingNow)
             {
+                crn_ctr += Delta;
+                bool renderNews = false;
+                if (crn_ctr > 0.5)
+                {
+                    renderNews = true;
+                    crn_ctr = 0;
+                }
                 int removed = 0;
                 if (NeedsRendering.Count > 0)
                 {
@@ -1113,20 +1124,28 @@ namespace Voxalia.ClientGame.WorldSystem
                         (b.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition())));
                     int cap = TheClient.CVars.r_chunksatonce.ValueI;
                     int done = 0;
+                    List<Chunk> compers = new List<Chunk>();
+                    List<Vector3i> removes = new List<Vector3i>();
                     while (NeedsRendering.Count > removed && done < cap && RenderingNow.Count < 200)
                     {
                         Vector3i temp = NeedsRendering[removed++];
                         try
                         {
                             Chunk ch = GetChunk(temp);
-                            if (ch != null)
+                            if (ch != null && (!ch.IsNew || renderNews))
                             {
                                 if (NeedsRendering.Count < 50 || ch.PosMultiplier != 15)
                                 {
                                     done++;
                                 }
                                 RenderingNow.Add(temp);
-                                ch.MakeVBONow();
+                                ch.MakeVBONow(false);
+                                compers.Add(ch);
+                                removes.Add(temp);
+                            }
+                            else if (ch == null)
+                            {
+                                removes.Add(temp);
                             }
                         }
                         catch (Exception ex)
@@ -1135,9 +1154,16 @@ namespace Voxalia.ClientGame.WorldSystem
                             SysConsole.Output("Pre-rendering chunks", ex);
                         }
                     }
+                    if (TheClient.CVars.r_compute.ValueB)
+                    {
+                        TheClient.VoxelComputer.Calc(compers.ToArray());
+                    }
                     if (removed > 0)
                     {
-                        NeedsRendering.RemoveRange(0, removed);
+                        foreach (Vector3i vec in removes)
+                        {
+                            NeedsRendering.Remove(vec);
+                        }
                     }
                 }
             }
