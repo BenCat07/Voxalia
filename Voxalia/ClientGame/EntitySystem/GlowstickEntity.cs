@@ -41,14 +41,14 @@ namespace Voxalia.ClientGame.EntitySystem
         {
             if (TheClient.MainWorldView.FBOid == FBOID.MAIN)
             {
-                GL.Uniform4(7, new Vector4(GColor.R * Brightness, GColor.G * Brightness, GColor.B * Brightness, 1f));
+                // TODO: ??? GL.Uniform4(7, new Vector4(GColor.R * Brightness, GColor.G * Brightness, GColor.B * Brightness, 1f));
             }
             TheClient.Rendering.SetMinimumLight(Brightness);
             base.Render();
             TheClient.Rendering.SetMinimumLight(0);
             if (TheClient.MainWorldView.FBOid == FBOID.MAIN)
             {
-                GL.Uniform4(7, new Vector4(0f, 0f, 0f, 0f));
+                // TODO: ??? GL.Uniform4(7, new Vector4(0f, 0f, 0f, 0f));
             }
         }
 

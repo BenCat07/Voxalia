@@ -2192,7 +2192,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 }
                 int c = 0;
                 float[] l_dats1 = new float[LIGHTS_MAX * 16];
-                float[] l_dats2 = new float[LIGHTS_MAX * 16];
                 float[] s_mats = new float[LIGHTS_MAX * 16];
                 for (int i = 0; i < Lights.Count; i++)
                 {
@@ -2204,40 +2203,26 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             float maxrange = (Lights[i].InternalLights[x] is LightOrtho) ? LightMaximum : Lights[i].InternalLights[x].maxrange;
                             Matrix4 matxyz = new Matrix4(Vector4.Zero, Vector4.Zero, Vector4.Zero, Vector4.Zero);
                             matxyz[0, 0] = maxrange <= 0 ? LightMaximum : maxrange;
-                            // TODO: Diffuse Albedo
-                            matxyz[0, 1] = 0.7f;
-                            matxyz[0, 2] = 0.7f;
-                            matxyz[0, 3] = 0.7f;
-                            // TODO: Specular Albedo
-                            matxyz[1, 0] = 0.7f;
-                            matxyz[1, 1] = 0.7f;
-                            matxyz[1, 2] = 0.7f;
+                            matxyz[0, 1] = (float)(Lights[i].EyePos.X - RenderRelative.X);
+                            matxyz[0, 2] = (float)(Lights[i].EyePos.Y - RenderRelative.Y);
+                            matxyz[0, 3] = (float)(Lights[i].EyePos.Z - RenderRelative.Z);
+                            matxyz[1, 0] = Lights[i].InternalLights[x].color.X;
+                            matxyz[1, 1] = Lights[i].InternalLights[x].color.Y;
+                            matxyz[1, 2] = Lights[i].InternalLights[x].color.Z;
                             matxyz[1, 3] = (Lights[i] is SpotLight) ? 1f : 0f;
                             matxyz[2, 0] = (Lights[i].InternalLights[x] is LightOrtho) ? 1f : 0f;
                             matxyz[2, 1] = 1f / TheClient.CVars.r_shadowquality.ValueI;
-                            matxyz[2, 2] = 0.5f;
-                            matxyz[2, 3] = (float)lightc;
-                            matxyz[3, 0] = (float)ambient.X;
+                            matxyz[2, 2] = MainEXP * TheClient.CVars.r_exposure.ValueF;
+                            matxyz[2, 3] = (float)lightc; // TODO: Move this to a generic
+                            matxyz[3, 0] = (float)ambient.X; // TODO: Remove ambient
                             matxyz[3, 1] = (float)ambient.Y;
                             matxyz[3, 2] = (float)ambient.Z;
-                            Matrix4 matabc = new Matrix4(Vector4.Zero, Vector4.Zero, Vector4.Zero, Vector4.Zero);
-                            matabc[0, 0] = 0f;
-                            matabc[0, 1] = 0f;
-                            matabc[0, 2] = 0f;
-                            matabc[1, 0] = (float)(Lights[i].EyePos.X - RenderRelative.X);
-                            matabc[1, 1] = (float)(Lights[i].EyePos.Y - RenderRelative.Y);
-                            matabc[1, 2] = (float)(Lights[i].EyePos.Z - RenderRelative.Z);
-                            matabc[2, 0] = MainEXP * TheClient.CVars.r_exposure.ValueF;
-                            matabc[0, 3] = Lights[i].InternalLights[x].color.X;
-                            matabc[2, 1] = Lights[i].InternalLights[x].color.Y;
-                            matabc[2, 2] = Lights[i].InternalLights[x].color.Z;
                             for (int mx = 0; mx < 4; mx++)
                             {
                                 for (int my = 0; my < 4; my++)
                                 {
                                     s_mats[c * 16 + mx * 4 + my] = lmat[mx, my];
                                     l_dats1[c * 16 + mx * 4 + my] = matxyz[mx, my];
-                                    l_dats2[c * 16 + mx * 4 + my] = matabc[mx, my];
                                 }
                             }
                             c++;
@@ -2282,7 +2267,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);
                 GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, l_dats1);
-                GL.UniformMatrix4(20 + LIGHTS_MAX + LIGHTS_MAX, LIGHTS_MAX, false, l_dats2);
                 CheckError("PreRenderTranspLights - 2");
                 if (TheClient.CVars.r_transpshadows.ValueB && TheClient.CVars.r_shadows.ValueB)
                 {
@@ -2312,7 +2296,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);
                 GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, l_dats1);
-                GL.UniformMatrix4(20 + LIGHTS_MAX + LIGHTS_MAX, LIGHTS_MAX, false, l_dats2);
                 CheckError("PreRenderTranspLights - 3");
                 if (TheClient.CVars.r_transpshadows.ValueB && TheClient.CVars.r_shadows.ValueB)
                 {
@@ -2341,7 +2324,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);
                 GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, l_dats1);
-                GL.UniformMatrix4(20 + LIGHTS_MAX + LIGHTS_MAX, LIGHTS_MAX, false, l_dats2);
                 GL.ActiveTexture(TextureUnit.Texture4);
                 GL.BindTexture(TextureTarget.Texture2DArray, fbo_shadow_tex);
                 GL.ActiveTexture(TextureUnit.Texture0);
