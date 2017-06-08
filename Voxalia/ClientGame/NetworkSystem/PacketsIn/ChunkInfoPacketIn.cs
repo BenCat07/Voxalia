@@ -23,7 +23,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
     {
         public override bool ParseBytesAndExecute(byte[] data)
         {
-            if (data.Length < 16)
+            if (data.Length < 17)
             {
                 SysConsole.Output(OutputType.WARNING, "Got chunk info packet of size: " + data.Length);
                 return false;
@@ -34,6 +34,27 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             int y = dr.ReadInt();
             int z = dr.ReadInt();
             int posMult = dr.ReadInt();
+            byte oinfo = dr.ReadByte();
+            if (oinfo == 1)
+            {
+                TheClient.TheRegion.ForgetChunk(new Vector3i(x, y, z));
+                TheClient.TheRegion.AirChunks.Add(new Vector3i(x, y, z));
+                for (int tx = -1; tx <= 1; tx++)
+                {
+                    for (int ty = -1; ty <= 1; ty++)
+                    {
+                        for (int tz = -1; tz <= 1; tz++)
+                        {
+                            Chunk ch = TheClient.TheRegion.GetChunk(new Vector3i(x + tx, y + ty, z + tz));
+                            if (ch != null)
+                            {
+                                ch.CreateVBO();
+                            }
+                        }
+                    }
+                }
+                return true;
+            }
             lock (TheClient.TheRegion.PreppingNow)
             {
                 Action act = () =>
@@ -46,7 +67,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                     {
                         try
                         {
-                            ParseData(data, dr, x, y, z, posMult);
+                            ParseData(dr, x, y, z, posMult);
                         }
                         catch (Exception ex)
                         {
@@ -64,7 +85,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             return true;
         }
 
-        void ParseData(byte[] data, DataReader dr, int x, int y, int z, int posMult)
+        void ParseData(DataReader dr, int x, int y, int z, int posMult)
         {
             byte[] reach = posMult >= 6 ? new byte[(int)ChunkReachability.COUNT] : dr.ReadBytes((int)ChunkReachability.COUNT);
             int csize = Chunk.CHUNK_SIZE / posMult;
@@ -154,7 +175,10 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             chk.LOADING = false;
             chk.PRED = true;
-            chk.OwningRegion.Regen(chk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE, chk);
+            TheClient.Schedule.ScheduleSyncTask(() =>
+            {
+                chk.OwningRegion.Regen(chk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE, chk);
+            });
             lock (TheClient.TheRegion.PreppingNow)
             {
                 TheClient.TheRegion.PreppingNow.Remove(chk.WorldPosition);

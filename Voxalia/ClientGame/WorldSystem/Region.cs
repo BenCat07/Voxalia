@@ -331,6 +331,8 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public Dictionary<Vector3i, Chunk> LoadedChunks = new Dictionary<Vector3i, Chunk>();
 
+        public HashSet<Vector3i> AirChunks = new HashSet<Vector3i>();
+
         public Dictionary<Vector3i, ChunkSLODHelper> SLODs = new Dictionary<Vector3i, ChunkSLODHelper>();
 
         public ChunkSLODHelper GetSLODHelp(Vector3i chunk_pos, bool generate = true)
@@ -513,26 +515,21 @@ namespace Voxalia.ClientGame.WorldSystem
         public void Regen(Location pos, Chunk ch, int x = 1, int y = 1, int z = 1)
         {
             Chunk tch = ch;
-            bool zupd = false;
             if (z == tch.CSize - 1 || TheClient.CVars.r_chunkoverrender.ValueB)
             {
                 ch = GetChunk(ChunkLocFor(pos) + new Vector3i(0, 0, 1));
                 if (ch != null)
                 {
-                    UpdateChunk(ch);
-                    zupd = true;
+                    EasyUpdateChunk(ch);
                 }
             }
-            if (!zupd)
-            {
-                UpdateChunk(tch);
-            }
+            UpdateChunk(tch);
             if (x == 0 || TheClient.CVars.r_chunkoverrender.ValueB)
             {
                 ch = GetChunk(ChunkLocFor(pos) + new Vector3i(-1, 0, 0));
                 if (ch != null)
                 {
-                    UpdateChunk(ch);
+                    EasyUpdateChunk(ch);
                 }
             }
             if (y == 0 || TheClient.CVars.r_chunkoverrender.ValueB)
@@ -540,7 +537,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 ch = GetChunk(ChunkLocFor(pos) + new Vector3i(0, -1, 0));
                 if (ch != null)
                 {
-                    UpdateChunk(ch);
+                    EasyUpdateChunk(ch);
                 }
             }
             if (x == tch.CSize - 1 || TheClient.CVars.r_chunkoverrender.ValueB)
@@ -548,7 +545,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 ch = GetChunk(ChunkLocFor(pos) + new Vector3i(1, 0, 0));
                 if (ch != null)
                 {
-                    UpdateChunk(ch);
+                    EasyUpdateChunk(ch);
                 }
             }
             if (y == tch.CSize - 1 || TheClient.CVars.r_chunkoverrender.ValueB)
@@ -556,7 +553,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 ch = GetChunk(ChunkLocFor(pos) + new Vector3i(0, 1, 0));
                 if (ch != null)
                 {
-                    UpdateChunk(ch);
+                    EasyUpdateChunk(ch);
                 }
             }
         }
@@ -572,6 +569,15 @@ namespace Voxalia.ClientGame.WorldSystem
             if (regen)
             {
                 Regen(pos, ch, x, y, z);
+            }
+        }
+
+        public void EasyUpdateChunk(Chunk ch)
+        {
+            ch.AddToWorld();
+            if (!ch.CreateVBO())
+            {
+                return;
             }
         }
 
@@ -843,6 +849,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 ch.Destroy();
                 LoadedChunks.Remove(cpos);
             }
+            AirChunks.Remove(cpos);
         }
 
         public bool InWater(Location min, Location max)

@@ -287,28 +287,28 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 return c.GetBlockAt(x, y, z);
             }
-            if (c.PosMultiplier > PosMultiplier && PosMultiplier < 5)
+            if (c.PosMultiplier < PosMultiplier)
             {
-                return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
-            }
-            return BlockInternal.AIR;
-            // TODO: Fix logic!
-            /*
-            for (int bx = 0; bx < c.PosMultiplier; bx++)
-            {
-                for (int by = 0; by < c.PosMultiplier; by++)
+                int posX = (x * PosMultiplier) / c.PosMultiplier;
+                int posY = (y * PosMultiplier) / c.PosMultiplier;
+                int posZ = (z * PosMultiplier) / c.PosMultiplier;
+                int cap = (int)Math.Ceiling(PosMultiplier / (float)c.PosMultiplier);
+                for (int bx = 0; bx < cap; bx++)
                 {
-                    for (int bz = 0; bz < c.PosMultiplier; bz++)
+                    for (int by = 0; by < cap; by++)
                     {
-                        if (!c.GetBlockAt(x * c.PosMultiplier + bx, y * c.PosMultiplier + bx, z * c.PosMultiplier + bz).IsOpaque())
+                        for (int bz = 0; bz < cap; bz++)
                         {
-                            return BlockInternal.AIR;
+                            if (!c.GetBlockAt(posX + bx, posY + by, posZ + bz).IsOpaque())
+                            {
+                                return BlockInternal.AIR;
+                            }
                         }
                     }
                 }
+                return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
             }
-            return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
-            */
+            return BlockInternal.AIR;
         }
 
         private class PlantRenderHelper

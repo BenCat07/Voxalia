@@ -227,7 +227,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     if (rel == null)
                     {
                         Vector3i reldist = ch.WorldPosition + Relatives[x] + centerChunk;
-                        ch.Render_BufsRel[x] = (Math.Abs(reldist.X) < maxRad && Math.Abs(reldist.Y) < maxRad && Math.Abs(reldist.Z) < maxRad)
+                        ch.Render_BufsRel[x] = TheClient.TheRegion.AirChunks.Contains(ch.WorldPosition + Relatives[x])
                             ? ZeroChunkRep : EmptyChunkRep[lookuper[ch.CSize]];
                     }
                     else if (x == 0 || rel.Render_VoxelBuffer == null || rel.Render_VoxelBuffer[lookuper[ch.CSize]] <= 0)

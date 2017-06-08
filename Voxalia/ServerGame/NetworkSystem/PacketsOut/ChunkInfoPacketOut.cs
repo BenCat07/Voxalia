@@ -21,6 +21,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
         public ChunkInfoPacketOut(Vector3i cpos, byte[] slod, int posMult)
         {
             UsageType = NetUsageType.CHUNKS;
+            ID = ServerToClientPacket.CHUNK_INFO;
             bool is_air = true;
             for (int i = 0; i < slod.Length; i += 2)
             {
@@ -33,21 +34,21 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             }
             if (is_air)
             {
-                Data = new byte[12];
-                // TODO: This is a bit hackish
-                ID = ServerToClientPacket.CHUNK_FORGET;
+                Data = new byte[17];
                 Utilities.IntToBytes(cpos.X).CopyTo(Data, 0);
                 Utilities.IntToBytes(cpos.Y).CopyTo(Data, 4);
                 Utilities.IntToBytes(cpos.Z).CopyTo(Data, 8);
+                Utilities.IntToBytes(1).CopyTo(Data, 12);
+                Data[16] = 1;
                 return;
             }
-            ID = ServerToClientPacket.CHUNK_INFO;
             DataStream ds = new DataStream(slod.Length + 16);
             DataWriter dw = new DataWriter(ds);
             dw.WriteInt(cpos.X);
             dw.WriteInt(cpos.Y);
             dw.WriteInt(cpos.Z);
             dw.WriteInt(posMult);
+            dw.WriteByte(0);
             dw.WriteBytes(slod);
             Data = ds.ToArray();
         }
@@ -94,12 +95,12 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             }
             if (data_orig == null)
             {
-                Data = new byte[12];
-                // TODO: This is a bit hackish
-                ID = ServerToClientPacket.CHUNK_FORGET;
+                Data = new byte[17];
                 Utilities.IntToBytes(chunk.WorldPosition.X).CopyTo(Data, 0);
                 Utilities.IntToBytes(chunk.WorldPosition.Y).CopyTo(Data, 4);
                 Utilities.IntToBytes(chunk.WorldPosition.Z).CopyTo(Data, 8);
+                Utilities.IntToBytes(1).CopyTo(Data, 12);
+                Data[16] = 1;
                 return;
             }
             byte[] gdata = lod == 15 ? data_orig : FileHandler.Compress(data_orig);
@@ -109,6 +110,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             dw.WriteInt(chunk.WorldPosition.Y);
             dw.WriteInt(chunk.WorldPosition.Z);
             dw.WriteInt(lod);
+            dw.WriteByte(0);
             byte[] reach = new byte[chunk.Reachability.Length];
             for (int i = 0; i < reach.Length; i++)
             {

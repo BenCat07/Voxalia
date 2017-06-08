@@ -135,6 +135,7 @@ namespace Voxalia.ServerGame.WorldSystem
             Material mat = Material.AIR;
             for (int tz = lod - 1; tz >= 0; tz--)
             {
+                // TODO: tx, ty?
                 Material c = GetBlockAt(xs, ys, zs + tz).Material;
                 if (c.IsOpaque())
                 {
