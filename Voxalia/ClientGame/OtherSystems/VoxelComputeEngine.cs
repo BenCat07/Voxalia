@@ -455,10 +455,11 @@ namespace Voxalia.ClientGame.OtherSystems
                             BitConverter.ToSingle(BitConverter.GetBytes((uint)resd), 0) + ")");
                         return;
                     }
+                    /*
                     else
                     {
                         SysConsole.Output(OutputType.DEBUG, "Passing for " + resd);
-                    }
+                    }*/
                     if (resd == 0)
                     {
                         return;

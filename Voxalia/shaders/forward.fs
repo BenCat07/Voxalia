@@ -91,6 +91,11 @@ layout (location = 58) uniform mat4 light_data_array[LIGHTS_MAX];
 layout (location = 0) out vec4 color;
 layout (location = 1) out vec3 nrml;
 
+vec4 unused_nonsense() // Prevent shader compiler from claiming variables are unused (Even if they /are/ unused!)
+{
+	return screen_size + fogCol + vec4(zdist, zdist);
+}
+
 float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a linear distance (still from 0.0 to 1.0).
 {
 	return (2.0 * zdist.x) / (zdist.y + zdist.x - rinput * (zdist.y - zdist.x));

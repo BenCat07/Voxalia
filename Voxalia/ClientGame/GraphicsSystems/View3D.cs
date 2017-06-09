@@ -933,17 +933,24 @@ namespace Voxalia.ClientGame.GraphicsSystems
             FBOid = FBOID.FORWARD_SOLID;
             Vector3 maxLit = TheClient.TheRegion.GetSunAdjust().Xyz;
             TheClient.s_forw_particles.Bind();
+            CheckError("Render/Fast - Uniforms 1.3");
             GL.Uniform4(4, new Vector4(TheClient.MainWorldView.Width, TheClient.MainWorldView.Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
-            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            CheckError("Render/Fast - Uniforms 1.4");
+            //GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            //CheckError("Render/Fast - Uniforms 1.43");
             GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            CheckError("Render/Fast - Uniforms 1.46");
             GL.Uniform2(14, new Vector2(TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
-            if (TheClient.CVars.r_forward_lights.ValueB)
+            CheckError("Render/Fast - Uniforms 1.5");
+            /*if (TheClient.CVars.r_forward_lights.ValueB)
             {
                 GL.Uniform1(15, (float)c);
+                CheckError("Render/Fast - Uniforms 1.7");
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
+                CheckError("Render/Fast - Uniforms 1.8");
                 GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
-            }
-            CheckError("Render/Fast - Uniforms 2");
+                CheckError("Render/Fast - Uniforms 2");
+            }*/
             TheClient.s_forw_grass.Bind();
             CheckError("Render/Fast - Uniforms 2.2");
             if (TheClient.CVars.r_forward_lights.ValueB)
@@ -967,13 +974,17 @@ namespace Voxalia.ClientGame.GraphicsSystems
             CheckError("Render/Fast - Uniforms 3");
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            CheckError("Render/Fast - Uniforms 3.2");
             GL.Uniform4(4, new Vector4(Width, Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
-            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            //GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            CheckError("Render/Fast - Uniforms 3.3");
             GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            CheckError("Render/Fast - Uniforms 3.5");
             float fogDist = 1.0f / TheClient.ZFar();
             fogDist *= fogDist;
             Vector2 zfar_rel = new Vector2(TheClient.CVars.r_znear.ValueF, TheClient.ZFar());
             GL.Uniform1(13, fogDist);
+            CheckError("Render/Fast - Uniforms 3.9");
             GL.Uniform2(14, zfar_rel);
             TheClient.Rendering.SetColor(Color4.White);
             TheClient.s_forwt.Bind();
@@ -1372,20 +1383,24 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform4(4, new Vector4(Width, Height, TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
-            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            //GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             TheClient.s_fbov = TheClient.s_fbov.Bind();
+            CheckError("Render - GBuffer - Uniforms - 0");
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform2(8, new Vector2(TheClient.sl_min, TheClient.sl_max));
+            CheckError("Render - GBuffer - Uniforms - 1");
             TheClient.s_fbot = TheClient.s_fbot.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            CheckError("Render - GBuffer - Uniforms - 2");
             TheClient.s_fbo = TheClient.s_fbo.Bind();
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            CheckError("Render - GBuffer - 0");
             FBOid = FBOID.MAIN;
             RenderingShadows = false;
             CFrust = camFrust;
@@ -1396,6 +1411,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             RenderSpecular = true;
             TheClient.Rendering.SetColor(Color4.White);
             StandardBlend();
+            CheckError("Render - GBuffer - 1");
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
             {
                 Viewport(Width / 2, 0, Width / 2, Height);
@@ -1430,6 +1446,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 FBOSpikeTime = FBOTime;
             }
+            CheckError("Render - GBuffer - Final");
         }
 
         /// <summary>
@@ -1449,6 +1466,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.BindTexture(TextureTarget.Texture2D, fbo_decal_depth);
             GL.ActiveTexture(TextureUnit.Texture0);
             GL.DepthMask(false);
+            CheckError("Render - Decals - 0");
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
             {
                 Viewport(Width / 2, 0, Width / 2, Height);
@@ -1469,6 +1487,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             {
                 DecalRender?.Invoke(this);
             }
+            CheckError("Render - Decals - Final");
             GL.DepthMask(true);
             GL.ActiveTexture(TextureUnit.Texture4);
             GL.BindTexture(TextureTarget.Texture2D, 0);
@@ -1491,6 +1510,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.DepthMask(false);
+            CheckError("Render - Refract - 0");
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)
             {
                 Viewport(Width / 2, 0, Width / 2, Height);

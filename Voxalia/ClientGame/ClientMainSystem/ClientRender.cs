@@ -824,7 +824,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
                             GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0, 0, 0, 0 });
                             Shaders.ColorMultShader.Bind();
-                            GL.Uniform1(6, (float)GlobalTickTimeLocal);
+                            //GL.Uniform1(6, (float)GlobalTickTimeLocal);
                             View3D.CheckError("RenderFrame - Setup2D");
                             if (CVars.r_3d_enable.ValueB || VR != null)
                             {
