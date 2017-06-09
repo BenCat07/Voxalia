@@ -341,7 +341,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <returns>Whether it is allowed.</returns>
         public bool IsAllowedToBreak(CharacterEntity ent, Location block, Material mat)
         {
-            if (block.Z > TheServer.CVars.g_maxheight.ValueI || block.Z < TheServer.CVars.g_minheight.ValueI)
+            if (block.Z > TheWorld.Settings.MaxHeight || block.Z < TheWorld.Settings.MinHeight)
             {
                 return false;
             }
@@ -357,7 +357,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <returns>Whether it is allowed.</returns>
         public bool IsAllowedToPlaceIn(CharacterEntity ent, Location block, Material mat)
         {
-            if (block.Z > TheServer.CVars.g_maxheight.ValueI || block.Z < TheServer.CVars.g_minheight.ValueI)
+            if (block.Z > TheWorld.Settings.MaxHeight || block.Z < TheWorld.Settings.MinHeight)
             {
                 return false;
             }

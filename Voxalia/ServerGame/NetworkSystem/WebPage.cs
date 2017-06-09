@@ -95,7 +95,7 @@ namespace Voxalia.ServerGame.NetworkSystem
             catch (Exception ex)
             {
                 Utilities.CheckException(ex);
-                if (TheServer.CVars.s_debug.ValueB)
+                if (TheServer.Settings.Debug)
                 {
                     SysConsole.Output("Handling webpage", ex);
                 }

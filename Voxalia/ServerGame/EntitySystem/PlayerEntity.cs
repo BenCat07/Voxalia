@@ -710,7 +710,7 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 MarkAFK();
             }
-            if (GetPosition().Z < TheServer.CVars.g_minheight.ValueD)
+            if (GetPosition().Z < TheRegion.TheWorld.Settings.MinHeight)
             {
                 Damageable().Damage(1); // TODO: Configurable damage amount!
             }
@@ -927,7 +927,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             const int MULTIPLIER = 15;
             // TODO: Player configurable multiplier (with server limiter)!
-            int maxChunks = TheServer.CVars.n_chunkspertick.ValueI * MULTIPLIER;
+            int maxChunks = TheServer.Settings.Net_ChunksPerTick * MULTIPLIER;
             int chunksFound = 0;
             if (LoadRelPos.IsNaN() || LoadRelDir.IsNaN() || LoadRelDir.LengthSquared() < 0.1f)
             {
@@ -1249,7 +1249,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <returns>The clamped position.</returns>
         public Location PosClamp(Location pos)
         {
-            double maxdist = Math.Abs(TheServer.CVars.g_maxdist.ValueD);
+            double maxdist = Math.Abs(TheRegion.TheWorld.Settings.MaxDistance);
             pos.X = Clamp(pos.X, -maxdist, maxdist);
             pos.Y = Clamp(pos.Y, -maxdist, maxdist);
             pos.Z = Clamp(pos.Z, -maxdist, maxdist);
@@ -1665,7 +1665,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <returns>Whether it can be reached.</returns>
         public bool CanReach(Location pos)
         {
-            double maxdist = Math.Abs(TheServer.CVars.g_maxdist.ValueD);
+            double maxdist = Math.Abs(TheRegion.TheWorld.Settings.MaxDistance);
             return Math.Abs(pos.X) < maxdist && Math.Abs(pos.Y) < maxdist && Math.Abs(pos.Z) < maxdist;
         }
 

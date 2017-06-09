@@ -132,7 +132,7 @@ namespace Voxalia.ServerGame.WorldSystem
             PhysicsWorld.TimeStepSettings.MaximumTimeStepsPerFrame = 10;
             PhysicsWorld.ForceUpdater.Gravity = (GravityNormal * GravityStrength).ToBVector();
             PhysicsWorld.DuringForcesUpdateables.Add(new LiquidVolume(this));
-            PhysicsWorld.TimeStepSettings.TimeStepDuration = 1f / TheServer.CVars.g_fps.ValueF;
+            PhysicsWorld.TimeStepSettings.TimeStepDuration = 1f / TheServer.Settings.FPS;
             Collision = new CollisionUtil(PhysicsWorld);
             // TODO: Perhaps these should be on the server level, not region?
             EntityConstructors.Add(EntityType.ITEM, new ItemEntityConstructor());

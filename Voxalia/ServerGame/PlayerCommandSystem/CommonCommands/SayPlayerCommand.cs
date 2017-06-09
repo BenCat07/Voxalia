@@ -27,7 +27,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 return;
             }
             string message = entry.AllArguments();
-            if (entry.Player.TheServer.CVars.t_blockcolors.ValueB)
+            if (entry.Player.TheServer.Settings.Text_BlockColors)
             {
                 message = message.Replace("^", "^^n");
             }

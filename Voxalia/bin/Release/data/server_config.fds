@@ -1,3 +1,43 @@
+# Configuration for the Voxalia server
 server:
+	# List all worlds you want to be loaded automatically by the server startup sequence here!
 	worlds:
 	- default
+	# What frame rate to use.
+	# TODO: per-world?
+	fps: 30
+	# Whether to output debug information.
+	debug: true
+# Default configuration for an un-customized world
+world_defaults:
+	automation:
+		# Whether to automatically save world changes as needed to disk.
+		saves: true
+	limits:
+		# How high a player may build in a world
+		max_height: 5000
+		# How low a player may build or travel in a world
+		min_height: -5000
+		# How far a player may travel in a world (default 100 million blocks)
+		max_distance: 100000000
+	players:
+		# The maximum distance a player can load chunks at
+		max_render_distance: 6
+		# The maximum distance a player can load low Level Of Detail chunks at
+		max_lod_render_distance: 20
+# Configuration for network options
+network:
+	# Whether to verify the connecting users' IP addresses with the global server.
+	verify_ip: true
+	# How many chunks to send in a single server tick, per player.
+	chunks_per_tick: 2
+	# Whether the server will authorize connections against the global server (disable this to palyer singleplayer without an internet connection).
+	online_mode: true
+# Configuration options related to text.
+text:
+	# Whether to automatically parse URLs in the chat into valid links.
+	translate_urls: true
+	# Whether to automatically block URLs as input to chat.
+	block_urls: false
+	# Whether to block all color codes input in the chat.
+	block_colors: false

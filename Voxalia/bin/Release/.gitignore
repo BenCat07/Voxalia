@@ -1,2 +1,4 @@
 shaders/
 data/info/text/
+server_*/
+client_*/

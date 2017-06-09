@@ -282,7 +282,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             }
             else if (arg0 == "tickRate")
             {
-                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Intended tick rate: " + entry.Player.TheServer.CVars.g_fps.ValueI + ", actual tick rate (last second): " + entry.Player.TheServer.TPS);
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Intended tick rate: " + entry.Player.TheServer.Settings.FPS + ", actual tick rate (last second): " + entry.Player.TheServer.TPS);
             }
             else if (arg0 == "paintBrush" && entry.InputArguments.Count > 1)
             {

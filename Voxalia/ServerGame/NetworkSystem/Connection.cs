@@ -19,6 +19,7 @@ using Voxalia.ServerGame.NetworkSystem.PacketsIn;
 using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using FreneticGameCore.Files;
 using FreneticGameCore;
+using Voxalia.ServerGame.WorldSystem;
 
 namespace Voxalia.ServerGame.NetworkSystem
 {
@@ -111,7 +112,7 @@ namespace Voxalia.ServerGame.NetworkSystem
             catch (Exception ex)
             {
                 SysConsole.Output(OutputType.WARNING, "Disconnected " + PE + " -> " + ex.GetType().Name + ": " + ex.Message);
-                if (TheServer.CVars.s_debug.ValueB)
+                if (TheServer.Settings.Debug)
                 {
                     SysConsole.Output(ex);
                 }
@@ -138,7 +139,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                 throw new ArgumentNullException();
             }
             string rip = PrimarySocket.RemoteEndPoint.ToString();
-            if (!TheServer.CVars.n_online.ValueB)
+            if (!TheServer.Settings.Net_OnlineMode)
             {
                 if (!IsLocalIP(rip))
                 {
@@ -160,7 +161,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                 if (resp.StartsWith("ACCEPT=") && resp.EndsWith(";"))
                 {
                     string ip = resp.Substring("ACCEPT=".Length, resp.Length - 1 - "ACCEPT=".Length);
-                    if (!TheServer.CVars.n_verifyip.ValueB
+                    if (!TheServer.Settings.Net_VerifyIP
                         || IsLocalIP(rip)
                         || rip.Contains(ip))
                     {
@@ -319,23 +320,25 @@ namespace Voxalia.ServerGame.NetworkSystem
                                 try
                                 {
                                     CheckWebSession(name, key);
-                                    TheServer.LoadedWorlds[0].Schedule.ScheduleSyncTask(() =>
+                                    World w = TheServer.LoadedWorlds[0];
+                                    w.Schedule.ScheduleSyncTask(() =>
                                     {
                                         // TODO: Additional details?
                                         // TODO: Choose a world smarter.
+                                        int worldMaxRenderDist = w.Settings.MaxRenderDistance;
                                         PlayerEntity player = new PlayerEntity(TheServer.LoadedWorlds[0].MainRegion, this, name)
                                         {
                                             SessionKey = key,
                                             Host = host,
                                             Port = port,
                                             IP = PrimarySocket.RemoteEndPoint.ToString(),
-                                            ViewRadiusInChunks = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(1, Utilities.StringToInt(rds[0]))),
-                                            ViewRadExtra2 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[1]))),
-                                            ViewRadExtra2Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[2]))),
-                                            ViewRadExtra5 = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[3]))),
-                                            ViewRadExtra5Height = Math.Min(TheServer.CVars.g_maxrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[4]))),
-                                            ViewRadExtra6 = Math.Min(TheServer.CVars.g_maxlodrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[5]))),
-                                            ViewRadExtra15 = Math.Min(TheServer.CVars.g_maxlodrenderdist.ValueI, Math.Max(0, Utilities.StringToInt(rds[6])))
+                                            ViewRadiusInChunks = Math.Min(worldMaxRenderDist, Math.Max(1, Utilities.StringToInt(rds[0]))),
+                                            ViewRadExtra2 = Math.Min(worldMaxRenderDist, Math.Max(0, Utilities.StringToInt(rds[1]))),
+                                            ViewRadExtra2Height = Math.Min(worldMaxRenderDist, Math.Max(0, Utilities.StringToInt(rds[2]))),
+                                            ViewRadExtra5 = Math.Min(worldMaxRenderDist, Math.Max(0, Utilities.StringToInt(rds[3]))),
+                                            ViewRadExtra5Height = Math.Min(worldMaxRenderDist, Math.Max(0, Utilities.StringToInt(rds[4]))),
+                                            ViewRadExtra6 = Math.Min(worldMaxRenderDist, Math.Max(0, Utilities.StringToInt(rds[5]))),
+                                            ViewRadExtra15 = Math.Min(worldMaxRenderDist, Math.Max(0, Utilities.StringToInt(rds[6])))
                                         };
                                         PE = player;
                                         player.Host = host;
@@ -360,7 +363,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                                         PrimarySocket.Close();
                                         Utilities.CheckException(ex);
                                         SysConsole.Output(OutputType.WARNING, "Forcibly disconnected client: " + ex.GetType().Name + ": " + ex.Message);
-                                        if (TheServer.CVars.s_debug.ValueB)
+                                        if (TheServer.Settings.Debug)
                                         {
                                             SysConsole.Output(ex);
                                         }
@@ -443,7 +446,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                 {
                     Utilities.CheckException(ex);
                     SysConsole.Output(OutputType.WARNING, "Forcibly disconnected client: " + ex.GetType().Name + ": " + ex.Message);
-                    if (TheServer.CVars.s_debug.ValueB)
+                    if (TheServer.Settings.Debug)
                     {
                         SysConsole.Output(ex);
                     }

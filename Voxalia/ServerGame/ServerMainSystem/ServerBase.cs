@@ -325,6 +325,11 @@ namespace Voxalia.ServerGame.ServerMainSystem
         }
 
         /// <summary>
+        /// The server's settings data.
+        /// </summary>
+        public ServerSettings Settings;
+
+        /// <summary>
         /// This will be locked on whenever the server is in an active tick. Lock on this to prevent conflict with server actions.
         /// (Consider using the <see cref="Schedule"/> system).
         /// </summary>
@@ -356,6 +361,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
             CVars.Init(this, Commands.Output);
             SysConsole.Output(OutputType.INIT, "Loading default settings...");
             Config = new FDSSection(Files.ReadText("server_config.fds"));
+            Settings = new ServerSettings(this, Config);
             if (Files.Exists("serverdefaultsettings.cfg"))
             {
                 string contents = Files.ReadText("serverdefaultsettings.cfg");
@@ -384,7 +390,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
             SysConsole.Output(OutputType.INIT, "Loading scripts...");
             AutorunScripts();
             SysConsole.Output(OutputType.INIT, "Building initial world(s)...");
-            foreach (string str in Config.GetStringList("server.worlds") ?? new List<string>())
+            foreach (string str in Settings.Worlds)
             {
                 LoadWorld(str.ToLowerFast());
             }
@@ -417,10 +423,10 @@ namespace Voxalia.ServerGame.ServerMainSystem
                     DeltaCounter.Reset();
                     DeltaCounter.Start();
                     // How much time should pass between each tick ideally
-                    TARGETFPS = CVars.g_fps.ValueD;
+                    TARGETFPS = Settings.FPS;
                     if (TARGETFPS < 1 || TARGETFPS > 600)
                     {
-                        CVars.g_fps.Set("30");
+                        Settings.FPS = 30;
                         TARGETFPS = 30;
                     }
                     TargetDelta = (1d / TARGETFPS);

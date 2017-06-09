@@ -357,7 +357,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
                 return;
             }
-            if (!OwningRegion.TheServer.CVars.g_save.ValueB)
+            if (!OwningRegion.TheWorld.Settings.Saves)
             {
                 if (callback != null)
                 {

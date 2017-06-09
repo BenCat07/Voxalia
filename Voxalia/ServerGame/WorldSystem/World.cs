@@ -16,6 +16,7 @@ using Voxalia.Shared.Collision;
 using System.Threading;
 using FreneticDataSyntax;
 using Voxalia.Shared;
+using Voxalia.ServerGame.OtherSystems;
 using System.Diagnostics;
 using FreneticGameCore;
 
@@ -80,6 +81,8 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public double GeneratorScale = 1.0;
 
+        public WorldSettings Settings;
+
         /// <summary>
         /// Loads the world configuration onto this world object.
         /// Is called as part of the startup sequence for a world.
@@ -106,6 +109,8 @@ namespace Voxalia.ServerGame.WorldSystem
             Config.Default("general.time", 0);
             Config.Default("general.generator", "simple");
             Config.Default("general.generator_scale", 1.0);
+            Settings = new WorldSettings();
+            Settings.LoadFromSection(TheServer, Config);
             GlobalTickTime = Config.GetLong("general.time", 0).Value;
             CFGEdited = true;
             Seed = Config.GetInt("general.seed", DefaultSeed).Value;
@@ -260,10 +265,9 @@ namespace Voxalia.ServerGame.WorldSystem
                     DeltaCounter.Reset();
                     DeltaCounter.Start();
                     // How much time should pass between each tick ideally
-                    TARGETFPS = TheServer.CVars.g_fps.ValueD;
+                    TARGETFPS = TheServer.Settings.FPS;
                     if (TARGETFPS < 1 || TARGETFPS > 600)
                     {
-                        TheServer.CVars.g_fps.Set("30");
                         TARGETFPS = 30;
                     }
                     TargetDelta = (1.0d / TARGETFPS);

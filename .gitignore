@@ -3,7 +3,6 @@ debug/
 *.suo
 *.user
 Voxalia.pdb
-ModelToVMDConverter/bin/Release/*.pdb
 SkeletalAnimationExtractor/bin/Release/*.pdb
 *.exe
 *.pak

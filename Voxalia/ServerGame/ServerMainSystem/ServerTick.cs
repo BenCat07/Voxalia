@@ -78,11 +78,11 @@ namespace Voxalia.ServerGame.ServerMainSystem
                 }
                 return;
             }
-            if (CVars.t_blockurls.ValueB)
+            if (Settings.Text_BlockURLs)
             {
                 message = message.Replace("://", ":^n//");
             }
-            if (CVars.t_translateurls.ValueB) // TODO: && sender has permission (or is the console)?
+            if (Settings.Text_TranslateURLs) // TODO: && sender has permission (or is the console)?
             {
                 message = TranslateURLs(message);
             }
