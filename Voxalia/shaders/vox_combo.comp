@@ -2,36 +2,36 @@
 
 layout(shared, binding = 0) buffer voxels
 {
-	uvec4[] posses;
+	uvec4 posses[];
 };
 
 layout(shared, binding = 1) buffer voxelsC
 {
-	uvec4[] possesC;
+	uvec4 possesC[];
 };
 layout(shared, binding = 2) buffer voxelsXP
 {
-	uvec4[] possesXP;
+	uvec4 possesXP[];
 };
 layout(shared, binding = 3) buffer voxelsXM
 {
-	uvec4[] possesXM;
+	uvec4 possesXM[];
 };
 layout(shared, binding = 4) buffer voxelsYP
 {
-	uvec4[] possesYP;
+	uvec4 possesYP[];
 };
 layout(shared, binding = 5) buffer voxelsYM
 {
-	uvec4[] possesYM;
+	uvec4 possesYM[];
 };
 layout(shared, binding = 6) buffer voxelsZP
 {
-	uvec4[] possesZP;
+	uvec4 possesZP[];
 };
 layout(shared, binding = 7) buffer voxelsZM
 {
-	uvec4[] possesZM;
+	uvec4 possesZM[];
 };
 
 layout(local_size_x = MCM_VOX_COUNT, local_size_y = 1, local_size_z = MCM_VOX_COUNT) in;
