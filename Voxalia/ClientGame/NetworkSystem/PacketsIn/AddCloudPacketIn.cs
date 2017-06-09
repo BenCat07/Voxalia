@@ -40,6 +40,9 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 CID = cid
             };
             int count = dr.ReadInt();
+            cloud.Points.Capacity = count * 2;
+            cloud.Sizes.Capacity = count * 2;
+            cloud.EndSizes.Capacity = count * 2;
             for (int i = 0; i < count; i++)
             {
                 cloud.Points.Add(Location.FromDoubleBytes(dr.ReadBytes(24), 0));

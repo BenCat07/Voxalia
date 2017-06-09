@@ -183,12 +183,17 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                                 pd.Cols = new Vector4[cloud.Points.Count];
                                 pd.TCs = new Vector2[cloud.Points.Count];
                             }
-                            for (int i = 0; i < pd.Poses.Length; i++)
+                            for (int i = 0; i < cloud.Points.Count; i++)
                             {
+                                if (lessClouds && i % 3 != 2)
+                                {
+                                    continue;
+                                }
+                                int c = i / 3;
                                 Location ppos = (cloud.Position + cloud.Points[i]) - TheClient.MainWorldView.RenderRelative;
-                                pd.Poses[i] = ClientUtilities.Convert(ppos);
-                                pd.Cols[i] = Vector4.One; // TODO: Colored clouds?
-                                pd.TCs[i] = new Vector2(cloud.Sizes[i], cloudID);
+                                pd.Poses[c] = ClientUtilities.Convert(ppos);
+                                pd.Cols[c] = Vector4.One; // TODO: Colored clouds?
+                                pd.TCs[c] = new Vector2(cloud.Sizes[i], cloudID);
                             }
                         }));
                     }
