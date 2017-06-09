@@ -51,12 +51,12 @@ namespace Voxalia
             if (args.Length == 1 && args[0] == "{{Launcher}}")
             {
                 args = new string[0];
+                SysConsole.AllowCursor = false;
 #if !LINUX
                 ShowWindow(ConsoleHandle, SW_HIDE);
 #endif
             }
             VoxProgram.PreInitVox();
-            SysConsole.AllowCursor = false;
             SysConsole.Init();
             StringBuilder arger = new StringBuilder();
             for (int i = 0; i < args.Length; i++)
