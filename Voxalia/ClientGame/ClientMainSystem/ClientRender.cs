@@ -239,7 +239,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void ShadersCheck()
         {
-            string def = CVars.r_good_graphics.ValueB ? "#MCM_GOOD_GRAPHICS" : "#";
+            string def = Shaders.MCM_GOOD_GRAPHICS ? "#MCM_GOOD_GRAPHICS" : "#";
             s_shadow = Shaders.GetShader("shadow" + def);
             s_shadow_nobones = Shaders.GetShader("shadow" + def + ",MCM_NO_BONES");
             s_shadowvox = Shaders.GetShader("shadowvox" + def);
@@ -284,9 +284,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 s_transponlyvoxlit_ll = Shaders.GetShader("transponlyvox" + def + ",MCM_LIT,MCM_LL");
                 s_transponlylitsh_ll = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_SHADOWS,MCM_LL");
                 s_transponlyvoxlitsh_ll = Shaders.GetShader("transponlyvox" + def + ",MCM_LIT,MCM_SHADOWS,MCM_LL");
+                s_ll_clearer = Shaders.GetShader("clearer" + def);
+                s_ll_fpass = Shaders.GetShader("fpass" + def);
             }
-            s_ll_clearer = Shaders.GetShader("clearer" + def);
-            s_ll_fpass = Shaders.GetShader("fpass" + def);
             s_hdrpass = Shaders.GetShader("hdrpass" + def);
             s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE" + forw_extra  +"?grass");
             s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY" + forw_extra  +"?grass");

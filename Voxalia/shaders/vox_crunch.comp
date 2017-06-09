@@ -2,74 +2,74 @@
 
 layout(binding = 0, r32f) uniform readonly image2D texture_ids;
 
-layout(shared, binding = 1) buffer voxels
+layout(std430, binding = 1) buffer voxels
 {
 	uvec4 posses[];
 };
-layout(shared, binding = 2) buffer b_indexmarkers
+layout(std430, binding = 2) buffer b_indexmarkers
 {
 	uint f_indexmark[];
 };
 
 #if MODE_THREE
-layout(shared, binding = 3) buffer b_thv
+layout(std430, binding = 3) buffer b_thv
 {
 	vec4 f_thv[];
 };
-layout(shared, binding = 4) buffer b_thw
+layout(std430, binding = 4) buffer b_thw
 {
 	vec4 f_thw[];
 };
 // TODO: Add set 2 of TH data
 /*
-layout(shared, binding = 5) buffer b_thv2
+layout(std430, binding = 5) buffer b_thv2
 {
 	vec4 f_thv2[];
 };
-layout(shared, binding = 6) buffer b_thw2
+layout(std430, binding = 6) buffer b_thw2
 {
 	vec4 f_thw2[];
 };
 */
 #else
 #if MODE_TWO
-layout(shared, binding = 3) buffer b_color
+layout(std430, binding = 3) buffer b_color
 {
 	vec4 f_color[];
 };
-layout(shared, binding = 4) buffer b_tcol
+layout(std430, binding = 4) buffer b_tcol
 {
 	vec4 f_tcol[];
 };
-layout(shared, binding = 5) buffer b_indices
+layout(std430, binding = 5) buffer b_indices
 {
 	uint f_indices[];
 };
-layout(shared, binding = 6) buffer b_lightinfos
+layout(std430, binding = 6) buffer b_lightinfos
 {
 	uint f_lightinfos[];
 };
 #else // MODE_ONE
-layout(shared, binding = 3) buffer b_position
+layout(std430, binding = 3) buffer b_position
 {
 	vec4 f_position[];
 };
-layout(shared, binding = 4) buffer b_normal
+layout(std430, binding = 4) buffer b_normal
 {
 	vec4 f_normal[];
 };
-layout(shared, binding = 5) buffer b_texcoord
+layout(std430, binding = 5) buffer b_texcoord
 {
 	vec4 f_texcoord[];
 };
-layout(shared, binding = 6) buffer b_tangent
+layout(std430, binding = 6) buffer b_tangent
 {
 	vec4 f_tangent[];
 };
 #endif
 #endif
 
-layout(shared, binding = 7) buffer b_shapes
+layout(std430, binding = 7) buffer b_shapes
 {
 	uint f_shapes[];
 };

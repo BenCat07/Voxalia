@@ -208,6 +208,8 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public Stopwatch sw1 = new Stopwatch(), sw2 = new Stopwatch(), sw3 = new Stopwatch(), sw1a = new Stopwatch();
 
+        byte[] EmptyBytes = new byte[0];
+
         public void Calc(params Chunk[] chs)
         {
             int maxRad = TheClient.CVars.r_renderdist.ValueI;
@@ -346,6 +348,11 @@ namespace Voxalia.ClientGame.OtherSystems
             View3D.CheckError("Compute - Run");
             // Gather results
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
+            /*if (!TheClient.Shaders.MCM_GOOD_GRAPHICS)
+            {
+                GL.Finish();
+                GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
+            }*/
             for (int chz = 0; chz < chs.Length; chz++)
             {
                 uint[] resses = new uint[1];
@@ -367,7 +374,6 @@ namespace Voxalia.ClientGame.OtherSystems
             for (int chz = 0; chz < chs.Length; chz++)
             {
                 Chunk ch = chs[chz];
-                byte[] minimum_needed = null;// new byte[resd * Vector4.SizeInBytes];
                 int resdSOLID = ch.CountForRender;
                 int resdTRANSP = ch.CountForRenderTRANSP;
                 if (resdSOLID == 0)
@@ -441,32 +447,57 @@ namespace Voxalia.ClientGame.OtherSystems
                 }
                 Action<bool> calc = (transp) =>
                 {
+                    View3D.CheckError("Compute - Pre New Buffers");
                     int resd = transp ? resdTRANSP : resdSOLID;
+                    if (resd < 0 || resd > 100 * 1000 * 1000)
+                    {
+                        SysConsole.Output(OutputType.WARNING, "Tried to render chunk of " + resd + " polygons! Denied! (May read as float: " + 
+                            BitConverter.ToSingle(BitConverter.GetBytes((uint)resd), 0) + ")");
+                        return;
+                    }
+                    else
+                    {
+                        SysConsole.Output(OutputType.DEBUG, "Passing for " + resd);
+                    }
                     if (resd == 0)
                     {
                         return;
                     }
+                    byte[] empty = null;
+                    /*if (!TheClient.Shaders.MCM_GOOD_GRAPHICS)
+                    {
+                        SysConsole.Output(OutputType.DEBUG, "Alloc: " + resd);
+                        if (EmptyBytes.Length < resd * Vector4.SizeInBytes)
+                        {
+                            EmptyBytes = new byte[resd * Vector4.SizeInBytes];
+                        }
+                        empty = EmptyBytes;
+                    }*/
                     uint[] newBufs = new uint[9];
                     GL.GenBuffers(9, newBufs);
+                    View3D.CheckError("Compute - New Buffers - Prep");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[0]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                    View3D.CheckError("Compute - New Buffers - 0");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[1]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[2]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[3]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[4]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                    View3D.CheckError("Compute - New Buffers - 4");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[5]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[6]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[7]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, minimum_needed, hintter);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                    View3D.CheckError("Compute - New Buffers - 7");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[8]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * sizeof(uint), minimum_needed, hintter);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * sizeof(uint), empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                     View3D.CheckError("Compute - New Buffers");
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, ch.Render_FBB);
