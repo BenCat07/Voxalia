@@ -364,11 +364,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.CLIENTINIT, "Loading shaders...");
             Shaders = new ShaderEngine();
             GLVendor = GL.GetString(StringName.Vendor);
-            CVars.s_glvendor.Value = GLVendor;
             GLVersion = GL.GetString(StringName.Version);
-            CVars.s_glversion.Value = GLVersion;
             GLRenderer = GL.GetString(StringName.Renderer);
-            CVars.s_glrenderer.Value = GLRenderer;
             SysConsole.Output(OutputType.CLIENTINIT, "Vendor: " + GLVendor + ", GLVersion: " + GLVersion + ", Renderer: " + GLRenderer);
             if (GLVendor.ToLowerFast().Contains("intel"))
             {

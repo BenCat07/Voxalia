@@ -1,0 +1,183 @@
+# Configuration for the Voxalia client
+client:
+	# Whether to display debug data for movement and related systems
+	debug_movement: false
+network:
+	# Whether to prefer IPv4 or IPv6
+	first: ipv4
+	# How strongly to lerp our own vehicle's movement (IE, a vehicle the player is controlling). Tweak this if vehicles are weird to control.
+	our_vehicle_lerp: 0.1
+	# Whether to only connect to servers with a valid login key. Disable this to play singleplayer without internet.
+	online: true
+audio:
+	# How loud music should be
+	music_volume: 0.5
+	# What pitch music should be at
+	music_pitch: 1
+	# What volume most things should be at
+	global_volume: 0.75
+	# What pitch most things should be at
+	global_pitch: 1
+	# Whether to quiet the window when deselected
+	quiet_on_deselect: true
+	# What volume to echo microphone pickup at (for testing).
+	echo_volume: 0
+	# Whether to enable the audio enforcer system.
+	enforcer: true
+	# Whether to enable the left audio channel.
+	left: true
+	# Whether to enable the right audio channel.
+	right: true
+ui:
+	# How sensitive the mouse should be
+	mouse_sensitivity: 1
+	# Which reticle to use
+	reticle: 1
+	# How big in pixels the reticle should be
+	reticle_scale: 32
+	# Whether to show the HUD
+	show_hud: true
+	# Whether to highlight the player's target block.
+	highlight_targetblock: true
+	# Whether to highlight the player's placement block.
+	highlight_placeblock: true
+	# Whether to show debug information
+	debug: false
+	# Whether to show the player's ping to the server.
+	show_ping: true
+	# Whether to color the text being typed.
+	color_typing: false
+	# How many frames between UI updates.
+	rate: 3
+renderer:
+	window:
+		# Whether the game is fullscreen
+		fullscreen: false
+		# Width of the window
+		width: 1280
+		# Height of the window
+		height: 720
+		# Whether to use vertical synchronization to prevent screen tearing
+		vsync: false
+		# The maximum FPS value.
+		max_fps: 1000
+	view:
+		# The field of view, in degrees
+		fov: 70
+		# the "near plane" for Z depth of the view
+		znear: 0.1
+	effects:
+		# Whether to enable 3D lighting in deferred (non-forward) mode (otherwise, full-bright colors).
+		lighting: true
+		# Whether transparent objects should be 'bright' or 'normal' (in deferred mode).
+		bright_transparents: true
+		# Whether to render decal effects.
+		decals: true
+		# How strong the depth of field effect should be.
+		dof_strength: 4
+		# What mode of fire effect to use (0 = simple, 1 = dense).
+		fire_mode: 0
+		# Whether dynamic objects can cast shadows.
+		dynamic_shadows: true
+		# Whether to enable the screen-space-ambient-occlusion effect.
+		ssao: true
+		# How wide the texture for shadows should be (this is squared then multiplied by 20 for the full 3D texture width, which when multiplied by 4 is size in bytes of shadow RAM usage).
+		shadow_quality: 1024
+		# What factor to use for shadow blurring. Smaller = blurrier.
+		shadow_blur: 0.25
+		# Whether to use shadows in deferred mode.
+		shadows: false
+		# Whether clouds should cast their own shadows in deferred mode.
+		cloud_shadows: false
+		# Whether to use 'good graphics' mode (where available).
+		good_graphics: true
+		# Whether block textures should use a linear blur or nearest pixel mode.
+		block_texture_linear: true
+		# What texture width (pixels) block textures should use.
+		block_texture_width: 512
+		# Whether deferred mode should use the toonify post processor effect.
+		toonify: false
+		# Whether transparent objects should be lit (otherwise, full-bright colors).
+		transp_lighting: true
+		# Whether transparent objects should have shadows cast upon them (requires shadows enabled).
+		transp_shadows: false
+		# Whether to enable 3D mode (side-by-side 3D effects).
+		enable_3d: false
+		# Whether to enable forward rendering mode (otherwise, deferred).
+		forward_mode: true
+		# How many chunks to process at a time.
+		chunks_at_once: 10
+		# Whether to 'over-render' chunks when not guaranteed to be needed.
+		chunk_over_render: true
+		# Whether to use linked-list transparency tricks.
+		transp_ll: false
+		# Whether trees cast shadows.
+		tree_shadows: true
+		# Whether to run god rays in deferred mode.
+		god_rays: true
+		# Whether to enable high dynamic range and exposure effects in deferred mode.
+		hdr: true
+		# Whether to blur the screen to represent motion.
+		motion_blur: false
+		# The exposure value to scale lighting effects by.
+		exposure: 1.0
+		# Whether to grayscale the deferred view.
+		grayscale: false
+		# What to scale everything in VR by.
+		vr_scale: 1
+		# Whether to use the Voxel Compute Shader engine to calculate chunk data.
+		compute: true
+		# Whether to enable fog.
+		fog: true
+		# Whether to enable normal map effects in forward rendering mode.
+		forward_normals: true
+		# Whether to enable lights in forward rendering mode.
+		forward_lights: true
+		# Whether to enable shadows in forward rendering mode.
+		forward_shadows: false
+		# Whether mipmaps should be enabled for blocks.
+		block_mipmaps: true
+		# Whether SLOD chunks should be smoothed out (experimental).
+		slod_smoothing: false
+		# Whether to reduce the number of clouds.
+		less_clouds: true
+	debug:
+		# Whether to render a wire frame model of the world alongside normal rendering.
+		render_wireframe: false
+		# Whether to draw the player's own self.
+		draw_self: true
+		# Whether to render any particle effects.
+		draw_particles: true
+		# Whether to draw any block chunks at all.
+		draw_chunks: true
+		# Whether to draw any entities at all.
+		draw_entities: true
+		# Whether to render clouds at all.
+		clouds: true
+		# Whether to render plants at all.
+		plants: true
+		# How rapidly to rerender shadows, in frames.
+		shadow_pace: 1
+		# Whether to disable the entire block shape system.
+		no_block_shapes: false
+	distances:
+		# How far you can see in full render quality.
+		full_quality: 3
+		# How much farther than full_quality you see at half quality.
+		half_quality: 1
+		# How much farther than full_quality you see at half quality, height-wise.
+		half_quality_height: 1
+		# How much farther than full_quality you see at one-fifth quality.
+		fifth_quality: 2
+		# How much farther than full_quality you see at one-fifth quality, height-wise.
+		fith_quality_height: 2
+		# How much farther than full_quality you see at one-sixth quality.
+		sixth_quality: 6
+		# How much farther than full_quality you see at one-fifteenth quality.
+		fifteenth_quality: 10
+		# How far away a light can be from the camera before it is disabled.
+		light_distance: 35
+		# How far away maximum to render models in full quality.
+		model_distance: 60
+		# How far away to render plants at, maximum.
+		plant_distance: 50

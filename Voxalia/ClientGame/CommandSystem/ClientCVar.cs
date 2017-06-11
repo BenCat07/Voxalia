@@ -23,10 +23,7 @@ namespace Voxalia.ClientGame.CommandSystem
         /// The CVar System the client will use.
         /// </summary>
         public CVarSystem system;
-
-        // System CVars
-        public CVar s_filepath, s_glversion, s_glrenderer, s_glvendor, s_littleendian;
-
+        
         // Game CVars
         public CVar g_timescale, g_firstperson, g_weathermode;
 
@@ -60,14 +57,9 @@ namespace Voxalia.ClientGame.CommandSystem
         {
             // TODO: Organize this mess!
             system = new CVarSystem(output);
-
-            // System CVars
-            s_filepath = Register("s_filepath", tclient.Files.BaseDirectory, CVarFlag.Textual | CVarFlag.ReadOnly, "The current system environment filepath (The directory of /data)."); // TODO: Tag!
-            s_glversion = Register("s_glversion", "UNKNOWN", CVarFlag.Textual | CVarFlag.ReadOnly, "What version of OpenGL is in use.");
-            s_glrenderer = Register("s_glrenderer", "UNKNOWN", CVarFlag.Textual | CVarFlag.ReadOnly, "What renderer for OpenGL is in use.");
-            s_glvendor = Register("s_glvendor", "UNKNOWN", CVarFlag.Textual | CVarFlag.ReadOnly, "What graphics card vendor made the device being used for rendering.");
+            
             // Game CVars
-            g_timescale = Register("g_timescale", "1", CVarFlag.Numeric | CVarFlag.ServerControl, "The current game time scale value.");
+            g_timescale = Register("g_timescale", "1", CVarFlag.Numeric | CVarFlag.ServerControl, "The current game time scale value."); // TODO: Server controllable setting
             g_firstperson = Register("g_firstperson", "true", CVarFlag.Boolean, "Whether to be in FirstPerson view mode.");
             g_weathermode = Register("g_weathermode", "0", CVarFlag.Numeric | CVarFlag.ServerControl, "What weather mode is currently shown. 0 = none, 1 = rain, 2 = snow.");
             // Network CVars
@@ -109,7 +101,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_shadows = Register("r_shadows", "false", CVarFlag.Boolean, "Whether to render shadows at all.");
             r_cloudshadows = Register("r_cloudshadows", "false", CVarFlag.Boolean, "Whether to display shadows from clouds.");
             r_good_graphics = Register("r_good_graphics", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether to use 'good' graphics."); // TODO: Callback to auto-set
-            r_skybox = Register("r_skybox", "default", CVarFlag.ServerControl | CVarFlag.Textual, "What skybox to use.");
+            r_skybox = Register("r_skybox", "default", CVarFlag.ServerControl | CVarFlag.Textual, "What skybox to use."); // TODO: Server controllable setting
             r_blocktexturelinear = Register("r_blocktexturelinear", "true", CVarFlag.Boolean | CVarFlag.Delayed, "Whether block textures are to use a linear blur or nearest-pixel mode.");
             r_blocktexturewidth = Register("r_blocktexturewidth", "256", CVarFlag.Numeric | CVarFlag.Delayed, "What texture width (pixels) block textures should use.");
             r_toonify = Register("r_toonify", "false", CVarFlag.Boolean, "Whether to use a 'toonify' post-processing effect.");
@@ -145,7 +137,7 @@ namespace Voxalia.ClientGame.CommandSystem
             a_musicpitch = Register("a_musicpitch", "1", CVarFlag.Numeric, "What pitch the music should be.");
             a_globalvolume = Register("a_globalvolume", "1", CVarFlag.Numeric, "What volume all sounds should be.");
             a_globalpitch = Register("a_globalpitch", "1", CVarFlag.Numeric, "What pitch all sounds should be.");
-            a_music = Register("a_music", "music/epic/bcvoxalia_adventure", CVarFlag.Textual | CVarFlag.ServerControl, "What music should be played.");
+            a_music = Register("a_music", "music/epic/bcvoxalia_adventure", CVarFlag.Textual | CVarFlag.ServerControl, "What music should be played.");// TODO: Server controllable setting
             a_quietondeselect = Register("a_quietondeselect", "true", CVarFlag.Boolean, "Whether to quiet music when the window is deselected.");
             a_echovolume = Register("a_echovolume", "0", CVarFlag.Numeric, "What volume to echo microphone pickup at, for audio testing purposes. Specify 0 to not listen to the microphone at all.");
             a_enforce = Register("a_enforce", "true", CVarFlag.Boolean, "Whether to use the audio enforcement mode.");
@@ -159,10 +151,10 @@ namespace Voxalia.ClientGame.CommandSystem
             u_highlight_targetblock = Register("u_highlight_targetblock", "true", CVarFlag.Boolean, "Whether to highlight the targeted block.");
             u_highlight_placeblock = Register("u_highlight_placeblock", "true", CVarFlag.Boolean, "Whether to highlight the targeted placement block.");
             u_debug = Register("u_debug", "false", CVarFlag.Boolean, "Whether to display debug information on the HUD.");
-            u_showmap = Register("u_showmap", "false", CVarFlag.Boolean | CVarFlag.ServerControl, "Whether to display a map on the HUD.");
-            u_showrangefinder = Register("u_showrangefinder", "false", CVarFlag.Boolean | CVarFlag.ServerControl, "Whether to display a range finder on the HUD.");
+            u_showmap = Register("u_showmap", "false", CVarFlag.Boolean | CVarFlag.ServerControl, "Whether to display a map on the HUD.");// TODO: Server controllable setting
+            u_showrangefinder = Register("u_showrangefinder", "false", CVarFlag.Boolean | CVarFlag.ServerControl, "Whether to display a range finder on the HUD.");// TODO: Server controllable setting
             u_showping = Register("u_showping", "true", CVarFlag.Boolean, "Whether to display the current ping on the UI.");
-            u_showcompass = Register("u_showcompass", "false", CVarFlag.Boolean | CVarFlag.ServerControl, "Whether to display a compass on the HUD.");
+            u_showcompass = Register("u_showcompass", "false", CVarFlag.Boolean | CVarFlag.ServerControl, "Whether to display a compass on the HUD.");// TODO: Server controllable setting
             u_colortyping = Register("u_colortyping", "false", CVarFlag.Boolean, "Whether to color the text currently being typed typed (chat, console, ...).");
             u_rate = Register("u_rate", "3", CVarFlag.Numeric, "How many frames between UI updates.");
         }
