@@ -15,7 +15,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.LightingSystem
 {
     class LightOrtho: Light
     {
-        public override OpenTK.Matrix4 GetMatrix()
+        public override Matrix4 GetMatrix()
         {
             Vector3d c = ClientUtilities.ConvertD(Client.Central.MainWorldView.RenderRelative);
             Vector3d e = eye - c;

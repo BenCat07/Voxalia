@@ -769,7 +769,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Whether shadows should be redrawn this frame.
         /// </summary>
-        public bool shouldRedrawShadows = false;
+        public bool shouldRedrawShadows = true;
 
         /// <summary>
         /// How many things the game is currently loading.
