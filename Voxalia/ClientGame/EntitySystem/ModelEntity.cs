@@ -441,12 +441,15 @@ namespace Voxalia.ClientGame.EntitySystem
             Matrix4d orient = GetOrientationMatrix();
             Matrix4d mat = (Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * orient * transform * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition())));
             TheClient.MainWorldView.SetMatrix(2, mat);
-            TheClient.Rendering.SetMinimumLight(0.0f);
+            if (!TheClient.MainWorldView.RenderingShadows)
+            {
+                TheClient.Rendering.SetMinimumLight(0.0f);
+            }
             if (model.Meshes[0].vbo.Tex == null)
             {
                 TheClient.Textures.White.Bind();
             }
-            if (TheClient.CVars.r_fast.ValueB || !TheClient.CVars.r_lighting.ValueB)
+            if (!TheClient.MainWorldView.RenderingShadows && (TheClient.CVars.r_fast.ValueB || !TheClient.CVars.r_lighting.ValueB)) // TODO: handle for forward lighting?
             {
                 OpenTK.Vector4 sadj = TheRegion.GetSunAdjust();
                 float skyl = TheRegion.GetSkyLightBase(GetPosition() + new Location(0, 0, ModelMax.Z));

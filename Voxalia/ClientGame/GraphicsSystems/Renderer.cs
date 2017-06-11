@@ -358,7 +358,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         
         public void SetMinimumLight(float min)
         {
-            if (Client.Central.MainWorldView.RenderLights) // TODO: Pass client reference!
+            if (Client.Central.MainWorldView.RenderLights && !Client.Central.MainWorldView.RenderingShadows) // TODO: Pass client reference!
             {
                 GL.Uniform1(16, min);
             }

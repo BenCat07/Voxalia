@@ -1925,6 +1925,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     SetVox();
                     TheRegion.ConfigureForRenderChunk();
+                    View3D.CheckError("Rendering - 0 - Configure Chunks");
                     foreach (Chunk ch in TheRegion.LoadedChunks.Values)
                     {
                         ch.Render();
@@ -1933,6 +1934,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
 #endif
                     }
                     SetEnts();
+                    View3D.CheckError("Rendering - 0 - Configure Ents");
                     for (int i = 0; i < TheRegion.GenShadowCasters.Length; i++)
                     {
                         TheRegion.GenShadowCasters[i].Render();
