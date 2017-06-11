@@ -474,8 +474,8 @@ namespace Voxalia.ClientGame.OtherSystems
                         }
                         empty = EmptyBytes;
                     }*/
-                    uint[] newBufs = new uint[9];
-                    GL.GenBuffers(9, newBufs);
+                    uint[] newBufs = new uint[11];
+                    GL.GenBuffers(11, newBufs);
                     View3D.CheckError("Compute - New Buffers - Prep");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[0]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
@@ -494,6 +494,10 @@ namespace Voxalia.ClientGame.OtherSystems
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[6]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[7]);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[9]);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[10]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     View3D.CheckError("Compute - New Buffers - 7");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
@@ -521,8 +525,8 @@ namespace Voxalia.ClientGame.OtherSystems
                     // Run computation MODE_THREE
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[6]);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[7]);
-                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, 0);
-                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, 0);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[9]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, newBufs[10]);
                     GL.UseProgram(transp ? Program_CruncherTRANSP3[lookuper[ch.CSize]] : Program_Cruncher3[lookuper[ch.CSize]]);
                     GL.DispatchCompute(1, ch.CSize, 1);
                     GL.UseProgram(0);
@@ -555,6 +559,10 @@ namespace Voxalia.ClientGame.OtherSystems
                     GL.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, 0, 0);
                     GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[7]);
                     GL.VertexAttribPointer(7, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[9]);
+                    GL.VertexAttribPointer(8, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[10]);
+                    GL.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, false, 0, 0);
                     GL.EnableVertexAttribArray(0);
                     GL.EnableVertexAttribArray(1);
                     GL.EnableVertexAttribArray(2);
@@ -563,6 +571,8 @@ namespace Voxalia.ClientGame.OtherSystems
                     GL.EnableVertexAttribArray(5);
                     GL.EnableVertexAttribArray(6);
                     GL.EnableVertexAttribArray(7);
+                    GL.EnableVertexAttribArray(8);
+                    GL.EnableVertexAttribArray(9);
                     GL.BindBuffer(BufferTarget.ElementArrayBuffer, newBufs[8]);
                     GL.BindVertexArray(0);
                     // Move buffers to chunk VBO
@@ -578,6 +588,8 @@ namespace Voxalia.ClientGame.OtherSystems
                         _THVVBO = newBufs[6],
                         _THWVBO = newBufs[7],
                         _IndexVBO = newBufs[8],
+                        _THV2VBO = newBufs[9],
+                        _THW2VBO = newBufs[10],
                         _VAO = vao,
                         vC = resd,
                         colors = true,

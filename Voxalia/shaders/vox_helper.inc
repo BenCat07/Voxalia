@@ -297,7 +297,6 @@ vec3 lightsFromBlocksFor(in vec3 fpos, in vec3 fnorm)
 
 void crunch_verts(in uvec3 pos, in uint start)
 {
-	// TODO: Shapes support?
 	uint id = blockID(pos);
 	uvec4 curBLK = posses[id];
 	// Guaranteed to render (by indexmark != 0), don't check RendersAtAll.
@@ -328,7 +327,6 @@ void crunch_verts(in uvec3 pos, in uint start)
 		f_normal[start + it3 + 0] =  vec4(n1, 0.0);
 		f_normal[start + it3 + 1] =  vec4(n2, 0.0);
 		f_normal[start + it3 + 2] =  vec4(n3, 0.0);
-		// TODO: Correct TextureIDs
 		f_texcoord[start + it3 + 0] = vec4(t1.xy, swap_tex(mat, fpos, t1.z), 0.0);
 		f_texcoord[start + it3 + 1] = vec4(t2.xy, swap_tex(mat, fpos, t2.z), 0.0);
 		f_texcoord[start + it3 + 2] = vec4(t3.xy, swap_tex(mat, fpos, t3.z), 0.0);
@@ -376,6 +374,12 @@ void crunch_verts(in uvec3 pos, in uint start)
 		f_thw[start + it3 + 1] = vec4(0.0);
 		f_thv[start + it3 + 2] = vec4(0.0);
 		f_thw[start + it3 + 2] = vec4(0.0);
+		f_thv2[start + it3] = vec4(0.0);
+		f_thw2[start + it3] = vec4(0.0);
+		f_thv2[start + it3 + 1] = vec4(0.0);
+		f_thw2[start + it3 + 1] = vec4(0.0);
+		f_thv2[start + it3 + 2] = vec4(0.0);
+		f_thw2[start + it3 + 2] = vec4(0.0);
 #endif
 	}
 }

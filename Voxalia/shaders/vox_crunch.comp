@@ -20,8 +20,6 @@ layout(std430, binding = 4) buffer b_thw
 {
 	vec4 f_thw[];
 };
-// TODO: Add set 2 of TH data
-/*
 layout(std430, binding = 5) buffer b_thv2
 {
 	vec4 f_thv2[];
@@ -30,7 +28,6 @@ layout(std430, binding = 6) buffer b_thw2
 {
 	vec4 f_thw2[];
 };
-*/
 #else
 #if MODE_TWO
 layout(std430, binding = 3) buffer b_color

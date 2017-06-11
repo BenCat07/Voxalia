@@ -116,7 +116,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_transplighting = Register("r_transplighting", "true", CVarFlag.Boolean, "Whether transparent objects should be lit properly (otherwise, fullbright).");
             r_transpshadows = Register("r_transpshadows", "false", CVarFlag.Boolean, "Whether transparent objects should be lit using HD shadows (Requires r_shadows true).");
             r_3d_enable = Register("r_3d_enable", "false", CVarFlag.Boolean, "Whether to use 3D side-by-side rendering mode.");
-            r_fast = Register("r_fast", "false", CVarFlag.Boolean, "Whether to use 'fast' rendering mode.");
+            r_fast = Register("r_fast", "true", CVarFlag.Boolean, "Whether to use 'fast' rendering mode.");
             r_chunksatonce = Register("r_chunksatonce", "10", CVarFlag.Numeric, "How many chunks can render at once.");
             r_chunkoverrender = Register("r_chunkoverrender", "true", CVarFlag.Boolean, "Whether to render chunks more often for quality's sake, at risk of performance.");
             r_transpll = Register("r_transpll", "false", CVarFlag.Boolean, "Whether to use GPU linked lists when rendering transparent objects.");
@@ -127,7 +127,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_clouds = Register("r_clouds", "true", CVarFlag.Boolean, "Whether to render clouds."); // TODO: Inform the server of this to reduce bandwidth.
             r_motionblur = Register("r_motionblur", "false", CVarFlag.Boolean, "Whether to blur the screen to better represent motion.");
             r_plants = Register("r_plants", "true", CVarFlag.Boolean, "Whether to render small plants around the view.");
-            r_exposure = Register("r_exposure", "1.5", CVarFlag.Numeric, "What value to scale the lighting by.");
+            r_exposure = Register("r_exposure", "1.0", CVarFlag.Numeric, "What value to scale the lighting by.");
             r_grayscale = Register("r_grayscale", "false", CVarFlag.Boolean, "Whether to grayscale the view.");
             r_vrscale = Register("r_vrscale", "1", CVarFlag.Numeric, "What scale to put everything at in VR mode.");
             r_compute = Register("r_compute", "true", CVarFlag.Boolean, "Whether to render chunks using the Voxel Compute Shader engine.");
