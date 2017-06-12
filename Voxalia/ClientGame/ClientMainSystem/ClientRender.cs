@@ -1916,7 +1916,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     foreach (Entity ent in entsRender)
                     {
                         ent.Render();
-#if !DEBUG
+#if DEBUG
                         View3D.CheckError("Rendering - 0 - TranspShadow - Specific: " + ent.ToString());
 #endif
                     }
@@ -1929,7 +1929,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     foreach (Chunk ch in TheRegion.LoadedChunks.Values)
                     {
                         ch.Render();
-#if !DEBUG
+#if DEBUG
                         View3D.CheckError("Rendering - 0 - StaticShadow:Chunks - Layer: " + ch.WorldPosition.Z);
 #endif
                     }
@@ -1938,7 +1938,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     for (int i = 0; i < TheRegion.GenShadowCasters.Length; i++)
                     {
                         TheRegion.GenShadowCasters[i].Render();
-#if !DEBUG
+#if DEBUG
                         View3D.CheckError("Rendering - 0 - Shadow Gen - Specific: " + TheRegion.GenShadowCasters[i].ToString());
 #endif
                     }

@@ -158,31 +158,49 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     }
                 }
                 View3D.CheckError("Rendering - Particles - PreClouds");
+                ParticleData pd = new ParticleData();
                 if (TheClient.CVars.r_clouds.ValueB)
                 {
                     int cloudID = GetTextureID("effects/clouds/cloud2"); // TODO: Cache!
-                    List<Task> tasks = new List<Task>(TheClient.TheRegion.Clouds.Count); // This could be an array.
-                    List<ParticleData> datas = new List<ParticleData>(tasks.Capacity);
+                    Task[] tasks = new Task[TheClient.TheRegion.Clouds.Count];
                     bool lessClouds = TheClient.CVars.r_less_clouds.ValueB;
+                    int posn = 0;
                     foreach (Cloud tcl in TheClient.TheRegion.Clouds)
                     {
                         Cloud cloud = tcl;
-                        ParticleData pd = new ParticleData();
-                        datas.Add(pd);
-                        tasks.Add(Task.Factory.StartNew(() =>
+                        int wid = 0;
+                        if (lessClouds)
                         {
-                            if (lessClouds)
-                            {
-                                pd.Poses = new Vector3[cloud.Points.Count / 3];
-                                pd.Cols = new Vector4[cloud.Points.Count / 3];
-                                pd.TCs = new Vector2[cloud.Points.Count / 3];
-                            }
-                            else
-                            {
-                                pd.Poses = new Vector3[cloud.Points.Count];
-                                pd.Cols = new Vector4[cloud.Points.Count];
-                                pd.TCs = new Vector2[cloud.Points.Count];
-                            }
+                            wid = cloud.Points.Count / 3;
+                        }
+                        else
+                        {
+                            wid = cloud.Points.Count;
+                        }
+                        posn += wid;
+                    }
+                    pd.Poses = new Vector3[posn];
+                    pd.Cols = new Vector4[posn];
+                    pd.TCs = new Vector2[posn];
+                    int n = 0;
+                    posn = 0;
+                    foreach (Cloud tcl in TheClient.TheRegion.Clouds)
+                    {
+                        int id = n;
+                        int posid = posn;
+                        Cloud cloud = tcl;
+                        int wid = 0;
+                        if (lessClouds)
+                        {
+                            wid = cloud.Points.Count / 3;
+                        }
+                        else
+                        {
+                            wid = cloud.Points.Count;
+                        }
+                        posn += wid;
+                        tasks[id] = Task.Factory.StartNew(() =>
+                        {
                             for (int i = 0; i < cloud.Points.Count; i++)
                             {
                                 if (lessClouds && i % 3 != 2)
@@ -191,21 +209,22 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                                 }
                                 int c = i / 3;
                                 Location ppos = (cloud.Position + cloud.Points[i]) - TheClient.MainWorldView.RenderRelative;
-                                pd.Poses[c] = ClientUtilities.Convert(ppos);
-                                pd.Cols[c] = Vector4.One; // TODO: Colored clouds?
-                                pd.TCs[c] = new Vector2(cloud.Sizes[i], cloudID);
+                                pd.Poses[posid + c] = ClientUtilities.Convert(ppos);
+                                pd.Cols[posid + c] = Vector4.One; // TODO: Colored clouds?
+                                pd.TCs[posid + c] = new Vector2(cloud.Sizes[i], cloudID);
                             }
-                        }));
+                        });
+                        n++;
                     }
                     int count = pos.Count;
-                    for (int i = 0; i < tasks.Count; i++)
+                    for (int i = 0; i < tasks.Length; i++)
                     {
                         tasks[i].Wait();
-                        // TODO: Pre-sized array logic instead of lists
-                        pos.AddRange(datas[i].Poses);
-                        col.AddRange(datas[i].Cols);
-                        tcs.AddRange(datas[i].TCs);
                     }
+                    // TODO: Could probably skip this addrange step with more clever usage of arrays!
+                    pos.AddRange(pd.Poses);
+                    col.AddRange(pd.Cols);
+                    tcs.AddRange(pd.TCs);
                     View3D.CheckError("Rendering - Particles - PostClouds");
                 }
                 if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
