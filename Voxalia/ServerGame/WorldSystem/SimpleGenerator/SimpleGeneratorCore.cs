@@ -144,6 +144,8 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 
         public const double MountainHeightMapSize = 4000;
 
+        public const double HillHeightMapSize = 1000;
+
         public const double GlobalHeightMapSize = 400;
 
         public const double LocalHeightMapSize = 40;
@@ -244,9 +246,18 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 mheight = (mheight + 0.9) * 4000f;
             }
-            double lheight = SimplexNoise.Generate(seed2 + (x / GlobalHeightMapSize), Seed + (y / GlobalHeightMapSize)) * 50f - 10f;
-            double height = SimplexNoise.Generate(Seed + (x / LocalHeightMapSize), seed2 + (y / LocalHeightMapSize)) * 6f - 3f;
-            return mheight + lheight + height;
+            double hheight = SimplexNoise.Generate(seed4 + (x / HillHeightMapSize), seed3 + (y / HillHeightMapSize)) * 2f - 1f;
+            if (hheight > 0.9)
+            {
+                hheight = (hheight - 0.9) * 700f;
+            }
+            else if (hheight < -0.9)
+            {
+                hheight = (hheight + 0.9) * 400f;
+            }
+            double lheight = SimplexNoise.Generate(seed2 + (x / GlobalHeightMapSize), Seed + (y / GlobalHeightMapSize)) * 40f - 7f;
+            double height = SimplexNoise.Generate(Seed + (x / LocalHeightMapSize), seed2 + (y / LocalHeightMapSize)) * 5f - 2.5f;
+            return mheight + hheight + lheight + height;
         }
         
         public override double GetHeight(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y)
