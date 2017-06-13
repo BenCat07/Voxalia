@@ -1911,6 +1911,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
 #endif
                     }
                     View3D.CheckError("Rendering - 0 - DynShadows");
+                    if (view.FBOid != FBOID.DYNAMIC_SHADOWS)
+                    {
+                        foreach (Chunk ch in TheRegion.LoadedChunks.Values)
+                        {
+                            ch.Render();
+#if DEBUG
+                            View3D.CheckError("Rendering - 0 - Shadow:Chunks - Layer: " + ch.WorldPosition.Z);
+#endif
+                        }
+                    }
                     List<Entity> entsRender = new List<Entity>();
                     AddParticles(entsRender);
                     foreach (Entity ent in entsRender)

@@ -268,7 +268,8 @@ namespace Voxalia.ServerGame.OtherSystems
                 for (int y = 0; y < wid; y++)
                 {
                     double h = tregion.Generator.GetHeight(tregion.TheWorld.Seed, tregion.TheWorld.Seed2, tregion.TheWorld.Seed3,
-                        tregion.TheWorld.Seed4, tregion.TheWorld.Seed5, minx + (maxx - minx) * x * one_div_wid, miny + (maxy - miny) * y * one_div_wid, 0, out Biome b);
+                        tregion.TheWorld.Seed4, tregion.TheWorld.Seed5, minx + (maxx - minx) * x * one_div_wid, miny + (maxy - miny) * y * one_div_wid);
+                    Biome b = tregion.Generator.GetBiomeGen().BiomeFor(tregion.TheWorld.Seed2, tregion.TheWorld.Seed3, tregion.TheWorld.Seed4, minx + (maxx - minx) * x * one_div_wid, miny + (maxy - miny) * y * one_div_wid, 0, h);
                     Material renderme;
                     if (h > 0)
                     {

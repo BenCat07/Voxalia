@@ -1294,9 +1294,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                     GL.BlendFunc(BlendingFactorSrc.One, BlendingFactorDest.Zero);
                                     if (Lights[i] is SkyLight sky)
                                     {
-                                        if (redraw || sky.InternalLights[0].NeedsUpdate)
+                                        if (redraw || sky.InternalLights[x].NeedsUpdate)
                                         {
-                                            sky.InternalLights[0].NeedsUpdate = false;
+                                            sky.InternalLights[x].NeedsUpdate = false;
                                             BindFramebuffer(FramebufferTarget.Framebuffer, sky.FBO);
                                             DrawBuffer(DrawBufferMode.ColorAttachment0);
                                             GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
@@ -1304,6 +1304,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                             FBOid = FBOID.STATIC_SHADOWS;
                                             CheckError("Prerender - Shadows - " + i);
                                             Render3D(this);
+                                            BindFramebuffer(FramebufferTarget.Framebuffer, 0);
                                         }
                                         BindFramebuffer(FramebufferTarget.Framebuffer, fbo_shadow[lTID]);
                                         GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, sky.FBO);
@@ -1311,7 +1312,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                                         GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
                                         if (TheClient.CVars.r_dynamicshadows.ValueB)
                                         {
-                                            GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
+                                            //GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 1f });
                                             FBOid = FBOID.DYNAMIC_SHADOWS;
                                             Render3D(this);
                                         }

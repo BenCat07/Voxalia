@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
@@ -42,8 +43,8 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 for (int y = 0; y < 2; y++)
                 {
-                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, out Biome biomeOrig);
-                    SimpleBiome biome = biomeOrig as SimpleBiome;
+                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y);
+                    SimpleBiome biome = Biomes.BiomeFor(seed2, seed3, seed4, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, hheight) as SimpleBiome;
                     if (hheight > cpos.Z * Chunk.CHUNK_SIZE)
                     {
                         if (hheight > (cpos.Z + 1) * Chunk.CHUNK_SIZE)
@@ -104,8 +105,8 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 for (int y = 0; y < 5; y++)
                 {
-                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, out Biome biomeOrig);
-                    SimpleBiome biome = biomeOrig as SimpleBiome;
+                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y);
+                    SimpleBiome biome = Biomes.BiomeFor(seed2, seed3, seed4, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, hheight) as SimpleBiome;
                     double topf = (hheight - cpos.Z * Chunk.CHUNK_SIZE) / 5.0;
                     int top = (int)Math.Round(topf);
                     for (int z = 0; z < Math.Min(top - 5, 5); z++)
@@ -248,7 +249,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return mheight + lheight + height;
         }
         
-        public override double GetHeight(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, double z, out Biome biome)
+        public override double GetHeight(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y)
         {
 #if TIMINGS
             Stopwatch sw = new Stopwatch();
@@ -257,7 +258,6 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
 #endif
             double valBasic = GetHeightQuick(Seed, seed2, seed3, seed4, seed5, x, y);
-            biome = Biomes.BiomeFor(seed2, seed3, seed4, x, y, z, valBasic);
             return valBasic;
 #if TIMINGS
             }
@@ -293,6 +293,87 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 if (!flags.HasFlag(BlockFlags.EDITED) && !flags.HasFlag(BlockFlags.PROTECTED))
                 {
                     chunk.BlocksInternal[chunk.BlockIndex(X, Y, Z)] = bi;
+                }
+            }
+        }
+
+        public Object LockHM = new Object();
+
+        public Dictionary<Vector2i, HeightMap> HMaps = new Dictionary<Vector2i, HeightMap>(2048);
+
+        public HeightMap GetHeightMap(Vector3i pos, int Seed, int seed2, int seed3, int seed4, int seed5)
+        {
+            Vector2i posser = new Vector2i(pos.X, pos.Y);
+            lock (LockHM)
+            {
+                if (HMaps.Count > 1024)
+                {
+                    HMaps.Clear();
+                }
+                else if (HMaps.TryGetValue(posser, out HeightMap hm))
+                {
+                    return hm;
+                }
+                HeightMap res = new HeightMap();
+                res.Generate(this, pos, Seed, seed2, seed3, seed4, seed5);
+                HMaps[posser] = res;
+                return res;
+            }
+        }
+
+        /// <summary>
+        /// The value of 1.0 / CHUNK_WIDTH. A constant.
+        /// </summary>
+        const double tCW = 1.0 / (double)Constants.CHUNK_WIDTH;
+
+        /// <summary>
+        /// Returns the chunk location for a world position.
+        /// </summary>
+        /// <param name="worldPos">The world position.</param>
+        /// <returns>The chunk location.</returns>
+        public Vector3i ChunkLocFor(Location worldPos)
+        {
+            Vector3i temp;
+            temp.X = (int)Math.Floor(worldPos.X * tCW);
+            temp.Y = (int)Math.Floor(worldPos.Y * tCW);
+            temp.Z = (int)Math.Floor(worldPos.Z * tCW);
+            return temp;
+        }
+
+        public double GetHeightRel(HeightMap hm, int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, double z, int inX, int inY)
+        {
+            Vector3i loc = ChunkLocFor(new Location(x, y, z));
+            if (loc == hm.ChunkPosition)
+            {
+                return hm.Heights[inY * Chunk.CHUNK_SIZE + inX];
+            }
+            HeightMap hmn = GetHeightMap(loc, Seed, seed2, seed3, seed4, seed5);
+            return hmn.Heights[(inY < 0 ? inY + Chunk.CHUNK_SIZE : (inY >= Chunk.CHUNK_SIZE ? inY - Chunk.CHUNK_SIZE : inY)) * Chunk.CHUNK_SIZE + (inX < 0 ? inX + Chunk.CHUNK_SIZE : (inX >= Chunk.CHUNK_SIZE ? inX - Chunk.CHUNK_SIZE : inX))];
+        }
+
+        public class HeightMap
+        {
+            public double[] Heights;
+
+            public Vector3i ChunkPosition;
+
+            public Location CPos;
+
+            public void Generate(SimpleGeneratorCore sgc, Vector3i chunkPos, int Seed, int seed2, int seed3, int seed4, int seed5)
+            {
+                ChunkPosition = chunkPos;
+                CPos = chunkPos.ToLocation() * Chunk.CHUNK_SIZE;
+                Heights = new double[Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE];
+                for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
+                {
+                    for (int y = 0; y < Chunk.CHUNK_SIZE; y++)
+                    {
+                        // Prepare basics
+                        int cx = (int)CPos.X + x;
+                        int cy = (int)CPos.Y + y;
+                        double hheight = sgc.GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy);
+                        Heights[y * Chunk.CHUNK_SIZE + x] = hheight;
+                    }
                 }
             }
         }
@@ -356,17 +437,18 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 }
                 return;
             }
+            Location cpos = chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
+            HeightMap hm = GetHeightMap(chunk.WorldPosition, Seed, seed2, seed3, seed4, seed5);
             // TODO: Special case for too far down as well.
             for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
             {
                 for (int y = 0; y < Chunk.CHUNK_SIZE; y++)
                 {
-                    Location cpos = chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
                     // Prepare basics
                     int cx = (int)cpos.X + x;
                     int cy = (int)cpos.Y + y;
-                    double hheight = GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy, cpos.Z, out Biome biomeOrig);
-                    SimpleBiome biome = biomeOrig as SimpleBiome;
+                    double hheight = hm.Heights[y * Chunk.CHUNK_SIZE + x];
+                    SimpleBiome biome = Biomes.BiomeFor(seed2, seed3, seed4, x, y, cpos.Z, hheight) as SimpleBiome;
                     //Biome biomeOrig2;
                     /*double hheight2 = */
                     /*GetHeight(Seed, seed2, seed3, seed4, seed5, cx + 7, cy + 7, (double)cpos.Z + 7, out biomeOrig2);
@@ -418,10 +500,10 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                         chunk.BlocksInternal[chunk.BlockIndex(x, y, z)] = new BlockInternal((ushort)(/*choice ? surf2 : */surf), 0, 0, 0);
                     }
                     // Smooth terrain cap
-                    double heightfxp = GetHeight(Seed, seed2, seed3, seed4, seed5, cx + 1, cy, (double)cpos.Z, out Biome tempb);
-                    double heightfxm = GetHeight(Seed, seed2, seed3, seed4, seed5, cx - 1, cy, (double)cpos.Z, out tempb);
-                    double heightfyp = GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy + 1, (double)cpos.Z, out tempb);
-                    double heightfym = GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy - 1, (double)cpos.Z, out tempb);
+                    double heightfxp = GetHeightRel(hm, Seed, seed2, seed3, seed4, seed5, cx + 1, cy, (double)cpos.Z, x + 1, y);
+                    double heightfxm = GetHeightRel(hm, Seed, seed2, seed3, seed4, seed5, cx - 1, cy, (double)cpos.Z, x - 1, y);
+                    double heightfyp = GetHeightRel(hm, Seed, seed2, seed3, seed4, seed5, cx, cy + 1, (double)cpos.Z, x, y + 1);
+                    double heightfym = GetHeightRel(hm, Seed, seed2, seed3, seed4, seed5, cx, cy - 1, (double)cpos.Z, x, y - 1);
                     double topfxp = heightfxp - (double)chunk.WorldPosition.Z * Chunk.CHUNK_SIZE;
                     double topfxm = heightfxm - (double)chunk.WorldPosition.Z * Chunk.CHUNK_SIZE;
                     double topfyp = heightfyp - (double)chunk.WorldPosition.Z * Chunk.CHUNK_SIZE;
