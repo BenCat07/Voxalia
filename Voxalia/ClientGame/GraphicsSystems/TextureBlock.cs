@@ -94,7 +94,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     MaterialTextureInfo tex = new MaterialTextureInfo()
                     {
-                        Mat = (Material)i
+                        Mat = i
                     };
                     string[] refrornot = MaterialHelpers.Textures[i].SplitFast('@');
                     if (refrornot.Length > 1)
@@ -277,9 +277,9 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     for (int y = 0; y < TWidth; y++)
                     {
-                        ptr[(x * 4) + y * stride + 0] = ptr1[(x * 4) + y * stride];
+                        ptr[(x * 4) + y * stride + 0] = ptr3[(x * 4) + y * stride];
                         ptr[(x * 4) + y * stride + 1] = ptr2[(x * 4) + y * stride];
-                        ptr[(x * 4) + y * stride + 2] = ptr3[(x * 4) + y * stride];
+                        ptr[(x * 4) + y * stride + 2] = ptr1[(x * 4) + y * stride];
                         ptr[(x * 4) + y * stride + 3] = ptr4[(x * 4) + y * stride];
                     }
                 }
@@ -290,11 +290,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 four.UnlockBits(bdat4);
             }
             return combined;
-        }
-
-        public int Gray(Color col)
-        {
-            return (col.R + (int)col.G + col.B) / 3;
         }
         
         public void SetTexture(int ID, string texture)
@@ -374,7 +369,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
     public class MaterialTextureInfo
     {
-        public Material Mat;
+        public int Mat;
 
         public string[] Textures;
 

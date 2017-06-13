@@ -22,10 +22,10 @@
 
 #if MCM_VOX
 layout (binding = 0) uniform sampler2DArray s;
-layout (binding = 2) uniform sampler2DArray normal_tex;
 #if MCM_LIGHTS
-layout (binding = 3) uniform sampler2DArray htex;
+layout (binding = 1) uniform sampler2DArray htex;
 #endif
+layout (binding = 2) uniform sampler2DArray normal_tex;
 #else
 #if MCM_GEOM_ACTIVE
 layout (binding = 0) uniform sampler2DArray s;
