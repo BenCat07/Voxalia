@@ -135,6 +135,8 @@ renderer:
 		forward_lights: true
 		# Whether to enable shadows in forward rendering mode.
 		forward_shadows: false
+		# Whether to enable reflection calculation in forward rendering mode.
+		forward_reflections: true
 		# Whether mipmaps should be enabled for blocks.
 		block_mipmaps: true
 		# Whether SLOD chunks should be smoothed out (experimental).

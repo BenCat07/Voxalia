@@ -39,7 +39,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_3d_enable, r_fast, r_chunksatonce, r_chunkoverrender, r_transpll, r_noblockshapes, r_treeshadows,
             r_godrays, r_hdr, r_clouds, r_motionblur, r_plants, r_exposure, r_grayscale, r_vrscale,
             r_forward_normals, r_forward_lights, r_forward_shadows, r_compute, r_less_clouds,
-            r_block_mipmaps, r_slodsmoothing, r_modeldistance, r_plantdistance;
+            r_block_mipmaps, r_slodsmoothing, r_modeldistance, r_plantdistance, r_forwardreflections;
 
         // Audio CVars
         public CVar a_musicvolume, a_musicpitch, a_globalvolume, a_globalpitch, a_music, a_quietondeselect, a_echovolume, a_enforce, a_left, a_right;
@@ -132,6 +132,7 @@ namespace Voxalia.ClientGame.CommandSystem
             r_modeldistance = Register("r_modeldistance", "60", CVarFlag.Boolean, "How far a static model can be from the camera before it becomes a cardboard cutout.");
             r_plantdistance = Register("r_plantdistance", "50", CVarFlag.Numeric, "How far away plants should be rendered at, maximum.");
             r_less_clouds = Register("r_less_clouds", "true", CVarFlag.Boolean, "Whether to reduce cloud density.");
+            r_forwardreflections = Register("r_forwardreflections", "true", CVarFlag.Boolean, "Whether to enable forward-mode reflections.");
             // Audio CVars
             a_musicvolume = Register("a_musicvolume", "0.5", CVarFlag.Numeric, "What volume the music should be.");
             a_musicpitch = Register("a_musicpitch", "1", CVarFlag.Numeric, "What pitch the music should be.");

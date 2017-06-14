@@ -290,6 +290,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 s_ll_fpass = Shaders.GetShader("fpass" + def);
             }
             s_hdrpass = Shaders.GetShader("hdrpass" + def);
+            s_post_fast = Shaders.GetShader("postfast" + def);
             s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE" + forw_extra  +"?grass");
             s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY" + forw_extra  +"?grass");
             s_shadow_grass = Shaders.GetShader("shadow" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_SHADOWS,MCM_IS_A_SHADOW?grass");
@@ -626,6 +627,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The shader used for forward ('fast') rendering of transparent data.
         /// </summary>
         public Shader s_forw_trans;
+
+        /// <summary>
+        /// The shader for forward ('fast') post-processing calculations.
+        /// </summary>
+        public Shader s_post_fast;
 
         /// <summary>
         /// The shader used for forward ('fast') rendering of transparent data, with no bones.

@@ -92,7 +92,10 @@ layout (location = 58) uniform mat4 light_data_array[LIGHTS_MAX];
 #endif
 
 layout (location = 0) out vec4 color;
-layout (location = 1) out vec3 nrml;
+layout (location = 1) out vec4 position;
+layout (location = 2) out vec4 nrml;
+// ...
+layout (location = 4) out vec4 renderhint2;
 
 vec4 unused_nonsense() // Prevent shader compiler from claiming variables are unused (Even if they /are/ unused!)
 {
@@ -119,10 +122,12 @@ float fix_sqr(in float inTemp)
 
 void main()
 {
+	position = vec4(fi.pos, 1.0);
 	vec4 col = textureLod(s, fi.texcoord, textureQueryLod(s, fi.texcoord.xy).x);
 #if MCM_VOX
 	float extra_specular = 0.0;
 	float rhBlur = 0.0;
+	float reflecto = 0.0;
 	if (fi.tcol.w == 0.0 && fi.tcol.x == 0.0 && fi.tcol.z == 0.0 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7)
 	{
 		rhBlur = (fi.tcol.y - 0.31) * ((1.0 / 0.38) * (3.14159 * 2.0));
@@ -139,6 +144,7 @@ void main()
 		}
 		else if (fi.tcol.x > 0.51)
 		{
+			reflecto = 0.75;
 			extra_specular = 1.0;
 		}
 		else
@@ -152,7 +158,12 @@ void main()
 	}
 #if MCM_LIGHTS
 	vec4 hintter = texture(htex, fi.texcoord);
-	float specularStrength = hintter.x + extra_specular;
+	float specularStrength = max(hintter.x, extra_specular);
+#if MCM_TRANSP
+#else // MCM_TRANSP
+	reflecto = max(reflecto, hintter.z);
+	renderhint2 = vec4(0.0, reflecto, 0.0, 1.0);
+#endif // else - MCM_TRANSP
 #endif // MCM_LIGHTS
 #else // MCM_VOX
 #if MCM_LIGHTS
@@ -178,8 +189,8 @@ void main()
 #else // MCM_BRIGHT
 	float opac_min = 0.0;
 	vec3 norms = texture(normal_tex, fi.texcoord).xyz * 2.0 - vec3(1.0);
-	nrml = norms;
 	vec3 tf_normal = normalize(fi.tbn * norms);
+	nrml = vec4(tf_normal, 1.0);
 #if MCM_LIGHTS
 	vec3 res_color = vec3(0.0);
 	int count = int(lights_used);

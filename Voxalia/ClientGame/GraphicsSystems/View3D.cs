@@ -811,7 +811,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public void RenderPass_FAST()
         {
             CheckError("Render/Fast - Prep");
-            if (TheClient.CVars.r_decals.ValueB)
+            if (TheClient.CVars.r_decals.ValueB || TheClient.CVars.r_forwardreflections.ValueB)
             {
                 RS4P.Bind();
                 RS4P.Clear();
@@ -1091,7 +1091,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 Render3D(this);
                 CheckError("Render/Fast - Solid");
             }
-            if (TheClient.CVars.r_decals.ValueB)
+            if (TheClient.CVars.r_decals.ValueB || TheClient.CVars.r_forwardreflections.ValueB)
             {
                 RS4P.Unbind();
                 BindFramebuffer(FramebufferTarget.Framebuffer, CurrentFBO);
@@ -1099,6 +1099,42 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, RS4P.fbo);
                 GL.BlitFramebuffer(0, 0, Width, Height, 0, 0, Width, Height, ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
                 GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
+                if (TheClient.CVars.r_forwardreflections.ValueB)
+                {
+                    TheClient.s_post_fast = TheClient.s_post_fast.Bind();
+                    GL.UniformMatrix4(1, false, ref SimpleOrthoMatrix);
+                    GL.UniformMatrix4(2, false, ref IdentityMatrix);
+                    GL.UniformMatrix4(6, false, ref PrimaryMatrix);
+                    GL.Uniform2(5, zfar_rel);
+                    GL.ActiveTexture(TextureUnit.Texture4);
+                    GL.BindTexture(TextureTarget.Texture2D, RS4P.PositionTexture);
+                    GL.ActiveTexture(TextureUnit.Texture3);
+                    GL.BindTexture(TextureTarget.Texture2D, RS4P.DepthTexture);
+                    GL.ActiveTexture(TextureUnit.Texture2);
+                    GL.BindTexture(TextureTarget.Texture2D, RS4P.NormalsTexture);
+                    GL.ActiveTexture(TextureUnit.Texture1);
+                    GL.BindTexture(TextureTarget.Texture2D, RS4P.DiffuseTexture);
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.BindTexture(TextureTarget.Texture2D, RS4P.Rh2Texture);
+                    GL.Disable(EnableCap.DepthTest);
+                    GL.Disable(EnableCap.CullFace);
+                    TheClient.Rendering.RenderRectangle(-1, -1, 1, 1);
+                    GL.Enable(EnableCap.DepthTest);
+                    GL.Enable(EnableCap.CullFace);
+                    GL.ActiveTexture(TextureUnit.Texture4);
+                    GL.BindTexture(TextureTarget.Texture2D, 0);
+                    GL.ActiveTexture(TextureUnit.Texture3);
+                    GL.BindTexture(TextureTarget.Texture2D, 0);
+                    GL.ActiveTexture(TextureUnit.Texture2);
+                    GL.BindTexture(TextureTarget.Texture2D, 0);
+                    GL.ActiveTexture(TextureUnit.Texture1);
+                    GL.BindTexture(TextureTarget.Texture2D, 0);
+                    GL.ActiveTexture(TextureUnit.Texture0);
+                    GL.BindTexture(TextureTarget.Texture2D, 0);
+                }
+            }
+            if (TheClient.CVars.r_decals.ValueB)
+            {
                 TheClient.s_forwdecal = TheClient.s_forwdecal.Bind();
                 GL.ActiveTexture(TextureUnit.Texture4);
                 GL.BindTexture(TextureTarget.Texture2D, RS4P.DepthTexture);
