@@ -371,7 +371,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 tempCast.UpdateBoundingBoxForTransform(ref def);
                 ShadowCastShape = tempCast.BoundingBox;
                 BEPUutilities.Vector3 size = ShadowCastShape.Max - ShadowCastShape.Min;
-                ShadowRadiusSquaredXY = size.X * size.X + size.Y * size.Y;
+                ShadowRadiusSquaredXY = (size.X * size.X + size.Y * size.Y) * 0.25;
                 if (model.LODHelper == null)
                 {
                     model.LODBox = new AABB() { Min = new Location(ModelMin), Max = new Location(ModelMax) };

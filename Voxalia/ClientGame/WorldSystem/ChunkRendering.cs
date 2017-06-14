@@ -106,28 +106,60 @@ namespace Voxalia.ClientGame.WorldSystem
         
         public void CalcSkyLight(Chunk above)
         {
-            if (CSize != CHUNK_SIZE)
+            for (int x = 0; x < CSize; x++)
             {
-                for (int x = 0; x < CSize; x++)
+                for (int y = 0; y < CSize; y++)
                 {
-                    for (int y = 0; y < CSize; y++)
+                    for (int z = 0; z < CSize; z++)
                     {
-                        for (int z = 0; z < CSize; z++)
-                        {
-                            BlocksInternal[BlockIndex(x, y, z)].BlockLocalData = 255;
-                        }
+                        BlocksInternal[BlockIndex(x, y, z)].BlockLocalData = 255;
                     }
                 }
+            }
+            if (CSize != CHUNK_SIZE)
+            {
                 return;
             }
+            Location chPos = WorldPosition.ToLocation() * CHUNK_SIZE;
             for (int x = 0; x < CHUNK_SIZE; x++)
             {
                 for (int y = 0; y < CHUNK_SIZE; y++)
                 {
+                    if (PosMultiplier == 1)
+                    {
+                        Location pos = chPos + new Location(x, y, 0);
+                        BEPUutilities.BoundingBox bb = new BEPUutilities.BoundingBox(pos.ToBVector(), (pos + new Location(1, 1, 300)).ToBVector());
+                        if (OwningRegion.GenShadowCasters != null)
+                        {
+                            for (int i = 0; i < OwningRegion.GenShadowCasters.Length; i++)
+                            {
+                                PhysicsEntity pe = OwningRegion.GenShadowCasters[i];
+                                if (pe.GenBlockShadows && pe.ShadowCastShape.Max.Z > pos.Z && pe.ShadowCenter.DistanceSquared_Flat(pos) < pe.ShadowRadiusSquaredXY)
+                                {
+                                    byte maxv = 175;
+                                    if (pe.ShadowCastShape.Intersects(bb))
+                                    {
+                                        if (pe.ShadowMainDupe.Intersects(bb))
+                                        {
+                                            maxv = 0;
+                                        }
+                                        maxv = 100;
+                                    }
+                                    for (int z = (int)Math.Min(CHUNK_SIZE - 1, pe.ShadowCastShape.Max.Z - chPos.Z); z >= 0; z--)
+                                    {
+                                        int ind = BlockIndex(x, y, z);
+                                        BlocksInternal[ind].BlockLocalData = maxv;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     byte light = (above != null && above.CSize == CHUNK_SIZE) ? above.GetBlockAt(x, y, 0).BlockLocalData : (byte)255;
                     for (int z = CHUNK_SIZE - 1; z >= 0; z--)
                     {
-                        if (light > 0)
+                        int ind = BlockIndex(x, y, z);
+                        byte tlight = (byte)Math.Max(0, BlocksInternal[ind].BlockLocalData - (255 - light));
+                        if (tlight > 0)
                         {
                             BlockInternal bi = GetBlockAt(x, y, z);
                             double transc = Colors.AlphaForByte(bi.BlockPaint);
@@ -140,7 +172,7 @@ namespace Voxalia.ClientGame.WorldSystem
                                 light = (byte)(light * (1.0 - (bi.Material.GetLightDamage() * transc)));
                             }
                         }
-                        BlocksInternal[BlockIndex(x, y, z)].BlockLocalData = light;
+                        BlocksInternal[ind].BlockLocalData = tlight;
                     }
                 }
             }
