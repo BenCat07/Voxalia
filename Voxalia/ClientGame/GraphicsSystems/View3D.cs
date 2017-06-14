@@ -159,7 +159,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
                 GL.ReadBuffer(ReadBufferMode.None);
                 float exp = FindExp(rd);
-                exp = Math.Max(Math.Min(exp, 3.0f), 0.33333f);
+                exp = Math.Max(Math.Min(exp, 5.0f), 0.4f);
                 exp = 1.0f / exp;
                 float stepUp = (float)TheClient.gDelta * 0.05f;
                 float stepDown = stepUp * 5.0f;
