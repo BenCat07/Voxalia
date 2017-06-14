@@ -1013,6 +1013,23 @@ namespace Voxalia.ClientGame.GraphicsSystems
             TheClient.Rendering.SetColor(Color4.White);
             GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
+            TheClient.s_forw_vox_slod.Bind();
+            if (TheClient.CVars.r_forward_lights.ValueB)
+            {
+                GL.Uniform1(15, (float)c);
+                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
+                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
+            }
+            CheckError("Render/Fast - Uniforms 5.25");
+            GL.UniformMatrix4(1, false, ref PrimaryMatrix);
+            GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, fogDist);
+            GL.Uniform2(14, zfar_rel);
+            TheClient.Rendering.SetColor(Color4.White);
+            GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
+            GL.Uniform3(11, maxLit);
             TheClient.s_forw_nobones.Bind();
             if (TheClient.CVars.r_forward_lights.ValueB)
             {
@@ -1387,6 +1404,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             //GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             TheClient.s_fbov = TheClient.s_fbov.Bind();
             CheckError("Render - GBuffer - Uniforms - 0");
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.UniformMatrix4(1, false, ref PrimaryMatrix);
+            GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform2(8, new Vector2(TheClient.sl_min, TheClient.sl_max));
+            TheClient.s_fbov = TheClient.s_fbovslod.Bind();
+            CheckError("Render - GBuffer - Uniforms - 0.5");
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);

@@ -474,8 +474,9 @@ namespace Voxalia.ClientGame.OtherSystems
                         }
                         empty = EmptyBytes;
                     }*/
-                    uint[] newBufs = new uint[11];
-                    GL.GenBuffers(11, newBufs);
+                    int bufc = ch.PosMultiplier == 1 ? 11 : 7;
+                    uint[] newBufs = new uint[bufc];
+                    GL.GenBuffers(bufc, newBufs);
                     View3D.CheckError("Compute - New Buffers - Prep");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[0]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
@@ -491,17 +492,20 @@ namespace Voxalia.ClientGame.OtherSystems
                     View3D.CheckError("Compute - New Buffers - 4");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[5]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
-                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[6]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
-                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[7]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
-                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[9]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
-                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[10]);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                    if (ch.PosMultiplier == 1)
+                    {
+                        GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[6]);
+                        GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                        GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[7]);
+                        GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                        GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[9]);
+                        GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                        GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[10]);
+                        GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
+                    }
                     View3D.CheckError("Compute - New Buffers - 7");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[8]);
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[ch.PosMultiplier == 1 ? 8 : 6]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * sizeof(uint), empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                     View3D.CheckError("Compute - New Buffers");
@@ -518,17 +522,20 @@ namespace Voxalia.ClientGame.OtherSystems
                     // Run computation MODE_TWO
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[4]);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[5]);
-                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[8]);
+                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[ch.PosMultiplier == 1 ? 8 : 6]);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, ch.CSize == Constants.CHUNK_WIDTH ? lbuf : ZeroChunkRep);
                     GL.UseProgram(transp ? Program_CruncherTRANSP2[lookuper[ch.CSize]] : Program_Cruncher2[lookuper[ch.CSize]]);
                     GL.DispatchCompute(1, ch.CSize, 1);
                     // Run computation MODE_THREE
-                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[6]);
-                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[7]);
-                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[9]);
-                    GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, newBufs[10]);
-                    GL.UseProgram(transp ? Program_CruncherTRANSP3[lookuper[ch.CSize]] : Program_Cruncher3[lookuper[ch.CSize]]);
-                    GL.DispatchCompute(1, ch.CSize, 1);
+                    if (ch.PosMultiplier == 1)
+                    {
+                        GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, newBufs[6]);
+                        GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, newBufs[7]);
+                        GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, newBufs[9]);
+                        GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, newBufs[10]);
+                        GL.UseProgram(transp ? Program_CruncherTRANSP3[lookuper[ch.CSize]] : Program_Cruncher3[lookuper[ch.CSize]]);
+                        GL.DispatchCompute(1, ch.CSize, 1);
+                    }
                     GL.UseProgram(0);
                     View3D.CheckError("Compute - Crunch");
                     // Unbind new buffers
@@ -555,25 +562,31 @@ namespace Voxalia.ClientGame.OtherSystems
                     GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
                     GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[5]);
                     GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, 0, 0);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[6]);
-                    GL.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, 0, 0);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[7]);
-                    GL.VertexAttribPointer(7, 4, VertexAttribPointerType.Float, false, 0, 0);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[9]);
-                    GL.VertexAttribPointer(8, 4, VertexAttribPointerType.Float, false, 0, 0);
-                    GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[10]);
-                    GL.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    if (ch.PosMultiplier == 1)
+                    {
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[6]);
+                        GL.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, 0, 0);
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[7]);
+                        GL.VertexAttribPointer(7, 4, VertexAttribPointerType.Float, false, 0, 0);
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[9]);
+                        GL.VertexAttribPointer(8, 4, VertexAttribPointerType.Float, false, 0, 0);
+                        GL.BindBuffer(BufferTarget.ArrayBuffer, newBufs[10]);
+                        GL.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, false, 0, 0);
+                    }
                     GL.EnableVertexAttribArray(0);
                     GL.EnableVertexAttribArray(1);
                     GL.EnableVertexAttribArray(2);
                     GL.EnableVertexAttribArray(3);
                     GL.EnableVertexAttribArray(4);
                     GL.EnableVertexAttribArray(5);
-                    GL.EnableVertexAttribArray(6);
-                    GL.EnableVertexAttribArray(7);
-                    GL.EnableVertexAttribArray(8);
-                    GL.EnableVertexAttribArray(9);
-                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, newBufs[8]);
+                    if (ch.PosMultiplier == 1)
+                    {
+                        GL.EnableVertexAttribArray(6);
+                        GL.EnableVertexAttribArray(7);
+                        GL.EnableVertexAttribArray(8);
+                        GL.EnableVertexAttribArray(9);
+                    }
+                    GL.BindBuffer(BufferTarget.ElementArrayBuffer, newBufs[ch.PosMultiplier == 1 ? 8 : 6]);
                     GL.BindVertexArray(0);
                     // Move buffers to chunk VBO
                     ChunkVBO vbo = new ChunkVBO()
@@ -585,17 +598,22 @@ namespace Voxalia.ClientGame.OtherSystems
                         _TangentVBO = newBufs[3],
                         _ColorVBO = newBufs[4],
                         _TCOLVBO = newBufs[5],
-                        _THVVBO = newBufs[6],
-                        _THWVBO = newBufs[7],
-                        _IndexVBO = newBufs[8],
-                        _THV2VBO = newBufs[9],
-                        _THW2VBO = newBufs[10],
+                        _IndexVBO = newBufs[ch.PosMultiplier == 1 ? 8 : 6],
                         _VAO = vao,
                         vC = resd,
                         colors = true,
                         tcols = true,
+                        usethvs = false,
                         reusable = false
                     };
+                    if (ch.PosMultiplier == 1)
+                    {
+                        vbo._THVVBO = newBufs[6];
+                        vbo._THWVBO = newBufs[7];
+                        vbo._THV2VBO = newBufs[9];
+                        vbo._THW2VBO = newBufs[10];
+                        vbo.usethvs = true;
+                    }
                     if (transp)
                     {
                         ch._VBOTransp?.Destroy();

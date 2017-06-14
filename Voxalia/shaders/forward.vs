@@ -14,6 +14,7 @@
 #define MCM_GEOM_ACTIVE 0
 #define MCM_INVERSE_FADE 0
 #define MCM_NO_BONES 0
+#define MCM_TH 0
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -22,8 +23,10 @@ layout (location = 3) in vec3 tangent;
 layout (location = 4) in vec4 color;
 #if MCM_VOX
 layout (location = 5) in vec4 tcol;
+#if MCM_TH
 layout (location = 6) in vec4 thv;
 layout (location = 7) in vec4 thw;
+#endif
 #else
 #if MCM_GEOM_ACTIVE
 #else
@@ -48,8 +51,10 @@ out struct vox_fout
 #if MCM_VOX
 	vec3 texcoord;
 	vec4 tcol;
+#if MCM_TH
 	vec4 thv;
 	vec4 thw;
+#endif
 #else
 	vec2 texcoord;
 #endif
@@ -92,8 +97,10 @@ void main()
 #if MCM_VOX
 	vec4 vpos = vec4(position, 1.0);
 	fi.texcoord = texcoords;
+#if MCM_TH
 	fi.thv = thv;
 	fi.thw = thw;
+#endif
 	vec3 tf_normal = (mv_mat_simple * vec4(normal, 0.0)).xyz;
 	vec3 tf_tangent = (mv_mat_simple * vec4(tangent, 0.0)).xyz;
 	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent, normal), 0.0)).xyz;

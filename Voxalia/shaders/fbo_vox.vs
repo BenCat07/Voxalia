@@ -8,16 +8,20 @@
 
 #version 430 core
 
+#define MCM_TH 0
+
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec3 texcoords;
 layout (location = 3) in vec3 tangent;
 layout (location = 4) in vec4 color;
 layout (location = 5) in vec4 tcol;
+#if MCM_TH
 layout (location = 6) in vec4 thv;
 layout (location = 7) in vec4 thw;
 layout (location = 8) in vec4 thv2;
 layout (location = 9) in vec4 thw2;
+#endif
 
 out struct vox_out
 {
@@ -26,10 +30,12 @@ out struct vox_out
 	vec4 color;
 	vec4 tcol;
 	mat3 tbn;
+#if MCM_TH
 	vec4 thv;
 	vec4 thw;
 	vec4 thv2;
 	vec4 thw2;
+#endif
 } f;
 
 layout (location = 1) uniform mat4 proj_matrix = mat4(1.0);
@@ -46,10 +52,12 @@ void main()
 	f.texcoord = texcoords;
 	f.position = mv_matrix * vec4(position, 1.0);
 	f.tcol = color_for(f.position);
+#if MCM_TH
 	f.thv = thv;
 	f.thw = thw;
 	f.thv2 = thv2;
 	f.thw2 = thw2;
+#endif
 	f.position /= f.position.w;
 	gl_Position = proj_matrix * mv_matrix * vec4(position, 1.0);
 	mat4 mv_mat_simple = mv_matrix;

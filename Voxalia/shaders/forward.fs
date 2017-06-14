@@ -19,6 +19,7 @@
 #define MCM_FADE_DEPTH 0
 #define MCM_LIGHTS 0
 #define MCM_SHADOWS 0
+#define MCM_TH 0
 
 #if MCM_VOX
 layout (binding = 0) uniform sampler2DArray s;
@@ -53,8 +54,10 @@ in struct vox_fout
 #if MCM_VOX
 	vec3 texcoord;
 	vec4 tcol;
-	vec4 thv;
+#if MCM_TH
+	vec4 thv; // TODO: Implement!
 	vec4 thw;
+#endif
 #else
 #if MCM_GEOM_ACTIVE
 	vec3 texcoord;

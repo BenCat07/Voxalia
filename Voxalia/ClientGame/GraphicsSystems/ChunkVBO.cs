@@ -118,10 +118,13 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 if (tcols)
                 {
                     GL.DeleteBuffer(_TCOLVBO);
-                    GL.DeleteBuffer(_THVVBO);
-                    GL.DeleteBuffer(_THWVBO);
-                    GL.DeleteBuffer(_THV2VBO);
-                    GL.DeleteBuffer(_THW2VBO);
+                    if (usethvs)
+                    {
+                        GL.DeleteBuffer(_THVVBO);
+                        GL.DeleteBuffer(_THWVBO);
+                        GL.DeleteBuffer(_THV2VBO);
+                        GL.DeleteBuffer(_THW2VBO);
+                    }
                     tcols = false;
                 }
                 generated = false;
@@ -155,6 +158,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
 
         public bool colors;
         public bool tcols;
+        public bool usethvs = true;
 
         public Vector3[] verts = null;
         public uint[] indices = null;

@@ -9,6 +9,7 @@
 #version 430 core
 
 #define MCM_REFRACT 0
+#define MCM_TH 0
 
 layout (binding = 0) uniform sampler2DArray s;
 layout (binding = 1) uniform sampler2DArray htex;
@@ -27,10 +28,12 @@ in struct vox_out
 	vec4 color;
 	vec4 tcol;
 	mat3 tbn;
+#if MCM_TH
 	vec4 thv;
 	vec4 thw;
 	vec4 thv2;
 	vec4 thw2;
+#endif
 } f;
 
 layout (location = 0) out vec4 color;
@@ -81,6 +84,7 @@ void main()
 #endif
 	vec4 col = textureLod(s, f.texcoord, textureQueryLod(s, f.texcoord.xy).x);
 	vec3 t_normal = texture(normal_tex, f.texcoord).xyz;
+#if MCM_TH
 	// Setup
 	vec3 thval = vec3(0.0); // Value
 	float thstr = 0.0; // Strength
@@ -148,6 +152,7 @@ void main()
 	*/
 	col.xyz = thval / thstr;
 	t_normal = thnorm / thstr;
+#endif
 	float rhBlur = 0.0;
     float spec = dets.x;
     float refl = dets.y;

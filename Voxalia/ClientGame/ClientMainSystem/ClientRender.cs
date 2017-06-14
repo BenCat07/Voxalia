@@ -245,7 +245,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_shadowvox = Shaders.GetShader("shadowvox" + def);
             s_fbo = Shaders.GetShader("fbo" + def);
             s_fbot = Shaders.GetShader("fbo" + def + ",MCM_TRANSP_ALLOWED");
-            s_fbov = Shaders.GetShader("fbo_vox" + def);
+            s_fbovslod = Shaders.GetShader("fbo_vox" + def);
+            s_fbov = Shaders.GetShader("fbo_vox" + def + ",MCM_TH");
             s_fbo_refract = Shaders.GetShader("fbo" + def + ",MCM_REFRACT");
             s_fbov_refract = Shaders.GetShader("fbo_vox" + def + ",MCM_REFRACT");
             s_shadowadder = Shaders.GetShader("lightadder" + def + ",MCM_SHADOWS");
@@ -272,7 +273,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 + (CVars.r_forward_shadows.ValueB ? ",MCM_SHADOWS" : "");
             s_forw = Shaders.GetShader("forward" + def + forw_extra);
             s_forw_nobones = Shaders.GetShader("forward" + def + ",MCM_NO_BONES" + forw_extra);
-            s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX" + forw_extra);
+            s_forw_vox_slod = Shaders.GetShader("forward" + def + ",MCM_VOX" + forw_extra);
+            s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TH" + forw_extra);
             s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);
             s_forw_trans_nobones = Shaders.GetShader("forward" + def + ",MCM_TRANSP,MCM_NO_BONES" + forw_extra);
             s_forw_vox_trans = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TRANSP" + forw_extra);
@@ -510,6 +512,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public Shader s_fbov;
 
         /// <summary>
+        /// The G-Buffer FBO shader, for SLOD voxels.
+        /// </summary>
+        public Shader s_fbovslod;
+
+        /// <summary>
         /// The G-Buffer FBO shader, for alltransparents (Skybox mainly).
         /// </summary>
         public Shader s_fbot;
@@ -609,6 +616,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The shader used for forward ('fast') rendering of voxels.
         /// </summary>
         public Shader s_forw_vox;
+
+        /// <summary>
+        /// The shader used for forward ('fast') rendering of SLOD voxels.
+        /// </summary>
+        public Shader s_forw_vox_slod;
 
         /// <summary>
         /// The shader used for forward ('fast') rendering of transparent data.
@@ -1220,14 +1232,19 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             if (MainWorldView.FBOid.IsForward())
             {
-                GL.Uniform2(14, new Vector2(30f, 5000f));
+                GL.Uniform2(14, new Vector2(CVars.r_znear.ValueF, ZFar()));
             }
             SetVox();
-            GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
             if (MainWorldView.FBOid.IsForward())
             {
+                s_forw_vox_slod = s_forw_vox_slod.Bind();
                 GL.Uniform2(14, new Vector2(30f, 5000f));
             }
+            else
+            {
+                s_fbovslod = s_fbovslod.Bind();
+            }
+            GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
             View3D.CheckError("Rendering - Sky - PostPrep");
             foreach (ChunkSLODHelper ch in TheRegion.SLODs.Values)
             {
