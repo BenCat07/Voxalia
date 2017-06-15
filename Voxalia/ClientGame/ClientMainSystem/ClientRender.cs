@@ -152,7 +152,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             MainWorldView.Generate(this, Window.Width, Window.Height);
             View3D.CheckError("Load - Rendering - ViewGen");
             ItemBarView.FastOnly = true;
-            ItemBarView.ClearColor = new float[] { 1f, 1f, 1f, 1f };
+            ItemBarView.ClearColor = new float[] { 1f, 1f, 1f, 0f };
             ItemBarView.Render3D = RenderItemBar;
             foreach (LightObject light in ItemBarView.Lights)
             {
