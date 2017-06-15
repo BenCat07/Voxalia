@@ -335,9 +335,14 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public Dictionary<Vector3i, ChunkSLODHelper> SLODs = new Dictionary<Vector3i, ChunkSLODHelper>();
 
+        public Vector3i SLODLocFor(Vector3i chunk_pos)
+        {
+            return new Vector3i((int)Math.Floor(chunk_pos.X / (double)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Y / (double)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Z / (double)Constants.CHUNKS_PER_SLOD));
+        }
+
         public ChunkSLODHelper GetSLODHelp(Vector3i chunk_pos, bool generate = true)
         {
-            Vector3i slodpos = new Vector3i((int)Math.Floor(chunk_pos.X / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Y / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Z / (float)Constants.CHUNKS_PER_SLOD));
+            Vector3i slodpos = SLODLocFor(chunk_pos);
             if (SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
                 return slod;
@@ -351,12 +356,16 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public void RecalculateSLOD(Vector3i chunk_pos)
         {
-            Vector3i slodpos = new Vector3i((int)Math.Floor(chunk_pos.X / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Y / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(chunk_pos.Z / (float)Constants.CHUNKS_PER_SLOD));
+            Vector3i slodpos = SLODLocFor(chunk_pos);
             RecalcSLODExact(slodpos);
         }
         
         public void RecalcSLODExact(Vector3i slodpos)
         {
+            if (TheClient.CVars.r_compute.ValueB)
+            {
+                return;
+            }
             if (!SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
                 return;
@@ -370,7 +379,7 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     continue;
                 }
-                Vector3i slodposser = new Vector3i((int)Math.Floor(entry.Key.X / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(entry.Key.Y / (float)Constants.CHUNKS_PER_SLOD), (int)Math.Floor(entry.Key.Z / (float)Constants.CHUNKS_PER_SLOD));
+                Vector3i slodposser = SLODLocFor(entry.Key);
                 if (slodposser == slodpos)
                 {
                     count++;

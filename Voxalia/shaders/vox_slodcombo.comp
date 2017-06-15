@@ -1,0 +1,97 @@
+#version 430 core
+
+#if MODE_ONE
+layout(std430, binding = 0) buffer b_indicesIN
+{
+	uint f_indicesIN[];
+};
+layout(std430, binding = 1) buffer b_positionIN
+{
+	vec4 f_positionIN[];
+};
+layout(std430, binding = 2) buffer b_normalIN
+{
+	vec4 f_normalIN[];
+};
+layout(std430, binding = 3) buffer b_texcoordIN
+{
+	vec4 f_texcoordIN[];
+};
+#endif
+#if MODE_TWO
+layout(std430, binding = 0) buffer b_tangentIN
+{
+	vec4 f_tangentIN[];
+};
+layout(std430, binding = 1) buffer b_colorIN
+{
+	vec4 f_colorIN[];
+};
+layout(std430, binding = 2) buffer b_tcolIN
+{
+	vec4 f_tcolIN[];
+};
+// ...
+#endif
+
+#if MODE_ONE
+layout(std430, binding = 4) buffer b_indicesOUT
+{
+	uint f_indicesOUT[];
+};
+layout(std430, binding = 5) buffer b_positionOUT
+{
+	vec4 f_positionOUT[];
+};
+layout(std430, binding = 6) buffer b_normalOUT
+{
+	vec4 f_normalOUT[];
+};
+layout(std430, binding = 7) buffer b_texcoordOUT
+{
+	vec4 f_texcoordOUT[];
+};
+#endif
+#if MODE_TWO
+layout(std430, binding = 4) buffer b_tangentOUT
+{
+	vec4 f_tangentOUT[];
+};
+layout(std430, binding = 5) buffer b_colorOUT
+{
+	vec4 f_colorOUT[];
+};
+layout(std430, binding = 6) buffer b_tcolOUT
+{
+	vec4 f_tcolOUT[];
+};
+// ...
+#endif
+
+layout (location = 10) uniform uint start_coord;
+layout (location = 11) uniform uint size_of_buf;
+#if MODE_ONE
+layout (location = 12) uniform vec4 pos_offs;
+#endif
+
+layout(local_size_x = 90, local_size_y = 1, local_size_z = 1) in; // TODO: tweak the 90 value
+
+void main()
+{
+	uint bcoord = gl_GlobalInvocationID.x;
+	if (bcoord < size_of_buf)
+	{
+		uint coord = start_coord + bcoord;
+#if MODE_ONE
+		f_indicesOUT[coord] = f_indicesIN[bcoord] + start_coord;
+		f_positionOUT[coord] = pos_offs + f_positionIN[bcoord];
+		f_normalOUT[coord] = f_normalIN[bcoord];
+		f_texcoordOUT[coord] = f_texcoordIN[bcoord];
+#endif
+#if MODE_TWO
+		f_tangentOUT[coord] = f_tangentIN[bcoord];
+		f_colorOUT[coord] = f_colorIN[bcoord];
+		f_tcolOUT[coord] = f_tcolIN[bcoord];
+#endif
+	}
+}

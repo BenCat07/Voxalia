@@ -1262,6 +1262,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ch.Render();
                 }
             }
+            /*
             foreach (Chunk ch in TheRegion.LoadedChunks.Values)
             {
                 if (ch.PosMultiplier < 5)
@@ -1274,7 +1275,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     ch.Render();
                 }
-            }
+            }*/
             View3D.CheckError("Rendering - Sky - Slods");
             SetEnts();
             if (MainWorldView.FBOid.IsForward())

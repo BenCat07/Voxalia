@@ -9,6 +9,7 @@ using Voxalia.ClientGame.GraphicsSystems;
 using OpenTK;
 using OpenTK.Graphics;
 using FreneticGameCore;
+using FreneticGameGraphics.GraphicsHelpers;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
 using FreneticGameCore.Collision;
@@ -37,7 +38,10 @@ namespace Voxalia.ClientGame.OtherSystems
         public int[] Program_CruncherTRANSP3 = new int[Reppers.Length];
 
         public int[] Program_Combo = new int[Reppers.Length];
-        
+
+        public int Program_SLODCombo1;
+        public int Program_SLODCombo2;
+
         public int Buf_Shapes = 0;
 
         public static readonly Dictionary<int, int> lookuper = new Dictionary<int, int>(128)
@@ -68,6 +72,8 @@ namespace Voxalia.ClientGame.OtherSystems
                 Program_CruncherTRANSP3[i] = TheClient.Shaders.CompileCompute("vox_crunch", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MODE_THREE 1\n#define MCM_TRANSP 1\n");
                 Program_Combo[i] = TheClient.Shaders.CompileCompute("vox_combo", "#define MCM_VOX_COUNT " + Reppers[i] + "\n");
             }
+            Program_SLODCombo1 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_ONE 1\n");
+            Program_SLODCombo2 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_TWO 1\n");
             View3D.CheckError("Compute - Startup - Shaders");
             float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 7)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
@@ -210,6 +216,138 @@ namespace Voxalia.ClientGame.OtherSystems
 
         byte[] EmptyBytes = new byte[0];
 
+        public void Combinulate(ChunkSLODHelper cslod, params Chunk[] chs)
+        {
+            cslod.NeedsComp = false;
+            int contained = 0;
+            cslod._VBO?.Destroy();
+            uint maxSize = 0;
+            for (int i = 0; i < chs.Length; i++)
+            {
+                if (chs[i].PosMultiplier < 5 || chs[i]._VBOSolid == null || chs[i]._VBOSolid.vC <= 0)
+                {
+                    continue;
+                }
+                maxSize += (uint)chs[i]._VBOSolid.vC;
+            }
+            if (maxSize == 0)
+            {
+                return;
+            }
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
+            uint coord = 0;
+            int[] bufs = new int[7];
+            GL.GenBuffers(7, bufs);
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[0]);
+            GL.BufferData(BufferTarget.ShaderStorageBuffer, (int)maxSize * sizeof(uint), IntPtr.Zero, hintter);
+            for (int i = 1; i < 7; i++)
+            {
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[i]);
+                GL.BufferData(BufferTarget.ShaderStorageBuffer, (int)maxSize * Vector4.SizeInBytes, IntPtr.Zero, hintter);
+            }
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+            for (int i = 0; i < chs.Length; i++)
+            {
+                if (chs[i].PosMultiplier < 5 || chs[i]._VBOSolid == null || chs[i]._VBOSolid.vC <= 0)
+                {
+                    continue;
+                }
+                // TEMP
+                /*{
+                    Vector4[] p = new Vector4[maxSize];
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, chs[i]._VBOSolid._VertexVBO);
+                    GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, (int)maxSize * Vector4.SizeInBytes, p);
+                    Console.WriteLine(String.Join(":::", p));
+                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+                }*/
+                GL.UseProgram(Program_SLODCombo1);
+                GL.Uniform1(10, coord);
+                GL.Uniform1(11, (uint)chs[i]._VBOSolid.vC);
+                Location relloc = chs[i].WorldPosition.ToLocation() * Constants.CHUNK_WIDTH;
+                Location slodloc = TheClient.TheRegion.SLODLocFor(chs[i].WorldPosition).ToLocation() * Constants.CHUNK_SLOD_WIDTH;
+                GL.Uniform4(12, new Vector4(ClientUtilities.Convert(relloc - slodloc), 0.0f));
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 0, chs[i]._VBOSolid._IndexVBO);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, chs[i]._VBOSolid._VertexVBO);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, chs[i]._VBOSolid._NormalVBO);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, chs[i]._VBOSolid._TexCoordVBO);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, bufs[0]);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, bufs[1]);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, bufs[2]);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, bufs[3]);
+                GL.DispatchCompute(chs[i]._VBOSolid.vC / 90 + 1, 1, 1);
+                GL.UseProgram(Program_SLODCombo2);
+                GL.Uniform1(10, coord);
+                GL.Uniform1(11, (uint)chs[i]._VBOSolid.vC);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 0, chs[i]._VBOSolid._TangentVBO);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, chs[i]._VBOSolid._ColorVBO);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, chs[i]._VBOSolid._TCOLVBO);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 4, bufs[4]);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, bufs[5]);
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, bufs[6]);
+                GL.DispatchCompute(chs[i]._VBOSolid.vC / 90 + 1, 1, 1);
+                coord += (uint)chs[i]._VBOSolid.vC;
+                contained++;
+            }
+            for (int i = 0; i < 7; i++)
+            {
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, i, 0);
+            }
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
+            int VAO = GL.GenVertexArray();
+            GL.BindVertexArray(VAO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[1]);
+            GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[2]);
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[3]);
+            GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[4]);
+            GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[5]);
+            GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[6]);
+            GL.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(2);
+            GL.EnableVertexAttribArray(3);
+            GL.EnableVertexAttribArray(4);
+            GL.EnableVertexAttribArray(5);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, bufs[0]);
+            cslod._VBO = new ChunkVBO()
+            {
+                _IndexVBO = (uint)bufs[0],
+                _VertexVBO = (uint)bufs[1],
+                _NormalVBO = (uint)bufs[2],
+                _TexCoordVBO = (uint)bufs[3],
+                _TangentVBO = (uint)bufs[4],
+                _ColorVBO = (uint)bufs[5],
+                _TCOLVBO = (uint)bufs[6],
+                tcols = true,
+                usethvs = false,
+                colors = true,
+                vC = (int)maxSize,
+                _VAO = VAO,
+                reusable = false,
+                generated = true
+            };
+            GL.BindVertexArray(0);
+            cslod.Contained = contained;
+            // TEMP
+            /*{
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[0]);
+                uint[] t = new uint[maxSize];
+                Vector4[] p = new Vector4[maxSize];
+                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, (int)maxSize * sizeof(uint), t);
+                Console.WriteLine(String.Join(",", t));
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[1]);
+                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, (int)maxSize * Vector4.SizeInBytes, p);
+                Console.WriteLine(String.Join(":::", p));
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+            }*/
+            View3D.CheckError("Calculate SLOD Combo");
+        }
+
         public void Calc(params Chunk[] chs)
         {
             int maxRad = TheClient.CVars.r_renderdist.ValueI;
@@ -220,6 +358,10 @@ namespace Voxalia.ClientGame.OtherSystems
             for (int chz = 0; chz < chs.Length; chz++)
             {
                 Chunk ch = chs[chz];
+                if (ch.PosMultiplier >= 5)
+                {
+                    ch.SLODComputed = true;
+                }
                 ch.Render_BufsRel = new int[7];
                 int len = ch.CSize * ch.CSize * ch.CSize * 4;
                 for (int x = 0; x < Relatives.Length; x++)

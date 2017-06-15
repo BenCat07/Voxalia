@@ -116,7 +116,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                             break;
                         }
                         Vector3i chunk_pos = ch.WorldPosition;
-                        ChunkSLODHelper slod = TheClient.TheRegion.GetSLODHelp(ch.WorldPosition);
+                        ChunkSLODHelper slod = TheClient.TheRegion.GetSLODHelp(ch.WorldPosition, false);
                         if (slod == null)
                         {
                             entry.Info(queue, "No SLOD.");

@@ -62,6 +62,10 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public List<Entity> CreatedEnts = new List<Entity>();
 
+        public bool SLODComputed = false;
+
+        public bool SLODMode = false;
+
         public bool CreateVBO()
         {
             List<KeyValuePair<Vector3i, Material>> tLits = new List<KeyValuePair<Vector3i, Material>>();
@@ -1047,6 +1051,10 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 return;
             }
+            if (SLODMode)
+            {
+                return;
+            }
             ChunkVBO _VBO = OwningRegion.TheClient.MainWorldView.FBOid.IsSolid() ? _VBOSolid : _VBOTransp;
             if (_VBO != null && _VBO.generated)
             {
@@ -1107,13 +1115,14 @@ namespace Voxalia.ClientGame.WorldSystem
     public class ChunkSLODHelper
     {
         public Vector3i Coordinate;
-
-        // TODO: Clear and replace this if any chunks within its section get edited!
-        public ChunkRenderHelper FullBlock = new ChunkRenderHelper(512);
+        
+        public ChunkRenderHelper FullBlock = new ChunkRenderHelper(0);
 
         public Region OwningRegion;
 
         public ChunkVBO _VBO;
+
+        public int Contained = 0;
 
         public int Claims = 0;
 

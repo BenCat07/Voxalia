@@ -214,20 +214,59 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Network.UsagesThisSecond[i] = 0;
             }
             ops_extra++;
-            List<ChunkSLODHelper> toFix = ops_extra > 3 ? new List<ChunkSLODHelper>() : null;
-            foreach (ChunkSLODHelper slod in new List<ChunkSLODHelper>(TheRegion.SLODs.Values))
+            if (CVars.r_compute.ValueB)
             {
-                if (slod.NeedsComp)
+                HashSet<Vector3i> handled = new HashSet<Vector3i>();
+                foreach (Chunk chk in TheRegion.LoadedChunks.Values)
                 {
-                    slod.CompileInternal();
-                    if (slod._VBO == null)
+                    if (chk.PosMultiplier < 5)
                     {
-                        TheRegion.SLODs.Remove(slod.Coordinate);
+                        continue;
+                    }
+                    Vector3i slodpos = TheRegion.SLODLocFor(chk.WorldPosition);
+                    if (handled.Contains(slodpos))
+                    {
+                        continue;
+                    }
+                    handled.Add(slodpos);
+                    if (!TheRegion.SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
+                    {
+                        slod = new ChunkSLODHelper() { Coordinate = slodpos, OwningRegion = TheRegion };
+                        TheRegion.SLODs[slodpos] = slod;
+                    }
+                    Chunk[] res = TheRegion.LoadedChunks.Values.Where((c) => c.PosMultiplier >= 5 && TheRegion.SLODLocFor(c.WorldPosition) == slodpos).ToArray();
+                    bool recomp = false;
+                    foreach (Chunk c in res)
+                    {
+                        if (c.SLODComputed && c._VBOSolid != null)
+                        {
+                            recomp = true;
+                            c.SLODMode = true;
+                            c.SLODComputed = false;
+                        }
+                    }
+                    if (recomp)
+                    {
+                        VoxelComputer.Combinulate(slod, res);
                     }
                 }
-                else if (ops_extra > 3 && ((slod.Coordinate.ToLocation() + new Location(0.5, 0.5, 0.5)) * Constants.CHUNK_SLOD_WIDTH).DistanceSquared(Player.GetPosition()) < Constants.CHUNK_SLOD_WIDTH * Constants.CHUNK_SLOD_WIDTH * 2)
+            }
+            else
+            {
+                foreach (ChunkSLODHelper slod in new List<ChunkSLODHelper>(TheRegion.SLODs.Values))
                 {
-                    TheRegion.RecalcSLODExact(slod.Coordinate);
+                    if (slod.NeedsComp)
+                    {
+                        slod.CompileInternal();
+                        if (slod._VBO == null)
+                        {
+                            TheRegion.SLODs.Remove(slod.Coordinate);
+                        }
+                    }
+                    else if (ops_extra > 3 && ((slod.Coordinate.ToLocation() + new Location(0.5, 0.5, 0.5)) * Constants.CHUNK_SLOD_WIDTH).DistanceSquared(Player.GetPosition()) < Constants.CHUNK_SLOD_WIDTH * Constants.CHUNK_SLOD_WIDTH * 2)
+                    {
+                        TheRegion.RecalcSLODExact(slod.Coordinate);
+                    }
                 }
             }
             if (ops_extra > 3)
