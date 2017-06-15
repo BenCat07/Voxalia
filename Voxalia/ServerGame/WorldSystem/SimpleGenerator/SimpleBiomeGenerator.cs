@@ -63,7 +63,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 return Hell;
             }
-            if (z < 90)
+            if (z < height - 90)
             {
                 return Stone;
             }
