@@ -1,0 +1,10 @@
+Name=Grass_Swamp_Tall
+Sound=GRASS
+BreakTime=1
+Breaker=Shovel
+PlantMultiplier=2
+PlantScale=0.333
+Plant=blocks/transparent/tallgrass
+TextureBasic=blocks/solid/natural/grass_swamp_side
+Texture_TOP=blocks/solid/natural/grass_swamp
+Texture_BOTTOM=blocks/solid/natural/dirt

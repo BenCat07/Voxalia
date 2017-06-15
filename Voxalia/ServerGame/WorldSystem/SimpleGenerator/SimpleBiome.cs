@@ -31,11 +31,6 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return Material.STONE;
         }
         
-        public virtual double HeightMod()
-        {
-            return 1;
-        }
-
         public virtual Material WaterMaterial()
         {
             return Material.DIRTY_WATER;

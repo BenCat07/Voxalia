@@ -65,10 +65,12 @@ namespace Voxalia.Shared
         FIRE = 38,
         GRASS_PLAINS = 39,
         STONE = 40,
+        GRASS_SWAMP = 41,
+        GRASS_SWAMP_TALL = 42,
         /// <summary>
         /// How many materials there are by default. Only for use with direct handling of this enumeration (shouldn't happen often.)
         /// </summary>
-        NUM_DEFAULT = 41,
+        NUM_DEFAULT = 43,
         /// <summary>
         /// How many materials there theoretically can be.
         /// </summary>

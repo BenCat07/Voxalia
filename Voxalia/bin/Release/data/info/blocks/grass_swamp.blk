@@ -1,0 +1,7 @@
+Name=Grass_Swamp
+Sound=GRASS
+BreakTime=1
+Breaker=Shovel
+TextureBasic=blocks/solid/natural/grass_swamp_side
+Texture_TOP=blocks/solid/natural/grass_swamp
+Texture_BOTTOM=blocks/solid/natural/dirt

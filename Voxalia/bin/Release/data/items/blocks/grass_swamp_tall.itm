@@ -1,0 +1,10 @@
+type: block
+icon: render_block:self
+display: Swamp Grass (Tall)
+description: Wet and tall and grassy!
+color: 1,1,1
+model: block
+bound: false
+datum: 42
+weight: 1
+volume: 1

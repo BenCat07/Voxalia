@@ -21,10 +21,5 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Biomes
         {
             return Material.GRASS_PLAINS_TALL;
         }
-
-        public override double HeightMod()
-        {
-            return 0.2f;
-        }
     }
 }
