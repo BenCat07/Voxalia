@@ -1125,8 +1125,14 @@ namespace Voxalia.ClientGame.WorldSystem
 
         double crn_ctr = 0;
 
+        public double CrunchTime = 0;
+
+        public double CrunchSpikeTime = 0;
+
         public void CheckForRenderNeed()
         {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
             lock (RenderingNow)
             {
                 crn_ctr += Delta;
@@ -1229,6 +1235,13 @@ namespace Voxalia.ClientGame.WorldSystem
                     }
                 }
             }
+            timer.Stop();
+            CrunchTime = (double)timer.ElapsedMilliseconds / 1000f;
+            if (CrunchTime > CrunchSpikeTime)
+            {
+                CrunchSpikeTime = CrunchTime;
+            }
+            timer.Reset();
         }
 
         public void DoneRendering(Chunk ch)

@@ -205,6 +205,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 FinishSpikeTime = 0;
                 TWODSpikeTime = 0;
                 TotalSpikeTime = 0;
+                TheRegion.CrunchSpikeTime = 0;
                 gFPS_Min = 0;
                 gFPS_Max = 0;
             }

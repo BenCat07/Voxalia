@@ -368,9 +368,8 @@ namespace Voxalia.ClientGame.OtherSystems
                 {
                     Chunk rel = x == 0 ? ch : TheClient.TheRegion.GetChunk(ch.WorldPosition + Relatives[x]);
                     int[] btemp;
-                    if (rel == null)
+                    if (rel == null || rel.LOADING)
                     {
-                        Vector3i reldist = ch.WorldPosition + Relatives[x] + centerChunk;
                         ch.Render_BufsRel[x] = TheClient.TheRegion.AirChunks.Contains(ch.WorldPosition + Relatives[x])
                             ? ZeroChunkRep : EmptyChunkRep[lookuper[ch.CSize]];
                     }

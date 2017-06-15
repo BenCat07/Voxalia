@@ -344,7 +344,8 @@ namespace Voxalia.ClientGame.WorldSystem
                 }
                 return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
             }
-            return BlockInternal.AIR;
+            //return BlockInternal.AIR;
+            return new BlockInternal((ushort)Material.STONE, 0, 0, 0);
         }
 
         private class PlantRenderHelper
@@ -427,6 +428,10 @@ namespace Voxalia.ClientGame.WorldSystem
         public void UploadPlants(uint[] posind, Vector4[] colorset, Vector2[] texcoordsset, Vector3[] posset)
         {
             DestroyPlants();
+            if (posind.Length == 0)
+            {
+                return;
+            }
             Plant_VAO = GL.GenVertexArray();
             Plant_VBO_Ind = GL.GenBuffer();
             Plant_VBO_Pos = GL.GenBuffer();
