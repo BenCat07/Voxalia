@@ -215,7 +215,7 @@ namespace Voxalia.ClientGame.OtherSystems
         public Stopwatch sw1 = new Stopwatch(), sw2 = new Stopwatch(), sw3 = new Stopwatch(), sw1a = new Stopwatch();
 
         byte[] EmptyBytes = new byte[0];
-
+        
         public void Combinulate(ChunkSLODHelper cslod, params Chunk[] chs)
         {
             cslod.NeedsComp = false;

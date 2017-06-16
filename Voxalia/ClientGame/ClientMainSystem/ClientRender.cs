@@ -245,7 +245,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_shadowvox = Shaders.GetShader("shadowvox" + def);
             s_fbo = Shaders.GetShader("fbo" + def);
             s_fbot = Shaders.GetShader("fbo" + def + ",MCM_TRANSP_ALLOWED");
-            s_fbovslod = Shaders.GetShader("fbo_vox" + def);
+            s_fbovslod = Shaders.GetShader("fbo_vox" + def + ",MCM_TRANSP_ALLOWED");
             s_fbov = Shaders.GetShader("fbo_vox" + def + ",MCM_TH");
             s_fbo_refract = Shaders.GetShader("fbo" + def + ",MCM_REFRACT");
             s_fbov_refract = Shaders.GetShader("fbo_vox" + def + ",MCM_REFRACT");
@@ -273,7 +273,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 + (CVars.r_forward_shadows.ValueB ? ",MCM_SHADOWS" : "");
             s_forw = Shaders.GetShader("forward" + def + forw_extra);
             s_forw_nobones = Shaders.GetShader("forward" + def + ",MCM_NO_BONES" + forw_extra);
-            s_forw_vox_slod = Shaders.GetShader("forward" + def + ",MCM_VOX" + forw_extra);
+            s_forw_vox_slod = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_NO_ALPHA_CAP" + forw_extra);
             s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TH" + forw_extra);
             s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);
             s_forw_trans_nobones = Shaders.GetShader("forward" + def + ",MCM_TRANSP,MCM_NO_BONES" + forw_extra);
