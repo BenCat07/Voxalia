@@ -361,6 +361,11 @@ namespace Voxalia.ClientGame.EntitySystem
             return Utilities.ForwardVector_Deg(Direction.Yaw, Direction.Pitch);
         }
 
+        public Location GetCenter()
+        {
+            return base.GetPosition();
+        }
+
         public override Location GetPosition()
         {
             if (Body != null)

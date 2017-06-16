@@ -15,6 +15,7 @@
 #define MCM_INVERSE_FADE 0
 #define MCM_NO_BONES 0
 #define MCM_TH 0
+#define MCM_GEOM_THREED_TEXTURE 0
 
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec3 normal;
@@ -56,7 +57,11 @@ out struct vox_fout
 	vec4 thw;
 #endif
 #else
+#if MCM_GEOM_THREED_TEXTURE
+	vec3 texcoord;
+#else
 	vec2 texcoord;
+#endif
 #endif
 	vec4 color;
 #if MCM_GEOM_ACTIVE
@@ -112,7 +117,11 @@ void main()
 	gl_Position = proj_matrix * vpos_mv;
 #else // MCM_VOX
 #if MCM_GEOM_ACTIVE
+#if MCM_GEOM_THREED_TEXTURE
+	f.texcoord = texcoords;
+#else
 	f.texcoord = texcoords.xy;
+#endif
 	vec4 normo = mv_mat_simple * vec4(normal, 1.0);
 	f.tbn = transpose(mat3(vec3(0.0), vec3(0.0), normo.xyz)); // TODO: Improve for decals?!
 	f.color = color * v_color;

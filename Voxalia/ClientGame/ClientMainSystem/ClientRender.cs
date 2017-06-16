@@ -291,9 +291,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             s_hdrpass = Shaders.GetShader("hdrpass" + def);
             s_post_fast = Shaders.GetShader("postfast" + def);
-            s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE" + forw_extra  +"?grass");
-            s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY" + forw_extra  +"?grass");
-            s_shadow_grass = Shaders.GetShader("shadow" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_SHADOWS,MCM_IS_A_SHADOW?grass");
+            s_forw_grass = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_GEOM_THREED_TEXTURE" + forw_extra  +"?grass");
+            s_fbo_grass = Shaders.GetShader("fbo" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_GEOM_THREED_TEXTURE?grass");
+            s_shadow_grass = Shaders.GetShader("shadow" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_SHADOWS,MCM_IS_A_SHADOW,MCM_GEOM_THREED_TEXTURE?grass");
             s_shadow_parts = Shaders.GetShader("shadow" + def + ",MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_SHADOWS,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH,MCM_IS_A_SHADOW?particles");
             s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH" + forw_extra + "?particles");
             s_fbodecal = Shaders.GetShader("fbo" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE,MCM_PRETTY?decal");
@@ -807,6 +807,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void Window_RenderFrame(object sender, FrameEventArgs e)
         {
+            ErrorCode ec = GL.GetError();
+            while (ec != ErrorCode.NoError)
+            {
+                SysConsole.Output(OutputType.WARNING, "Unhandled GL error: " + ec);
+                ec = GL.GetError();
+            }
             lock (TickLock)
             {
                 gDelta = e.Time;

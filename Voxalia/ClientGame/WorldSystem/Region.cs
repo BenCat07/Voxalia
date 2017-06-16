@@ -77,6 +77,7 @@ namespace Voxalia.ClientGame.WorldSystem
             PhysicsWorld.DuringForcesUpdateables.Add(new LiquidVolume(this));
             // Load a CollisionUtil instance
             Collision = new CollisionUtil(PhysicsWorld);
+            PrepPlants();
         }
         public void AddChunk(FullChunkObject mesh)
         {
@@ -205,6 +206,7 @@ namespace Voxalia.ClientGame.WorldSystem
             SolveJoints();
             TickClouds();
             CheckForRenderNeed();
+            CommonSquishies();
         }
 
         public void SolveJoints()
@@ -646,70 +648,6 @@ namespace Voxalia.ClientGame.WorldSystem
             });
         }
 
-        public Dictionary<Vector3i, Tuple<Matrix4d, Model, Model, Location, Texture>> AxisAlignedModels = new Dictionary<Vector3i, Tuple<Matrix4d, Model, Model, Location, Texture>>();
-
-        const double MAX_GRASS_DIST = 9; // TODO: CVar?
-
-        const double mgd_sq = MAX_GRASS_DIST * MAX_GRASS_DIST;
-
-        public void RenderPlants()
-        {
-            if (TheClient.CVars.r_plants.ValueB)
-            {
-                TheClient.SetEnts();
-                RenderGrass();
-            }
-        }
-
-        public void RenderGrass()
-        {
-            if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_SOLID)
-            {
-                TheClient.s_forw_grass = TheClient.s_forw_grass.Bind();
-                GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
-                GL.Uniform4(12, new OpenTK.Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
-                GL.Uniform2(14, new OpenTK.Vector2(TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
-                GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
-            }
-            else if (TheClient.MainWorldView.FBOid == FBOID.MAIN)
-            {
-                TheClient.s_fbo_grass = TheClient.s_fbo_grass.Bind();
-                GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
-            }
-            else if (TheClient.MainWorldView.FBOid == FBOID.SHADOWS && TheClient.MainWorldView.TranspShadows)
-            {
-                TheClient.s_shadow_grass = TheClient.s_shadow_grass.Bind();
-            }
-            else
-            {
-                return;
-            }
-            GL.ActiveTexture(TextureUnit.Texture3);
-            GL.BindTexture(TextureTarget.Texture2DArray, 0);
-            GL.ActiveTexture(TextureUnit.Texture2);
-            GL.BindTexture(TextureTarget.Texture2DArray, 0);
-            GL.ActiveTexture(TextureUnit.Texture1);
-            GL.BindTexture(TextureTarget.Texture2DArray, 0);
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2DArray, TheClient.GrassTextureID);
-            GL.Uniform1(6, (float)GlobalTickTimeLocal);
-            GL.Uniform3(7, ClientUtilities.Convert(ActualWind));
-            GL.Uniform1(8, TheClient.CVars.r_plantdistance.ValueF * TheClient.CVars.r_plantdistance.ValueF);
-            TheClient.Rendering.SetColor(GetSunAdjust());
-            foreach (Chunk chunk in chToRender)
-            {
-                if (chunk.Plant_VAO != -1)
-                {
-                    Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE));
-                    TheClient.MainWorldView.SetMatrix(2, mat);
-                    GL.BindVertexArray(chunk.Plant_VAO);
-                    GL.DrawElements(PrimitiveType.Points, chunk.Plant_C, DrawElementsType.UnsignedInt, IntPtr.Zero);
-                }
-            }
-            TheClient.isVox = true;
-            TheClient.SetEnts();
-        }
-        
         public void RenderEffects()
         {
             GL.LineWidth(5);

@@ -350,9 +350,9 @@ namespace Voxalia.ClientGame.WorldSystem
 
         private class PlantRenderHelper
         {
-            public List<Vector3> poses = new List<Vector3>();
+            public List<Vector4> poses = new List<Vector4>();
             public List<Vector4> colorses = new List<Vector4>();
-            public List<Vector2> tcses = new List<Vector2>();
+            public List<Vector4> tcses = new List<Vector4>();
         }
 
         public void HandlePlants(Chunk c_zp, List<Chunk> potentials, Dictionary<Vector3i, Chunk> pots)
@@ -402,18 +402,18 @@ namespace Voxalia.ClientGame.WorldSystem
                                     {
                                         rayhit.Location = new BEPUutilities.Vector3(rxx, ryy, 1.0);
                                     }
-                                    ph2.poses.Add(new Vector3(x + (float)rayhit.Location.X, y + (float)rayhit.Location.Y, z + (float)rayhit.Location.Z));
+                                    ph2.poses.Add(new Vector4(x + (float)rayhit.Location.X, y + (float)rayhit.Location.Y, z + (float)rayhit.Location.Z, 0));
                                     ph2.colorses.Add(new Vector4((float)skylight.X, (float)skylight.Y, (float)skylight.Z, 1.0f));
-                                    ph2.tcses.Add(new Vector2(c.Material.GetPlantScale(), OwningRegion.TheClient.GrassMatSet[(int)c.Material]));
+                                    ph2.tcses.Add(new Vector4(c.Material.GetPlantScale(), OwningRegion.TheClient.GrassMatSet[(int)c.Material], 0.0f, 0));
                                 }
                             }
                         }
                     }
                 }
             }
-            Vector3[] posset = ph2.poses.ToArray();
+            Vector4[] posset = ph2.poses.ToArray();
             Vector4[] colorset = ph2.colorses.ToArray();
-            Vector2[] texcoordsset = ph2.tcses.ToArray();
+            Vector4[] texcoordsset = ph2.tcses.ToArray();
             uint[] posind = new uint[posset.Length];
             for (uint i = 0; i < posind.Length; i++)
             {
@@ -425,7 +425,7 @@ namespace Voxalia.ClientGame.WorldSystem
             });
         }
 
-        public void UploadPlants(uint[] posind, Vector4[] colorset, Vector2[] texcoordsset, Vector3[] posset)
+        public void UploadPlants(uint[] posind, Vector4[] colorset, Vector4[] texcoordsset, Vector4[] posset)
         {
             DestroyPlants();
             if (posind.Length == 0)
@@ -433,25 +433,27 @@ namespace Voxalia.ClientGame.WorldSystem
                 return;
             }
             Plant_VAO = GL.GenVertexArray();
-            Plant_VBO_Ind = GL.GenBuffer();
-            Plant_VBO_Pos = GL.GenBuffer();
-            Plant_VBO_Col = GL.GenBuffer();
-            Plant_VBO_Tcs = GL.GenBuffer();
+            int[] res = new int[4];
+            GL.GenBuffers(4, res);
+            Plant_VBO_Ind = res[0];
+            Plant_VBO_Pos = res[1];
+            Plant_VBO_Col = res[2];
+            Plant_VBO_Tcs = res[3];
             Plant_C = posind.Length;
             GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * Vector3.SizeInBytes), posset, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * Vector4.SizeInBytes), posset, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(texcoordsset.Length * Vector2.SizeInBytes), texcoordsset, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(texcoordsset.Length * Vector4.SizeInBytes), texcoordsset, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
             GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(colorset.Length * Vector4.SizeInBytes), colorset, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, Plant_VBO_Ind);
             GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(posind.Length * sizeof(uint)), posind, BufferUsageHint.StaticDraw);
             GL.BindVertexArray(Plant_VAO);
             GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Pos);
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Tcs);
-            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, 0, 0);
+            GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(2);
             GL.BindBuffer(BufferTarget.ArrayBuffer, Plant_VBO_Col);
             GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
@@ -852,9 +854,9 @@ namespace Voxalia.ClientGame.WorldSystem
                                             {
                                                 rayhit.Location = new BEPUutilities.Vector3(rxx, ryy, 1.0);
                                             }
-                                            ph.poses.Add(new Vector3(x + (float)rayhit.Location.X, y + (float)rayhit.Location.Y, z + (float)rayhit.Location.Z));
+                                            ph.poses.Add(new Vector4(x + (float)rayhit.Location.X, y + (float)rayhit.Location.Y, z + (float)rayhit.Location.Z, 0));
                                             ph.colorses.Add(new Vector4((float)skylight.X, (float)skylight.Y, (float)skylight.Z, 1.0f));
-                                            ph.tcses.Add(new Vector2(c.Material.GetPlantScale(), OwningRegion.TheClient.GrassMatSet[(int)c.Material]));
+                                            ph.tcses.Add(new Vector4(c.Material.GetPlantScale(), OwningRegion.TheClient.GrassMatSet[(int)c.Material], 0.0f, 0));
                                         }
                                     }
                                 }
@@ -1000,9 +1002,9 @@ namespace Voxalia.ClientGame.WorldSystem
                 tVBO.THWs2 = rh2.THWs2;
                 tVBO.Tangents = rh2.Tangs;
                 tVBO.Oldvert();
-                Vector3[] posset = ph2.poses.ToArray();
+                Vector4[] posset = ph2.poses.ToArray();
                 Vector4[] colorset = ph2.colorses.ToArray();
-                Vector2[] texcoordsset = ph2.tcses.ToArray();
+                Vector4[] texcoordsset = ph2.tcses.ToArray();
                 uint[] posind = new uint[posset.Length];
                 for (uint i = 0; i < posind.Length; i++)
                 {
