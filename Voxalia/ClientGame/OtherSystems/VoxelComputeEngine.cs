@@ -228,7 +228,37 @@ namespace Voxalia.ClientGame.OtherSystems
         public Stopwatch sw1 = new Stopwatch(), sw2 = new Stopwatch(), sw3 = new Stopwatch(), sw1a = new Stopwatch();
 
         byte[] EmptyBytes = new byte[0];
-        
+
+        public int[] Holder = new int[1024];
+
+        public int[] GetHolder(int len)
+        {
+            if (Holder.Length < len)
+            {
+                SysConsole.Output(OutputType.DEBUG, "Now i " + len);
+                Holder = new int[len];
+            }
+            return Holder;
+        }
+
+        public uint[] ResHolder = new uint[1];
+
+        public uint[] UHolder = new uint[1024];
+
+        public uint[] GetUHolder(int len)
+        {
+            if (UHolder.Length < len)
+            {
+                SysConsole.Output(OutputType.DEBUG, "Now u " + len);
+                UHolder = new uint[len];
+            }
+            return UHolder;
+        }
+
+        public uint[] EBuf = new uint[32];
+
+        public int[] IBuf = new int[32];
+
         public void Combinulate(ChunkSLODHelper cslod, params Chunk[] chs)
         {
             cslod.NeedsComp = false;
@@ -249,7 +279,7 @@ namespace Voxalia.ClientGame.OtherSystems
             }
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
             uint coord = 0;
-            int[] bufs = new int[7];
+            int[] bufs = IBuf;
             GL.GenBuffers(7, bufs);
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[0]);
             GL.BufferData(BufferTarget.ShaderStorageBuffer, (int)maxSize * sizeof(uint), IntPtr.Zero, hintter);
@@ -380,7 +410,6 @@ namespace Voxalia.ClientGame.OtherSystems
                 for (int x = 0; x < Relatives.Length; x++)
                 {
                     Chunk rel = x == 0 ? ch : TheClient.TheRegion.GetChunk(ch.WorldPosition + Relatives[x]);
-                    int[] btemp;
                     if (rel == null || rel.LOADING)
                     {
                         ch.Render_BufsRel[x] = TheClient.TheRegion.AirChunks.Contains(ch.WorldPosition + Relatives[x])
@@ -388,7 +417,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     }
                     else if (x == 0 || rel.Render_VoxelBuffer == null || rel.Render_VoxelBuffer[lookuper[ch.CSize]] <= 0)
                     {
-                        btemp = new int[len];
+                        int[] btemp = GetHolder(len);
                         for (int rz = 0; rz < ch.CSize; rz++)
                         {
                             for (int ry = 0; ry < ch.CSize; ry++)
@@ -406,7 +435,7 @@ namespace Voxalia.ClientGame.OtherSystems
                         }
                         int VoxelBuffer = GL.GenBuffer();
                         GL.BindBuffer(BufferTarget.ShaderStorageBuffer, VoxelBuffer);
-                        GL.BufferData(BufferTarget.ShaderStorageBuffer, btemp.Length * sizeof(int), btemp, BufferUsageHint.StaticDraw);
+                        GL.BufferData(BufferTarget.ShaderStorageBuffer, len * sizeof(int), btemp, BufferUsageHint.StaticDraw);
                         GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                         if (rel.Render_VoxelBuffer == null)
                         {
@@ -464,7 +493,8 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.UseProgram(Program_Counter[lookuper[ch.CSize]]);
                 int resBuf = GL.GenBuffer();
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, resBuf);
-                uint[] resses = new uint[1];
+                uint[] resses = ResHolder;
+                resses[0] = 0;
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, sizeof(uint), resses, hintter);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 View3D.CheckError("Compute - Run - Setup A");
@@ -482,7 +512,8 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, ch.CSize * ch.CSize * ch.CSize * sizeof(uint), IntPtr.Zero, hintter);
                 int resBufTRANSP = GL.GenBuffer();
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, resBufTRANSP);
-                uint[] ressesTRANSP = new uint[1];
+                uint[] ressesTRANSP = ResHolder;
+                ressesTRANSP[0] = 0;
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, sizeof(uint), ressesTRANSP, hintter);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 GL.UseProgram(Program_CounterTRANSP[lookuper[ch.CSize]]);
@@ -509,16 +540,14 @@ namespace Voxalia.ClientGame.OtherSystems
             }*/
             for (int chz = 0; chz < chs.Length; chz++)
             {
-                uint[] resses = new uint[1];
-                uint[] ressesTRANSP = new uint[1];
                 Chunk ch = chs[chz];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_ResBuf);
-                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, sizeof(uint), resses);
+                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, sizeof(uint), ResHolder);
+                ch.CountForRender = (int)ResHolder[0];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_ResBufTRANSP);
-                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, sizeof(uint), ressesTRANSP);
+                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, sizeof(uint), ResHolder);
+                ch.CountForRenderTRANSP = (int)ResHolder[0];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-                ch.CountForRender = (int)resses[0];
-                ch.CountForRenderTRANSP = (int)ressesTRANSP[0];
                 //Console.WriteLine("Found: " + ch.CountForRender + ", transp: " + ch.CountForRenderTRANSP);
             }
             sw2.Stop();
@@ -577,7 +606,7 @@ namespace Voxalia.ClientGame.OtherSystems
                         }
                     }
                     int id = 1;
-                    uint[] bres = new uint[cnt * 7 + 1];
+                    uint[] bres = GetUHolder(cnt * 7 + 1);
                     bres[0] = (uint)cnt;
                     foreach (Chunk tch in potentials)
                     {
@@ -596,7 +625,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     }
                     lbuf = GL.GenBuffer();
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, lbuf);
-                    GL.BufferData(BufferTarget.ShaderStorageBuffer, bres.Length * sizeof(uint), bres, BufferUsageHint.StaticRead);
+                    GL.BufferData(BufferTarget.ShaderStorageBuffer, (cnt * 7 + 1) * sizeof(uint), bres, BufferUsageHint.StaticRead);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 }
                 Action<bool> calc = (transp) =>
@@ -629,7 +658,7 @@ namespace Voxalia.ClientGame.OtherSystems
                         empty = EmptyBytes;
                     }*/
                     int bufc = ch.PosMultiplier == 1 ? 11 : 7;
-                    uint[] newBufs = new uint[bufc];
+                    uint[] newBufs = EBuf;
                     GL.GenBuffers(bufc, newBufs);
                     View3D.CheckError("Compute - New Buffers - Prep");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[0]);
