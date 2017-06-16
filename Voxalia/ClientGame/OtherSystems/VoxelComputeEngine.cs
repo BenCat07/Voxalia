@@ -129,10 +129,23 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, EmptyChunkRep[i]);
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, btemp.Length * sizeof(int), btemp, BufferUsageHint.StaticDraw);
             }
-            ZeroChunkRep = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ZeroChunkRep);
-            GL.BufferData(BufferTarget.ShaderStorageBuffer, (Constants.CHUNK_BLOCK_COUNT) * sizeof(int), IntPtr.Zero, BufferUsageHint.StaticDraw);
-            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+            // Gen ZeroChunk
+            {
+                int[] btemp = new int[Constants.CHUNK_BLOCK_COUNT * 4];
+                BlockInternal bi = new BlockInternal((ushort)Material.AIR, 0, 0, 255);
+                for (int rz = 0; rz < Constants.CHUNK_BLOCK_COUNT; rz++)
+                {
+                    int ind = rz * 4;
+                    btemp[ind + 0] = bi._BlockMaterialInternal;
+                    btemp[ind + 1] = bi.BlockLocalData;
+                    btemp[ind + 2] = bi.BlockData;
+                    btemp[ind + 3] = bi._BlockPaintInternal;
+                }
+                ZeroChunkRep = GL.GenBuffer();
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ZeroChunkRep);
+                GL.BufferData(BufferTarget.ShaderStorageBuffer, (Constants.CHUNK_BLOCK_COUNT) * sizeof(int), btemp, BufferUsageHint.StaticDraw);
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+            }
             View3D.CheckError("Compute - Startup - Empty Buffers");
             float[] preBuf = new float[256 * 12];
             for (int i = 0; i < 256; i++)
