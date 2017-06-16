@@ -629,10 +629,7 @@ namespace Voxalia.ClientGame.WorldSystem
             TheClient.Schedule.ScheduleSyncTask(() =>
             {
                 ch.AddToWorld();
-                if (!ch.CreateVBO())
-                {
-                    return;
-                }
+                ch.CreateVBO();
                 // TODO: If chunk previously could read downward, then still render downward (once, then forget that info)!
                 if (!ch.Reachability[(int)ChunkReachability.ZP_ZM])
                 {

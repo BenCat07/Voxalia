@@ -48,6 +48,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                             Chunk ch = TheClient.TheRegion.GetChunk(new Vector3i(x + tx, y + ty, z + tz));
                             if (ch != null)
                             {
+                                ch.AddToWorld();
                                 ch.CreateVBO();
                             }
                         }
