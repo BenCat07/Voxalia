@@ -235,7 +235,6 @@ namespace Voxalia.ClientGame.OtherSystems
         {
             if (Holder.Length < len)
             {
-                SysConsole.Output(OutputType.DEBUG, "Now i " + len);
                 Holder = new int[len];
             }
             return Holder;
@@ -249,7 +248,6 @@ namespace Voxalia.ClientGame.OtherSystems
         {
             if (UHolder.Length < len)
             {
-                SysConsole.Output(OutputType.DEBUG, "Now u " + len);
                 UHolder = new uint[len];
             }
             return UHolder;
@@ -397,6 +395,8 @@ namespace Voxalia.ClientGame.OtherSystems
             Vector3i centerChunk = TheClient.TheRegion.ChunkLocFor(TheClient.Player.GetPosition());
             centerChunk = new Vector3i(-centerChunk.X, -centerChunk.Y, -centerChunk.Z);
             sw1.Start();
+            int[] tbufs = new int[chs.Length * 4];
+            GL.GenBuffers(chs.Length, tbufs);
             // Create voxel buffer data
             for (int chz = 0; chz < chs.Length; chz++)
             {
@@ -452,7 +452,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 View3D.CheckError("Compute - Prep -1");
                 // Combine buffers
                 sw1a.Start();
-                int fbufVoxels = GL.GenBuffer();
+                int fbufVoxels = tbufs[chz];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, fbufVoxels);
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, len * 7 * sizeof(uint), IntPtr.Zero, hintter);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
@@ -483,15 +483,16 @@ namespace Voxalia.ClientGame.OtherSystems
             View3D.CheckError("Compute - Prep 0");
             GL.BindImageTexture(0, Texture_IDs, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
             // Create a results buffer
+            GL.GenBuffers(chs.Length * 4, tbufs);
             for (int chz = 0; chz < chs.Length; chz++)
             {
                 Chunk ch = chs[chz];
-                ch.Render_IndBuf = GL.GenBuffer();
+                ch.Render_IndBuf = tbufs[chz * 4];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_IndBuf);
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, ch.CSize * ch.CSize * ch.CSize * sizeof(uint), IntPtr.Zero, hintter);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 GL.UseProgram(Program_Counter[lookuper[ch.CSize]]);
-                int resBuf = GL.GenBuffer();
+                int resBuf = tbufs[chz * 4 + 1];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, resBuf);
                 uint[] resses = ResHolder;
                 resses[0] = 0;
@@ -507,10 +508,10 @@ namespace Voxalia.ClientGame.OtherSystems
                 ch.Render_ResBuf = resBuf;
                 View3D.CheckError("Compute - Run - Ran A");
                 // TRANSPARENT MODE:
-                ch.Render_IndBufTRANSP = GL.GenBuffer();
+                ch.Render_IndBufTRANSP = tbufs[chz * 4 + 2];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_IndBufTRANSP);
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, ch.CSize * ch.CSize * ch.CSize * sizeof(uint), IntPtr.Zero, hintter);
-                int resBufTRANSP = GL.GenBuffer();
+                int resBufTRANSP = tbufs[chz * 4 + 3];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, resBufTRANSP);
                 uint[] ressesTRANSP = ResHolder;
                 ressesTRANSP[0] = 0;
