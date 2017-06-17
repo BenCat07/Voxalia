@@ -1226,14 +1226,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 * Matrix4.CreateTranslation(ClientUtilities.Convert(TheSun.Direction * -(GetSkyDistance() * 0.96f)));
             Rendering.RenderRectangle(0, 0, spf, spf, rot); // TODO: Adjust scale based on view rad
             View3D.CheckError("Rendering - Sky - Sun");
-            Textures.GetTexture("skies/planet").Bind(); // TODO: Store var!
+            Textures.GetTexture("skies/planet_sphere").Bind(); // TODO: Store var!
             float ppf = 1000f;
             Rendering.SetColor(new Color4(PlanetLight, PlanetLight, PlanetLight, 1));
-            rot = Matrix4.CreateTranslation(-ppf * 0.5f, -ppf * 0.5f, 0f)
-                * Matrix4.CreateRotationY((float)((-PlanetAngle.Pitch - 90f) * Utilities.PI180))
+            rot = Matrix4.CreateScale(ppf * 0.5f)
+                * Matrix4.CreateTranslation(-ppf * 0.5f, -ppf * 0.5f, 0f)
+                //* Matrix4.CreateRotationY((float)((-PlanetAngle.Pitch - 90f) * Utilities.PI180))
                 * Matrix4.CreateRotationZ((float)((180f + PlanetAngle.Yaw) * Utilities.PI180))
                 * Matrix4.CreateTranslation(ClientUtilities.Convert(PlanetDir * -(GetSkyDistance() * 0.8f)));
-            Rendering.RenderRectangle(0, 0, ppf, ppf, rot);
+            //Rendering.RenderRectangle(0, 0, ppf, ppf, rot);
+            GL.UniformMatrix4(2, false, ref rot);
+            Models.Sphere.Draw();
             View3D.CheckError("Rendering - Sky - Planet");
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.Enable(EnableCap.CullFace);
