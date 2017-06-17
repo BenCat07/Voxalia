@@ -459,7 +459,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                     int cx = (int)cpos.X + x;
                     int cy = (int)cpos.Y + y;
                     double hheight = hm.Heights[y * Chunk.CHUNK_SIZE + x];
-                    SimpleBiome biome = Biomes.BiomeFor(seed2, seed3, seed4, x, y, cpos.Z, hheight) as SimpleBiome;
+                    SimpleBiome biome = Biomes.BiomeFor(seed2, seed3, seed4, cx, cy, cpos.Z, hheight) as SimpleBiome;
                     //Biome biomeOrig2;
                     /*double hheight2 = */
                     /*GetHeight(Seed, seed2, seed3, seed4, seed5, cx + 7, cy + 7, (double)cpos.Z + 7, out biomeOrig2);
