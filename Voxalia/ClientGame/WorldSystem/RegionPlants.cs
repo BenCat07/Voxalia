@@ -49,7 +49,14 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public void PrepPlants()
         {
-            Shader_Compute_Grass_Swing = TheClient.Shaders.CompileCompute("grass_swing", "");
+            try
+            {
+                Shader_Compute_Grass_Swing = TheClient.Shaders.CompileCompute("grass_swing", "");
+            }
+            catch (Exception ex)
+            {
+                SysConsole.Output(ex);
+            }
         }
 
         public float SphereRadFor(BEPUutilities.BoundingBox bb)
@@ -59,6 +66,10 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public void CommonSquishies()
         {
+            if (!TheClient.CVars.r_compute.ValueB)
+            {
+                return;
+            }
             for (int i = 0; i < Entities.Count; i++)
             {
                 if (Entities[i] is CharacterEntity ce)
