@@ -46,6 +46,8 @@ const int LIGHTS_MAX = 38; // How many lights we can ever have.
 
 layout (location = 4) uniform float desaturationAmount = 1.0;
 // ...
+layout (location = 6) uniform float time;
+layout (location = 7) uniform float volume;
 layout (location = 8) uniform vec2 u_screensize = vec2(1024, 1024);
 layout (location = 9) uniform mat4 lights_used_helper;
 // ...
@@ -58,6 +60,8 @@ layout (location = 58) uniform mat4 light_details_array[LIGHTS_MAX];
 #else
 out vec4 fcolor;
 #endif
+
+float snoise2(in vec3 v);
 
 vec3 desaturate(vec3 c)
 {
@@ -92,6 +96,106 @@ void main()
 		{
 			spec = 1.0;
 			//refl = 0.75;
+		}
+		// TODO: color shifts effect normals, specular, ...
+		else if (f.tcol.y > (172.0 / 255.0))
+		{
+			if (f.tcol.y > (174.0 / 255.0))
+			{
+				float newY = mod(f.texcoord.y - time * 0.5, 1.0);
+				vec2 tcfix = vec2(f.texcoord.x, newY < 0.0 ? newY + 1.0 : newY);
+				tcolor = texture(tex, vec3(tcfix, f.texcoord.z));
+			}
+			else
+			{
+				float newX = mod(f.texcoord.x - time * 0.5, 1.0);
+				vec2 tcfix = vec2(newX < 0.0 ? newX + 1.0 : newX, f.texcoord.y);
+				tcolor = texture(tex, vec3(tcfix, f.texcoord.z));
+			}
+		}
+		else if (f.tcol.y > (168.0 / 255.0))
+		{
+			if (f.tcol.y > (170.0 / 255.0))
+			{
+				tcolor *= vec4(vec3(snoise2(f.texcoord * 10.0)), 1.0);
+			}
+			else
+			{
+				float snx = snoise2(vec3(f.texcoord.xy, volume * 2.0));
+				float sny = snoise2(vec3(f.texcoord.xy, 3.1 + volume * 2.0));
+				float snz = snoise2(vec3(f.texcoord.xy, 17.25 + volume * 2.0));
+				tcolor *= mix(vec4(1.0), vec4(snx, sny, snz, 1.0), volume);
+			}
+		}
+		else if (f.tcol.y > (162.0 / 255.0))
+		{
+			if (f.tcol.y > (166.0 / 255.0))
+			{
+				float rot_factorCOS = cos(time * 2.0 + dot(f.texcoord - 0.5, f.texcoord - 0.5) * 3.0);
+				float rot_factorSIN = sin(time * 2.0 + dot(f.texcoord - 0.5, f.texcoord - 0.5) * 3.0);
+				vec2 tcfx = vec2((f.texcoord.x - 0.5) * rot_factorCOS - (f.texcoord.y - 0.5) * rot_factorSIN, (f.texcoord.y - 0.5) * rot_factorCOS + (f.texcoord.x - 0.5) * rot_factorSIN) + vec2(0.5);
+				tcfx.x = tcfx.x > 1.0 ? tcfx.x - 1.0 : (tcfx.x < 0.0 ? tcfx.x + 1.0 : tcfx.x);
+				tcfx.y = tcfx.y > 1.0 ? tcfx.y - 1.0 : (tcfx.y < 0.0 ? tcfx.y + 1.0 : tcfx.y);
+				tcolor = texture(tex, vec3(tcfx, f.texcoord.z));
+			}
+			else if (f.tcol.y > (164.0 / 255.0))
+			{
+				float rot_factorCOS = cos(time * 0.5);
+				float rot_factorSIN = sin(time * 0.5);
+				vec2 tcfx = vec2((f.texcoord.x - 0.5) * rot_factorCOS - (f.texcoord.y - 0.5) * rot_factorSIN, (f.texcoord.y - 0.5) * rot_factorCOS + (f.texcoord.x - 0.5) * rot_factorSIN) + vec2(0.5);
+				tcfx.x = tcfx.x > 1.0 ? tcfx.x - 1.0 : (tcfx.x < 0.0 ? tcfx.x + 1.0 : tcfx.x);
+				tcfx.y = tcfx.y > 1.0 ? tcfx.y - 1.0 : (tcfx.y < 0.0 ? tcfx.y + 1.0 : tcfx.y);
+				tcolor = texture(tex, vec3(tcfx, f.texcoord.z));
+			}
+			else
+			{
+				const float ROT_FACTOR = 0.707106;
+				vec2 tcfx = vec2((f.texcoord.x - 0.5) * ROT_FACTOR - (f.texcoord.y - 0.5) * ROT_FACTOR, (f.texcoord.y - 0.5) * ROT_FACTOR + (f.texcoord.x - 0.5) * ROT_FACTOR) + vec2(0.5);
+				tcfx.x = tcfx.x > 1.0 ? tcfx.x - 1.0 : (tcfx.x < 0.0 ? tcfx.x + 1.0 : tcfx.x);
+				tcfx.y = tcfx.y > 1.0 ? tcfx.y - 1.0 : (tcfx.y < 0.0 ? tcfx.y + 1.0 : tcfx.y);
+				tcolor = texture(tex, vec3(tcfx, f.texcoord.z));
+			}
+		}
+		else if (f.tcol.y > (156.0 / 255.0))
+		{
+			if (f.tcol.y > (160.0 / 255.0))
+			{
+				vec2 tcfix = vec2(f.texcoord.x, mod(f.texcoord.y + time * 0.5, 1.0));
+				tcolor = texture(tex, vec3(tcfix, f.texcoord.z));
+			}
+			else if (f.tcol.y > (158.0 / 255.0))
+			{
+				vec2 tcfix = vec2(mod(f.texcoord.x + time * 0.5, 1.0), f.texcoord.y);
+				tcolor = texture(tex, vec3(tcfix, f.texcoord.z));
+			}
+			else
+			{
+				float shift_x = snoise2(vec3(float(int(f.position.x)) + time * 0.075, float(int(f.position.y)) + time * 0.05, float(int(f.position.z)) + time * 0.1));
+				float shift_y = snoise2(vec3(float(int(f.position.x)) + time * 0.1, float(int(f.position.y)) + time * 0.05, float(int(f.position.z)) + time * 0.075));
+				vec2 tcfix = vec2(mod(f.texcoord.x + shift_x, 1.0), mod(f.texcoord.y + shift_y, 1.0));
+				tcolor = texture(tex, vec3(tcfix, f.texcoord.z));
+			}
+		}
+		else if (f.tcol.y > 0.51)
+		{
+			if (f.tcol.y > (150.0 / 255.0))
+			{
+				if (f.tcol.y > (152.0 / 255.0))
+				{
+					float res_fix = (f.tcol.y > (154.0 / 255.0) ? 8 : 32);
+					vec2 tcfix = vec2(float(int(f.texcoord.x * res_fix)) / res_fix, float(int(f.texcoord.y * res_fix)) / res_fix);
+					tcolor = texture(tex, vec3(tcfix, f.texcoord.z));
+				}
+				else
+				{
+					tcolor *= vec4(vec3(((int(f.texcoord.x * 8.0)) % 2 != (int(f.texcoord.y * 8.0) % 2)) ? 1.0 : 0.1), 1.0);
+				}
+			}
+			else
+			{
+				float shift = (f.tcol.y > (148.0 / 255.0)) ? 0.25 : (f.tcol.y > (146.0 / 255.0)) ? 0.5 : 0.75;
+				tcolor *= mix(vec4(texture(tex, vec3(f.texcoord.xy, 1)).xyz, 1.0), vec4(1.0), shift);
+			}
 		}
 		else
 		{
@@ -275,3 +379,5 @@ void main()
 	imageStore(uib_spage, int(page + frag), abv);
 #endif
 }
+
+#include glnoise.inc

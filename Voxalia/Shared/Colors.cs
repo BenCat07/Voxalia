@@ -99,6 +99,8 @@ namespace Voxalia.Shared
         public static Color SWIRLING = Color.FromArgb(0, 127, 167, 127);
         public static Color MUSICAL = Color.FromArgb(0, 127, 169, 127);
         public static Color NOISEY = Color.FromArgb(0, 127, 171, 127);
+        public static Color CONVEYOR3 = Color.FromArgb(0, 127, 173, 127);
+        public static Color CONVEYOR4 = Color.FromArgb(0, 127, 175, 127);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
@@ -270,7 +272,9 @@ namespace Voxalia.Shared
             Register("ROTATING", ROTATING);
             Register("SWIRLING", SWIRLING);
             Register("MUSICAL", MUSICAL);
-            Register("NOISEY", NOISEY); // 77
+            Register("NOISEY", NOISEY);
+            Register("CONVEYOR3", CONVEYOR3);
+            Register("CONVEYOR4", CONVEYOR4); // 79
             // TODO: Rest to 127
         }
     }

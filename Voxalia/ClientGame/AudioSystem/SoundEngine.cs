@@ -668,5 +668,20 @@ namespace Voxalia.ClientGame.AudioSystem
                 return b;
             }
         }
+
+        public float EstimateAudioLevel()
+        {
+            if (AudioInternal != null)
+            {
+                lock (AudioInternal.CLelLock)
+                {
+                    return AudioInternal.CurrentLevel;
+                }
+            }
+            else
+            {
+                return 0.5f; // TODO???
+            }
+        }
     }
 }

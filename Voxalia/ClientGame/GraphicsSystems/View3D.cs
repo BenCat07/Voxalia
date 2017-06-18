@@ -644,6 +644,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
             }
         }
 
+        public float AudioLevel = 0f;
+
         public void Render()
         {
             int pfbo = CurrentFBO;
@@ -1007,6 +1009,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform1(7, AudioLevel);
             GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
             GL.Uniform1(13, fogDist);
             GL.Uniform2(14, zfar_rel);
@@ -1170,6 +1173,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform1(7, AudioLevel);
             GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
             GL.Uniform1(13, fogDist);
             GL.Uniform2(14, zfar_rel);
@@ -1443,6 +1447,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform1(7, AudioLevel);
             GL.Uniform2(8, new Vector2(TheClient.sl_min, TheClient.sl_max));
             TheClient.s_fbov = TheClient.s_fbovslod.Bind();
             CheckError("Render - GBuffer - Uniforms - 0.5");
@@ -2371,7 +2376,8 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                 }
                 GL.UniformMatrix4(2, false, ref IdentityMatrix);
-                GL.Uniform1(7, (float)TheClient.GlobalTickTimeLocal);
+                GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+                GL.Uniform1(7, AudioLevel);
                 GL.Uniform2(8, new Vector2(Width, Height));
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
                 GL.UniformMatrix4(20, LIGHTS_MAX, false, s_mats);

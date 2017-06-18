@@ -18,6 +18,7 @@ layout (binding = 2) uniform sampler2DArray normal_tex;
 layout (location = 3) uniform vec4 v_color = vec4(1.0);
 // ...
 layout (location = 6) uniform float time;
+layout (location = 7) uniform float volume;
 // ...
 layout (location = 8) uniform vec2 light_clamp = vec2(0.0, 1.0);
 // ...
@@ -176,6 +177,21 @@ void main()
 			refl = 0.75;
 		}
 		// TODO: color shifts effect normals, specular, ...
+		else if (f.tcol.y > (172.0 / 255.0))
+		{
+			if (f.tcol.y > (174.0 / 255.0))
+			{
+				float newY = mod(f.texcoord.y - time * 0.5, 1.0);
+				vec2 tcfix = vec2(f.texcoord.x, newY < 0.0 ? newY + 1.0 : newY);
+				col = texture(s, vec3(tcfix, f.texcoord.z));
+			}
+			else
+			{
+				float newX = mod(f.texcoord.x - time * 0.5, 1.0);
+				vec2 tcfix = vec2(newX < 0.0 ? newX + 1.0 : newX, f.texcoord.y);
+				col = texture(s, vec3(tcfix, f.texcoord.z));
+			}
+		}
 		else if (f.tcol.y > (168.0 / 255.0))
 		{
 			if (f.tcol.y > (170.0 / 255.0))
@@ -184,7 +200,10 @@ void main()
 			}
 			else
 			{
-				// TODO: Implement!
+				float snx = snoise2(vec3(f.texcoord.xy, volume * 2.0));
+				float sny = snoise2(vec3(f.texcoord.xy, 3.1 + volume * 2.0));
+				float snz = snoise2(vec3(f.texcoord.xy, 17.25 + volume * 2.0));
+				col *= mix(vec4(1.0), vec4(snx, sny, snz, 1.0), volume);
 			}
 		}
 		else if (f.tcol.y > (162.0 / 255.0))

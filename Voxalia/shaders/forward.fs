@@ -79,6 +79,9 @@ const int LIGHTS_MAX = 38;
 layout (location = 4) uniform vec4 screen_size = vec4(1024, 1024, 0.1, 1000.0);
 // ...
 layout (location = 6) uniform float time;
+#if MCM_VOX
+layout (location = 7) uniform float volume;
+#endif
 // ...
 layout (location = 10) uniform vec3 sunlightDir = vec3(0.0, 0.0, -1.0);
 layout (location = 11) uniform vec3 maximum_light = vec3(0.9, 0.9, 0.9);
@@ -151,6 +154,21 @@ void main()
 			extra_specular = 1.0;
 		}
 		// TODO: color shifts effect normals, specular, ...
+		else if (fi.tcol.y > (172.0 / 255.0))
+		{
+			if (fi.tcol.y > (174.0 / 255.0))
+			{
+				float newY = mod(fi.texcoord.y - time * 0.5, 1.0);
+				vec2 tcfix = vec2(fi.texcoord.x, newY < 0.0 ? newY + 1.0 : newY);
+				col = texture(s, vec3(tcfix, fi.texcoord.z));
+			}
+			else
+			{
+				float newX = mod(fi.texcoord.x - time * 0.5, 1.0);
+				vec2 tcfix = vec2(newX < 0.0 ? newX + 1.0 : newX, fi.texcoord.y);
+				col = texture(s, vec3(tcfix, fi.texcoord.z));
+			}
+		}
 		else if (fi.tcol.y > (168.0 / 255.0))
 		{
 			if (fi.tcol.y > (170.0 / 255.0))
@@ -159,7 +177,10 @@ void main()
 			}
 			else
 			{
-				// TODO: Implement!
+				float snx = snoise2(vec3(fi.texcoord.xy, volume * 2.0));
+				float sny = snoise2(vec3(fi.texcoord.xy, 3.1 + volume * 2.0));
+				float snz = snoise2(vec3(fi.texcoord.xy, 17.25 + volume * 2.0));
+				col *= mix(vec4(1.0), vec4(snx, sny, snz, 1.0), volume);
 			}
 		}
 		else if (fi.tcol.y > (162.0 / 255.0))

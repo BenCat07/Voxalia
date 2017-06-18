@@ -94,6 +94,10 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
 
         const float QUARTER_PI = (float)Math.PI * 0.25f;
 
+        public Object CLelLock = new Object();
+
+        public float CurrentLevel = 0.0f;
+
         public void ForceAudioLoop()
         {
             try
@@ -249,6 +253,19 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                             {
                                 Playing.Remove(inst);
                             }
+                        }
+                        float clevelval = 0.0f;
+                        for (int i = 0; i < b.Length; i += BYTERATE)
+                        {
+                            int val = b[i] | (b[i + 1] << 8);
+                            float tval = val / (float)ushort.MaxValue;
+                            clevelval += tval;
+                        }
+                        clevelval /= (b.Length / 2) * Volume;
+                        lock (CLelLock)
+                        {
+                            CurrentLevel = clevelval;
+                            SysConsole.Output(OutputType.DEBUG, "" + CurrentLevel);
                         }
                         int buf = usable.Count > 0 ? usable.Dequeue() : AL.GenBuffer();
                         AL.BufferData(buf, ALFormat.Stereo16, b, ACTUAL_SAMPLES, FREQUENCY);

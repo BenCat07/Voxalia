@@ -1110,6 +1110,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 MainWorldView.FogAlpha = (FogEnhanceTime > 0.01) ? Math.Max(fg, (FogEnhanceTime < 1.0 ? (FogEnhanceStrength - ((1.0f - (float)FogEnhanceTime) * FogEnhanceStrength)) : FogEnhanceStrength)) : fg;
                 MainWorldView.SunLoc = GetSunLocation();
+                MainWorldView.AudioLevel = Sounds.EstimateAudioLevel();
                 MainWorldView.Render();
                 ReverseEntitiesOrder();
             }
