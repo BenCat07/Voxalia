@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using FreneticGameCore.Files;
 using FreneticGameCore;
@@ -286,9 +287,14 @@ namespace Voxalia.Shared
                 }
             }
             Textures = new string[c];
+            Textures[0] = TexturesToIDs.Where((ke) => ke.Value == 0).First().Key;
+            Textures[1] = TexturesToIDs.Where((ke) => ke.Value == 1).First().Key;
             foreach (KeyValuePair<string, int> val in TexturesToIDs)
             {
-                Textures[val.Value] = val.Key;
+                if (val.Value > 1)
+                {
+                    Textures[val.Value] = val.Key;
+                }
             }
             lock (ALL_MATS)
             {

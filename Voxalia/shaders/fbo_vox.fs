@@ -17,6 +17,8 @@ layout (binding = 2) uniform sampler2DArray normal_tex;
 
 layout (location = 3) uniform vec4 v_color = vec4(1.0);
 // ...
+layout (location = 6) uniform float time;
+// ...
 layout (location = 8) uniform vec2 light_clamp = vec2(0.0, 1.0);
 // ...
 layout (location = 16) uniform float minimum_light = 0.0;
@@ -41,6 +43,8 @@ layout (location = 1) out vec4 position;
 layout (location = 2) out vec4 normal;
 layout (location = 3) out vec4 renderhint;
 layout (location = 4) out vec4 renderhint2;
+
+float snoise2(in vec3 v);
 
 void main()
 {
@@ -171,6 +175,88 @@ void main()
 			spec = 1.0;
 			refl = 0.75;
 		}
+		// TODO: color shifts effect normals, specular, ...
+		else if (f.tcol.y > (168.0 / 255.0))
+		{
+			if (f.tcol.y > (170.0 / 255.0))
+			{
+				col *= vec4(vec3(snoise2(f.texcoord * 10.0)), 1.0);
+			}
+			else
+			{
+				// TODO: Implement!
+			}
+		}
+		else if (f.tcol.y > (162.0 / 255.0))
+		{
+			if (f.tcol.y > (166.0 / 255.0))
+			{
+				float rot_factorCOS = cos(time * 2.0 + dot(f.texcoord - 0.5, f.texcoord - 0.5) * 3.0);
+				float rot_factorSIN = sin(time * 2.0 + dot(f.texcoord - 0.5, f.texcoord - 0.5) * 3.0);
+				vec2 tcfx = vec2((f.texcoord.x - 0.5) * rot_factorCOS - (f.texcoord.y - 0.5) * rot_factorSIN, (f.texcoord.y - 0.5) * rot_factorCOS + (f.texcoord.x - 0.5) * rot_factorSIN) + vec2(0.5);
+				tcfx.x = tcfx.x > 1.0 ? tcfx.x - 1.0 : (tcfx.x < 0.0 ? tcfx.x + 1.0 : tcfx.x);
+				tcfx.y = tcfx.y > 1.0 ? tcfx.y - 1.0 : (tcfx.y < 0.0 ? tcfx.y + 1.0 : tcfx.y);
+				col = texture(s, vec3(tcfx, f.texcoord.z));
+			}
+			else if (f.tcol.y > (164.0 / 255.0))
+			{
+				float rot_factorCOS = cos(time * 0.5);
+				float rot_factorSIN = sin(time * 0.5);
+				vec2 tcfx = vec2((f.texcoord.x - 0.5) * rot_factorCOS - (f.texcoord.y - 0.5) * rot_factorSIN, (f.texcoord.y - 0.5) * rot_factorCOS + (f.texcoord.x - 0.5) * rot_factorSIN) + vec2(0.5);
+				tcfx.x = tcfx.x > 1.0 ? tcfx.x - 1.0 : (tcfx.x < 0.0 ? tcfx.x + 1.0 : tcfx.x);
+				tcfx.y = tcfx.y > 1.0 ? tcfx.y - 1.0 : (tcfx.y < 0.0 ? tcfx.y + 1.0 : tcfx.y);
+				col = texture(s, vec3(tcfx, f.texcoord.z));
+			}
+			else
+			{
+				const float ROT_FACTOR = 0.707106;
+				vec2 tcfx = vec2((f.texcoord.x - 0.5) * ROT_FACTOR - (f.texcoord.y - 0.5) * ROT_FACTOR, (f.texcoord.y - 0.5) * ROT_FACTOR + (f.texcoord.x - 0.5) * ROT_FACTOR) + vec2(0.5);
+				tcfx.x = tcfx.x > 1.0 ? tcfx.x - 1.0 : (tcfx.x < 0.0 ? tcfx.x + 1.0 : tcfx.x);
+				tcfx.y = tcfx.y > 1.0 ? tcfx.y - 1.0 : (tcfx.y < 0.0 ? tcfx.y + 1.0 : tcfx.y);
+				col = texture(s, vec3(tcfx, f.texcoord.z));
+			}
+		}
+		else if (f.tcol.y > (156.0 / 255.0))
+		{
+			if (f.tcol.y > (160.0 / 255.0))
+			{
+				vec2 tcfix = vec2(f.texcoord.x, mod(f.texcoord.y + time * 0.5, 1.0));
+				col = texture(s, vec3(tcfix, f.texcoord.z));
+			}
+			else if (f.tcol.y > (158.0 / 255.0))
+			{
+				vec2 tcfix = vec2(mod(f.texcoord.x + time * 0.5, 1.0), f.texcoord.y);
+				col = texture(s, vec3(tcfix, f.texcoord.z));
+			}
+			else
+			{
+				float shift_x = snoise2(vec3(float(int(f.position.x)) + time * 0.075, float(int(f.position.y)) + time * 0.05, float(int(f.position.z)) + time * 0.1));
+				float shift_y = snoise2(vec3(float(int(f.position.x)) + time * 0.1, float(int(f.position.y)) + time * 0.05, float(int(f.position.z)) + time * 0.075));
+				vec2 tcfix = vec2(mod(f.texcoord.x + shift_x, 1.0), mod(f.texcoord.y + shift_y, 1.0));
+				col = texture(s, vec3(tcfix, f.texcoord.z));
+			}
+		}
+		else if (f.tcol.y > 0.51)
+		{
+			if (f.tcol.y > (150.0 / 255.0))
+			{
+				if (f.tcol.y > (152.0 / 255.0))
+				{
+					float res_fix = (f.tcol.y > (154.0 / 255.0) ? 8 : 32);
+					vec2 tcfix = vec2(float(int(f.texcoord.x * res_fix)) / res_fix, float(int(f.texcoord.y * res_fix)) / res_fix);
+					col = texture(s, vec3(tcfix, f.texcoord.z));
+				}
+				else
+				{
+					col *= vec4(vec3(((int(f.texcoord.x * 8.0)) % 2 != (int(f.texcoord.y * 8.0) % 2)) ? 1.0 : 0.1), 1.0);
+				}
+			}
+			else
+			{
+				float shift = (f.tcol.y > (148.0 / 255.0)) ? 0.25 : (f.tcol.y > (146.0 / 255.0)) ? 0.5 : 0.75;
+				col *= mix(vec4(texture(s, vec3(f.texcoord.xy, 1)).xyz, 1.0), vec4(1.0), shift);
+			}
+		}
 		else
 		{
 			col *= mix(vec4(texture(s, vec3(f.texcoord.xy, 0)).xyz, 1.0), vec4(1.0), (f.tcol.x - 0.3) * 3.0);
@@ -194,3 +280,5 @@ void main()
 	renderhint = vec4(spec, rhBlur, light_min, 1.0);
 	renderhint2 = vec4(0.0, refl, 0.0, 1.0);
 }
+
+#include glnoise.inc

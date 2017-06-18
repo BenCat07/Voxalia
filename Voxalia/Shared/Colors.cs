@@ -51,7 +51,9 @@ namespace Voxalia.Shared
         public static Color LIME = Color.FromArgb(128, 255, 0);
         public static Color SKY_BLUE = Color.FromArgb(0, 128, 255);
         public static Color VERY_DARK_GRAY = Color.FromArgb(32, 32, 32);
-        // Placeholder 1-3
+        // SLIGHTLY_BRIGHT
+        // BRIGHT
+        // VERY_BRIGHT
         public static Color TRANSPARENT_GREEN = Color.FromArgb(127, 0, 255, 0);
         public static Color TRANSPARENT_BLUE = Color.FromArgb(127, 0, 0, 255);
         public static Color TRANSPARENT_RED = Color.FromArgb(127, 255, 0, 0);
@@ -83,12 +85,26 @@ namespace Voxalia.Shared
         public static Color CRACKS_DARK = Color.FromArgb(0, 127, 127, 127);
         public static Color INVERT = Color.FromArgb(0, 127, 127, 145);
         public static Color SHINE = Color.FromArgb(0, 145, 127, 127);
+        public static Color SLIGHTLY_DIRTY = Color.FromArgb(0, 127, 145, 127);
+        public static Color DIRTY = Color.FromArgb(0, 127, 147, 127);
+        public static Color VERY_DIRTY = Color.FromArgb(0, 127, 149, 127);
+        public static Color CHECKERED = Color.FromArgb(0, 127, 151, 127);
+        public static Color LOW_RES = Color.FromArgb(0, 127, 153, 127);
+        public static Color VERY_LOW_RES = Color.FromArgb(0, 127, 155, 127);
+        public static Color SLOW_MOVEMENT = Color.FromArgb(0, 127, 157, 127);
+        public static Color CONVEYOR = Color.FromArgb(0, 127, 159, 127);
+        public static Color CONVEYOR2 = Color.FromArgb(0, 127, 161, 127);
+        public static Color ROTATED = Color.FromArgb(0, 127, 163, 127);
+        public static Color ROTATING = Color.FromArgb(0, 127, 165, 127);
+        public static Color SWIRLING = Color.FromArgb(0, 127, 167, 127);
+        public static Color MUSICAL = Color.FromArgb(0, 127, 169, 127);
+        public static Color NOISEY = Color.FromArgb(0, 127, 171, 127);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
-        public static Color[] KnownColorsArray = new Color[64];
+        public static Color[] KnownColorsArray = new Color[128];
 
-        public static string[] KnownColorNamesArray = new string[64];
+        public static string[] KnownColorNamesArray = new string[128];
 
         public static double AlphaForByte(byte input)
         {
@@ -241,6 +257,21 @@ namespace Voxalia.Shared
             Register("CRACKS_DARK", CRACKS_DARK);
             Register("INVERT", INVERT);
             Register("SHINE", SHINE);
+            Register("SLIGHTLY_DIRTY", SLIGHTLY_DIRTY);
+            Register("DIRTY", DIRTY);
+            Register("VERY_DIRTY", VERY_DIRTY);
+            Register("CHECKERED", CHECKERED);
+            Register("LOW_RES", LOW_RES);
+            Register("VERY_LOW_RES", VERY_LOW_RES);
+            Register("SLOW_MOVEMENT", SLOW_MOVEMENT);
+            Register("CONVEYOR", CONVEYOR);
+            Register("CONVEYOR2", CONVEYOR2);
+            Register("ROTATED", ROTATED);
+            Register("ROTATING", ROTATING);
+            Register("SWIRLING", SWIRLING);
+            Register("MUSICAL", MUSICAL);
+            Register("NOISEY", NOISEY); // 77
+            // TODO: Rest to 127
         }
     }
 }
