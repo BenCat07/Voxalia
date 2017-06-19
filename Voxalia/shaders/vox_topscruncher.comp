@@ -64,7 +64,7 @@ void main()
 			f_indices[c_ind + i] = c_ind + i;
 			f_color[c_ind + i] = vec4(1.0);
 		}
-		const int S_M = 125;
+		const int S_M = 25;
 		f_position[c_ind + 2] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, float(c_hei), 0.0);
 		f_position[c_ind + 1] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M, float(xp_hei), 0.0);
 		f_position[c_ind + 0] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, float(pp_hei), 0.0);

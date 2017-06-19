@@ -277,6 +277,10 @@ void main()
 #endif // MCM_LIGHTS
 #endif // else - MCM_VOX
 #if MCM_NO_ALPHA_CAP
+	if (col.w * fi.color.w <= 0.01)
+	{
+		discard;
+	}
 #else // MCM_NO_ALPHA_CAP
 #if MCM_TRANSP
 	if (col.w * fi.color.w >= 0.99)

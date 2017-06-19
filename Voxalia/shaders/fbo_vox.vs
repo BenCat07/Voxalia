@@ -56,9 +56,9 @@ void main()
 	f.thw = thw;
 	f.thv2 = thv2;
 	f.thw2 = thw2;
-	f.tcol = vec4(1.0);
-#else
 	f.tcol = color_for(f.position);
+#else
+	f.tcol = vec4(1.0);
 #endif
 	f.position /= f.position.w;
 	gl_Position = proj_matrix * mv_matrix * vec4(position, 1.0);

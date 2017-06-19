@@ -426,7 +426,7 @@ namespace Voxalia.ClientGame.OtherSystems
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
             // TEMP
             /*{
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[3]);
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[5]);
                 Vector4[] dets = new Vector4[Constants.TOPS_VERT_COUNT];
                 GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, Constants.TOPS_VERT_COUNT * Vector4.SizeInBytes, dets);
                 SysConsole.Output(OutputType.DEBUG, string.Join(":", dets));

@@ -110,9 +110,9 @@ void main()
 #if MCM_TH
 	fi.thv = thv;
 	fi.thw = thw;
-	fi.tcol = vec4(1.0);
-#else
 	fi.tcol = color_for(vpos_mv, tcol);
+#else
+	fi.tcol = vec4(1.0);
 #endif
     fi.color = color_for(vpos_mv, color * v_color);
 	fi.pos = vpos_mv.xyz;
