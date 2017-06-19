@@ -253,7 +253,8 @@ namespace Voxalia.Shared
         BLOCK_ITEM = 7,
         STATIC_BLOCK = 8,
         MODEL = 9,
-        HOVER_MESSAGE = 10
+        HOVER_MESSAGE = 10,
+        SMASHER_PRIMITIVE = 11
     }
 
     /// <summary>

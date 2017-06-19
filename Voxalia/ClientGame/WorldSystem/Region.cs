@@ -206,7 +206,6 @@ namespace Voxalia.ClientGame.WorldSystem
             SolveJoints();
             TickClouds();
             CheckForRenderNeed();
-            CommonSquishies();
         }
 
         public void SolveJoints()

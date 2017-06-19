@@ -64,31 +64,12 @@ namespace Voxalia.ClientGame.WorldSystem
             return (float)(new Location(bb.Max - bb.Min).BiggestValue());
         }
 
-        public void CommonSquishies()
+        public void SquishGrassSwing(Vector4 swinger)
         {
             if (!TheClient.CVars.r_compute.ValueB)
             {
                 return;
             }
-            for (int i = 0; i < Entities.Count; i++)
-            {
-                if (Entities[i] is CharacterEntity ce)
-                {
-                    float srf = (float)ce.CBody.BodyRadius * 5.0f;
-                    Location loc = ce.GetCenter();
-                    SquishGrassSwing(new Vector4(ClientUtilities.Convert(loc), srf));
-                }
-                else if (Entities[i] is PhysicsEntity pe && !pe.GenBlockShadows)
-                {
-                    float srf = SphereRadFor(pe.Body.CollisionInformation.BoundingBox);
-                    Location loc = pe.GetPosition();
-                    SquishGrassSwing(new Vector4(ClientUtilities.Convert(loc), srf));
-                }
-            }
-        }
-
-        public void SquishGrassSwing(Vector4 swinger)
-        {
             Location spos = new Location(swinger.X, swinger.Y, swinger.Z);
             double maxdist = (swinger.W + Chunk.CHUNK_SIZE) * (swinger.W + Chunk.CHUNK_SIZE) * 4;
             GL.UseProgram(Shader_Compute_Grass_Swing);

@@ -36,6 +36,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 Entity e = etc.Create(TheClient.TheRegion, rem);
                 if (e == null)
                 {
+                    SysConsole.Output(OutputType.WARNING, "Tried spawning entity of type " + etype + " but got back null!");
                     return false;
                 }
                 e.EID = eid;

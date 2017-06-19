@@ -213,6 +213,17 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 TheRegion.LoadChunk(cpos);
             }
+            if (!GenBlockShadow)// TODO: and world config allows trackables
+            {
+                if (TheRegion.GetEntitiesInRadius(GetPosition(), 1.5f, EntityType.SMASHER_PRIMTIVE).Count == 0)
+                {
+                    // TODO: 5 * 60 -> world config
+                    TheRegion.SpawnEntity(new SmasherPrimitiveEntity(TheRegion, Math.Min((float)GetScaleEstimate(), 2f), TheRegion.TheWorld.GlobalTickTime + (5 * 60))
+                    {
+                        Position = GetPosition()
+                    });
+                }
+            }
             // TODO: More genericish
             if (TheRegion.Generator is SphereGeneratorCore)
             {
@@ -230,7 +241,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 SetGravity(gravDir * (-TheRegion.GravityStrength));
             }
         }
-
+        
         bool wasActive = false;
 
         public override void PotentialActivate()

@@ -135,6 +135,7 @@ namespace Voxalia.ServerGame.WorldSystem
             PhysicsWorld.TimeStepSettings.TimeStepDuration = 1f / TheServer.Settings.FPS;
             Collision = new CollisionUtil(PhysicsWorld);
             // TODO: Perhaps these should be on the server level, not region?
+            // TODO: Organize...
             EntityConstructors.Add(EntityType.ITEM, new ItemEntityConstructor());
             EntityConstructors.Add(EntityType.BLOCK_ITEM, new BlockItemEntityConstructor());
             EntityConstructors.Add(EntityType.GLOWSTICK, new GlowstickEntityConstructor());
@@ -142,6 +143,7 @@ namespace Voxalia.ServerGame.WorldSystem
             EntityConstructors.Add(EntityType.SMOKE_GRENADE, new SmokeGrenadeEntityConstructor());
             EntityConstructors.Add(EntityType.MUSIC_BLOCK, new MusicBlockEntityConstructor());
             EntityConstructors.Add(EntityType.HOVER_MESSAGE, new HoverMessageEntityConstructor());
+            EntityConstructors.Add(EntityType.SMASHER_PRIMTIVE, new SmasherPrimitiveEntityConstructor());
             ChunkManager = new ChunkDataManager();
             ChunkManager.Init(this);
         }

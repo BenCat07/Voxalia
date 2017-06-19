@@ -94,6 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientGame\EntitySystem\SmasherPrimitiveEntity.cs" />
     <Compile Include="ClientGame\NetworkSystem\PingInfo.cs" />
     <Compile Include="ClientGame\OtherSystems\VoxelComputeEngine.cs" />
     <Compile Include="ClientGame\WorldSystem\RegionPlants.cs" />

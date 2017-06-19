@@ -265,7 +265,6 @@ namespace Voxalia.ClientGame.AudioSystem.Enforcer
                         lock (CLelLock)
                         {
                             CurrentLevel = clevelval;
-                            SysConsole.Output(OutputType.DEBUG, "" + CurrentLevel);
                         }
                         int buf = usable.Count > 0 ? usable.Dequeue() : AL.GenBuffer();
                         AL.BufferData(buf, ALFormat.Stereo16, b, ACTUAL_SAMPLES, FREQUENCY);

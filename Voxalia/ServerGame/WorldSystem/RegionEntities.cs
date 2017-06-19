@@ -279,6 +279,33 @@ namespace Voxalia.ServerGame.WorldSystem
         }
 
         /// <summary>
+        /// Gets all entities in a radius from a location, with a specified type.
+        /// </summary>
+        /// <param name="pos">The position.</param>
+        /// <param name="rad">The radius.</param>
+        /// <param name="tp">Entity type.</param>
+        /// <returns>All entities in radius.</returns>
+        public List<Entity> GetEntitiesInRadius(Location pos, double rad, EntityType tp)
+        {
+            List<Entity> es = new List<Entity>();
+            // TODO: Efficiency!
+            // TODO: Accuracy!
+            double rx = rad * rad;
+            foreach (Entity e in Entities.Values)
+            {
+                if (e.GetEntityType() != tp)
+                {
+                    continue;
+                }
+                if ((e.GetPosition().DistanceSquared(pos)) <= rx + e.GetScaleEstimate())
+                {
+                    es.Add(e);
+                }
+            }
+            return es;
+        }
+
+        /// <summary>
         /// Gets all entities in a radius from a location.
         /// </summary>
         /// <param name="pos">The position.</param>

@@ -19,23 +19,33 @@ using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
-    public class HoverMessageEntity : PrimitiveEntity
+    public class SmasherPrimitiveEntity : PrimitiveEntity
     {
-        public System.Drawing.Color BackColor = System.Drawing.Color.FromArgb(64, 0, 255, 255);
+        public float Size;
 
-        public string Text;
+        public double EndTimeStamp;
 
-        public HoverMessageEntity(Region tregion, string message)
+        public SmasherPrimitiveEntity(Region tregion, float _size, double _endtime)
             : base(tregion)
         {
-            Text = message ?? "";
+            Size = _size;
+            EndTimeStamp = _endtime;
             Gravity = Location.Zero;
             Scale = Location.One;
         }
 
         public override EntityType GetEntityType()
         {
-            return EntityType.HOVER_MESSAGE;
+            return EntityType.SMASHER_PRIMTIVE;
+        }
+
+        public override void Tick()
+        {
+            if (TheRegion.TheWorld.GlobalTickTime > EndTimeStamp)
+            {
+                RemoveMe();
+            }
+            base.Tick();
         }
 
         public override string GetModel()
@@ -45,39 +55,34 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public override byte[] GetNetData()
         {
-            byte[] b = GetPrimitiveNetData();
-            DataStream ds = new DataStream();
-            DataWriter dw = new DataWriter(ds);
-            dw.WriteBytes(b);
-            dw.WriteInt(BackColor.ToArgb());
-            dw.WriteFullString(Text);
-            byte[] res = ds.ToArray();
-            return res;
+            byte[] b = new byte[24 + 4];
+            GetPosition().ToDoubleBytes().CopyTo(b, 0);
+            Utilities.FloatToBytes(Size).CopyTo(b, 24);
+            return b;
         }
 
         public override NetworkEntityType GetNetType()
         {
-            return NetworkEntityType.HOVER_MESSAGE;
+            return NetworkEntityType.SMASHER_PRIMITIVE;
         }
 
         public override BsonDocument GetSaveData()
         {
-            BsonDocument doc = base.GetSaveData();
-            doc["hm_color"] = BackColor.ToArgb();
-            doc["hm_text"] = Text;
-            return doc;
+            return new BsonDocument()
+            {
+                { "smash_pos", Position.ToDoubleBytes() },
+                { "smash_size", (double)Size },
+                { "smash_endtime", (double)EndTimeStamp }
+            };
         }
     }
 
-    public class HoverMessageEntityConstructor : EntityConstructor
+    public class SmasherPrimitiveEntityConstructor : EntityConstructor
     {
         public override Entity Create(Region tregion, BsonDocument doc)
         {
-            HoverMessageEntity ent = new HoverMessageEntity(tregion, doc["hm_text"].AsString)
-            {
-                BackColor = System.Drawing.Color.FromArgb(doc["hm_color"].AsInt32)
-            };
-            ent.ApplyPrimitiveSaveData(doc);
+            SmasherPrimitiveEntity ent = new SmasherPrimitiveEntity(tregion, (float)doc["smash_size"].AsDouble, doc["smash_endtime"].AsDouble);
+            ent.SetPosition(Location.FromDoubleBytes(doc["smash_pos"].AsBinary, 0));
             return ent;
         }
     }

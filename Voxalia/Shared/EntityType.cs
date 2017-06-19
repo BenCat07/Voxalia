@@ -93,6 +93,10 @@ namespace Voxalia.Shared
         /// <summary>
         /// A hovering text message popup.
         /// </summary>
-        HOVER_MESSAGE = 19
+        HOVER_MESSAGE = 19,
+        /// <summary>
+        /// A grass-smashing / trackable primitive.
+        /// </summary>
+        SMASHER_PRIMTIVE = 20
     }
 }

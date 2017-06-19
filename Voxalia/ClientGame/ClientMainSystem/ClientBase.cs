@@ -304,13 +304,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// All constructors for known entity types.
         /// </summary>
-        public Dictionary<NetworkEntityType, EntityTypeConstructor> EntityConstructors = new Dictionary<NetworkEntityType, EntityTypeConstructor>();
+        public Dictionary<NetworkEntityType, EntityTypeConstructor> EntityConstructors = new Dictionary<NetworkEntityType, EntityTypeConstructor>(256);
 
         /// <summary>
         /// Set up the default constructors for entity types (IE, ones in the base unmodified game!)
         /// </summary>
         public void RegisterDefaultEntityTypes()
         {
+            // TODO: Organize?
             EntityConstructors[NetworkEntityType.BULLET] = new BulletEntityConstructor();
             EntityConstructors[NetworkEntityType.PRIMITIVE] = new PrimitiveEntityConstructor();
             EntityConstructors[NetworkEntityType.CHARACTER] = new CharacterEntityConstructor();
@@ -321,6 +322,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             EntityConstructors[NetworkEntityType.STATIC_BLOCK] = new StaticBlockEntityConstructor();
             EntityConstructors[NetworkEntityType.MODEL] = new ModelEntityConstructor();
             EntityConstructors[NetworkEntityType.HOVER_MESSAGE] = new HoverMessageEntityConstructor();
+            EntityConstructors[NetworkEntityType.SMASHER_PRIMITIVE] = new SmasherPrimitiveEntityConstructor();
         }
 
         Stopwatch SWLoading = new Stopwatch();
