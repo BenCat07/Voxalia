@@ -64,13 +64,13 @@ void main()
 			f_indices[c_ind + i] = c_ind + i;
 			f_color[c_ind + i] = vec4(1.0);
 		}
-		const int S_M = 25;
-		f_position[c_ind + 0] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, c_hei, 0.0);
-		f_position[c_ind + 1] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M, xp_hei, 0.0);
-		f_position[c_ind + 2] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, pp_hei, 0.0);
-		f_position[c_ind + 3] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, c_hei, 0.0);
-		f_position[c_ind + 4] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, pp_hei, 0.0);
-		f_position[c_ind + 5] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M + S_M, yp_hei, 0.0);
+		const int S_M = 125;
+		f_position[c_ind + 2] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, float(c_hei), 0.0);
+		f_position[c_ind + 1] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M, float(xp_hei), 0.0);
+		f_position[c_ind + 0] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, float(pp_hei), 0.0);
+		f_position[c_ind + 5] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, float(c_hei), 0.0);
+		f_position[c_ind + 4] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, float(pp_hei), 0.0);
+		f_position[c_ind + 3] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M + S_M, float(yp_hei), 0.0);
 		vec4 norm_a = vec4(normalize(cross(vec3(1.0, 0.0, float(xp_hei - c_hei)), vec3(1.0, 1.0, float(pp_hei - c_hei)))), 0.0);
 		f_normal[c_ind + 0] = norm_a;
 		f_normal[c_ind + 1] = norm_a;

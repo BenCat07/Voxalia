@@ -1274,8 +1274,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             if (CVars.r_compute.ValueB && VoxelComputer.TopsChunk != null)
             {
-                //SysConsole.Output(OutputType.INFO, VoxelComputer.TopsX * Chunk.CHUNK_SIZE + ", " + VoxelComputer.TopsY * Chunk.CHUNK_SIZE);
-                Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.TopsX * Chunk.CHUNK_SIZE - 25 * Chunk.CHUNK_SIZE, VoxelComputer.TopsY * Chunk.CHUNK_SIZE - 25 * Chunk.CHUNK_SIZE, 0);
+                const int C_EXTRA = 125;
+                const double C_SUB = C_EXTRA;// + C_EXTRA * 0.5;
+                Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.TopsX * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.TopsY * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
                 TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
                 VoxelComputer.TopsChunk.Render();
             }
