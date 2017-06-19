@@ -1,0 +1,105 @@
+#version 430 core
+
+layout(binding = 0, r32f) uniform readonly image2D texture_ids;
+
+layout(std430, binding = 1) buffer b_indices
+{
+	uint f_indices[];
+};
+layout(std430, binding = 2) buffer b_position
+{
+	vec4 f_position[];
+};
+layout(std430, binding = 3) buffer b_normal
+{
+	vec4 f_normal[];
+};
+layout(std430, binding = 4) buffer b_texcoord
+{
+	vec4 f_texcoord[];
+};
+layout(std430, binding = 5) buffer b_tangent
+{
+	vec4 f_tangent[];
+};
+layout(std430, binding = 6) buffer b_color
+{
+	vec4 f_color[];
+};
+layout(std430, binding = 7) buffer tops_data
+{
+	ivec4 f_topsdat[];
+};
+
+layout(local_size_x = 89, local_size_y = 10, local_size_z = 1) in;
+
+float tex_for(in uint mat)
+{
+	return imageLoad(texture_ids, ivec2(mat, 1)).x;
+}
+
+int mat_for(uvec2 coord)
+{
+	return f_topsdat[(coord.y * 89) + (coord.x)].x;
+}
+
+int height_for(uvec2 coord)
+{
+	return f_topsdat[(coord.y * 89) + (coord.x)].y;
+}
+
+void main()
+{
+	if (gl_GlobalInvocationID.y != 90)
+	{
+		int c_ind = int(((gl_GlobalInvocationID.y * 89) + (gl_GlobalInvocationID.x)) * 6);
+		int c_mat = mat_for(gl_GlobalInvocationID.xy);
+		float texter = tex_for(uint(c_mat));
+		int c_hei = height_for(gl_GlobalInvocationID.xy);
+		int xp_hei = height_for(gl_GlobalInvocationID.xy + ivec2(1, 0));
+		int yp_hei = height_for(gl_GlobalInvocationID.xy + ivec2(0, 1));
+		int pp_hei = height_for(gl_GlobalInvocationID.xy + ivec2(1, 1));
+		for (int i = 0; i < 6; i++)
+		{
+			f_indices[c_ind + i] = c_ind + i;
+			f_color[c_ind + i] = vec4(1.0);
+		}
+		const int S_M = 25;
+		f_position[c_ind + 0] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, c_hei, 0.0);
+		f_position[c_ind + 1] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M, xp_hei, 0.0);
+		f_position[c_ind + 2] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, pp_hei, 0.0);
+		f_position[c_ind + 3] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, c_hei, 0.0);
+		f_position[c_ind + 4] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, pp_hei, 0.0);
+		f_position[c_ind + 5] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M + S_M, yp_hei, 0.0);
+		vec4 norm_a = vec4(normalize(cross(vec3(1.0, 0.0, float(xp_hei - c_hei)), vec3(1.0, 1.0, float(pp_hei - c_hei)))), 0.0);
+		f_normal[c_ind + 0] = norm_a;
+		f_normal[c_ind + 1] = norm_a;
+		f_normal[c_ind + 2] = norm_a;
+		vec4 norm_b = vec4(normalize(cross(vec3(1.0, 1.0, float(pp_hei - c_hei)), vec3(0.0, 1.0, float(yp_hei - c_hei)))), 0.0);
+		f_normal[c_ind + 3] = norm_b;
+		f_normal[c_ind + 4] = norm_b;
+		f_normal[c_ind + 5] = norm_b;
+		vec3 dv1_a = vec3(1.0, 0.0, float(xp_hei - c_hei));
+		vec3 dv2_a = vec3(1.0, 1.0, float(pp_hei - c_hei));
+		vec3 dt1_a = vec3(1.0, 0.0, 0.0);
+		vec3 dt2_a = vec3(1.0, 1.0, 0.0);
+		vec3 tng_a = normalize((dv1_a * dt2_a.y - dv2_a * dt1_a.y) / (dt1_a.x * dt2_a.y - dt1_a.y * dt2_a.x));
+		f_tangent[c_ind + 0] = vec4(tng_a, 0.0);
+		f_tangent[c_ind + 1] = vec4(tng_a, 0.0);
+		f_tangent[c_ind + 2] = vec4(tng_a, 0.0);
+		vec3 dv1_b = vec3(1.0, 1.0, float(pp_hei - c_hei));
+		vec3 dv2_b = vec3(0.0, 1.0, float(yp_hei - c_hei));
+		vec3 dt1_b = vec3(1.0, 1.0, 0.0);
+		vec3 dt2_b = vec3(0.0, 1.0, 0.0);
+		vec3 tng_b = normalize((dv1_b * dt2_b.y - dv2_b * dt1_b.y) / (dt1_b.x * dt2_b.y - dt1_b.y * dt2_b.x));
+		f_tangent[c_ind + 3] = vec4(tng_b, 0.0);
+		f_tangent[c_ind + 4] = vec4(tng_b, 0.0);
+		f_tangent[c_ind + 5] = vec4(tng_b, 0.0);
+		f_texcoord[c_ind + 0] = vec4(0.0, 0.0, texter, 0.0);
+		f_texcoord[c_ind + 1] = vec4(1.0, 0.0, texter, 0.0);
+		f_texcoord[c_ind + 2] = vec4(1.0, 1.0, texter, 0.0);
+		f_texcoord[c_ind + 3] = vec4(0.0, 0.0, texter, 0.0);
+		f_texcoord[c_ind + 4] = vec4(1.0, 1.0, texter, 0.0);
+		f_texcoord[c_ind + 5] = vec4(0.0, 1.0, texter, 0.0);
+	}
+}

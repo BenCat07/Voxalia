@@ -27,6 +27,7 @@ using LiteDB;
 using FreneticDataSyntax;
 using FreneticGameCore.Collision;
 using FreneticGameCore.EntitySystem;
+using FreneticGameCore.Files;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -816,6 +817,7 @@ namespace Voxalia.ServerGame.EntitySystem
                         }
                     }
                 }
+                SendTopsFix();
             }
             if (!DoneReadingChunks)
             {
@@ -918,6 +920,14 @@ namespace Voxalia.ServerGame.EntitySystem
         HashSet<Vector3i> seen;
 
         Queue<Vector3i> toSee;
+
+        public void SendTopsFix()
+        {
+            Vector3i cpos = TheRegion.ChunkLocFor(GetPosition());
+            Vector2i flat = new Vector2i(cpos.X, cpos.Y);
+            byte[] toper = TheRegion.GetTopsArray(flat);
+            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, FileHandler.Compress(toper)));
+        }
         
         /// <summary>
         /// Runs through the chunks near the player and sends them in a reasonable order.
@@ -1571,7 +1581,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 TopsAwareof.Remove(tops);
                 return;
             }
-            Network.SendPacket(new TopsPacketOut(tops, bua));
+            ChunkNetwork.SendPacket(new TopsPacketOut(tops, bua));
         }
 
         /// <summary>

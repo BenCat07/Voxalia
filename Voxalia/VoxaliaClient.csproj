@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientGame\EntitySystem\SmasherPrimitiveEntity.cs" />
+    <Compile Include="ClientGame\NetworkSystem\PacketsIn\TopsDataPacketIn.cs" />
     <Compile Include="ClientGame\NetworkSystem\PingInfo.cs" />
     <Compile Include="ClientGame\OtherSystems\VoxelComputeEngine.cs" />
     <Compile Include="ClientGame\WorldSystem\RegionPlants.cs" />
@@ -401,6 +402,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="shaders\map.vs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="shaders\vox_topscruncher.comp">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

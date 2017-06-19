@@ -208,7 +208,7 @@ namespace Voxalia.Shared
         ADD_JOINT = 11,
         YOUR_EID = 12,
         DESTROY_JOINT = 13,
-        // ...
+        TOPS_DATA = 14,
         PRIMITIVE_ENTITY_UPDATE = 15,
         ANIMATION = 16,
         FLASHLIGHT = 17,

@@ -50,6 +50,8 @@ namespace Voxalia.ClientGame.OtherSystems
         public int Program_SLODCombo1;
         public int Program_SLODCombo2;
 
+        public int Program_TopsCruncher;
+
         public int Buf_Shapes = 0;
 
         public static readonly Dictionary<int, int> lookuper = new Dictionary<int, int>(128)
@@ -82,6 +84,7 @@ namespace Voxalia.ClientGame.OtherSystems
             }
             Program_SLODCombo1 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_ONE 1\n");
             Program_SLODCombo2 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_TWO 1\n");
+            Program_TopsCruncher = TheClient.Shaders.CompileCompute("vox_topscruncher");
             View3D.CheckError("Compute - Startup - Shaders");
             float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 7)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
@@ -301,14 +304,6 @@ namespace Voxalia.ClientGame.OtherSystems
                 {
                     continue;
                 }
-                // TEMP
-                /*{
-                    Vector4[] p = new Vector4[maxSize];
-                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, chs[i]._VBOSolid._VertexVBO);
-                    GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, (int)maxSize * Vector4.SizeInBytes, p);
-                    Console.WriteLine(String.Join(":::", p));
-                    GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-                }*/
                 GL.UseProgram(Program_SLODCombo1);
                 GL.Uniform1(10, coord);
                 GL.Uniform1(11, (uint)chs[i]._VBOSolid.vC);
@@ -382,19 +377,96 @@ namespace Voxalia.ClientGame.OtherSystems
             };
             GL.BindVertexArray(0);
             cslod.Contained = contained;
+            View3D.CheckError("Calculate SLOD Combo");
+        }
+
+        public int TopsX, TopsY;
+
+        public ChunkVBO TopsChunk;
+
+        public void TopsCrunch(byte[] inp)
+        {
+            TopsChunk?.Destroy();
+            if (!TheClient.CVars.r_compute.ValueB)
+            {
+                return;
+            }
+            const int sectiontwo = Constants.TOPS_DATA_SIZE * 2;
+            int[] res = GetHolder(Constants.TOPS_DATA_SIZE * 4);
+            for (int i = 0; i < Constants.TOPS_DATA_SIZE; i++)
+            {
+                res[i * 4 + 0] = Utilities.BytesToUshort(Utilities.BytesPartial(inp, i * 2, 2));
+                res[i * 4 + 1] = Utilities.BytesToInt(Utilities.BytesPartial(inp, sectiontwo + i * 4, 4));
+            }
+            int buf = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, buf);
+            GL.BufferData(BufferTarget.ShaderStorageBuffer, Constants.TOPS_DATA_SIZE * 4 * sizeof(int), res, hintter);
+            GL.GenBuffers(6, IBuf);
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, IBuf[0]);
+            GL.BufferData(BufferTarget.ShaderStorageBuffer, Constants.TOPS_VERT_COUNT * sizeof(uint), IntPtr.Zero, hintter);
+            for (int i = 1; i < 6; i++)
+            {
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, IBuf[i]);
+                GL.BufferData(BufferTarget.ShaderStorageBuffer, Constants.TOPS_VERT_COUNT * Vector4.SizeInBytes, IntPtr.Zero, hintter);
+            }
+            GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+            GL.BindImageTexture(0, Texture_IDs, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
+            for (int i = 0; i < 6; i++)
+            {
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, i + 1, IBuf[i]);
+            }
+            GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, buf);
+            GL.UseProgram(Program_TopsCruncher);
+            GL.DispatchCompute(1, 9, 1);
+            for (int i = 0; i < 8; i++)
+            {
+                GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, i, 0);
+            }
+            int[] bufs = IBuf;
+            GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
             // TEMP
             /*{
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[0]);
-                uint[] t = new uint[maxSize];
-                Vector4[] p = new Vector4[maxSize];
-                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, (int)maxSize * sizeof(uint), t);
-                Console.WriteLine(String.Join(",", t));
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[1]);
-                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, (int)maxSize * Vector4.SizeInBytes, p);
-                Console.WriteLine(String.Join(":::", p));
-                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
+                GL.BindBuffer(BufferTarget.ShaderStorageBuffer, bufs[3]);
+                Vector4[] dets = new Vector4[Constants.TOPS_VERT_COUNT];
+                GL.GetBufferSubData(BufferTarget.ShaderStorageBuffer, IntPtr.Zero, Constants.TOPS_VERT_COUNT * Vector4.SizeInBytes, dets);
+                SysConsole.Output(OutputType.DEBUG, string.Join(":", dets));
             }*/
-            View3D.CheckError("Calculate SLOD Combo");
+            int VAO = GL.GenVertexArray();
+            GL.BindVertexArray(VAO);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[1]);
+            GL.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[2]);
+            GL.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[3]);
+            GL.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[4]);
+            GL.VertexAttribPointer(3, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, bufs[5]);
+            GL.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, 0, 0);
+            GL.EnableVertexAttribArray(0);
+            GL.EnableVertexAttribArray(1);
+            GL.EnableVertexAttribArray(2);
+            GL.EnableVertexAttribArray(3);
+            GL.EnableVertexAttribArray(4);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, bufs[0]);
+            TopsChunk = new ChunkVBO()
+            {
+                _IndexVBO = (uint)bufs[0],
+                _VertexVBO = (uint)bufs[1],
+                _NormalVBO = (uint)bufs[2],
+                _TexCoordVBO = (uint)bufs[3],
+                _TangentVBO = (uint)bufs[4],
+                _ColorVBO = (uint)bufs[5],
+                _TCOLVBO = 0,
+                tcols = true,
+                usethvs = false,
+                colors = true,
+                vC = Constants.TOPS_VERT_COUNT,
+                _VAO = VAO,
+                reusable = false,
+                generated = true
+            };
+            GL.BindVertexArray(0);
         }
 
         public void Calc(params Chunk[] chs)

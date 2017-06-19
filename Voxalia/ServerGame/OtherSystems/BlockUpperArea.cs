@@ -23,7 +23,7 @@ namespace Voxalia.ServerGame.OtherSystems
     {
         public struct TopBlock
         {
-            public static readonly TopBlock AIR = new TopBlock() { BasicMat = 0, Height = 0 };
+            public static readonly TopBlock VOID = new TopBlock() { BasicMat = Material.SPECIAL_VOID, Height = 0 };
 
             public Material BasicMat;
 
@@ -47,32 +47,32 @@ namespace Voxalia.ServerGame.OtherSystems
                 return;
             }
             int ind = BlockIndex(x, y);
-            if (Blocks[ind].Height <= z || Blocks[ind].BasicMat == Material.AIR)
+            if (Blocks[ind].Height <= z || !Blocks[ind].BasicMat.RendersAtAll())
             {
                 Blocks[ind].Height = z;
                 Blocks[ind].BasicMat = mat;
                 ind *= 4;
                 if (BlocksTrans[ind].Height <= z)
                 {
-                    BlocksTrans[ind + 3] = TopBlock.AIR;
-                    BlocksTrans[ind + 2] = TopBlock.AIR;
-                    BlocksTrans[ind + 1] = TopBlock.AIR;
-                    BlocksTrans[ind + 0] = TopBlock.AIR;
+                    BlocksTrans[ind + 3] = TopBlock.VOID;
+                    BlocksTrans[ind + 2] = TopBlock.VOID;
+                    BlocksTrans[ind + 1] = TopBlock.VOID;
+                    BlocksTrans[ind + 0] = TopBlock.VOID;
                 }
                 else if (BlocksTrans[ind + 1].Height <= z)
                 {
-                    BlocksTrans[ind + 3] = TopBlock.AIR;
-                    BlocksTrans[ind + 2] = TopBlock.AIR;
-                    BlocksTrans[ind + 1] = TopBlock.AIR;
+                    BlocksTrans[ind + 3] = TopBlock.VOID;
+                    BlocksTrans[ind + 2] = TopBlock.VOID;
+                    BlocksTrans[ind + 1] = TopBlock.VOID;
                 }
                 else if (BlocksTrans[ind + 2].Height <= z)
                 {
-                    BlocksTrans[ind + 3] = TopBlock.AIR;
-                    BlocksTrans[ind + 2] = TopBlock.AIR;
+                    BlocksTrans[ind + 3] = TopBlock.VOID;
+                    BlocksTrans[ind + 2] = TopBlock.VOID;
                 }
                 else if (BlocksTrans[ind + 3].Height <= z)
                 {
-                    BlocksTrans[ind + 3] = TopBlock.AIR;
+                    BlocksTrans[ind + 3] = TopBlock.VOID;
                 }
                 Edited = true;
                 return;
@@ -121,12 +121,12 @@ namespace Voxalia.ServerGame.OtherSystems
                 return;
             }
             int ind = BlockIndex(x, y);
-            if (Blocks[ind].Height >= z && Blocks[ind].BasicMat != Material.AIR)
+            if (Blocks[ind].Height >= z && Blocks[ind].BasicMat.RendersAtAll())
             {
                 return;
             }
             ind *= 4;
-            if (BlocksTrans[ind].Height <= z || BlocksTrans[ind].BasicMat == Material.AIR)
+            if (BlocksTrans[ind].Height <= z || !BlocksTrans[ind].BasicMat.RendersAtAll())
             {
                 BlocksTrans[ind + 3] = BlocksTrans[ind + 2];
                 BlocksTrans[ind + 2] = BlocksTrans[ind + 1];
@@ -136,7 +136,7 @@ namespace Voxalia.ServerGame.OtherSystems
                 Edited = true;
                 return;
             }
-            else if (BlocksTrans[ind + 1].Height <= z || BlocksTrans[ind + 1].BasicMat == Material.AIR)
+            else if (BlocksTrans[ind + 1].Height <= z || !BlocksTrans[ind + 1].BasicMat.RendersAtAll())
             {
                 BlocksTrans[ind + 3] = BlocksTrans[ind + 2];
                 BlocksTrans[ind + 2] = BlocksTrans[ind + 1];
@@ -145,7 +145,7 @@ namespace Voxalia.ServerGame.OtherSystems
                 Edited = true;
                 return;
             }
-            else if (BlocksTrans[ind + 2].Height <= z || BlocksTrans[ind + 2].BasicMat == Material.AIR)
+            else if (BlocksTrans[ind + 2].Height <= z || !BlocksTrans[ind + 2].BasicMat.RendersAtAll())
             {
                 BlocksTrans[ind + 3] = BlocksTrans[ind + 2];
                 BlocksTrans[ind + 2].Height = z;
@@ -153,7 +153,7 @@ namespace Voxalia.ServerGame.OtherSystems
                 Edited = true;
                 return;
             }
-            else if (BlocksTrans[ind + 3].Height <= z || BlocksTrans[ind + 3].BasicMat == Material.AIR)
+            else if (BlocksTrans[ind + 3].Height <= z || !BlocksTrans[ind + 3].BasicMat.RendersAtAll())
             {
                 BlocksTrans[ind + 3].Height = z;
                 BlocksTrans[ind + 3].BasicMat = mat;

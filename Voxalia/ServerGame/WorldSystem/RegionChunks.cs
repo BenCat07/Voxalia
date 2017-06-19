@@ -44,6 +44,50 @@ namespace Voxalia.ServerGame.WorldSystem
             return Generator.GetLODSix(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
         }
 
+        public byte[] GetTopsArray(Vector2i chunkPos)
+        {
+            byte[] result = new byte[Constants.TOPS_DATA_SIZE * 6];
+            const int sectiontwo = Constants.TOPS_DATA_SIZE * 4;
+            const int countter = (Constants.TOPS_DATA_WIDTH / Constants.CHUNK_WIDTH);
+            const int top_mod = 25;
+            for (int x = 0; x < countter; x++)
+            {
+                for (int y = 0; y < countter; y++)
+                {
+                    const int sizer = top_mod * Constants.CHUNK_WIDTH;
+                    Vector2i relPos = new Vector2i(chunkPos.X + x - sizer, chunkPos.Y + y - sizer);
+                    KeyValuePair<byte[], byte[]> known_tops = ChunkManager.GetTopsHigher(relPos.X, relPos.Y, 2);
+                    for  (int bx = 0; bx < Constants.CHUNK_WIDTH; bx++)
+                    {
+                        for (int by = 0; by < Constants.CHUNK_WIDTH; by++)
+                        {
+                            int inner_ind = by * Constants.CHUNK_WIDTH + bx;
+                            ushort mat = known_tops.Key == null ? (ushort)0 : Utilities.BytesToUshort(Utilities.BytesPartial(known_tops.Key, inner_ind * 2, 2));
+                            int height = known_tops.Value == null ? 0 : Utilities.BytesToInt(Utilities.BytesPartial(known_tops.Value, inner_ind * 4, 4));
+                            if (mat == 0 && height == 0)
+                            {
+                                Vector2i absCoord = new Vector2i(relPos.X + bx * top_mod, relPos.Y + by * top_mod);
+                                height = (int)Generator.GetHeight(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, absCoord.X, absCoord.Y);
+                                Biome b = Generator.GetBiomeGen().BiomeFor(TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, absCoord.X, absCoord.Y, height, height);
+                                if (height > 0)
+                                {
+                                    mat = (ushort)b.GetAboveZeromat();
+                                }
+                                else
+                                {
+                                    mat = (ushort)b.GetZeroOrLowerMat();
+                                }
+                            }
+                            int idder = (relPos.Y * Constants.CHUNK_WIDTH + by) * (Constants.CHUNK_WIDTH + countter) + (relPos.X * Constants.CHUNK_WIDTH + bx);
+                            Utilities.UshortToBytes(mat).CopyTo(result, idder * 2);
+                            Utilities.IntToBytes(height).CopyTo(result, sectiontwo + idder * 4);
+                        }
+                    }
+                }
+            }
+            return result;
+        }
+
         /// <summary>
         /// Adds a chunk object to the physics environment.
         /// </summary>

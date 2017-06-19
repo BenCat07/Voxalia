@@ -66,5 +66,24 @@ namespace Voxalia.Shared
         /// It is calculated as CHUNK_WIDTH (30) multiplied by CHUNKS_PER_SLOD (3).
         /// </summary>
         public const int CHUNK_SLOD_WIDTH = CHUNKS_PER_SLOD * CHUNK_WIDTH;
+
+        /// <summary>
+        /// How wide the TOPS data is. Chosen as (3 * CHUNK_WIDTH(30)): 90.
+        /// Meaning, 1 set on either side, plus one partially empty set in the center!
+        /// </summary>
+        public const int TOPS_DATA_WIDTH = 3 * CHUNK_WIDTH;
+
+        /// <summary>
+        /// The size of a tops data array: (WIDTH * WIDTH).
+        /// </summary>
+        public const int TOPS_DATA_SIZE = TOPS_DATA_WIDTH * TOPS_DATA_WIDTH;
+
+        /// <summary>
+        /// The count of tops vertices.
+        /// ((TOPS_DATA_WIDTH - 1) ^ 2) * 6.
+        /// 6 is the number of vertices per valid points.
+        /// All points are valid exact the positive most row and column.
+        /// </summary>
+        public const int TOPS_VERT_COUNT = ((TOPS_DATA_WIDTH - 1) * (TOPS_DATA_WIDTH - 1)) * 6;
     }
 }

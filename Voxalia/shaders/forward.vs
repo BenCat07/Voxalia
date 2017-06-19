@@ -102,17 +102,19 @@ void main()
 #if MCM_VOX
 	vec4 vpos = vec4(position, 1.0);
 	fi.texcoord = texcoords;
-#if MCM_TH
-	fi.thv = thv;
-	fi.thw = thw;
-#endif
 	vec3 tf_normal = (mv_mat_simple * vec4(normal, 0.0)).xyz;
 	vec3 tf_tangent = (mv_mat_simple * vec4(tangent, 0.0)).xyz;
 	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent, normal), 0.0)).xyz;
 	fi.tbn = transpose(mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
 	vec4 vpos_mv = mv_matrix * vpos;
-    fi.color = color_for(vpos_mv, color * v_color);
+#if MCM_TH
+	fi.thv = thv;
+	fi.thw = thw;
+	fi.tcol = vec4(1.0);
+#else
 	fi.tcol = color_for(vpos_mv, tcol);
+#endif
+    fi.color = color_for(vpos_mv, color * v_color);
 	fi.pos = vpos_mv.xyz;
 	gl_Position = proj_matrix * vpos_mv;
 #else // MCM_VOX

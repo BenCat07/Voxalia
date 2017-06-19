@@ -336,6 +336,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                         packet = new DestroyJointPacketIn();
                         usage = NetUsageType.ENTITIES;
                         break;
+                    case ServerToClientPacket.TOPS_DATA:
+                        packet = new TopsDataPacketIn();
+                        usage = NetUsageType.CHUNKS;
+                        break;
                     case ServerToClientPacket.PRIMITIVE_ENTITY_UPDATE:
                         packet = new PrimitiveEntityUpdatePacketIn();
                         usage = NetUsageType.ENTITIES;

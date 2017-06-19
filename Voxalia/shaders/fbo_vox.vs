@@ -51,12 +51,14 @@ void main()
 	f.color = color;
 	f.texcoord = texcoords;
 	f.position = mv_matrix * vec4(position, 1.0);
-	f.tcol = color_for(f.position);
 #if MCM_TH
 	f.thv = thv;
 	f.thw = thw;
 	f.thv2 = thv2;
 	f.thw2 = thw2;
+	f.tcol = vec4(1.0);
+#else
+	f.tcol = color_for(f.position);
 #endif
 	f.position /= f.position.w;
 	gl_Position = proj_matrix * mv_matrix * vec4(position, 1.0);

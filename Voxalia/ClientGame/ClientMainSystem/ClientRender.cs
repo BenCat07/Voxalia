@@ -1272,6 +1272,13 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ch.Render();
                 }
             }
+            if (CVars.r_compute.ValueB && VoxelComputer.TopsChunk != null)
+            {
+                //SysConsole.Output(OutputType.INFO, VoxelComputer.TopsX * Chunk.CHUNK_SIZE + ", " + VoxelComputer.TopsY * Chunk.CHUNK_SIZE);
+                Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.TopsX * Chunk.CHUNK_SIZE - 25 * Chunk.CHUNK_SIZE, VoxelComputer.TopsY * Chunk.CHUNK_SIZE - 25 * Chunk.CHUNK_SIZE, 0);
+                TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
+                VoxelComputer.TopsChunk.Render();
+            }
             /*
             foreach (Chunk ch in TheRegion.LoadedChunks.Values)
             {
