@@ -51,7 +51,6 @@ namespace Voxalia.ServerGame.WorldSystem
             const int sectiontwo = Constants.TOPS_DATA_SIZE * 2;
             const int countter = (Constants.TOPS_DATA_WIDTH / Constants.CHUNK_WIDTH);
             const int top_mod = 25;
-            Vector2i min = new Vector2i(100000, 100000), max = new Vector2i(-100000, -100000);
             for (int x = 0; x < countter; x++)
             {
                 for (int y = 0; y < countter; y++)
@@ -67,10 +66,6 @@ namespace Voxalia.ServerGame.WorldSystem
                             ushort mat = 0;// known_tops.Key == null ? (ushort)0 : Utilities.BytesToUshort(Utilities.BytesPartial(known_tops.Key, inner_ind * 2, 2));
                             int height = 0;// known_tops.Key == null ? 0 : Utilities.BytesToInt(Utilities.BytesPartial(known_tops.Value, inner_ind * 4 + (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * 2, 4));
                             Vector2i absCoord = new Vector2i(relPos.X * Constants.CHUNK_WIDTH + bx * top_mod, relPos.Y * Constants.CHUNK_WIDTH + by * top_mod);
-                            min.X = Math.Min(min.X, absCoord.X);
-                            min.Y = Math.Min(min.Y, absCoord.Y);
-                            max.X = Math.Max(max.X, absCoord.X);
-                            max.Y = Math.Max(max.Y, absCoord.Y);
                             //if (mat == 0 && height == 0)
                             {
                                 height = (int)Generator.GetHeight(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, absCoord.X, absCoord.Y);
@@ -91,7 +86,6 @@ namespace Voxalia.ServerGame.WorldSystem
                     }
                 }
             }
-            SysConsole.Output(OutputType.DEBUG, min + " to " + max);
             return result;
         }
 

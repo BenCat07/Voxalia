@@ -20,6 +20,7 @@
 #define MCM_LIGHTS 0
 #define MCM_SHADOWS 0
 #define MCM_TH 0
+#define MCM_SKY_FOG 0
 
 #if MCM_VOX
 layout (binding = 0) uniform sampler2DArray s;
@@ -115,10 +116,20 @@ float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a
 
 void applyFog()
 {
-	float dist = pow(dot(fi.pos, fi.pos) * fogDist, 0.6);
-	float fogMod = min(dist * exp(fogCol.w) * fogCol.w, 1.5);
-	float fmz = min(fogMod, 1.0);
-	color.xyz = min(color.xyz * (1.0 - fmz) + fogCol.xyz * fmz + vec3(fogMod - fmz), vec3(1.0));
+#if MCM_SKY_FOG
+	float fmza = 1.0 - max(min(fi.pos.z / 1000.0, 1.0), 0.0);
+	color.xyz = min(color.xyz * (1.0 - fmza) + fogCol.xyz * fmza, vec3(1.0));
+#endif
+#if MCM_BRIGHT
+	if (fogCol.w > 1.0)
+#endif
+	{
+		float dist = pow(dot(fi.pos, fi.pos) * fogDist, 0.6);
+		float fogMod = dist * exp(fogCol.w) * fogCol.w;
+		float fmz = min(fogMod, 1.0);
+		fmz *= fmz * fmz * fmz;
+		color.xyz = min(color.xyz * (1.0 - fmz) + fogCol.xyz * fmz, vec3(1.0));
+	}
 }
 
 float fix_sqr(in float inTemp)
@@ -281,6 +292,7 @@ void main()
 	{
 		discard;
 	}
+	col.w = 1.0;
 #else // MCM_NO_ALPHA_CAP
 #if MCM_TRANSP
 	if (col.w * fi.color.w >= 0.99)
@@ -418,10 +430,7 @@ void main()
 #endif // MCM_VOX
 #endif // MCM_TRANSP
 #endif // else - MCM_BRIGHT
-	if (fogCol.w > 1.0)
-	{
-		applyFog();
-	}
+	applyFog();
 #if MCM_INVERSE_FADE
 	float dist = linearizeDepth(gl_FragCoord.z);
 	vec2 fc_xy = gl_FragCoord.xy / screen_size.xy;
