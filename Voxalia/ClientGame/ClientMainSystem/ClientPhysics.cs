@@ -182,7 +182,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Aproximate default sky color.
         /// </summary>
-        public static readonly Location SkyApproxColDefault = new Location(0.1, 0.4, 0.5);
+        public static readonly Location SkyApproxColDefault = new Location(0.5, 0.8, 1.0);
 
         /// <summary>
         /// The current approximate color of the sky.

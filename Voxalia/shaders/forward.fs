@@ -117,7 +117,7 @@ float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a
 void applyFog()
 {
 #if MCM_SKY_FOG
-	float fmza = 1.0 - max(min(fi.pos.z / 1000.0, 1.0), 0.0);
+	float fmza = 1.0 - max(min((fi.pos.z - 1000.0) / 2000.0, 1.0), 0.0);
 	color.xyz = min(color.xyz * (1.0 - fmza) + fogCol.xyz * fmza, vec3(1.0));
 #endif
 #if MCM_BRIGHT

@@ -1234,7 +1234,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * SunLightModDirect), 1));
             View3D.CheckError("Rendering - Sky - Light");
             float zf = ZFar();
-            float spf = 600f;
+            float spf = 3000f;
             Textures.GetTexture("skies/sun").Bind(); // TODO: Store var!
             Matrix4 rot = Matrix4.CreateTranslation(-spf * 0.5f, -spf * 0.5f, 0f)
                 * Matrix4.CreateRotationY((float)((-SunAngle.Pitch - 90f) * Utilities.PI180))
@@ -1243,7 +1243,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Rendering.RenderRectangle(0, 0, spf, spf, rot); // TODO: Adjust scale based on view rad
             View3D.CheckError("Rendering - Sky - Sun");
             Textures.GetTexture("skies/planet_sphere").Bind(); // TODO: Store var!
-            float ppf = 1000f;
+            float ppf = 5000f;
             Rendering.SetColor(new Color4(PlanetLight, PlanetLight, PlanetLight, 1));
             rot = Matrix4.CreateScale(ppf * 0.5f)
                 * Matrix4.CreateTranslation(-ppf * 0.5f, -ppf * 0.5f, 0f)
