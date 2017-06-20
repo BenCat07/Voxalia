@@ -40,12 +40,12 @@ float tex_for(in uint mat)
 
 int mat_for(uvec2 coord)
 {
-	return f_topsdat[(coord.y * 89) + (coord.x)].x;
+	return f_topsdat[(coord.y * 90) + (coord.x)].x;
 }
 
 int height_for(uvec2 coord)
 {
-	return f_topsdat[(coord.y * 89) + (coord.x)].y;
+	return f_topsdat[(coord.y * 90) + (coord.x)].y;
 }
 
 void main()

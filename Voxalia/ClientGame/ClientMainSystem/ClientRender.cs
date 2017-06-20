@@ -1275,7 +1275,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (CVars.r_compute.ValueB && VoxelComputer.TopsChunk != null)
             {
                 const int C_EXTRA = 25;
-                const double C_SUB = (int)(C_EXTRA + C_EXTRA * 0.5);
+                const double C_SUB = C_EXTRA + C_EXTRA / 2;
                 Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.TopsX * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.TopsY * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
                 TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
                 VoxelComputer.TopsChunk.Render();

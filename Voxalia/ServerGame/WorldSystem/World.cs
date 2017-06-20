@@ -309,6 +309,10 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
+            catch (Exception ex)
+            {
+                SysConsole.Output("World crash", ex);
+            }
         }
 
         /// <summary>
