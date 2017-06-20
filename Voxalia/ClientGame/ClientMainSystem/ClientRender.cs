@@ -119,6 +119,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
             return MaximumStraightBlockDistance() * 2;
         }
 
+        public float FogMaxDist()
+        {
+            if (CVars.r_compute.ValueB)
+            {
+                return 2000;
+            }
+            return ZFar();
+        }
+
         /// <summary>
         /// The rendering subsystem for the primary world view.
         /// This is in some situations temporarily swapped for the currently rendering view as needed.

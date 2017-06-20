@@ -982,7 +982,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             CheckError("Render/Fast - Uniforms 3.3");
             GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
             CheckError("Render/Fast - Uniforms 3.5");
-            float fogDist = 1.0f / TheClient.ZFar();
+            float fogDist = 1.0f / TheClient.FogMaxDist();
             fogDist *= fogDist;
             Vector2 zfar_rel = new Vector2(TheClient.CVars.r_znear.ValueF, TheClient.ZFar());
             GL.Uniform1(13, fogDist);
@@ -1840,7 +1840,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform3(8, ClientUtilities.Convert(TheClient.CameraFinalTarget));
             GL.Uniform1(9, TheClient.CVars.r_dof_strength.ValueF);
             GL.Uniform1(10, MainEXP * TheClient.CVars.r_exposure.ValueF);
-            float fogDist = 1.0f / TheClient.ZFar();
+            float fogDist = 1.0f / TheClient.FogMaxDist();
             fogDist *= fogDist;
             Vector2 zfar_rel = new Vector2(TheClient.CVars.r_znear.ValueF, TheClient.ZFar());
             GL.Uniform1(16, fogDist);

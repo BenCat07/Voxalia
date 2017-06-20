@@ -101,6 +101,9 @@ namespace Voxalia.ClientGame.WorldSystem
                 TheClient.s_forw_grass = TheClient.s_forw_grass.Bind();
                 GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
                 GL.Uniform4(12, new Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
+                float fogDist = 1.0f / TheClient.FogMaxDist();
+                fogDist *= fogDist;
+                GL.Uniform1(13, fogDist);
                 GL.Uniform2(14, new Vector2(TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
                 GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
             }
