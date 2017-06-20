@@ -925,6 +925,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 timer.Start();
                 View3D.CheckError("Finish");
+                ec = GL.GetError();
+                while (ec != ErrorCode.NoError)
+                {
+                    SysConsole.Output(OutputType.WARNING, "Unhandled GL error: " + ec);
+                    ec = GL.GetError();
+                }
                 Window.SwapBuffers();
                 if (VR != null)
                 {
@@ -1287,6 +1293,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 const double C_SUB = C_EXTRA + C_EXTRA / 2;
                 Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.TopsX * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.TopsY * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
                 TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
+                GL.Uniform1(8, (float)C_EXTRA);
                 VoxelComputer.TopsChunk.Render();
             }
             if (CVars.r_compute.ValueB && VoxelComputer.Tops2Chunk != null)
@@ -1295,6 +1302,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 const double C_SUB = C_EXTRA + C_EXTRA / 2;
                 Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.Tops2X * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.Tops2Y * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
                 TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
+                GL.Uniform1(8, (float)C_EXTRA);
                 VoxelComputer.Tops2Chunk.Render();
             }
             /*

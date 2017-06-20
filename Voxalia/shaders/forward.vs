@@ -110,8 +110,8 @@ void main()
 	fi.thw = thw;
 	fi.tcol = color_for(vpos_mv, tcol);
 #else
-	fi.thv = vec4(texcoords.w, normal.w, 0.0, 0.0);
-	fi.thw = vec4(position.w, tangent.w, 0.0, 0.0);
+	fi.thv = vec4(abs(position.w), abs(texcoords.w), abs(normal.w), abs(tangent.w));
+	fi.thw = vec4(position.w < 0 ? 0.0 : 1.0, texcoords.w < 0 ? 0.0 : 1.0, normal.w < 0 ? 0.0 : 1.0, tangent.w < 0 ? 0.0 : 1.0);
 	fi.tcol = vec4(1.0);
 #endif
     fi.color = color_for(vpos_mv, color * v_color);
