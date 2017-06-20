@@ -51,6 +51,7 @@ namespace Voxalia.ClientGame.OtherSystems
         public int Program_SLODCombo2;
 
         public int Program_TopsCruncher;
+        public int Program_Tops2Cruncher;
 
         public int Buf_Shapes = 0;
 
@@ -84,7 +85,8 @@ namespace Voxalia.ClientGame.OtherSystems
             }
             Program_SLODCombo1 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_ONE 1\n");
             Program_SLODCombo2 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_TWO 1\n");
-            Program_TopsCruncher = TheClient.Shaders.CompileCompute("vox_topscruncher");
+            Program_TopsCruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 25\n");
+            Program_Tops2Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 125\n");
             View3D.CheckError("Compute - Startup - Shaders");
             float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 7)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
@@ -384,9 +386,13 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public ChunkVBO TopsChunk;
 
-        public void TopsCrunch(byte[] inp)
+        public int Tops2X, Tops2Y;
+
+        public ChunkVBO Tops2Chunk;
+
+        public void TopsCrunch(byte[] inp, byte mode)
         {
-            TopsChunk?.Destroy();
+            (mode == 1 ? TopsChunk : Tops2Chunk)?.Destroy();
             if (!TheClient.CVars.r_compute.ValueB)
             {
                 return;
@@ -416,7 +422,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, i + 1, IBuf[i]);
             }
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, buf);
-            GL.UseProgram(Program_TopsCruncher);
+            GL.UseProgram(mode == 1 ? Program_TopsCruncher : Program_Tops2Cruncher);
             GL.DispatchCompute(1, 9, 1);
             for (int i = 0; i < 8; i++)
             {
@@ -449,7 +455,7 @@ namespace Voxalia.ClientGame.OtherSystems
             GL.EnableVertexAttribArray(3);
             GL.EnableVertexAttribArray(4);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, bufs[0]);
-            TopsChunk = new ChunkVBO()
+            ChunkVBO tv = new ChunkVBO()
             {
                 _IndexVBO = (uint)bufs[0],
                 _VertexVBO = (uint)bufs[1],
@@ -466,6 +472,14 @@ namespace Voxalia.ClientGame.OtherSystems
                 reusable = false,
                 generated = true
             };
+            if (mode == 1)
+            {
+                TopsChunk = tv;
+            }
+            else
+            {
+                Tops2Chunk = tv;
+            }
             GL.BindVertexArray(0);
         }
 

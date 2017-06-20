@@ -123,7 +123,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             if (CVars.r_compute.ValueB)
             {
-                return 2000;
+                return 10000;
             }
             return ZFar();
         }
@@ -1150,7 +1150,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public float GetSecondSkyDistance()
         {
-            return 3500f;
+            return 15000f;
         }
 
         /// <summary>
@@ -1158,7 +1158,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public float GetSkyDistance()
         {
-            return 3000f;
+            return 10000f;
         }
 
         /// <summary>
@@ -1263,7 +1263,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (MainWorldView.FBOid.IsForward())
             {
                 s_forw_vox_slod = s_forw_vox_slod.Bind();
-                GL.Uniform2(14, new Vector2(60f, 5000f));
+                GL.Uniform2(14, new Vector2(60f, 25000f));
             }
             else
             {
@@ -1288,6 +1288,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.TopsX * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.TopsY * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
                 TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
                 VoxelComputer.TopsChunk.Render();
+            }
+            if (CVars.r_compute.ValueB && VoxelComputer.Tops2Chunk != null)
+            {
+                const int C_EXTRA = 125;
+                const double C_SUB = C_EXTRA + C_EXTRA / 2;
+                Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.Tops2X * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.Tops2Y * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
+                TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
+                VoxelComputer.Tops2Chunk.Render();
             }
             /*
             foreach (Chunk ch in TheRegion.LoadedChunks.Values)

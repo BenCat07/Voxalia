@@ -44,20 +44,20 @@ namespace Voxalia.ServerGame.WorldSystem
             return Generator.GetLODSix(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
         }
 
-        public byte[] GetTopsArray(Vector2i chunkPos)
+        public byte[] GetTopsArray(Vector2i chunkPos, int offs, int size_mode)
         {
-            // TODO: Find more logical basis for this system than tops data...? Maybe keep as 'default gen' only.
+            // TODO: Find more logical basis for this system than tops data...? Maybe keep as 'default gen' only... or somehow calculate reasonable but-below-the-top max data from block/chunk average weights...
             byte[] result = new byte[Constants.TOPS_DATA_SIZE * 6];
             const int sectiontwo = Constants.TOPS_DATA_SIZE * 2;
             const int countter = (Constants.TOPS_DATA_WIDTH / Constants.CHUNK_WIDTH);
-            const int top_mod = 25;
+            int top_mod = offs;
             for (int x = 0; x < countter; x++)
             {
                 for (int y = 0; y < countter; y++)
                 {
-                    const int sizer = top_mod;
+                    int sizer = top_mod;
                     Vector2i relPos = new Vector2i(chunkPos.X + x * sizer - sizer - sizer / 2, chunkPos.Y + y * sizer - sizer - sizer / 2);
-                    //KeyValuePair<byte[], byte[]> known_tops = ChunkManager.GetTopsHigher(relPos.X * Constants.CHUNK_WIDTH / top_mod, relPos.Y * Constants.CHUNK_WIDTH / top_mod, 2);
+                    //KeyValuePair<byte[], byte[]> known_tops = ChunkManager.GetTopsHigher(relPos.X * Constants.CHUNK_WIDTH / top_mod, relPos.Y * Constants.CHUNK_WIDTH / top_mod, size_mode);
                     for (int bx = 0; bx < Constants.CHUNK_WIDTH; bx++)
                     {
                         for (int by = 0; by < Constants.CHUNK_WIDTH; by++)

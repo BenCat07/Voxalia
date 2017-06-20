@@ -20,14 +20,15 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {
     class TopsDataPacketOut: AbstractPacketOut
     {
-        public TopsDataPacketOut(Vector2i chunk_center, byte[] bdata)
+        public TopsDataPacketOut(Vector2i chunk_center, byte mode, byte[] bdata)
         {
             UsageType = NetUsageType.CHUNKS;
             ID = ServerToClientPacket.TOPS_DATA;
-            byte[] res = new byte[bdata.Length + 8];
+            byte[] res = new byte[bdata.Length + 8 + 1];
             Utilities.IntToBytes(chunk_center.X).CopyTo(res, 0);
             Utilities.IntToBytes(chunk_center.Y).CopyTo(res, 4);
-            bdata.CopyTo(res, 8);
+            res[8] = mode;
+            bdata.CopyTo(res, 9);
             Data = res;
         }
     }

@@ -925,8 +925,10 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             Vector3i cpos = TheRegion.ChunkLocFor(GetPosition());
             Vector2i flat = new Vector2i(cpos.X, cpos.Y);
-            byte[] toper = TheRegion.GetTopsArray(flat);
-            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, FileHandler.Compress(toper)));
+            byte[] toper = TheRegion.GetTopsArray(flat, 25, 2);
+            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, FileHandler.Compress(toper)));
+            byte[] toper2 = TheRegion.GetTopsArray(flat, 125, 3);
+            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, FileHandler.Compress(toper2)));
         }
         
         /// <summary>

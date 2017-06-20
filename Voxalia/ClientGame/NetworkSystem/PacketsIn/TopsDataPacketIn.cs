@@ -21,18 +21,32 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
     {
         public override bool ParseBytesAndExecute(byte[] data)
         {
-            if (data.Length < 8)
+            if (data.Length < 9)
             {
                 return false;
             }
             int x = Utilities.BytesToInt(Utilities.BytesPartial(data, 0, 4));
             int y = Utilities.BytesToInt(Utilities.BytesPartial(data, 4, 4));
-            byte[] dat = new byte[data.Length - 8];
-            Array.Copy(data, 8, dat, 0, dat.Length);
+            byte mode = data[8];
+            byte[] dat = new byte[data.Length - 9];
+            Array.Copy(data, 9, dat, 0, dat.Length);
             dat = FileHandler.Uncompress(dat);
-            TheClient.VoxelComputer.TopsX = x;
-            TheClient.VoxelComputer.TopsY = y;
-            TheClient.VoxelComputer.TopsCrunch(dat);
+            if (mode == 1)
+            {
+                TheClient.VoxelComputer.TopsX = x;
+                TheClient.VoxelComputer.TopsY = y;
+            }
+            else if (mode == 2)
+            {
+                TheClient.VoxelComputer.Tops2X = x;
+                TheClient.VoxelComputer.Tops2Y = y;
+            }
+            else
+            {
+                // Ignore unimplemented alternate sizes.
+                return true;
+            }
+            TheClient.VoxelComputer.TopsCrunch(dat, mode);
             return true;
         }
     }
