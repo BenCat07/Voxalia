@@ -274,9 +274,11 @@ void main()
 	}
 	//vec2 modder = vec2(fi.texcoord.x - 0.5, fi.texcoord.y - 0.5);
 	float multo = 1.0;//dot(modder, modder);
-	col.xyz += multo * fi.thw.x * texture(s, vec3(fi.texcoord.xy, fi.thv.x)).xyz;
-	col.xyz += multo * fi.thw.y * texture(s, vec3(fi.texcoord.xy, fi.thv.y)).xyz;
-	col.xyz /= 1.0 + multo * fi.thw.x + multo * fi.thw.y;
+	vec3 tempCol = vec3(0.0);
+	tempCol += multo * fi.thw.x * texture(s, vec3(fi.texcoord.xy, fi.thv.x)).xyz;
+	tempCol += multo * fi.thw.y * texture(s, vec3(fi.texcoord.xy, fi.thv.y)).xyz;
+	float influ = multo * fi.thw.x + multo * fi.thw.y;
+	col.xyz = col.xyz * (1.0 - influ) + tempCol;
 #if MCM_LIGHTS
 	vec4 hintter = texture(htex, fi.texcoord);
 	float specularStrength = max(hintter.x, extra_specular);
