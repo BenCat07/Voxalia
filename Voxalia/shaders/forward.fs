@@ -54,10 +54,9 @@ in struct vox_fout
 #if MCM_VOX
 	vec3 texcoord;
 	vec4 tcol;
-#if MCM_TH
-	vec4 thv; // TODO: Implement!
+	vec4 thv;
 	vec4 thw;
-#endif
+	// TODO: thv2, thw2
 #else
 #if MCM_GEOM_ACTIVE
 	vec3 texcoord;
@@ -273,6 +272,11 @@ void main()
 	{
 		col *= fi.tcol;
 	}
+	//vec2 modder = vec2(fi.texcoord.x - 0.5, fi.texcoord.y - 0.5);
+	float multo = 1.0;//dot(modder, modder);
+	col.xyz += multo * fi.thw.x * texture(s, vec3(fi.texcoord.xy, fi.thv.x)).xyz;
+	col.xyz += multo * fi.thw.y * texture(s, vec3(fi.texcoord.xy, fi.thv.y)).xyz;
+	col.xyz /= 1.0 + multo * fi.thw.x + multo * fi.thw.y;
 #if MCM_LIGHTS
 	vec4 hintter = texture(htex, fi.texcoord);
 	float specularStrength = max(hintter.x, extra_specular);

@@ -17,10 +17,10 @@
 #define MCM_TH 0
 #define MCM_GEOM_THREED_TEXTURE 0
 
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec3 normal;
-layout (location = 2) in vec3 texcoords;
-layout (location = 3) in vec3 tangent;
+layout (location = 0) in vec4 position;
+layout (location = 1) in vec4 normal;
+layout (location = 2) in vec4 texcoords;
+layout (location = 3) in vec4 tangent;
 layout (location = 4) in vec4 color;
 #if MCM_VOX
 layout (location = 5) in vec4 tcol;
@@ -52,10 +52,8 @@ out struct vox_fout
 #if MCM_VOX
 	vec3 texcoord;
 	vec4 tcol;
-#if MCM_TH
 	vec4 thv;
 	vec4 thw;
-#endif
 #else
 #if MCM_GEOM_THREED_TEXTURE
 	vec3 texcoord;
@@ -100,11 +98,11 @@ void main()
 	mv_mat_simple[3][1] = 0.0;
 	mv_mat_simple[3][2] = 0.0;
 #if MCM_VOX
-	vec4 vpos = vec4(position, 1.0);
-	fi.texcoord = texcoords;
-	vec3 tf_normal = (mv_mat_simple * vec4(normal, 0.0)).xyz;
-	vec3 tf_tangent = (mv_mat_simple * vec4(tangent, 0.0)).xyz;
-	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent, normal), 0.0)).xyz;
+	vec4 vpos = vec4(position.xyz, 1.0);
+	fi.texcoord = texcoords.xyz;
+	vec3 tf_normal = (mv_mat_simple * vec4(normal.xyz, 0.0)).xyz;
+	vec3 tf_tangent = (mv_mat_simple * vec4(tangent.xyz, 0.0)).xyz;
+	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent.xyz, normal.xyz), 0.0)).xyz;
 	fi.tbn = transpose(mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
 	vec4 vpos_mv = mv_matrix * vpos;
 #if MCM_TH
@@ -112,6 +110,8 @@ void main()
 	fi.thw = thw;
 	fi.tcol = color_for(vpos_mv, tcol);
 #else
+	fi.thv = vec4(texcoords.w, normal.w, 0.0, 0.0);
+	fi.thw = vec4(position.w, tangent.w, 0.0, 0.0);
 	fi.tcol = vec4(1.0);
 #endif
     fi.color = color_for(vpos_mv, color * v_color);
@@ -120,14 +120,14 @@ void main()
 #else // MCM_VOX
 #if MCM_GEOM_ACTIVE
 #if MCM_GEOM_THREED_TEXTURE
-	f.texcoord = texcoords;
+	f.texcoord = texcoords.xyz;
 #else
 	f.texcoord = texcoords.xy;
 #endif
-	vec4 normo = mv_mat_simple * vec4(normal, 1.0);
+	vec4 normo = mv_mat_simple * vec4(normal.xyz, 1.0);
 	f.tbn = transpose(mat3(vec3(0.0), vec3(0.0), normo.xyz)); // TODO: Improve for decals?!
 	f.color = color * v_color;
-	gl_Position = mv_matrix * vec4(position, 1.0);
+	gl_Position = mv_matrix * vec4(position.xyz, 1.0);
 #else // MCM_GEOM_ACTIVE
 	vec4 pos1;
 	vec4 norm1;
@@ -149,13 +149,13 @@ void main()
 		BT += boneTrans[int(BoneID2[2])] * Weights2[2];
 		BT += boneTrans[int(BoneID2[3])] * Weights2[3];
 		BT += mat4(1.0) * (1.0 - rem);
-		pos1 = vec4(position, 1.0) * BT;
-		norm1 = vec4(normal, 1.0) * BT;
+		pos1 = vec4(position.xyz, 1.0) * BT;
+		norm1 = vec4(normal.xyz, 1.0) * BT;
 	}
 	else
 	{
-		pos1 = vec4(position, 1.0);
-		norm1 = vec4(normal, 1.0);
+		pos1 = vec4(position.xyz, 1.0);
+		norm1 = vec4(normal.xyz, 1.0);
 	}
 	pos1 *= simplebone_matrix;
 	norm1 *= simplebone_matrix;
@@ -165,8 +165,8 @@ void main()
 	fi.pos = posser.xyz;
 	gl_Position = proj_matrix * posser;
 	vec3 tf_normal = (mv_mat_simple * vec4(norm1.xyz, 0.0)).xyz; // TODO: Should BT be here?
-	vec3 tf_tangent = (mv_mat_simple * vec4(tangent, 0.0)).xyz; // TODO: Should BT be here?
-	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent, norm1.xyz), 0.0)).xyz; // TODO: Should BT be here?
+	vec3 tf_tangent = (mv_mat_simple * vec4(tangent.xyz, 0.0)).xyz; // TODO: Should BT be here?
+	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent.xyz, norm1.xyz), 0.0)).xyz; // TODO: Should BT be here?
 	fi.tbn = transpose(mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
 #endif // else - MCM_GEOM_ACTIVE
 #endif // else - MCM_VOX

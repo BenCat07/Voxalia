@@ -59,6 +59,14 @@ void main()
 		int xp_hei = height_for(gl_GlobalInvocationID.xy + ivec2(1, 0));
 		int yp_hei = height_for(gl_GlobalInvocationID.xy + ivec2(0, 1));
 		int pp_hei = height_for(gl_GlobalInvocationID.xy + ivec2(1, 1));
+		int xp_mat = mat_for(gl_GlobalInvocationID.xy + ivec2(1, 0));
+		int yp_mat = mat_for(gl_GlobalInvocationID.xy + ivec2(0, 1));
+		int xm_mat = mat_for(gl_GlobalInvocationID.xy + ivec2(-1, 0));
+		int ym_mat = mat_for(gl_GlobalInvocationID.xy + ivec2(0, -1));
+		float texter_xp = tex_for(uint(xp_mat));
+		float texter_xm = tex_for(uint(xm_mat));
+		float texter_yp = tex_for(uint(yp_mat));
+		float texter_ym = tex_for(uint(ym_mat));
 		for (int i = 0; i < 6; i++)
 		{
 			f_indices[c_ind + i] = c_ind + i;
@@ -74,17 +82,22 @@ void main()
 			yp_hei -= 100000;
 			pp_hei -= 100000;
 		}
+		// 0,0  :  1,0  :  1,1 - xp ym
+		// 0,0  :  1,1  :  0,1 - xm yp
+		// -----------------------
+		// 0,ym : xp,ym : xp,0
+		// xm,0 : 0,yp  : xm,yp
 		f_position[c_ind + 2] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, float(c_hei), 0.0);
-		f_position[c_ind + 1] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M, float(xp_hei), 0.0);
-		f_position[c_ind + 0] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, float(pp_hei), 0.0);
-		f_position[c_ind + 5] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, float(c_hei), 0.0);
+		f_position[c_ind + 1] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M, float(xp_hei), 1.0);
+		f_position[c_ind + 0] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, float(pp_hei), 1.0);
+		f_position[c_ind + 5] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, float(c_hei), 1.0);
 		f_position[c_ind + 4] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, float(pp_hei), 0.0);
-		f_position[c_ind + 3] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M + S_M, float(yp_hei), 0.0);
-		vec4 norm_a = vec4(normalize(cross(vec3(1.0, 0.0, float(xp_hei - c_hei)), vec3(1.0, 1.0, float(pp_hei - c_hei)))), 0.0);
+		f_position[c_ind + 3] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M + S_M, float(yp_hei), 1.0);
+		vec4 norm_a = vec4(normalize(cross(vec3(1.0, 0.0, float(xp_hei - c_hei)), vec3(1.0, 1.0, float(pp_hei - c_hei)))), texter_ym);
 		f_normal[c_ind + 0] = norm_a;
 		f_normal[c_ind + 1] = norm_a;
 		f_normal[c_ind + 2] = norm_a;
-		vec4 norm_b = vec4(normalize(cross(vec3(1.0, 1.0, float(pp_hei - c_hei)), vec3(0.0, 1.0, float(yp_hei - c_hei)))), 0.0);
+		vec4 norm_b = vec4(normalize(cross(vec3(1.0, 1.0, float(pp_hei - c_hei)), vec3(0.0, 1.0, float(yp_hei - c_hei)))), texter_yp);
 		f_normal[c_ind + 3] = norm_b;
 		f_normal[c_ind + 4] = norm_b;
 		f_normal[c_ind + 5] = norm_b;
@@ -93,23 +106,23 @@ void main()
 		vec3 dt1_a = vec3(1.0, 0.0, 0.0);
 		vec3 dt2_a = vec3(1.0, 1.0, 0.0);
 		vec3 tng_a = normalize((dv1_a * dt2_a.y - dv2_a * dt1_a.y) / (dt1_a.x * dt2_a.y - dt1_a.y * dt2_a.x));
+		f_tangent[c_ind + 2] = vec4(tng_a, 1.0);
+		f_tangent[c_ind + 1] = vec4(tng_a, 1.0);
 		f_tangent[c_ind + 0] = vec4(tng_a, 0.0);
-		f_tangent[c_ind + 1] = vec4(tng_a, 0.0);
-		f_tangent[c_ind + 2] = vec4(tng_a, 0.0);
 		vec3 dv1_b = vec3(1.0, 1.0, float(pp_hei - c_hei));
 		vec3 dv2_b = vec3(0.0, 1.0, float(yp_hei - c_hei));
 		vec3 dt1_b = vec3(1.0, 1.0, 0.0);
 		vec3 dt2_b = vec3(0.0, 1.0, 0.0);
 		vec3 tng_b = normalize((dv1_b * dt2_b.y - dv2_b * dt1_b.y) / (dt1_b.x * dt2_b.y - dt1_b.y * dt2_b.x));
-		f_tangent[c_ind + 3] = vec4(tng_b, 0.0);
-		f_tangent[c_ind + 4] = vec4(tng_b, 0.0);
 		f_tangent[c_ind + 5] = vec4(tng_b, 0.0);
+		f_tangent[c_ind + 4] = vec4(tng_b, 1.0);
+		f_tangent[c_ind + 3] = vec4(tng_b, 1.0);
 		const float tex_help = float(TOPS_WIDTH);
-		f_texcoord[c_ind + 0] = vec4(0.0, 0.0, texter, 0.0);
-		f_texcoord[c_ind + 1] = vec4(tex_help, 0.0, texter, 0.0);
-		f_texcoord[c_ind + 2] = vec4(tex_help, tex_help, texter, 0.0);
-		f_texcoord[c_ind + 3] = vec4(0.0, 0.0, texter, 0.0);
-		f_texcoord[c_ind + 4] = vec4(tex_help, tex_help, texter, 0.0);
-		f_texcoord[c_ind + 5] = vec4(0.0, tex_help, texter, 0.0);
+		f_texcoord[c_ind + 0] = vec4(0.0, 0.0, texter, texter_xp);
+		f_texcoord[c_ind + 1] = vec4(tex_help, 0.0, texter, texter_xp);
+		f_texcoord[c_ind + 2] = vec4(tex_help, tex_help, texter, texter_xp);
+		f_texcoord[c_ind + 3] = vec4(0.0, 0.0, texter, texter_xm);
+		f_texcoord[c_ind + 4] = vec4(tex_help, tex_help, texter, texter_xm);
+		f_texcoord[c_ind + 5] = vec4(0.0, tex_help, texter, texter_xm);
 	}
 }
