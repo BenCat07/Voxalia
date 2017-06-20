@@ -110,7 +110,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             public Vector2[] TCs;
         }
 
-        public void Render(double mind, double maxd)
+        public void Render(double mind, double maxd, bool outview = false)
         {
             View3D.CheckError("Rendering - Particles - Pre");
             if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP || TheClient.MainWorldView.FBOid.IsMainTransp()
@@ -230,7 +230,8 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
                 {
                     TheClient.s_forw_particles = TheClient.s_forw_particles.Bind();
-                    GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
+                    Matrix4 mat = outview ? TheClient.MainWorldView.OutViewMatrix : TheClient.MainWorldView.PrimaryMatrix;
+                    GL.UniformMatrix4(1, false, ref mat);
                 }
                 else if (TheClient.MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
                 {
@@ -263,7 +264,8 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     }
                     GL.ActiveTexture(TextureUnit.Texture1);
                     GL.BindTexture(TextureTarget.Texture2D, TheClient.MainWorldView.RS4P.DepthTexture);
-                    GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
+                    Matrix4 mat = outview ? TheClient.MainWorldView.OutViewMatrix : TheClient.MainWorldView.PrimaryMatrix;
+                    GL.UniformMatrix4(1, false, ref mat);
                 }
                 View3D.CheckError("Rendering - Particles - 1");
                 Matrix4 ident = Matrix4.Identity;

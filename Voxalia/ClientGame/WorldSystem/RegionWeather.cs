@@ -41,6 +41,26 @@ namespace Voxalia.ClientGame.WorldSystem
                     }
                 }
             }
+            if (TheClient.CVars.r_extraclouds.ValueB)
+            {
+                while (Clouds.Count < 1000)
+                {
+                    Location cloudPos = TheClient.Player.GetPosition() + new Location(Utilities.UtilRandom.NextDouble() - 0.5, Utilities.UtilRandom.NextDouble() - 0.5, 0) * 10000.0;
+                    cloudPos.Z = 100.0;
+                    if (Math.Max(Math.Abs(cloudPos.SmallestValue()), Math.Abs(cloudPos.BiggestValue())) < 500f)
+                    {
+                        continue;
+                    }
+                    Cloud cld = new Cloud(this, cloudPos) { CID = -1024 };
+                    double size = Utilities.UtilRandom.NextDouble() * 16 + 16;
+                    cld.EndSizes.Add((float)size);
+                    cld.Sizes.Add((float)size);
+                    cld.Points.Add(new Location(0, 0, 0));
+                    cld.Velocity = new Location(0, 0, 0);
+                    Clouds.Add(cld);
+                    SysConsole.Output(OutputType.DEBUG, "Spawned cloud at " + cloudPos);
+                }
+            }
         }
         
         public List<Cloud> Clouds = new List<Cloud>();

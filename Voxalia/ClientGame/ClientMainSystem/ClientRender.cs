@@ -1319,6 +1319,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ch.Render();
                 }
             }*/
+            // TODO: Very distant clouds? new ParticlesEntity(TheRegion) { DistMin = 100, DistMax = TEMP_PARTICLE_MAXRANGE, OutView = true }.Render();
             View3D.CheckError("Rendering - Sky - Slods");
             SetEnts();
             if (MainWorldView.FBOid.IsForward())
@@ -1842,6 +1843,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
             public double DistMax;
 
+            public bool OutView = false;
+
             public ParticlesEntity(Region tregion)
                 : base(tregion, false, false)
             {
@@ -1853,7 +1856,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.ActiveTexture(TextureUnit.Texture1);
                 TheClient.Textures.NormalDef.Bind();
                 GL.ActiveTexture(TextureUnit.Texture0);
-                TheClient.Particles.Engine.Render(DistMin, DistMax);
+                TheClient.Particles.Engine.Render(DistMin, DistMax, OutView);
                 GL.ActiveTexture(TextureUnit.Texture1);
                 TheClient.Textures.NormalDef.Bind();
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -1930,6 +1933,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        const double TEMP_PARTICLE_MAXRANGE = 100000; // TODO: CVar!
+
         void AddParticles(List<Entity> entsRender)
         {
             if (CVars.r_particles.ValueB)
@@ -1945,7 +1950,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 7, DistMax = 12 });
                 entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 12, DistMax = 20 });
                 entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 20, DistMax = 40 });
-                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 40, DistMax = 100 }); // TODO: 100 -> particles view render distance!
+                entsRender.Add(new ParticlesEntity(TheRegion) { DistMin = 40, DistMax = 100 });
             }
         }
 
