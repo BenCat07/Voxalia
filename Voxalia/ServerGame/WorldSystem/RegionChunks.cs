@@ -50,13 +50,16 @@ namespace Voxalia.ServerGame.WorldSystem
             const int sectiontwo = Constants.TOPS_DATA_SIZE * 2;
             const int countter = (Constants.TOPS_DATA_WIDTH / Constants.CHUNK_WIDTH);
             const int top_mod = 25;
+            int max = 0;
+            Vector2i abscrd = Vector2i.Zero;
             for (int x = 0; x < countter; x++)
             {
                 for (int y = 0; y < countter; y++)
                 {
                     const int sizer = top_mod;
-                    Vector2i relPos = new Vector2i(chunkPos.X + x - sizer, chunkPos.Y + y - sizer);
-                    KeyValuePair<byte[], byte[]> known_tops = ChunkManager.GetTopsHigher(relPos.X, relPos.Y, 2);
+                    Vector2i relPos = new Vector2i(chunkPos.X + x * sizer - sizer, chunkPos.Y + y * sizer - sizer);
+                    KeyValuePair<byte[], byte[]> known_tops = new KeyValuePair<byte[], byte[]>(null, null);// ChunkManager.GetTopsHigher(relPos.X * Constants.CHUNK_WIDTH / top_mod, relPos.Y * Constants.CHUNK_WIDTH / top_mod, 2);
+                    SysConsole.Output(OutputType.DEBUG, "Scan: " + relPos.ToLocation() * Constants.CHUNK_WIDTH);
                     for  (int bx = 0; bx < Constants.CHUNK_WIDTH; bx++)
                     {
                         for (int by = 0; by < Constants.CHUNK_WIDTH; by++)
@@ -64,9 +67,9 @@ namespace Voxalia.ServerGame.WorldSystem
                             int inner_ind = by * Constants.CHUNK_WIDTH + bx;
                             ushort mat = known_tops.Key == null ? (ushort)0 : Utilities.BytesToUshort(Utilities.BytesPartial(known_tops.Key, inner_ind * 2, 2));
                             int height = known_tops.Key == null ? 0 : Utilities.BytesToInt(Utilities.BytesPartial(known_tops.Value, inner_ind * 4 + (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * 2, 4));
+                            Vector2i absCoord = new Vector2i(relPos.X * Constants.CHUNK_WIDTH + bx * top_mod, relPos.Y * Constants.CHUNK_WIDTH + by * top_mod);
                             if (mat == 0 && height == 0)
                             {
-                                Vector2i absCoord = new Vector2i(relPos.X * Constants.CHUNK_WIDTH + bx * top_mod, relPos.Y * Constants.CHUNK_WIDTH + by * top_mod);
                                 height = (int)Generator.GetHeight(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, absCoord.X, absCoord.Y);
                                 Biome b = Generator.GetBiomeGen().BiomeFor(TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, absCoord.X, absCoord.Y, height, height);
                                 if (height > 0)
@@ -81,10 +84,16 @@ namespace Voxalia.ServerGame.WorldSystem
                             int idder = (y * Constants.CHUNK_WIDTH + by) * (Constants.CHUNK_WIDTH * countter) + (x * Constants.CHUNK_WIDTH + bx);
                             Utilities.UshortToBytes(mat).CopyTo(result, idder * 2);
                             Utilities.IntToBytes(height).CopyTo(result, sectiontwo + idder * 4);
+                            if (height > max)
+                            {
+                                max = height;
+                                abscrd = absCoord;
+                            }
                         }
                     }
                 }
             }
+            SysConsole.Output(OutputType.DEBUG, max + " " + abscrd);
             return result;
         }
 
