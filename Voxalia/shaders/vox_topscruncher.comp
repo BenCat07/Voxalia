@@ -104,11 +104,12 @@ void main()
 		f_tangent[c_ind + 3] = vec4(tng_b, 0.0);
 		f_tangent[c_ind + 4] = vec4(tng_b, 0.0);
 		f_tangent[c_ind + 5] = vec4(tng_b, 0.0);
+		const float tex_help = float(TOPS_WIDTH);
 		f_texcoord[c_ind + 0] = vec4(0.0, 0.0, texter, 0.0);
-		f_texcoord[c_ind + 1] = vec4(1.0, 0.0, texter, 0.0);
-		f_texcoord[c_ind + 2] = vec4(1.0, 1.0, texter, 0.0);
+		f_texcoord[c_ind + 1] = vec4(tex_help, 0.0, texter, 0.0);
+		f_texcoord[c_ind + 2] = vec4(tex_help, tex_help, texter, 0.0);
 		f_texcoord[c_ind + 3] = vec4(0.0, 0.0, texter, 0.0);
-		f_texcoord[c_ind + 4] = vec4(1.0, 1.0, texter, 0.0);
-		f_texcoord[c_ind + 5] = vec4(0.0, 1.0, texter, 0.0);
+		f_texcoord[c_ind + 4] = vec4(tex_help, tex_help, texter, 0.0);
+		f_texcoord[c_ind + 5] = vec4(0.0, tex_help, texter, 0.0);
 	}
 }
