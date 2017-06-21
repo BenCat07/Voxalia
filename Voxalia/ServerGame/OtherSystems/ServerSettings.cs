@@ -85,6 +85,8 @@ namespace Voxalia.ServerGame.OtherSystems
 
         public int MaxLODRenderDistance;
 
+        public bool TreesInDistance;
+
         public FDSSection Section;
 
         public void LoadFromSection(Server tserver, FDSSection sect)
@@ -101,6 +103,8 @@ namespace Voxalia.ServerGame.OtherSystems
                 FDSSection players = sect.GetSection("players") ?? new FDSSection();
                 MaxRenderDistance = players.GetInt("max_render_distance", tserver == null ? 6 : tserver.Settings.WorldDefault.MaxRenderDistance).Value;
                 MaxLODRenderDistance = players.GetInt("max_lod_render_distance", tserver == null ? 20 : tserver.Settings.WorldDefault.MaxLODRenderDistance).Value;
+                FDSSection debug = sect.GetSection("debug") ?? new FDSSection();
+                TreesInDistance = debug.GetString("trees_in_distance", tserver == null ? "false" : (tserver.Settings.WorldDefault.TreesInDistance ? "true" : "false")) == "true";
             }
             catch (Exception ex)
             {

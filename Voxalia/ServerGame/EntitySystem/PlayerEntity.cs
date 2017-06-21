@@ -36,6 +36,11 @@ namespace Voxalia.ServerGame.EntitySystem
     /// </summary>
     public class PlayerEntity: HumanoidEntity
     {
+        public bool ShouldNetworkAnyway(Entity e)
+        {
+            return e is PhysicsEntity p && p.GenBlockShadow;
+        }
+
         /// <summary>
         /// The player's current session key that they used to connect.
         /// Only useful during the login sequence.

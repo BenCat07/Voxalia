@@ -998,6 +998,24 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(13, fogDist);
             GL.Uniform2(14, zfar_rel);
             TheClient.Rendering.SetColor(Color4.White);
+            TheClient.s_forwt_nofog.Bind();
+            CheckError("Render/Fast - Uniforms 4");
+            GL.UniformMatrix4(1, false, ref PrimaryMatrix);
+            GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, fogDist);
+            GL.Uniform2(14, zfar_rel);
+            TheClient.Rendering.SetColor(Color4.White);
+            TheClient.s_forwt_obj.Bind();
+            CheckError("Render/Fast - Uniforms 4");
+            GL.UniformMatrix4(1, false, ref PrimaryMatrix);
+            GL.UniformMatrix4(2, false, ref IdentityMatrix);
+            GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
+            GL.Uniform4(12, new Vector4(ClientUtilities.Convert(FogCol), FogAlpha));
+            GL.Uniform1(13, fogDist);
+            GL.Uniform2(14, zfar_rel);
+            TheClient.Rendering.SetColor(Color4.White);
             TheClient.s_forw_vox.Bind();
             if (TheClient.CVars.r_forward_lights.ValueB)
             {

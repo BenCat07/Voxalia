@@ -414,6 +414,11 @@ namespace Voxalia.ClientGame.EntitySystem
             model.Draw(); // TODO: Animation?
         }
 
+        public override void RenderWithOffsetLOD(Location pos)
+        {
+            model.DrawLOD(GetPosition() + pos + ClientUtilities.ConvertD(transform.ExtractTranslation()));
+        }
+
         /// <summary>
         /// General entity render.
         /// </summary>
@@ -435,6 +440,7 @@ namespace Voxalia.ClientGame.EntitySystem
             double distsq = GetPosition().DistanceSquared(TheClient.MainWorldView.RenderRelative);
             if (distsq > maxr * maxr)
             {
+                // TODO: Rotation?
                 model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()));
                 return;
             }

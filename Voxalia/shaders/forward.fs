@@ -21,6 +21,7 @@
 #define MCM_SHADOWS 0
 #define MCM_TH 0
 #define MCM_SKY_FOG 0
+#define MCM_ANTI_TRANSP 0
 
 #if MCM_VOX
 layout (binding = 0) uniform sampler2DArray s;
@@ -312,7 +313,9 @@ void main()
 	{
 		discard;
 	}
+#if MCM_ANTI_TRANSP
 	col.w = 1.0;
+#endif
 #else // MCM_NO_ALPHA_CAP
 #if MCM_TRANSP
 	if (col.w * fi.color.w >= 0.99)

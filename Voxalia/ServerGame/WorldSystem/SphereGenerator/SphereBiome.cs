@@ -31,5 +31,10 @@ namespace Voxalia.ServerGame.WorldSystem.SphereGenerator
         {
             return Material.AIR;
         }
+
+        public override bool LikelyToHaveTrees()
+        {
+            return false;
+        }
     }
 }

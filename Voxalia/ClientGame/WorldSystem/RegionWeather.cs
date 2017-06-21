@@ -58,11 +58,10 @@ namespace Voxalia.ClientGame.WorldSystem
                     cld.Points.Add(new Location(0, 0, 0));
                     cld.Velocity = new Location(0, 0, 0);
                     Clouds.Add(cld);
-                    SysConsole.Output(OutputType.DEBUG, "Spawned cloud at " + cloudPos);
                 }
             }
         }
         
-        public List<Cloud> Clouds = new List<Cloud>();
+        public List<Cloud> Clouds = new List<Cloud>(1024);
     }
 }

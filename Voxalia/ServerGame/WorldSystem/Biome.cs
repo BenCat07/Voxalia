@@ -25,5 +25,7 @@ namespace Voxalia.ServerGame.WorldSystem
         public abstract Material GetZeroOrLowerMat();
 
         public abstract Material GetAboveZeromat();
+
+        public abstract bool LikelyToHaveTrees();
     }
 }

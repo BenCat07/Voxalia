@@ -287,7 +287,7 @@ namespace Voxalia.ServerGame.EntitySystem
                     {
                         continue;
                     }
-                    bool shouldseec = player.ShouldSeePosition(pos);
+                    bool shouldseec = player.ShouldSeePosition(pos) || player.ShouldNetworkAnyway(this);
                     bool shouldseel = player.Known.Contains(EID); // player.ShouldSeePositionPreviously(lPos) && wasEverVis;
                     if (shouldseec && !shouldseel)
                     {

@@ -38,6 +38,11 @@ namespace Voxalia.ClientGame.EntitySystem
         public long EID;
 
         /// <summary>
+        /// Whether this entity can render at excessive distances.
+        /// </summary>
+        public bool CanDistanceRender = false;
+
+        /// <summary>
         /// Whether this entity should tick.
         /// </summary>
         public readonly bool Ticks;
@@ -57,6 +62,11 @@ namespace Voxalia.ClientGame.EntitySystem
         public virtual void RenderForMap()
         {
             // Do nothing by default.
+        }
+
+        public virtual void RenderWithOffsetLOD(Location pos)
+        {
+            Render();
         }
 
         /// <summary>

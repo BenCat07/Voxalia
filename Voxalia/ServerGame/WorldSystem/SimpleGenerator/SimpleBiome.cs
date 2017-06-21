@@ -55,5 +55,10 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         {
             return SurfaceBlock();
         }
+
+        public override bool LikelyToHaveTrees()
+        {
+            return true;
+        }
     }
 }

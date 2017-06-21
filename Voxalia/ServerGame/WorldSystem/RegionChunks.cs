@@ -51,6 +51,7 @@ namespace Voxalia.ServerGame.WorldSystem
             const int sectiontwo = Constants.TOPS_DATA_SIZE * 2;
             const int countter = (Constants.TOPS_DATA_WIDTH / Constants.CHUNK_WIDTH);
             int top_mod = offs;
+            int treesGenned = 0;
             for (int x = 0; x < countter; x++)
             {
                 for (int y = 0; y < countter; y++)
@@ -77,6 +78,21 @@ namespace Voxalia.ServerGame.WorldSystem
                                 else
                                 {
                                     mat = (ushort)b.GetZeroOrLowerMat();
+                                }
+                                // TODO: less weird tree placement helper
+                                if (TheWorld.Settings.TreesInDistance && b.LikelyToHaveTrees() && treesGenned < 200 && Utilities.UtilRandom.Next(20) == 0)
+                                {
+                                    Location treePos = new Location(absCoord.X, absCoord.Y, height);
+                                    Vector3i TreeChunkPos = ChunkLocFor(treePos);
+                                    if (GetChunk(TreeChunkPos) == null && GetEntitiesInRadius(treePos, 30).Count == 0)
+                                    {
+                                        double treex = Utilities.UtilRandom.NextDouble() * 30.0 - 15.0;
+                                        double treey = Utilities.UtilRandom.NextDouble() * 30.0 - 15.0;
+                                        Location treeResult = new Location(absCoord.X + treex, absCoord.Y + treey, height + 10.0);
+                                        SpawnTree("treevox01", treeResult, null);
+                                        SysConsole.Output(OutputType.DEBUG, "Tree at " + treeResult);
+                                        treesGenned++;
+                                    }
                                 }
                             }
                             int idder = (y * Constants.CHUNK_WIDTH + by) * (Constants.CHUNK_WIDTH * countter) + (x * Constants.CHUNK_WIDTH + bx);

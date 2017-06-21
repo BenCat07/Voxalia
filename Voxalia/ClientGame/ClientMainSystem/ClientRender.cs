@@ -282,7 +282,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 + (CVars.r_forward_shadows.ValueB ? ",MCM_SHADOWS" : "");
             s_forw = Shaders.GetShader("forward" + def + forw_extra);
             s_forw_nobones = Shaders.GetShader("forward" + def + ",MCM_NO_BONES" + forw_extra);
-            s_forw_vox_slod = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_NO_ALPHA_CAP" + forw_extra);
+            s_forw_vox_slod = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_NO_ALPHA_CAP,MCM_ANTI_TRANSP" + forw_extra);
             s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TH" + forw_extra);
             s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);
             s_forw_trans_nobones = Shaders.GetShader("forward" + def + ",MCM_TRANSP,MCM_NO_BONES" + forw_extra);
@@ -307,6 +307,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_forw_particles = Shaders.GetShader("forward" + def + ",MCM_GEOM_ACTIVE,MCM_TRANSP,MCM_BRIGHT,MCM_NO_ALPHA_CAP,MCM_FADE_DEPTH" + forw_extra + "?particles");
             s_fbodecal = Shaders.GetShader("fbo" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE,MCM_PRETTY?decal");
             s_forwdecal = Shaders.GetShader("forward" + def + ",MCM_INVERSE_FADE,MCM_NO_ALPHA_CAP,MCM_GEOM_ACTIVE" + forw_extra + "?decal");
+            s_forwt_nofog = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT,MCM_NO_BONES" + forw_extra);
+            s_forwt_obj = Shaders.GetShader("forward" + def + ",MCM_NO_BONES" + forw_extra);
             s_forwt = Shaders.GetShader("forward" + def + ",MCM_NO_ALPHA_CAP,MCM_BRIGHT,MCM_NO_BONES,MCM_SKY_FOG" + forw_extra);
             s_transponly_particles = Shaders.GetShader("transponly" + def + ",MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
             s_transponlylit_particles = Shaders.GetShader("transponly" + def + ",MCM_LIT,MCM_ANY,MCM_GEOM_ACTIVE,MCM_PRETTY,MCM_FADE_DEPTH?particles");
@@ -721,6 +723,16 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The shader used for decal rendering in forward mode.
         /// </summary>
         public Shader s_forwdecal;
+
+        /// <summary>
+        /// The shader used for all-transparency rendering in forward mode (specifically not the skybox itself).
+        /// </summary>
+        public Shader s_forwt_obj;
+
+        /// <summary>
+        /// The shader used for all-transparency rendering in forward mode (specifically those objects that shouldn't have fog).
+        /// </summary>
+        public Shader s_forwt_nofog;
 
         /// <summary>
         /// The shader used for all-transparency rendering in forward mode (primarily the skybox).
@@ -1233,6 +1245,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
             skybox[5].Render(false);
             Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * SunLightModDirect), 1));
             View3D.CheckError("Rendering - Sky - Light");
+            Rendering.SetMinimumLight(0);
+            Rendering.SetColor(Color4.White);
+            if (CVars.r_fast.ValueB)
+            {
+                s_forwt_nofog.Bind();
+                GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
+                GL.Uniform2(14, new Vector2(60f, 25000f));
+            }
+            else
+            {
+                // TODO: Deferred option?
+            }
             float zf = ZFar();
             float spf = 3000f;
             Textures.GetTexture("skies/sun").Bind(); // TODO: Store var!
@@ -1258,8 +1282,28 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.Enable(EnableCap.CullFace);
             Matrix4 ident = Matrix4.Identity;
             GL.UniformMatrix4(2, false, ref ident);
-            Rendering.SetColor(Color4.White);
             Rendering.SetMinimumLight(0);
+            Rendering.SetColor(Color4.White);
+            if (CVars.r_fast.ValueB)
+            {
+                s_forwt_obj.Bind();
+                GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
+                GL.Uniform2(14, new Vector2(60f, 25000f));
+            }
+            else
+            {
+                // TODO: Deferred option?
+            }
+            Location pos = MainWorldView.RenderRelative;
+            double maxDist = ZFar() * ZFar() * 0.5;
+            for (int i = 0; i < TheRegion.Entities.Count; i++) // TODO: Move this block to AFTER chunk SLODs
+            {
+                if (TheRegion.Entities[i].CanDistanceRender && TheRegion.Entities[i].GetPosition().DistanceSquared(pos) > maxDist)
+                {
+                    TheRegion.Entities[i].RenderWithOffsetLOD(Location.Zero);
+                }
+                //Models.GetModel("plants/trees/treevox01").DrawLOD(Player.GetPosition() + Player.ForwardVector() * ZFar() * 0.75);
+            }
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             if (MainWorldView.FBOid.IsForward())
             {

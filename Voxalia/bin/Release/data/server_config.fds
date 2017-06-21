@@ -25,6 +25,9 @@ world_defaults:
 		max_render_distance: 6
 		# The maximum distance a player can load low Level Of Detail chunks at
 		max_lod_render_distance: 20
+	debug:
+		# Whether to render randomly generated trees off in the distance.
+		trees_in_distance: false
 # Configuration for network options
 network:
 	# Whether to verify the connecting users' IP addresses with the global server.

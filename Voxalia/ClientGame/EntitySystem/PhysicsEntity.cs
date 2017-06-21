@@ -421,6 +421,7 @@ namespace Voxalia.ClientGame.EntitySystem
             byte fl = dat[4 + 24 + 24 + 16 + 24 + 4 + 4];
             Visible = (fl & 1) == 1;
             GenBlockShadows = (fl & 2) == 2;
+            CanDistanceRender = GenBlockShadows;
             byte cg = dat[4 + 24 + 24 + 16 + 24 + 4 + 4 + 1];
             if (cg == 2)
             {
