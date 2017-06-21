@@ -38,7 +38,7 @@ namespace Voxalia.ServerGame.EntitySystem
     {
         public bool ShouldNetworkAnyway(Entity e)
         {
-            return e is PhysicsEntity p && p.GenBlockShadow;
+            return TheRegion.TheWorld.Settings.TreesInDistance && e is PhysicsEntity p && p.GenBlockShadow;
         }
 
         /// <summary>
@@ -847,14 +847,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 foreach (Vector3i loc in removes)
                 {
                     Chunk ch = TheRegion.GetChunk(loc);
-                    if (ch != null)
-                    {
-                        ForgetChunk(ch, loc);
-                    }
-                    else
-                    {
-                        ChunksAwareOf.Remove(loc);
-                    }
+                    ForgetChunk(ch, loc);
                 }
                 removes.Clear();
                 pChunkLoc = cpos;
@@ -1659,7 +1652,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 foreach (long visibleEnt in Known)
                 {
                     // TODO: TryGetValue stuff here.
-                    if (!TheRegion.Entities.ContainsKey(visibleEnt) || ch.Contains(TheRegion.Entities[visibleEnt].GetPosition()))
+                    if (!TheRegion.Entities.ContainsKey(visibleEnt) || (ch != null && ch.Contains(TheRegion.Entities[visibleEnt].GetPosition())))
                     {
                         Network.SendPacket(new DespawnEntityPacketOut(visibleEnt));
                         delMe.Add(visibleEnt);

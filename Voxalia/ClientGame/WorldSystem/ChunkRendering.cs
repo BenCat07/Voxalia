@@ -1159,6 +1159,10 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public void CompileInternal()
         {
+            if (OwningRegion.TheClient.CVars.r_compute.ValueB)
+            {
+                return;
+            }
             NeedsComp = false;
             if (FullBlock.Vertices.Count == 0)
             {

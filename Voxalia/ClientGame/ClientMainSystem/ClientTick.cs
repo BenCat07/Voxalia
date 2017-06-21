@@ -236,7 +236,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         TheRegion.SLODs[slodpos] = slod;
                     }
                     Chunk[] res = TheRegion.LoadedChunks.Values.Where((c) => c.PosMultiplier >= 5 && TheRegion.SLODLocFor(c.WorldPosition) == slodpos).ToArray();
-                    bool recomp = false;
+                    bool recomp = slod.NeedsComp;
                     foreach (Chunk c in res)
                     {
                         if (c.SLODComputed && c._VBOSolid != null)
@@ -244,12 +244,37 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             recomp = true;
                             c.SLODMode = true;
                             c.SLODComputed = false;
+                            slod.NeedsComp = false;
                         }
                     }
                     if (recomp)
                     {
-                        VoxelComputer.Combinulate(slod, res);
+                        if (!VoxelComputer.Combinulate(slod, res))
+                        {
+                            TheRegion.SLODs.Remove(slodpos);
+                        }
                     }
+                }
+                List<Vector3i> needsRem = new List<Vector3i>();
+                foreach (ChunkSLODHelper slod in TheRegion.SLODs.Values)
+                {
+                    if (slod.NeedsComp)
+                    {
+                        slod._VBO?.Destroy();
+                        needsRem.Add(slod.Coordinate);
+                        continue;
+                    }
+                    int count = TheRegion.LoadedChunks.Values.Where((c) => c.PosMultiplier >= 5 && TheRegion.SLODLocFor(c.WorldPosition) == slod.Coordinate).Count();
+                    if (count == 0)
+                    {
+                        slod._VBO?.Destroy();
+                        needsRem.Add(slod.Coordinate);
+                        continue;
+                    }
+                }
+                foreach (Vector3i vec in needsRem)
+                {
+                    TheRegion.SLODs.Remove(vec);
                 }
             }
             else

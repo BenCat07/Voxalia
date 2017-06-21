@@ -270,7 +270,7 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public int[] IBuf = new int[32];
 
-        public void Combinulate(ChunkSLODHelper cslod, params Chunk[] chs)
+        public bool Combinulate(ChunkSLODHelper cslod, params Chunk[] chs)
         {
             cslod.NeedsComp = false;
             int contained = 0;
@@ -286,7 +286,7 @@ namespace Voxalia.ClientGame.OtherSystems
             }
             if (maxSize == 0)
             {
-                return;
+                return false;
             }
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
             uint coord = 0;
@@ -380,6 +380,7 @@ namespace Voxalia.ClientGame.OtherSystems
             GL.BindVertexArray(0);
             cslod.Contained = contained;
             View3D.CheckError("Calculate SLOD Combo");
+            return true;
         }
 
         public int TopsX, TopsY;

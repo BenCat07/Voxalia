@@ -363,12 +363,13 @@ namespace Voxalia.ClientGame.WorldSystem
         
         public void RecalcSLODExact(Vector3i slodpos)
         {
-            if (TheClient.CVars.r_compute.ValueB)
+            if (!SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
             {
                 return;
             }
-            if (!SLODs.TryGetValue(slodpos, out ChunkSLODHelper slod))
+            if (TheClient.CVars.r_compute.ValueB)
             {
+                slod.NeedsComp = true;
                 return;
             }
             slod.Users = 0;
