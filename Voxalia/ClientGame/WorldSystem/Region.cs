@@ -523,10 +523,12 @@ namespace Voxalia.ClientGame.WorldSystem
             return ch.GetBlockAt(x, y, z);
         }
 
-        public void Regen(Location pos, Chunk ch, int x = 1, int y = 1, int z = 1)
+        public void Regen(Location pos, int x = 1, int y = 1, int z = 1)
         {
-            Chunk tch = ch;
-            if (z == tch.CSize - 1 || TheClient.CVars.r_chunkoverrender.ValueB)
+            Chunk ch;
+            Chunk tch = GetChunk(ChunkLocFor(pos));
+            int CSize = tch == null ? Constants.CHUNK_WIDTH : tch.CSize;
+            if (z == CSize - 1 || TheClient.CVars.r_chunkoverrender.ValueB)
             {
                 ch = GetChunk(ChunkLocFor(pos) + new Vector3i(0, 0, 1));
                 if (ch != null)
@@ -534,7 +536,10 @@ namespace Voxalia.ClientGame.WorldSystem
                     EasyUpdateChunk(ch);
                 }
             }
-            UpdateChunk(tch);
+            if (tch != null)
+            {
+                UpdateChunk(tch);
+            }
             if (x == 0 || TheClient.CVars.r_chunkoverrender.ValueB)
             {
                 ch = GetChunk(ChunkLocFor(pos) + new Vector3i(-1, 0, 0));
@@ -551,7 +556,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     EasyUpdateChunk(ch);
                 }
             }
-            if (x == tch.CSize - 1 || TheClient.CVars.r_chunkoverrender.ValueB)
+            if (x == CSize - 1 || TheClient.CVars.r_chunkoverrender.ValueB)
             {
                 ch = GetChunk(ChunkLocFor(pos) + new Vector3i(1, 0, 0));
                 if (ch != null)
@@ -559,7 +564,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     EasyUpdateChunk(ch);
                 }
             }
-            if (y == tch.CSize - 1 || TheClient.CVars.r_chunkoverrender.ValueB)
+            if (y == CSize - 1 || TheClient.CVars.r_chunkoverrender.ValueB)
             {
                 ch = GetChunk(ChunkLocFor(pos) + new Vector3i(0, 1, 0));
                 if (ch != null)
@@ -579,7 +584,7 @@ namespace Voxalia.ClientGame.WorldSystem
             ch.Edited = true;
             if (regen)
             {
-                Regen(pos, ch, x, y, z);
+                Regen(pos, x, y, z);
             }
         }
 

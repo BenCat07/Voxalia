@@ -58,6 +58,8 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             lock (TheClient.TheRegion.PreppingNow)
             {
+                Chunk chk = TheClient.TheRegion.LoadChunk(new Vector3i(x, y, z), posMult);
+                chk.LOADING = true;
                 Action act = () =>
                 {
                     lock (TheClient.TheRegion.PreppingNow)
@@ -68,7 +70,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                     {
                         try
                         {
-                            ParseData(dr, x, y, z, posMult);
+                            ParseData(dr, x, y, z, posMult, chk);
                         }
                         catch (Exception ex)
                         {
@@ -86,7 +88,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             return true;
         }
 
-        void ParseData(DataReader dr, int x, int y, int z, int posMult)
+        void ParseData(DataReader dr, int x, int y, int z, int posMult, Chunk chk)
         {
             byte[] reach = posMult >= 6 ? new byte[(int)ChunkReachability.COUNT] : dr.ReadBytes((int)ChunkReachability.COUNT);
             int csize = Chunk.CHUNK_SIZE / posMult;
@@ -115,7 +117,6 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             Action act = () =>
             {
-                Chunk chk = TheClient.TheRegion.LoadChunk(new Vector3i(x, y, z), posMult);
                 for (int i = 0; i < reach.Length; i++)
                 {
                     chk.Reachability[i] = reach[i] == 1;
@@ -178,7 +179,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             chk.PRED = true;
             TheClient.Schedule.ScheduleSyncTask(() =>
             {
-                chk.OwningRegion.Regen(chk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE, chk);
+                chk.OwningRegion.Regen(chk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE);
             });
             lock (TheClient.TheRegion.PreppingNow)
             {
