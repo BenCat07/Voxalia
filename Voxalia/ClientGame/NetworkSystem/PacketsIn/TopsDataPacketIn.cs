@@ -28,9 +28,17 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             int x = Utilities.BytesToInt(Utilities.BytesPartial(data, 0, 4));
             int y = Utilities.BytesToInt(Utilities.BytesPartial(data, 4, 4));
             byte mode = data[8];
-            byte[] dat = new byte[data.Length - 9];
-            Array.Copy(data, 9, dat, 0, dat.Length);
-            dat = FileHandler.Uncompress(dat);
+            byte[] dat;
+            if (data.Length == 9)
+            {
+                dat = new byte[0];
+            }
+            else
+            {
+                dat = new byte[data.Length - 9];
+                Array.Copy(data, 9, dat, 0, dat.Length);
+                dat = FileHandler.Uncompress(dat);
+            }
             if (mode == 1)
             {
                 TheClient.VoxelComputer.TopsX = x;

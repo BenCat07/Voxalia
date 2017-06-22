@@ -35,6 +35,8 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             switch ((StatusOperation)data[0])
             {
+                case StatusOperation.CHUNK_MOVED:
+                    return true;
                 default:
                     return false;
             }

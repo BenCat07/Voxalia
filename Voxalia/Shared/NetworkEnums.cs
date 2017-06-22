@@ -55,12 +55,11 @@ namespace Voxalia.Shared
 
     /// <summary>
     /// For the OperationStatus packet.
-    /// TODO: Delete this, and associated packets?
     /// </summary>
     public enum StatusOperation : byte
     {
         NONE = 0,
-        CHUNK_LOAD = 1
+        CHUNK_MOVED = 1
     }
 
     /// <summary>

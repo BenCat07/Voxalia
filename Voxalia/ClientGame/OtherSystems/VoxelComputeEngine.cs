@@ -391,10 +391,16 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public ChunkVBO Tops2Chunk;
 
+        byte[] TopsData, Tops2Data;
+
         public void TopsCrunch(byte[] inp, byte mode)
         {
             (mode == 1 ? TopsChunk : Tops2Chunk)?.Destroy();
             if (!TheClient.CVars.r_compute.ValueB)
+            {
+                return;
+            }
+            if (inp.Length == 0)
             {
                 return;
             }
@@ -476,10 +482,12 @@ namespace Voxalia.ClientGame.OtherSystems
             if (mode == 1)
             {
                 TopsChunk = tv;
+                TopsData = inp;
             }
             else
             {
                 Tops2Chunk = tv;
+                Tops2Data = inp;
             }
             GL.BindVertexArray(0);
         }

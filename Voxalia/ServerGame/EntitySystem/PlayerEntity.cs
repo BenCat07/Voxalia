@@ -822,7 +822,12 @@ namespace Voxalia.ServerGame.EntitySystem
                         }
                     }
                 }
-                SendTopsFix();
+                Vector3i ctops = new Vector3i(cpos.X / 10, cpos.Y / 10, cpos.Z / 10);
+                if (ctops != currentTops)
+                {
+                    currentTops = ctops;
+                    SendTopsFix();
+                }
             }
             if (!DoneReadingChunks)
             {
@@ -919,14 +924,23 @@ namespace Voxalia.ServerGame.EntitySystem
 
         Queue<Vector3i> toSee;
 
+        Vector3i currentTops = new Vector3i(int.MaxValue, int.MaxValue, int.MaxValue);
+
         public void SendTopsFix()
         {
             Vector3i cpos = TheRegion.ChunkLocFor(GetPosition());
             Vector2i flat = new Vector2i(cpos.X, cpos.Y);
             byte[] toper = TheRegion.GetTopsArray(flat, 25, 2);
             ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, FileHandler.Compress(toper)));
-            byte[] toper2 = TheRegion.GetTopsArray(flat, 125, 3);
-            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, FileHandler.Compress(toper2)));
+            if (currentTops.Z > 0)
+            {
+                byte[] toper2 = TheRegion.GetTopsArray(flat, 125, 3);
+                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, FileHandler.Compress(toper2)));
+            }
+            else
+            {
+                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
+            }
         }
         
         /// <summary>
