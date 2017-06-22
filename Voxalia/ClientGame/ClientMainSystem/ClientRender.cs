@@ -119,11 +119,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
             return MaximumStraightBlockDistance() * 2;
         }
 
+        const float FOGMAXDIST_2 = 10000;
+
+        const float FOGMAXDIST_1 = 25 * 90;
+
+        float CurFogMax = FOGMAXDIST_1;
+
         public float FogMaxDist()
         {
             if (CVars.r_compute.ValueB)
             {
-                return 10000;
+                return CurFogMax;
             }
             return ZFar();
         }
@@ -836,6 +842,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             lock (TickLock)
             {
+                float goalMax = VoxelComputer.Tops2Chunk == null || !VoxelComputer.Tops2Chunk.generated ? FOGMAXDIST_1 : FOGMAXDIST_2;
+                if (goalMax > CurFogMax)
+                {
+                    CurFogMax = Math.Min(goalMax, CurFogMax * (float)Math.Pow(1.5f, Delta));
+                }
+                else
+                {
+                    CurFogMax = Math.Max(goalMax, CurFogMax * (float)Math.Pow(0.6666f, Delta));
+                }
                 gDelta = e.Time;
                 int gfps = (int)(1.0 / gDelta);
                 gFPS_Min = gFPS_Min == 0 ? gfps : Math.Min(gFPS_Min, gfps);
