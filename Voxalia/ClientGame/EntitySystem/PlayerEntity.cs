@@ -112,7 +112,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public int CurrentMovePacketID = 0;
 
-        public const int PACKET_CAP = 256;
+        public const int PACKET_CAP = 1024;
 
         public Location[] Positions = new Location[PACKET_CAP];
 
@@ -194,6 +194,10 @@ namespace Voxalia.ClientGame.EntitySystem
                 {
                     LagRateLimit = 0.0;
                     SysConsole.Output(OutputType.WARNING, "Lagging: Movement tracker full (" + CurrentMovePacketID + ", " + GTTs[CurrentMovePacketID] + ")");
+                    for (int i = 0; i < PACKET_CAP; i++)
+                    {
+                        GTTs[i] = -1; // TODO: Temporary!
+                    }
                 }
                 return;
             }

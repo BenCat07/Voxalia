@@ -100,8 +100,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
                     return false;
                 }
                 rel /= len;
-                RayCastResult rcr;
-                if (Player.TheRegion.SpecialCaseConvexTrace(new BoxShape(1.1f, 1.1f, 1.1f), start + up, rel, (double)len, MaterialSolidity.FULLSOLID, Player.IgnoreThis, out rcr))
+                if (Player.TheRegion.SpecialCaseConvexTrace(new BoxShape(1.1f, 1.1f, 1.1f), start + up, rel, (double)len, MaterialSolidity.FULLSOLID, Player.IgnoreThis, out RayCastResult rcr))
                 {
                     Player.Teleport(start);
                 }
