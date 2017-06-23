@@ -803,7 +803,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public Quaternion GetRelativeQuaternion()
         {
-            if (InPlane())
+            if (InPlane() && TheClient.CVars.g_firstperson.ValueB)
             {
                 return Vehicle.GetOrientation();
             }

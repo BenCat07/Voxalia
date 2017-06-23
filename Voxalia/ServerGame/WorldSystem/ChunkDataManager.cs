@@ -154,7 +154,9 @@ namespace Voxalia.ServerGame.WorldSystem
             SLODders[vec] = SLOD;
             DBSuperLOD.Upsert(newdoc);
         }
-
+        
+            // NOTE: Not currently used!
+        /*
         public byte[] GetLODChunkDetails(int x, int y, int z)
         {
             BsonDocument doc;
@@ -163,7 +165,8 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return null;
             }
-            return FileHandler.Uncompress(doc["blocks"].AsBinary);
+            byte[] b = doc["blocks"].AsBinary;
+            return b.Length == 0 ? b : FileHandler.Uncompress(b);
         }
 
         public void WriteLODChunkDetails(int x, int y, int z, byte[] LOD)
@@ -172,9 +175,9 @@ namespace Voxalia.ServerGame.WorldSystem
             BsonDocument newdoc = new BsonDocument();
             Dictionary<string, BsonValue> tbs = newdoc.RawValue;
             tbs["_id"] = id;
-            tbs["blocks"] = new BsonValue(FileHandler.Compress(LOD));
+            tbs["blocks"] = new BsonValue(LOD.Length == 0 ? LOD : FileHandler.Compress(LOD));
             DBLODs.Upsert(newdoc);
-        }
+        }*/
 
         public ChunkDetails GetChunkEntities(int x, int y, int z)
         {
@@ -212,7 +215,8 @@ namespace Voxalia.ServerGame.WorldSystem
             ChunkDetails det = new ChunkDetails() { X = x, Y = y, Z = z };
             det.Version = doc["version"].AsInt32;
             det.Flags = (ChunkFlags)doc["flags"].AsInt32;
-            det.Blocks = FileHandler.Uncompress(doc["blocks"].AsBinary);
+            byte[] blk = doc["blocks"].AsBinary;
+            det.Blocks = blk.Length == 0 ? blk : FileHandler.Uncompress(blk);
             det.Reachables = doc["reach"].AsBinary;
             return det;
         }
@@ -225,7 +229,7 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["_id"] = id;
             tbs["version"] = new BsonValue(details.Version);
             tbs["flags"] = new BsonValue((int)details.Flags);
-            tbs["blocks"] = new BsonValue(FileHandler.Compress(details.Blocks));
+            tbs["blocks"] = new BsonValue(details.Blocks.Length == 0 ? details.Blocks : FileHandler.Compress(details.Blocks));
             tbs["reach"] = new BsonValue(details.Reachables);
             DBChunks.Upsert(newdoc);
         }

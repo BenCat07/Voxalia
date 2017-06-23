@@ -22,9 +22,15 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public partial class Region
     {
+        byte[] LSAir = new byte[Constants.CHUNK_BLOCK_COUNT * 2 / (15 * 15 * 15)];
+
         public byte[] GetSuperLODChunkData(Vector3i cpos)
         {
             byte[] b = ChunkManager.GetSuperLODChunkDetails(cpos.X, cpos.Y, cpos.Z);
+            if (b.Length == 0)
+            {
+                return LSAir;
+            }
             if (b != null)
             {
                 return b;
@@ -33,9 +39,15 @@ namespace Voxalia.ServerGame.WorldSystem
             return Generator.GetSuperLOD(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
         }
 
+        byte[] L6Air = new byte[Constants.CHUNK_BLOCK_COUNT * 2 / (6 * 6 * 6)];
+
         public byte[] GetLODSixChunkData(Vector3i cpos)
         {
             byte[] b = ChunkManager.GetLODSixChunkDetails(cpos.X, cpos.Y, cpos.Z);
+            if (b.Length == 0)
+            {
+                return L6Air;
+            }
             if (b != null)
             {
                 return b;

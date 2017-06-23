@@ -67,7 +67,7 @@ namespace Voxalia.ClientGame.EntitySystem
         {
             get
             {
-                return GetMass() * 12f;
+                return GetMass() * 20f;
             }
         }
 
@@ -75,7 +75,7 @@ namespace Voxalia.ClientGame.EntitySystem
         {
             get
             {
-                return GetMass() * 3f;
+                return GetMass() * 5f;
             }
         }
 

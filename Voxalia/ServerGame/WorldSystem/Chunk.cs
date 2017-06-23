@@ -264,17 +264,23 @@ namespace Voxalia.ServerGame.WorldSystem
         /// Gets the save data for a chunks blocks.
         /// </summary>
         /// <returns>The save data.</returns>
-        public byte[] GetChunkSaveData()
+        public byte[] GetChunkSaveData(bool canZero = false)
         {
+            bool any = false;
             byte[] bytes = new byte[BlocksInternal.Length * 5];
             for (int i = 0; i < BlocksInternal.Length; i++)
             {
                 ushort mat = BlocksInternal[i]._BlockMaterialInternal;
+                any = any || mat != 0;
                 bytes[i * 2] = (byte)(mat & 0xFF);
                 bytes[i * 2 + 1] = (byte)((mat >> 8) & 0xFF);
                 bytes[BlocksInternal.Length * 2 + i] = BlocksInternal[i].BlockData;
                 bytes[BlocksInternal.Length * 3 + i] = BlocksInternal[i].BlockLocalData;
                 bytes[BlocksInternal.Length * 4 + i] = BlocksInternal[i]._BlockPaintInternal;
+            }
+            if (!any && canZero)
+            {
+                return new byte[0];
             }
             return bytes;
         }
@@ -397,9 +403,17 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
                 return;
             }
+            if (!OwningRegion.TheWorld.Settings.Saves)
+            {
+                if (callback != null)
+                {
+                    callback.Invoke();
+                }
+                return;
+            }
             LastEdited = -1;
             BsonDocument ents = GetEntitySaveData();
-            byte[] blks = GetChunkSaveData();
+            byte[] blks = GetChunkSaveData(true);
             OwningRegion.TheServer.Schedule.StartAsyncTask(() =>
             {
                 SaveToFileI(blks);
@@ -434,8 +448,9 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         /// <param name="lod">The level of detail.</param>
         /// <param name="canReturnNull">Whether null is acceptable if the chunk is purely air.</param>
+        /// <param name="canZero">Whether we can return zero bytes for air.</param>
         /// <returns>The usable byte array data.</returns>
-        public byte[] LODBytes(int lod, bool canReturnNull = false)
+        public byte[] LODBytes(int lod, bool canReturnNull = false, bool canZero = false)
         {
             if (LOD != null && lod == 5)
             {
@@ -445,7 +460,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
                 return LOD;
             }
-            bool isAir = canReturnNull;
+            bool isAir = canReturnNull || canZero;
             int csize = Chunk.CHUNK_SIZE / lod;
             byte[] data_orig = new byte[csize * csize * csize * 2];
             for (int x = 0; x < csize; x++)
@@ -467,6 +482,10 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             if (isAir)
             {
+                if (canZero)
+                {
+                    return new byte[0];
+                }
                 return null;
             }
             return data_orig;
@@ -494,13 +513,13 @@ namespace Voxalia.ServerGame.WorldSystem
                 {
                     det.Reachables[i] = (byte)(Reachability[i] ? 1 : 0);
                 }
-                byte[] lod = LODBytes(5);
-                byte[] lodsix = LODBytes(6);
-                byte[] slod = SLODBytes(lod);
+                byte[] lod = LODBytes(5, false, true);
+                byte[] lodsix = LODBytes(6, false, true);
+                byte[] slod = lod.Length == 0 ? lod : SLODBytes(lod, true);
                 lock (GetLocker())
                 {
                     OwningRegion.ChunkManager.WriteChunkDetails(det);
-                    OwningRegion.ChunkManager.WriteLODChunkDetails(det.X, det.Y, det.Z, lod);
+                    //OwningRegion.ChunkManager.WriteLODChunkDetails(det.X, det.Y, det.Z, lod);
                     OwningRegion.ChunkManager.WriteSuperLODChunkDetails(det.X, det.Y, det.Z, slod);
                     OwningRegion.ChunkManager.WriteLODSixChunkDetails(det.X, det.Y, det.Z, lodsix);
                 }
@@ -511,9 +530,10 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
         
-        public byte[] SLODBytes(byte[] b)
+        public byte[] SLODBytes(byte[] b, bool canZero = false)
         {
             byte[] res = new byte[2 * 2 * 2 * 2];
+            bool any = false;
             for (int x = 0; x < 2; x++)
             {
                 for (int y = 0; y < 2; y++)
@@ -543,11 +563,16 @@ namespace Voxalia.ServerGame.WorldSystem
                             }
                         }
                         gotem:
+                        any = any || strongest != Material.AIR;
                         ushort m = (ushort)strongest;
                         res[rcoord] = (byte)(m & 0xFF);
                         res[rcoord + 1] = (byte)((m >> 8) & 0xFF);
                     }
                 }
+            }
+            if (!any && canZero)
+            {
+                return new byte[0];
             }
             return res;
         }
@@ -594,12 +619,15 @@ namespace Voxalia.ServerGame.WorldSystem
                 throw new Exception("invalid save data VERSION: " + det.Version + " and " + ents.Version + "!");
             }
             Flags = det.Flags & ~(ChunkFlags.POPULATING);
-            for (int i = 0; i < BlocksInternal.Length; i++)
+            if (det.Blocks.Length > 0)
             {
-                BlocksInternal[i]._BlockMaterialInternal = Utilities.BytesToUshort(Utilities.BytesPartial(det.Blocks, i * 2, 2));
-                BlocksInternal[i].BlockData = det.Blocks[BlocksInternal.Length * 2 + i];
-                BlocksInternal[i].BlockLocalData = det.Blocks[BlocksInternal.Length * 3 + i];
-                BlocksInternal[i]._BlockPaintInternal = det.Blocks[BlocksInternal.Length * 4 + i];
+                for (int i = 0; i < BlocksInternal.Length; i++)
+                {
+                    BlocksInternal[i]._BlockMaterialInternal = Utilities.BytesToUshort(Utilities.BytesPartial(det.Blocks, i * 2, 2));
+                    BlocksInternal[i].BlockData = det.Blocks[BlocksInternal.Length * 2 + i];
+                    BlocksInternal[i].BlockLocalData = det.Blocks[BlocksInternal.Length * 3 + i];
+                    BlocksInternal[i]._BlockPaintInternal = det.Blocks[BlocksInternal.Length * 4 + i];
+                }
             }
             for (int i = 0; i < Reachability.Length; i++)
             {
