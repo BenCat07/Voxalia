@@ -1353,7 +1353,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ch.Render();
                 }
             }
-            if (CVars.r_compute.ValueB && VoxelComputer.Tops3Chunk != null)
+            if (CVars.r_compute.ValueB && VoxelComputer.Tops3Chunk != null && VoxelComputer.Tops3Chunk.generated)
             {
                 const int C_EXTRA = 750;
                 const double C_SUB = C_EXTRA + C_EXTRA / 2;
@@ -1364,7 +1364,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             else
             {
-                if (CVars.r_compute.ValueB && VoxelComputer.TopsChunk != null)
+                if (CVars.r_compute.ValueB && VoxelComputer.TopsChunk != null && VoxelComputer.TopsChunk.generated)
                 {
                     const int C_EXTRA = 30;
                     const double C_SUB = C_EXTRA + C_EXTRA / 2;
@@ -1373,7 +1373,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     GL.Uniform1(8, (float)C_EXTRA);
                     VoxelComputer.TopsChunk.Render();
                 }
-                if (CVars.r_compute.ValueB && VoxelComputer.Tops2Chunk != null)
+                if (CVars.r_compute.ValueB && VoxelComputer.Tops2Chunk != null && VoxelComputer.Tops2Chunk.generated)
                 {
                     const int C_EXTRA = 150;
                     const double C_SUB = C_EXTRA + C_EXTRA / 2;
