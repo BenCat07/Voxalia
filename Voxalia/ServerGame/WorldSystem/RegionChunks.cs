@@ -102,7 +102,7 @@ namespace Voxalia.ServerGame.WorldSystem
                     zers++;
                     if (zers >= 2)
                     {
-                        max = i - 3;
+                        max = i - 2;
                         break;
                     }
                 }
