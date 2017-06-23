@@ -61,7 +61,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <returns>A locker object.</returns>
         public Object GetLocker()
         {
-            return Lockers[Math.Abs(WorldPosition.GetHashCode()) % 20];
+            return Lockers[Math.Abs(WorldPosition.X * 17 + WorldPosition.Y * 89) % 20];
         }
 
         /// <summary>
@@ -499,10 +499,6 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             try
             {
-                if (blks.Length == 0 && !FromFile)
-                {
-                    return;
-                }
                 ChunkDetails det = new ChunkDetails()
                 {
                     Version = 2,
@@ -520,6 +516,11 @@ namespace Voxalia.ServerGame.WorldSystem
                 byte[] lod = LODBytes(5, false, true);
                 byte[] lodsix = LODBytes(6, false, true);
                 byte[] slod = lod.Length == 0 ? lod : SLODBytes(lod, true);
+                OwningRegion.PushHeightCorrection(WorldPosition, slod);
+                if (blks.Length == 0 && !FromFile)
+                {
+                    return;
+                }
                 lock (GetLocker())
                 {
                     OwningRegion.ChunkManager.WriteChunkDetails(det);

@@ -56,6 +56,131 @@ namespace Voxalia.ServerGame.WorldSystem
             return Generator.GetLODSix(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
         }
 
+        public void PushHeightCorrection(Vector3i chunkPos, byte[] slod)
+        {
+            if (chunkPos.Z < 0 || chunkPos.Z >= 256)
+            {
+                return;
+            }
+            if (slod.Length != 16 && slod.Length != 0)
+            {
+                throw new Exception("Incorrect slod data");
+            }
+            byte b = 0;
+            byte posser = 1;
+            if (slod.Length == 16)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    ushort t = Utilities.BytesToUshort(Utilities.BytesPartial(slod, i * 2, 2));
+                    if (((Material)t).IsOpaque())
+                    {
+                        b |= posser;
+                    }
+                    posser *= 2;
+                }
+            }
+            byte[] bytes = ChunkManager.GetHeightHelper(chunkPos.X, chunkPos.Y);
+            if (bytes == null)
+            {
+                bytes = new byte[256 + 256 + 256 * 8 * 2];
+            }
+            bytes[256 + chunkPos.Z] = 1;
+            bytes[chunkPos.Z] = b;
+            slod.CopyTo(bytes, 256 + 256 + chunkPos.Z * (8 * 2));
+            ChunkManager.WriteHeightHelper(chunkPos.X, chunkPos.Y, bytes);
+            int zers = 0;
+            int max = 0;
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                if (bytes[256 + i] != 1)
+                {
+                    return;
+                }
+                if (bytes[i] == 0)
+                {
+                    zers++;
+                    if (zers >= 2)
+                    {
+                        max = i - 3;
+                        break;
+                    }
+                }
+                else
+                {
+                    zers = 0;
+                }
+            }
+            const ushort tg = (ushort)Material.GRASS_FOREST;
+            int maxA = 0, maxB = 0, maxC = 0, maxD = 0;
+            ushort matA = tg, matB = tg, matC = tg, matD = tg;
+            bool ba = false, bb = false, bc = false, bd = false;
+            for (int x = max; x >= 0; x--)
+            {
+                byte cap = bytes[x];
+                if (!ba && (cap & 2) == 2)
+                {
+                    maxA = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
+                    matA = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 1, 2));
+                    ba = true;
+                }
+                else if (!ba && (cap & 1) == 1)
+                {
+                    maxA = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
+                    matA = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 0, 2));
+                    ba = true;
+                }
+                if (!bb && (cap & 8) == 8)
+                {
+                    maxB = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
+                    matB = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 3, 2));
+                    bb = true;
+                }
+                else if (!bb && (cap & 4) == 4)
+                {
+                    maxB = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
+                    matB = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 2, 2));
+                    bb = true;
+                }
+                if (!bc && (cap & 32) == 32)
+                {
+                    maxC = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
+                    matC = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 5, 2));
+                    bc = true;
+                }
+                else if (!bc && (cap & 16) == 16)
+                {
+                    maxC = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
+                    matC = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 4, 2));
+                    bc = true;
+                }
+                if (!bd && (cap & 128) == 128)
+                {
+                    maxD = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
+                    matD = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 7, 2));
+                    bd = true;
+                }
+                else if (!bd && (cap & 64) == 64)
+                {
+                    maxD = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
+                    matD = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 6, 2));
+                    bd = true;
+                }
+            }
+            //SysConsole.Output(OutputType.DEBUG, "Wrote heights: " + chunkPos + ": " + maxA + ", " + maxB + ", " + maxC + ", " + maxD + " - " + max + " - " + matA + ", " + matB + ", " + matC + ", " + matD);
+            ChunkManager.WriteHeightEstimates(chunkPos.X, chunkPos.Y, new ChunkDataManager.Heights()
+            {
+                A = maxA,
+                B = maxB,
+                C = maxC,
+                D = maxD,
+                MA = matA,
+                MB = matB,
+                MC = matC,
+                MD = matD
+            });
+        }
+
         public byte[] GetTopsArray(Vector2i chunkPos, int offs, int size_mode)
         {
             // TODO: Find more logical basis for this system than tops data...? Maybe keep as 'default gen' only... or somehow calculate reasonable but-below-the-top max data from block/chunk average weights...
@@ -75,11 +200,40 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         for (int by = 0; by < Constants.CHUNK_WIDTH; by++)
                         {
+                            Vector2i absCoord = new Vector2i(relPos.X * Constants.CHUNK_WIDTH + bx * top_mod, relPos.Y * Constants.CHUNK_WIDTH + by * top_mod);
+                            Vector2i chunkker = new Vector2i(absCoord.X / Constants.CHUNK_WIDTH, absCoord.Y / Constants.CHUNK_WIDTH);
+                            Vector2i posd = new Vector2i(absCoord.X - chunkker.X * Constants.CHUNK_WIDTH, absCoord.Y - chunkker.Y * Constants.CHUNK_WIDTH);
+                            ChunkDataManager.Heights h = ChunkManager.GetHeightEstimates(chunkker.X, chunkker.Y);
                             //int inner_ind = by * Constants.CHUNK_WIDTH + bx;
                             ushort mat = 0;// known_tops.Key == null ? (ushort)0 : Utilities.BytesToUshort(Utilities.BytesPartial(known_tops.Key, inner_ind * 2, 2));
                             int height = 0;// known_tops.Key == null ? 0 : Utilities.BytesToInt(Utilities.BytesPartial(known_tops.Value, inner_ind * 4 + (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * 2, 4));
-                            Vector2i absCoord = new Vector2i(relPos.X * Constants.CHUNK_WIDTH + bx * top_mod, relPos.Y * Constants.CHUNK_WIDTH + by * top_mod);
-                            //if (mat == 0 && height == 0)
+                            if (posd.X < Constants.CHUNK_WIDTH / 2)
+                            {
+                                if (posd.Y < Constants.CHUNK_WIDTH / 2)
+                                {
+                                    mat = h.MA;
+                                    height = h.A;
+                                }
+                                else
+                                {
+                                    mat = h.MB;
+                                    height = h.B;
+                                }
+                            }
+                            else
+                            {
+                                if (posd.Y < Constants.CHUNK_WIDTH / 2)
+                                {
+                                    mat = h.MC;
+                                    height = h.C;
+                                }
+                                else
+                                {
+                                    mat = h.MD;
+                                    height = h.D;
+                                }
+                            }
+                            if (mat == 0 || height == int.MaxValue)
                             {
                                 height = (int)Generator.GetHeight(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, absCoord.X, absCoord.Y);
                                 Biome b = Generator.GetBiomeGen().BiomeFor(TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, absCoord.X, absCoord.Y, height, height);
@@ -90,6 +244,7 @@ namespace Voxalia.ServerGame.WorldSystem
                                 else
                                 {
                                     mat = (ushort)b.GetZeroOrLowerMat();
+                                    height = 0;
                                 }
                                 // TODO: less weird tree placement helper
                                 if (TheWorld.Settings.TreesInDistance && b.LikelyToHaveTrees() && treesGenned < 200 && Utilities.UtilRandom.Next(20) == 0)
@@ -106,6 +261,11 @@ namespace Voxalia.ServerGame.WorldSystem
                                         treesGenned++;
                                     }
                                 }
+                                //SysConsole.Output(OutputType.DEBUG, "fail for " + chunkker.X + ", " + chunkker.Y);
+                            }
+                            else
+                            {
+                                SysConsole.Output(OutputType.DEBUG, "Used " + height + ", " + mat);
                             }
                             int idder = (y * Constants.CHUNK_WIDTH + by) * (Constants.CHUNK_WIDTH * countter) + (x * Constants.CHUNK_WIDTH + bx);
                             Utilities.UshortToBytes(mat).CopyTo(result, idder * 2);
