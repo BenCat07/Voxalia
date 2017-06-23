@@ -52,6 +52,7 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public int Program_TopsCruncher;
         public int Program_Tops2Cruncher;
+        public int Program_Tops3Cruncher;
 
         public int Buf_Shapes = 0;
 
@@ -87,6 +88,7 @@ namespace Voxalia.ClientGame.OtherSystems
             Program_SLODCombo2 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_TWO 1\n");
             Program_TopsCruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 30\n");
             Program_Tops2Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 150\n");
+            Program_Tops3Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 750\n");
             View3D.CheckError("Compute - Startup - Shaders");
             float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 7)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
@@ -391,11 +393,15 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public ChunkVBO Tops2Chunk;
 
-        byte[] TopsData, Tops2Data;
+        public int Tops3X, Tops3Y;
+
+        public ChunkVBO Tops3Chunk;
+
+        byte[] TopsData, Tops2Data, Tops3Data;
 
         public void TopsCrunch(byte[] inp, byte mode)
         {
-            (mode == 1 ? TopsChunk : Tops2Chunk)?.Destroy();
+            (mode == 1 ? TopsChunk : (mode == 2 ? Tops2Chunk : Tops3Chunk))?.Destroy();
             if (!TheClient.CVars.r_compute.ValueB)
             {
                 return;
@@ -429,7 +435,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, i + 1, IBuf[i]);
             }
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, buf);
-            GL.UseProgram(mode == 1 ? Program_TopsCruncher : Program_Tops2Cruncher);
+            GL.UseProgram(mode == 1 ? Program_TopsCruncher : (mode == 2 ? Program_Tops2Cruncher : Program_Tops3Cruncher));
             GL.DispatchCompute(1, 9, 1);
             for (int i = 0; i < 8; i++)
             {
@@ -484,10 +490,15 @@ namespace Voxalia.ClientGame.OtherSystems
                 TopsChunk = tv;
                 TopsData = inp;
             }
-            else
+            else if (mode == 2)
             {
                 Tops2Chunk = tv;
                 Tops2Data = inp;
+            }
+            else
+            {
+                Tops3Chunk = tv;
+                Tops3Data = inp;
             }
             GL.BindVertexArray(0);
         }

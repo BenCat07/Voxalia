@@ -22,6 +22,7 @@
 #define MCM_TH 0
 #define MCM_SKY_FOG 0
 #define MCM_ANTI_TRANSP 0
+#define MCM_SIMPLE_LIGHT 0
 
 #if MCM_VOX
 layout (binding = 0) uniform sampler2DArray s;
@@ -374,6 +375,9 @@ void main()
 			f_spos.x = sign(f_spos.x) * fix_sqr(1.0 - abs(f_spos.x)); // Inverse square the relative position while preserving the sign. Shadow creation buffer also did this.
 			f_spos.y = sign(f_spos.y) * fix_sqr(1.0 - abs(f_spos.y)); // This section means that coordinates near the center of the light view will have more pixels per area available than coordinates far from the center.
 		}
+#if MCM_SIMPLE_LIGHT
+		const float depth = 1.0;
+#else
 		vec3 fs = vec3(0.0);
 		if (is_point == 0)
 		{
@@ -429,6 +433,7 @@ void main()
 		}
 #else
 		const float depth = 1.0;
+#endif
 #endif
 		vec3 L = light_path / light_length; // Get the light's movement direction as a vector
 		vec3 diffuse = max(dot(tf_normal, L), 0.0) * vec3(diffuse_albedo); // Find out how much diffuse light to apply

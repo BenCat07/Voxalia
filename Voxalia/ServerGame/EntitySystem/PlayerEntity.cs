@@ -825,6 +825,12 @@ namespace Voxalia.ServerGame.EntitySystem
                 Vector3i ctops = new Vector3i(cpos.X / 10, cpos.Y / 10, cpos.Z / 10);
                 if (ctops != currentTops)
                 {
+                    Vector3i cetops = new Vector3i(ctops.X / 5, ctops.Y / 5, ctops.Z / 5);
+                    if (cetops != excessTops)
+                    {
+                        excessTops = cetops;
+                        SendExcessTops();
+                    }
                     currentTops = ctops;
                     SendTopsFix();
                 }
@@ -926,19 +932,44 @@ namespace Voxalia.ServerGame.EntitySystem
 
         Vector3i currentTops = new Vector3i(int.MaxValue, int.MaxValue, int.MaxValue);
 
+        Vector3i excessTops = new Vector3i(int.MaxValue, int.MaxValue, int.MaxValue);
+
+        public void SendExcessTops()
+        {
+            Vector3i cpos = TheRegion.ChunkLocFor(GetPosition());
+            Vector2i flat = new Vector2i(cpos.X, cpos.Y);
+            if (excessTops.Z > 0)
+            {
+                byte[] toper3 = TheRegion.GetTopsArray(flat, 750, 4);
+                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 3, FileHandler.Compress(toper3)));
+            }
+            else
+            {
+                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 3, new byte[0]));
+            }
+        }
+
         public void SendTopsFix()
         {
             Vector3i cpos = TheRegion.ChunkLocFor(GetPosition());
             Vector2i flat = new Vector2i(cpos.X, cpos.Y);
-            byte[] toper = TheRegion.GetTopsArray(flat, 30, 2);
-            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, FileHandler.Compress(toper)));
-            if (currentTops.Z > 0)
+            if (excessTops.Z <= 0)
             {
-                byte[] toper2 = TheRegion.GetTopsArray(flat, 150, 3);
-                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, FileHandler.Compress(toper2)));
+                byte[] toper = TheRegion.GetTopsArray(flat, 30, 2);
+                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, FileHandler.Compress(toper)));
+                if (currentTops.Z > 0)
+                {
+                    byte[] toper2 = TheRegion.GetTopsArray(flat, 150, 3);
+                    ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, FileHandler.Compress(toper2)));
+                }
+                else
+                {
+                    ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
+                }
             }
             else
             {
+                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, new byte[0]));
                 ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
             }
         }

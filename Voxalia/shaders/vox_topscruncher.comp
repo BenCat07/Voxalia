@@ -76,12 +76,12 @@ void main()
 		const int OFFSETTER = 8;
 		const int S_M = TOPS_WIDTH;
 		if (S_M == 150 && gl_GlobalInvocationID.x > (45 - OFFSETTER) && gl_GlobalInvocationID.x < (45 + OFFSETTER)
-					   && gl_GlobalInvocationID.y > (45 - OFFSETTER) && gl_GlobalInvocationID.y < (45 + OFFSETTER))
+					  && gl_GlobalInvocationID.y > (45 - OFFSETTER) && gl_GlobalInvocationID.y < (45 + OFFSETTER))
 		{
-			c_hei -= 100000;
-			xp_hei -= 100000;
-			yp_hei -= 100000;
-			pp_hei -= 100000;
+			c_hei -= 100;
+			xp_hei -= 100;
+			yp_hei -= 100;
+			pp_hei -= 100;
 		}
 		// 0,0  :  1,0  :  1,1 - xp ym
 		// 0,0  :  1,1  :  0,1 - xm yp

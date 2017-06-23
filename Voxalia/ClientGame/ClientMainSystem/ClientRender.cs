@@ -119,11 +119,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
             return MaximumStraightBlockDistance() * 2;
         }
 
+        const float FOGMAXDIST_3 = 55000;
+        
         const float FOGMAXDIST_2 = 11000;
 
         const float FOGMAXDIST_1 = 30 * 90;
 
         float CurFogMax = FOGMAXDIST_1;
+
+        public float ZFarOut()
+        {
+            return CurFogMax * 3.0f;
+        }
 
         public float FogMaxDist()
         {
@@ -288,7 +295,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 + (CVars.r_forward_shadows.ValueB ? ",MCM_SHADOWS" : "");
             s_forw = Shaders.GetShader("forward" + def + forw_extra);
             s_forw_nobones = Shaders.GetShader("forward" + def + ",MCM_NO_BONES" + forw_extra);
-            s_forw_vox_slod = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_NO_ALPHA_CAP,MCM_ANTI_TRANSP" + forw_extra);
+            s_forw_vox_slod = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_SIMPLE_LIGHT,MCM_NO_ALPHA_CAP,MCM_ANTI_TRANSP" + forw_extra);
             s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TH" + forw_extra);
             s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);
             s_forw_trans_nobones = Shaders.GetShader("forward" + def + ",MCM_TRANSP,MCM_NO_BONES" + forw_extra);
@@ -842,7 +849,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             lock (TickLock)
             {
-                float goalMax = VoxelComputer.Tops2Chunk == null || !VoxelComputer.Tops2Chunk.generated ? FOGMAXDIST_1 : FOGMAXDIST_2;
+                float goalMax = (VoxelComputer.Tops3Chunk == null || !VoxelComputer.Tops3Chunk.generated) ? (VoxelComputer.Tops2Chunk == null || !VoxelComputer.Tops2Chunk.generated ? FOGMAXDIST_1 : FOGMAXDIST_2) : FOGMAXDIST_3;
                 if (goalMax > CurFogMax)
                 {
                     CurFogMax = Math.Min(goalMax, CurFogMax * (float)Math.Pow(1.5f, Delta));
@@ -1183,7 +1190,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public float GetSecondSkyDistance()
         {
-            return 15000f;
+            return ZFarOut() * 0.65f;
         }
 
         /// <summary>
@@ -1191,7 +1198,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public float GetSkyDistance()
         {
-            return 10000f;
+            return ZFarOut() * 0.5f;
         }
 
         /// <summary>
@@ -1266,29 +1273,29 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 s_forwt_nofog.Bind();
                 GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
-                GL.Uniform2(14, new Vector2(60f, 25000f));
+                GL.Uniform2(14, new Vector2(60f, ZFarOut()));
             }
             else
             {
                 // TODO: Deferred option?
             }
             float zf = ZFar();
-            float spf = 3000f;
+            float spf = ZFarOut() * 0.3333f;
             Textures.GetTexture("skies/sun").Bind(); // TODO: Store var!
             Matrix4 rot = Matrix4.CreateTranslation(-spf * 0.5f, -spf * 0.5f, 0f)
                 * Matrix4.CreateRotationY((float)((-SunAngle.Pitch - 90f) * Utilities.PI180))
                 * Matrix4.CreateRotationZ((float)((180f + SunAngle.Yaw) * Utilities.PI180))
-                * Matrix4.CreateTranslation(ClientUtilities.Convert(TheSun.Direction * -(GetSkyDistance() * 0.96f)));
+                * Matrix4.CreateTranslation(ClientUtilities.Convert(TheSun.Direction * -(GetSkyDistance() * 0.95f)));
             Rendering.RenderRectangle(0, 0, spf, spf, rot); // TODO: Adjust scale based on view rad
             View3D.CheckError("Rendering - Sky - Sun");
             Textures.GetTexture("skies/planet_sphere").Bind(); // TODO: Store var!
-            float ppf = 5000f;
+            float ppf = ZFarOut() * 0.5f;
             Rendering.SetColor(new Color4(PlanetLight, PlanetLight, PlanetLight, 1));
             rot = Matrix4.CreateScale(ppf * 0.5f)
                 * Matrix4.CreateTranslation(-ppf * 0.5f, -ppf * 0.5f, 0f)
                 //* Matrix4.CreateRotationY((float)((-PlanetAngle.Pitch - 90f) * Utilities.PI180))
                 * Matrix4.CreateRotationZ((float)((180f + PlanetAngle.Yaw) * Utilities.PI180))
-                * Matrix4.CreateTranslation(ClientUtilities.Convert(PlanetDir * -(GetSkyDistance() * 0.8f)));
+                * Matrix4.CreateTranslation(ClientUtilities.Convert(PlanetDir * -(GetSkyDistance() * 0.79f)));
             //Rendering.RenderRectangle(0, 0, ppf, ppf, rot);
             GL.UniformMatrix4(2, false, ref rot);
             Models.Sphere.Draw();
@@ -1303,7 +1310,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 s_forwt_obj.Bind();
                 GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
-                GL.Uniform2(14, new Vector2(60f, 25000f));
+                GL.Uniform2(14, new Vector2(60f, ZFarOut()));
             }
             else
             {
@@ -1328,7 +1335,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (MainWorldView.FBOid.IsForward())
             {
                 s_forw_vox_slod = s_forw_vox_slod.Bind();
-                GL.Uniform2(14, new Vector2(60f, 25000f));
+                GL.Uniform2(14, new Vector2(60f, ZFarOut()));
             }
             else
             {
@@ -1346,23 +1353,35 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ch.Render();
                 }
             }
-            if (CVars.r_compute.ValueB && VoxelComputer.TopsChunk != null)
+            if (CVars.r_compute.ValueB && VoxelComputer.Tops3Chunk != null)
             {
-                const int C_EXTRA = 30;
+                const int C_EXTRA = 750;
                 const double C_SUB = C_EXTRA + C_EXTRA / 2;
-                Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.TopsX * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.TopsY * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
+                Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.Tops3X * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.Tops3Y * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
                 TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
                 GL.Uniform1(8, (float)C_EXTRA);
-                VoxelComputer.TopsChunk.Render();
+                VoxelComputer.Tops3Chunk.Render();
             }
-            if (CVars.r_compute.ValueB && VoxelComputer.Tops2Chunk != null)
+            else
             {
-                const int C_EXTRA = 150;
-                const double C_SUB = C_EXTRA + C_EXTRA / 2;
-                Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.Tops2X * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.Tops2Y * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
-                TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
-                GL.Uniform1(8, (float)C_EXTRA);
-                VoxelComputer.Tops2Chunk.Render();
+                if (CVars.r_compute.ValueB && VoxelComputer.TopsChunk != null)
+                {
+                    const int C_EXTRA = 30;
+                    const double C_SUB = C_EXTRA + C_EXTRA / 2;
+                    Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.TopsX * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.TopsY * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
+                    TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
+                    GL.Uniform1(8, (float)C_EXTRA);
+                    VoxelComputer.TopsChunk.Render();
+                }
+                if (CVars.r_compute.ValueB && VoxelComputer.Tops2Chunk != null)
+                {
+                    const int C_EXTRA = 150;
+                    const double C_SUB = C_EXTRA + C_EXTRA / 2;
+                    Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.Tops2X * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.Tops2Y * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
+                    TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
+                    GL.Uniform1(8, (float)C_EXTRA);
+                    VoxelComputer.Tops2Chunk.Render();
+                }
             }
             /*
             foreach (Chunk ch in TheRegion.LoadedChunks.Values)

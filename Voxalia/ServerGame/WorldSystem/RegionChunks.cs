@@ -27,12 +27,12 @@ namespace Voxalia.ServerGame.WorldSystem
         public byte[] GetSuperLODChunkData(Vector3i cpos)
         {
             byte[] b = ChunkManager.GetSuperLODChunkDetails(cpos.X, cpos.Y, cpos.Z);
-            if (b.Length == 0)
-            {
-                return LSAir;
-            }
             if (b != null)
             {
+                if (b.Length == 0)
+                {
+                    return LSAir;
+                }
                 return b;
             }
             // TODO: Maybe save this value to the ChunkManager?
@@ -44,12 +44,12 @@ namespace Voxalia.ServerGame.WorldSystem
         public byte[] GetLODSixChunkData(Vector3i cpos)
         {
             byte[] b = ChunkManager.GetLODSixChunkDetails(cpos.X, cpos.Y, cpos.Z);
-            if (b.Length == 0)
-            {
-                return L6Air;
-            }
             if (b != null)
             {
+                if (b.Length == 0)
+                {
+                    return L6Air;
+                }
                 return b;
             }
             // TODO: Maybe save this value to the ChunkManager?

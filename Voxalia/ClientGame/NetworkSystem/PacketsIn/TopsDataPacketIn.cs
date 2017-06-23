@@ -49,6 +49,11 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 TheClient.VoxelComputer.Tops2X = x;
                 TheClient.VoxelComputer.Tops2Y = y;
             }
+            else if (mode == 3)
+            {
+                TheClient.VoxelComputer.Tops3X = x;
+                TheClient.VoxelComputer.Tops3Y = y;
+            }
             else
             {
                 // Ignore unimplemented alternate sizes.
