@@ -295,7 +295,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 + (CVars.r_forward_shadows.ValueB ? ",MCM_SHADOWS" : "");
             s_forw = Shaders.GetShader("forward" + def + forw_extra);
             s_forw_nobones = Shaders.GetShader("forward" + def + ",MCM_NO_BONES" + forw_extra);
-            s_forw_vox_slod = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_SIMPLE_LIGHT,MCM_NO_ALPHA_CAP,MCM_ANTI_TRANSP" + forw_extra);
+            s_forw_vox_slod = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_SIMPLE_LIGHT,MCM_NO_ALPHA_CAP,MCM_ANTI_TRANSP");
             s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TH" + forw_extra);
             s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);
             s_forw_trans_nobones = Shaders.GetShader("forward" + def + ",MCM_TRANSP,MCM_NO_BONES" + forw_extra);

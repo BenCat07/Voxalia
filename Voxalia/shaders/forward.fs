@@ -445,7 +445,9 @@ void main()
 	}
 	color.xyz = min(res_color * (1.0 - max(0.2, minimum_light)) + color.xyz * max(0.2, minimum_light), vec3(1.0));
 #else // MCM_LIGHTS
-	color.xyz *= min(max(dot(-tf_normal, sunlightDir) * maximum_light, max(0.2, minimum_light)), 1.0);
+	float dotted = dot(-tf_normal, sunlightDir);
+	dotted = dotted <= 0.0 ? 0.0 : sqrt(dotted);
+	color.xyz *= min(max(dotted * maximum_light, max(0.2, minimum_light)), 1.0) * 0.75;
 #endif // else - MCM_LIGHTS
 	applyFog();
 #if MCM_TRANSP

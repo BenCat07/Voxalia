@@ -1035,12 +1035,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
             TheClient.s_forw_vox_slod.Bind();
-            if (TheClient.CVars.r_forward_lights.ValueB)
-            {
-                GL.Uniform1(15, (float)c);
-                GL.UniformMatrix4(20, LIGHTS_MAX, false, shadowmat_dat);
-                GL.UniformMatrix4(20 + LIGHTS_MAX, LIGHTS_MAX, false, light_dat);
-            }
             CheckError("Render/Fast - Uniforms 5.25");
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
