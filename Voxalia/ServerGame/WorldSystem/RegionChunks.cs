@@ -263,10 +263,10 @@ namespace Voxalia.ServerGame.WorldSystem
                                 }
                                 //SysConsole.Output(OutputType.DEBUG, "fail for " + chunkker.X + ", " + chunkker.Y);
                             }
-                            else
+                            /*else
                             {
                                 SysConsole.Output(OutputType.DEBUG, "Used " + height + ", " + mat);
-                            }
+                            }*/
                             int idder = (y * Constants.CHUNK_WIDTH + by) * (Constants.CHUNK_WIDTH * countter) + (x * Constants.CHUNK_WIDTH + bx);
                             Utilities.UshortToBytes(mat).CopyTo(result, idder * 2);
                             Utilities.IntToBytes(height).CopyTo(result, sectiontwo + idder * 4);
