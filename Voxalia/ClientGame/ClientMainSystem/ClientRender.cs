@@ -119,9 +119,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             return MaximumStraightBlockDistance() * 2;
         }
 
-        const float FOGMAXDIST_2 = 10000;
+        const float FOGMAXDIST_2 = 11000;
 
-        const float FOGMAXDIST_1 = 25 * 90;
+        const float FOGMAXDIST_1 = 30 * 90;
 
         float CurFogMax = FOGMAXDIST_1;
 
@@ -1348,7 +1348,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             if (CVars.r_compute.ValueB && VoxelComputer.TopsChunk != null)
             {
-                const int C_EXTRA = 25;
+                const int C_EXTRA = 30;
                 const double C_SUB = C_EXTRA + C_EXTRA / 2;
                 Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.TopsX * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.TopsY * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
                 TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);
@@ -1357,7 +1357,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             if (CVars.r_compute.ValueB && VoxelComputer.Tops2Chunk != null)
             {
-                const int C_EXTRA = 125;
+                const int C_EXTRA = 150;
                 const double C_SUB = C_EXTRA + C_EXTRA / 2;
                 Matrix4d mat = Matrix4d.CreateTranslation(VoxelComputer.Tops2X * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, VoxelComputer.Tops2Y * Chunk.CHUNK_SIZE - C_SUB * Chunk.CHUNK_SIZE, 0);
                 TheRegion.TheClient.MainWorldView.SetMatrix(2, mat);

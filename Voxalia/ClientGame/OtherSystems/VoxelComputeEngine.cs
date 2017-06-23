@@ -85,8 +85,8 @@ namespace Voxalia.ClientGame.OtherSystems
             }
             Program_SLODCombo1 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_ONE 1\n");
             Program_SLODCombo2 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_TWO 1\n");
-            Program_TopsCruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 25\n");
-            Program_Tops2Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 125\n");
+            Program_TopsCruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 30\n");
+            Program_Tops2Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 150\n");
             View3D.CheckError("Compute - Startup - Shaders");
             float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 7)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
