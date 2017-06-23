@@ -186,90 +186,97 @@ namespace Voxalia.ServerGame.WorldSystem
             // TODO: Find more logical basis for this system than tops data...? Maybe keep as 'default gen' only... or somehow calculate reasonable but-below-the-top max data from block/chunk average weights...
             byte[] result = new byte[Constants.TOPS_DATA_SIZE * 6];
             const int sectiontwo = Constants.TOPS_DATA_SIZE * 2;
-            const int countter = (Constants.TOPS_DATA_WIDTH / Constants.CHUNK_WIDTH);
+            const int countter = 3;
             int top_mod = offs;
-            int treesGenned = 0;
+            //int treesGenned = 0;
+            int sizer = top_mod;
             for (int x = 0; x < countter; x++)
             {
                 for (int y = 0; y < countter; y++)
                 {
-                    int sizer = top_mod;
                     Vector2i relPos = new Vector2i(chunkPos.X + x * sizer - sizer - sizer / 2, chunkPos.Y + y * sizer - sizer - sizer / 2);
                     //KeyValuePair<byte[], byte[]> known_tops = ChunkManager.GetTopsHigher(relPos.X * Constants.CHUNK_WIDTH / top_mod, relPos.Y * Constants.CHUNK_WIDTH / top_mod, size_mode);
                     for (int bx = 0; bx < Constants.CHUNK_WIDTH; bx++)
                     {
                         for (int by = 0; by < Constants.CHUNK_WIDTH; by++)
                         {
-                            Vector2i absCoord = new Vector2i(relPos.X * Constants.CHUNK_WIDTH + bx * top_mod, relPos.Y * Constants.CHUNK_WIDTH + by * top_mod);
-                            Vector2i chunkker = new Vector2i(absCoord.X / Constants.CHUNK_WIDTH, absCoord.Y / Constants.CHUNK_WIDTH);
-                            Vector2i posd = new Vector2i(absCoord.X - chunkker.X * Constants.CHUNK_WIDTH, absCoord.Y - chunkker.Y * Constants.CHUNK_WIDTH);
-                            ChunkDataManager.Heights h = ChunkManager.GetHeightEstimates(chunkker.X, chunkker.Y);
-                            //int inner_ind = by * Constants.CHUNK_WIDTH + bx;
-                            ushort mat = 0;// known_tops.Key == null ? (ushort)0 : Utilities.BytesToUshort(Utilities.BytesPartial(known_tops.Key, inner_ind * 2, 2));
-                            int height = 0;// known_tops.Key == null ? 0 : Utilities.BytesToInt(Utilities.BytesPartial(known_tops.Value, inner_ind * 4 + (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * 2, 4));
-                            if (posd.X < Constants.CHUNK_WIDTH / 2)
+                            for (int rx = 0; rx < 2; rx++)
                             {
-                                if (posd.Y < Constants.CHUNK_WIDTH / 2)
+                                for (int ry = 0; ry < 2; ry++)
                                 {
-                                    mat = h.MA;
-                                    height = h.A;
-                                }
-                                else
-                                {
-                                    mat = h.MB;
-                                    height = h.B;
-                                }
-                            }
-                            else
-                            {
-                                if (posd.Y < Constants.CHUNK_WIDTH / 2)
-                                {
-                                    mat = h.MC;
-                                    height = h.C;
-                                }
-                                else
-                                {
-                                    mat = h.MD;
-                                    height = h.D;
-                                }
-                            }
-                            if (mat == 0 || height == int.MaxValue)
-                            {
-                                height = (int)Generator.GetHeight(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, absCoord.X, absCoord.Y);
-                                Biome b = Generator.GetBiomeGen().BiomeFor(TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, absCoord.X, absCoord.Y, height, height);
-                                if (height > 0)
-                                {
-                                    mat = (ushort)b.GetAboveZeromat();
-                                }
-                                else
-                                {
-                                    mat = (ushort)b.GetZeroOrLowerMat();
-                                    height = 0;
-                                }
-                                // TODO: less weird tree placement helper
-                                if (TheWorld.Settings.TreesInDistance && b.LikelyToHaveTrees() && treesGenned < 200 && Utilities.UtilRandom.Next(20) == 0)
-                                {
-                                    Location treePos = new Location(absCoord.X, absCoord.Y, height);
-                                    Vector3i TreeChunkPos = ChunkLocFor(treePos);
-                                    if (GetChunk(TreeChunkPos) == null && GetEntitiesInRadius(treePos, 30).Count == 0)
+                                    Vector2i absCoord = new Vector2i(relPos.X * Constants.CHUNK_WIDTH + bx * top_mod + rx * top_mod / 2, relPos.Y * Constants.CHUNK_WIDTH + by * top_mod + ry * top_mod / 2);
+                                    Vector2i chunkker = new Vector2i(absCoord.X / Constants.CHUNK_WIDTH, absCoord.Y / Constants.CHUNK_WIDTH);
+                                    Vector2i posd = new Vector2i(absCoord.X - chunkker.X * Constants.CHUNK_WIDTH, absCoord.Y - chunkker.Y * Constants.CHUNK_WIDTH);
+                                    ChunkDataManager.Heights h = ChunkManager.GetHeightEstimates(chunkker.X, chunkker.Y);
+                                    //int inner_ind = by * Constants.CHUNK_WIDTH + bx;
+                                    ushort mat = 0;// known_tops.Key == null ? (ushort)0 : Utilities.BytesToUshort(Utilities.BytesPartial(known_tops.Key, inner_ind * 2, 2));
+                                    int height = 0;// known_tops.Key == null ? 0 : Utilities.BytesToInt(Utilities.BytesPartial(known_tops.Value, inner_ind * 4 + (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * 2, 4));
+                                    if (posd.X < Constants.CHUNK_WIDTH / 2)
                                     {
-                                        double treex = Utilities.UtilRandom.NextDouble() * 30.0 - 15.0;
-                                        double treey = Utilities.UtilRandom.NextDouble() * 30.0 - 15.0;
-                                        Location treeResult = new Location(absCoord.X + treex, absCoord.Y + treey, height + 10.0);
-                                        SpawnTree("treevox01", treeResult, null);
-                                        SysConsole.Output(OutputType.DEBUG, "Tree at " + treeResult);
-                                        treesGenned++;
+                                        if (posd.Y < Constants.CHUNK_WIDTH / 2)
+                                        {
+                                            mat = h.MA;
+                                            height = h.A;
+                                        }
+                                        else
+                                        {
+                                            mat = h.MB;
+                                            height = h.B;
+                                        }
                                     }
+                                    else
+                                    {
+                                        if (posd.Y < Constants.CHUNK_WIDTH / 2)
+                                        {
+                                            mat = h.MC;
+                                            height = h.C;
+                                        }
+                                        else
+                                        {
+                                            mat = h.MD;
+                                            height = h.D;
+                                        }
+                                    }
+                                    if (mat == 0 || height == int.MaxValue)
+                                    {
+                                        height = (int)Generator.GetHeight(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, absCoord.X, absCoord.Y);
+                                        Biome b = Generator.GetBiomeGen().BiomeFor(TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, absCoord.X, absCoord.Y, height, height);
+                                        if (height > 0)
+                                        {
+                                            mat = (ushort)b.GetAboveZeromat();
+                                        }
+                                        else
+                                        {
+                                            mat = (ushort)b.GetZeroOrLowerMat();
+                                            height = 0;
+                                        }
+                                        // TODO: less weird tree placement helper
+                                        /*
+                                        if (TheWorld.Settings.TreesInDistance && b.LikelyToHaveTrees() && treesGenned < 200 && Utilities.UtilRandom.Next(20) == 0)
+                                        {
+                                            Location treePos = new Location(absCoord.X, absCoord.Y, height);
+                                            Vector3i TreeChunkPos = ChunkLocFor(treePos);
+                                            if (GetChunk(TreeChunkPos) == null && GetEntitiesInRadius(treePos, 30).Count == 0)
+                                            {
+                                                double treex = Utilities.UtilRandom.NextDouble() * 30.0 - 15.0;
+                                                double treey = Utilities.UtilRandom.NextDouble() * 30.0 - 15.0;
+                                                Location treeResult = new Location(absCoord.X + treex, absCoord.Y + treey, height + 10.0);
+                                                SpawnTree("treevox01", treeResult, null);
+                                                SysConsole.Output(OutputType.DEBUG, "Tree at " + treeResult);
+                                                treesGenned++;
+                                            }
+                                        }*/
+                                        //SysConsole.Output(OutputType.DEBUG, "fail for " + chunkker.X + ", " + chunkker.Y);
+                                    }
+                                    /*else
+                                    {
+                                        SysConsole.Output(OutputType.DEBUG, "Used " + height + ", " + mat);
+                                    }*/
+                                    int idder = ((y * Constants.CHUNK_WIDTH + by) * 2 + ry) * (Constants.CHUNK_WIDTH * countter * 2) + ((x * Constants.CHUNK_WIDTH + bx) * 2 + rx);
+                                    Utilities.UshortToBytes(mat).CopyTo(result, idder * 2);
+                                    Utilities.IntToBytes(height).CopyTo(result, sectiontwo + idder * 4);
                                 }
-                                //SysConsole.Output(OutputType.DEBUG, "fail for " + chunkker.X + ", " + chunkker.Y);
                             }
-                            /*else
-                            {
-                                SysConsole.Output(OutputType.DEBUG, "Used " + height + ", " + mat);
-                            }*/
-                            int idder = (y * Constants.CHUNK_WIDTH + by) * (Constants.CHUNK_WIDTH * countter) + (x * Constants.CHUNK_WIDTH + bx);
-                            Utilities.UshortToBytes(mat).CopyTo(result, idder * 2);
-                            Utilities.IntToBytes(height).CopyTo(result, sectiontwo + idder * 4);
                         }
                     }
                 }

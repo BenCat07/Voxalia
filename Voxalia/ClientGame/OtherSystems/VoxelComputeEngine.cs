@@ -86,9 +86,9 @@ namespace Voxalia.ClientGame.OtherSystems
             }
             Program_SLODCombo1 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_ONE 1\n");
             Program_SLODCombo2 = TheClient.Shaders.CompileCompute("vox_slodcombo", "#define MODE_TWO 1\n");
-            Program_TopsCruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 30\n");
-            Program_Tops2Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 150\n");
-            Program_Tops3Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 750\n");
+            Program_TopsCruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 15\n");
+            Program_Tops2Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 75\n");
+            Program_Tops3Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 375\n");
             View3D.CheckError("Compute - Startup - Shaders");
             float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 7)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
@@ -436,7 +436,7 @@ namespace Voxalia.ClientGame.OtherSystems
             }
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, buf);
             GL.UseProgram(mode == 1 ? Program_TopsCruncher : (mode == 2 ? Program_Tops2Cruncher : Program_Tops3Cruncher));
-            GL.DispatchCompute(1, 9, 1);
+            GL.DispatchCompute(1, 36, 1);
             for (int i = 0; i < 8; i++)
             {
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, i, 0);

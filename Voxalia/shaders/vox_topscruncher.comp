@@ -31,7 +31,7 @@ layout(std430, binding = 7) buffer tops_data
 	ivec4 f_topsdat[];
 };
 
-layout(local_size_x = 89, local_size_y = 10, local_size_z = 1) in;
+layout(local_size_x = 179, local_size_y = 5, local_size_z = 1) in;
 
 float tex_for(in uint mat)
 {
@@ -40,20 +40,19 @@ float tex_for(in uint mat)
 
 int mat_for(uvec2 coord)
 {
-	uint cd = (coord.y * 90) + (coord.x);
-	return cd < 0 ? 0 : f_topsdat[cd].x;
+	return f_topsdat[(coord.y * 180) + (coord.x)].x;
 }
 
 int height_for(uvec2 coord)
 {
-	return f_topsdat[(coord.y * 90) + (coord.x)].y;
+	return f_topsdat[(coord.y * 180) + (coord.x)].y;
 }
 
 void main()
 {
-	if (gl_GlobalInvocationID.y != 90)
+	if (gl_GlobalInvocationID.y != 180)
 	{
-		int c_ind = int(((gl_GlobalInvocationID.y * 89) + (gl_GlobalInvocationID.x)) * 6);
+		int c_ind = int(((gl_GlobalInvocationID.y * 179) + (gl_GlobalInvocationID.x)) * 6);
 		int c_mat = mat_for(gl_GlobalInvocationID.xy);
 		float texter = tex_for(uint(c_mat));
 		int c_hei = height_for(gl_GlobalInvocationID.xy);
@@ -73,10 +72,10 @@ void main()
 			f_indices[c_ind + i] = c_ind + i;
 			f_color[c_ind + i] = vec4(1.0);
 		}
-		const int OFFSETTER = 8;
+		const int OFFSETTER = 16;
 		const int S_M = TOPS_WIDTH;
-		if (S_M == 150 && gl_GlobalInvocationID.x > (45 - OFFSETTER) && gl_GlobalInvocationID.x < (45 + OFFSETTER)
-					   && gl_GlobalInvocationID.y > (45 - OFFSETTER) && gl_GlobalInvocationID.y < (45 + OFFSETTER))
+		if (S_M == 75 && gl_GlobalInvocationID.x > (90 - OFFSETTER) && gl_GlobalInvocationID.x < (90 + OFFSETTER)
+					   && gl_GlobalInvocationID.y > (90 - OFFSETTER) && gl_GlobalInvocationID.y < (90 + OFFSETTER))
 		{
 			c_hei -= 100;
 			xp_hei -= 100;

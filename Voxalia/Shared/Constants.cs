@@ -68,10 +68,10 @@ namespace Voxalia.Shared
         public const int CHUNK_SLOD_WIDTH = CHUNKS_PER_SLOD * CHUNK_WIDTH;
 
         /// <summary>
-        /// How wide the TOPS data is. Chosen as (3 * CHUNK_WIDTH(30)): 90.
+        /// How wide the TOPS data is. Chosen as (3 * CHUNK_WIDTH(30) * 2): 180.
         /// Meaning, 1 set on either side, plus one partially empty set in the center!
         /// </summary>
-        public const int TOPS_DATA_WIDTH = 3 * CHUNK_WIDTH;
+        public const int TOPS_DATA_WIDTH = 3 * CHUNK_WIDTH * 2;
 
         /// <summary>
         /// The size of a tops data array: (WIDTH * WIDTH).

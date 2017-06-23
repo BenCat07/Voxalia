@@ -312,6 +312,8 @@ namespace Voxalia.ServerGame.WorldSystem
             catch (Exception ex)
             {
                 SysConsole.Output("World crash", ex);
+                UnloadFully(null);
+                FinalShutdown();
             }
         }
 
