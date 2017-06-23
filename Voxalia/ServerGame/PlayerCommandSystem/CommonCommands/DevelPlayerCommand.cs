@@ -22,6 +22,7 @@ using FreneticScript.TagHandlers.Objects;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.JointSystem;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
 {
@@ -386,6 +387,59 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                         return;
                 }
                 entry.Player.Network.SendPacket(pepo);
+            }
+            else if (arg0 == "summonMountain")
+            {
+                System.Drawing.Image img = System.Drawing.Image.FromFile("mountain.png");
+                System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(img);
+                Location min = entry.Player.GetPosition();
+                for (int x = 0; x < bmp.Width; x++)
+                {
+                    int xxer = x;
+                    Action a = () =>
+                    {
+                        HashSet<Vector3i> loads = new HashSet<Vector3i>();
+                        List<Location> locs = new List<Location>(2048);
+                        for (int y = 0; y < bmp.Height; y++)
+                        {
+                            int col = bmp.GetPixel(xxer, y).R * 3;
+                            for (int z = -30; z < col; z++)
+                            {
+                                for (int tx = 0; tx < 3; tx++)
+                                {
+                                    for (int ty = 0; ty < 3; ty++)
+                                    {
+                                        Location loc = min + new Location(xxer * 3  + tx, y * 3 + ty, z);
+                                        locs.Add(loc);
+                                    }
+                                }
+                            }
+                            for (int z = -30; z < col + 120; z += 10)
+                            {
+                                Location loc = min + new Location(xxer * 3, y * 3, z);
+                                Vector3i cloc = entry.Player.TheRegion.ChunkLocFor(loc);
+                                if (!loads.Contains(cloc))
+                                {
+                                    loads.Add(cloc);
+                                    entry.Player.TheRegion.LoadChunk(cloc);
+                                }
+                            }
+                        }
+                        Location[] loca = locs.ToArray();
+                        BlockInternal[] bia = new BlockInternal[loca.Length];
+                        for (int fx = 0; fx < bia.Length; fx++)
+                        {
+                            bia[fx] = new BlockInternal((ushort)Material.STONE, 0, 0, 0);
+                        }
+                        entry.Player.TheRegion.MassBlockEdit(loca, bia);
+                    };
+                    entry.Player.TheRegion.TheWorld.Schedule.ScheduleSyncTask(a, x * 0.1);
+                }
+                entry.Player.TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
+                {
+                    bmp.Dispose();
+                    img.Dispose();
+                }, bmp.Width * 0.05 + 1);
             }
             else
             {

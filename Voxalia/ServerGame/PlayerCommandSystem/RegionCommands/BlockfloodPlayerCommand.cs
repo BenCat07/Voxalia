@@ -13,6 +13,7 @@ using Voxalia.Shared;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.WorldSystem;
 using FreneticGameCore;
+using FreneticGameCore.Collision;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
 {
@@ -32,43 +33,52 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
             }
             Material chosenMat = MaterialHelpers.FromNameOrNumber(entry.InputArguments[0]);
             double maxRad = Utilities.StringToFloat(entry.InputArguments[1]);
-            if (maxRad > 50) // TODO: Config!
+            if (maxRad > 100) // TODO: Config!
             {
-                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Maximum radius is 50!");
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Maximum radius is 100!");
                 return;
             }
             Location start = entry.Player.GetPosition().GetBlockLocation() + new Location(0, 0, 1);
-            HashSet<Location> locs = new HashSet<Location>();
-            FloodFrom(entry.Player.TheRegion, start, start, maxRad, locs);
-            Location[] tlocs = locs.ToArray();
+            HashSet<Vector3i> locs = new HashSet<Vector3i>();
+            FloodFrom(entry.Player.TheRegion, start.ToVec3i(), maxRad, locs);
+            Vector3i[] tlocs = locs.ToArray();
             BlockInternal[] bis = new BlockInternal[tlocs.Length];
+            Location[] plocs = new Location[tlocs.Length];
             for (int i = 0; i < bis.Length; i++)
             {
+                plocs[i] = tlocs[i].ToLocation();
                 bis[i] = new BlockInternal((ushort)chosenMat, 0, 0, (byte)BlockFlags.EDITED);
             }
-            entry.Player.TheRegion.MassBlockEdit(tlocs, bis, false);
+            entry.Player.TheRegion.MassBlockEdit(plocs, bis);
         }
 
-        Location[] FloodDirs = new Location[] { Location.UnitX, Location.UnitY, -Location.UnitX, -Location.UnitY, -Location.UnitZ };
+        Vector3i[] FloodDirs = new Vector3i[] { new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0), new Vector3i(0, 1, 0), new Vector3i(0, -1, 0), new Vector3i(0, 0, -1) };
 
-        void FloodFrom(Region tregion, Location start, Location c, double maxRad, HashSet<Location> locs)
+        void FloodFrom(Region tregion, Vector3i start, double maxRad, HashSet<Vector3i> locs)
         {
-            if ((c - start).LengthSquared() > maxRad * maxRad)
+            Queue<Vector3i> toCheck = new Queue<Vector3i>(128);
+            Dictionary<Vector3i, Chunk> chks = new Dictionary<Vector3i, Chunk>(64);
+            toCheck.Enqueue(start);
+            while (toCheck.Count > 0)
             {
-                return;
-            }
-            if (tregion.GetBlockMaterial(c) != Material.AIR)
-            {
-                return;
-            }
-            if (locs.Contains(c))
-            {
-                return;
-            }
-            locs.Add(c);
-            foreach (Location dir in FloodDirs)
-            {
-                FloodFrom(tregion, start, c + dir, maxRad, locs);
+                Vector3i c = toCheck.Dequeue();
+                if ((c.ToLocation() - start.ToLocation()).LengthSquared() > maxRad * maxRad)
+                {
+                    continue;
+                }
+                if (tregion.GetBlockMaterial(chks, c.ToLocation()) != Material.AIR)
+                {
+                    continue;
+                }
+                if (locs.Contains(c))
+                {
+                    continue;
+                }
+                locs.Add(c);
+                foreach (Vector3i dir in FloodDirs)
+                {
+                    toCheck.Enqueue(c + dir);
+                }
             }
         }
     }
