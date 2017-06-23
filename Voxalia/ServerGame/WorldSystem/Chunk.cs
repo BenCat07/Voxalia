@@ -499,6 +499,10 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             try
             {
+                if (blks.Length == 0 && !FromFile)
+                {
+                    return;
+                }
                 ChunkDetails det = new ChunkDetails()
                 {
                     Version = 2,
@@ -606,7 +610,12 @@ namespace Voxalia.ServerGame.WorldSystem
         /// Any fix paths this chunk needs to run upon being added to the world.
         /// </summary>
         public List<SyncScheduleItem> fixesToRun = new List<SyncScheduleItem>();
-        
+
+        /// <summary>
+        /// Whether this chunk was loaded from file (otherwise, generated).
+        /// </summary>
+        public bool FromFile = false;
+
         /// <summary>
         /// Loads the chunk from save data.
         /// </summary>
@@ -628,6 +637,7 @@ namespace Voxalia.ServerGame.WorldSystem
                     BlocksInternal[i].BlockLocalData = det.Blocks[BlocksInternal.Length * 3 + i];
                     BlocksInternal[i]._BlockPaintInternal = det.Blocks[BlocksInternal.Length * 4 + i];
                 }
+                FromFile = true;
             }
             for (int i = 0; i < Reachability.Length; i++)
             {
