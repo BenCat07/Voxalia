@@ -19,6 +19,91 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 {
     public class SimpleGeneratorCore: BlockPopulator
     {
+        public struct MountainData
+        {
+            public Vector2i Center;
+
+            public double Height;
+
+            public double Radius;
+        }
+
+        public const double MountainGridSize = 400;
+
+        public const double MountainRangeRadius = 1200;
+
+        public const double MountainMaxSizeBlocks = 1200;
+
+        public const double MountainMaxSizeChunks = MountainMaxSizeBlocks / Constants.CHUNK_WIDTH;
+
+        public void GenMountainPositionsForGridCell(List<MountainData> locs, Vector2i mountainPos, Vector2i chunkPos, int seed)
+        {
+            Vector2i mtChunk = new Vector2i((int)(mountainPos.X * MountainGridSize), (int)(mountainPos.Y * MountainGridSize));
+            Location chunkCenter = chunkPos.ToLocation() * Constants.CHUNK_WIDTH;
+            MTRandom random = new MTRandom(39, (ulong)(mountainPos.X * 39 + mountainPos.Y));
+            int count = random.Next(1, 5);
+            for (int i = 0; i < count; i++)
+            {
+                int rangeSize = random.Next(1, 3);
+                double ca = random.NextDouble();
+                double cb = random.NextDouble();
+                Vector2i centerMt = new Vector2i(mtChunk.X * Constants.CHUNK_WIDTH + (int)(ca * MountainGridSize), mtChunk.Y * Constants.CHUNK_WIDTH + (int)(cb * MountainGridSize));
+                double ch = random.NextDouble() * 512 + 512;
+                double cradius = random.NextDouble() * ch * 0.25 + ch * 0.75;
+                MountainData cmt = new MountainData() { Center = centerMt, Height = ch, Radius = cradius };
+                if (centerMt.ToLocation().DistanceSquared(chunkCenter) < (MountainMaxSizeBlocks * MountainMaxSizeBlocks))
+                {
+                    locs.Add(cmt);
+                }
+                for (int r = 1; r < rangeSize; r++)
+                {
+                    double ra = random.NextDouble() * 2.0 - 1.0;
+                    double rb = random.NextDouble() * 2.0 - 1.0;
+                    Vector2i rngMt = new Vector2i(centerMt.X +  (int)(ra * MountainRangeRadius), centerMt.Y + (int)(rb * MountainRangeRadius));
+                    double rh = random.NextDouble() * (ch * 0.5) + (ch * 0.5);
+                    double rradius = random.NextDouble() * rh * 0.25 + rh * 0.75;
+                    MountainData rmt = new MountainData() { Center = rngMt, Height = rh, Radius = rradius };
+                    if (rngMt.ToLocation().DistanceSquared(chunkCenter) < (MountainMaxSizeBlocks * MountainMaxSizeBlocks))
+                    {
+                        locs.Add(rmt);
+                    }
+                }
+            }
+        }
+
+        public List<MountainData> GenMountainPositionsAround(Vector2i chunkPos, int seed)
+        {
+            Vector2i mountainSetLoc = new Vector2i((int)Math.Floor(chunkPos.X * (1.0 / MountainGridSize)), (int)Math.Floor(chunkPos.Y * (1.0 / MountainGridSize)));
+            Vector2i mountainChunkCorner = new Vector2i(mountainSetLoc.X * (int)MountainGridSize, mountainSetLoc.Y * (int)MountainGridSize);
+            List<MountainData> toret = new List<MountainData>();
+            GenMountainPositionsForGridCell(toret, mountainSetLoc, chunkPos, seed);
+            if (chunkPos.X - mountainChunkCorner.X < MountainMaxSizeChunks)
+            {
+                GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(-1, 0), chunkPos, seed);
+            }
+            if (chunkPos.Y - mountainChunkCorner.Y < MountainMaxSizeChunks)
+            {
+                GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(0, -1), chunkPos, seed);
+            }
+            if (mountainChunkCorner.X + MountainGridSize - chunkPos.X < MountainMaxSizeChunks)
+            {
+                GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(1, 0), chunkPos, seed);
+            }
+            if (mountainChunkCorner.Y + MountainGridSize - chunkPos.Y < MountainMaxSizeChunks)
+            {
+                GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(0, 1), chunkPos, seed);
+            }
+            return toret;
+        }
+
+        public double GetMountainHeightAt(MountainData mtd, double dx, double dy)
+        {
+            double relX = mtd.Center.X - dx;
+            double relY = mtd.Center.Y - dy;
+            double dist = Math.Sqrt(relX * relX + relY * relY);
+            return Math.Max(0, ((mtd.Radius - dist) / mtd.Radius) * mtd.Height);
+        }
+
         public override byte[] GetSuperLOD(int seed, int seed2, int seed3, int seed4, int seed5, Vector3i cpos)
         {
             byte[] b = new byte[2 * 2 * 2 * 2];
@@ -142,7 +227,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return Biomes;
         }
 
-        public const double MountainHeightMapSize = 4000;
+        //public const double MountainHeightMapSize = 4000;
 
         public const double HillHeightMapSize = 1000;
 
@@ -235,9 +320,9 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return val > biome.AirDensity();
         }
 
-        public double GetHeightQuick(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y)
+        public double GetHeightQuick(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, List<MountainData> mountains)
         {
-            double mheight = SimplexNoise.Generate(seed4 + (x / MountainHeightMapSize), seed3 + (y / MountainHeightMapSize)) * 2f - 1f;
+            /*double mheight = SimplexNoise.Generate(seed4 + (x / MountainHeightMapSize), seed3 + (y / MountainHeightMapSize)) * 2f - 1f;
             if (mheight > 0.9)
             {
                 mheight = (mheight - 0.9) * 7000f;
@@ -245,6 +330,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             else if (mheight < -0.9)
             {
                 mheight = (mheight + 0.9) * 4000f;
+            }*/
+            double mheight = 0;
+            for (int i = 0; i < mountains.Count; i++)
+            {
+                mheight = Math.Max(mheight, GetMountainHeightAt(mountains[i], x, y));
             }
             double hheight = SimplexNoise.Generate(seed4 + (x / HillHeightMapSize), seed3 + (y / HillHeightMapSize)) * 2f - 1f;
             if (hheight > 0.9)
@@ -259,8 +349,13 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             double height = SimplexNoise.Generate(Seed + (x / LocalHeightMapSize), seed2 + (y / LocalHeightMapSize)) * 5f - 2.5f;
             return mheight + hheight + lheight + height;
         }
-        
-        public override double GetHeight(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y)
+
+        public override double GetHeight(int seed, int seed2, int seed3, int seed4, int seed5, double x, double y)
+        {
+            return GetHeight(seed, seed2, seed3, seed4, seed5, x, y, null);
+        }
+
+        public double GetHeight(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, List<MountainData> mountains)
         {
 #if TIMINGS
             Stopwatch sw = new Stopwatch();
@@ -268,7 +363,12 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             try
             {
 #endif
-            double valBasic = GetHeightQuick(Seed, seed2, seed3, seed4, seed5, x, y);
+            if (mountains == null)
+            {
+                Vector2i chunkloc = new Vector2i((int)Math.Floor(x * (1.0 / Constants.CHUNK_WIDTH)), (int)Math.Floor(y * (1.0 / Constants.CHUNK_WIDTH)));
+                mountains = GenMountainPositionsAround(chunkloc, Seed);
+            }
+            double valBasic = GetHeightQuick(Seed, seed2, seed3, seed4, seed5, x, y, mountains);
             return valBasic;
 #if TIMINGS
             }
@@ -372,6 +472,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 
             public void Generate(SimpleGeneratorCore sgc, Vector3i chunkPos, int Seed, int seed2, int seed3, int seed4, int seed5)
             {
+                List<MountainData> mountains = sgc.GenMountainPositionsAround(new Vector2i(chunkPos.X, chunkPos.Y), Seed);
                 ChunkPosition = chunkPos;
                 CPos = chunkPos.ToLocation() * Chunk.CHUNK_SIZE;
                 Heights = new double[Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE];
@@ -382,7 +483,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                         // Prepare basics
                         int cx = (int)CPos.X + x;
                         int cy = (int)CPos.Y + y;
-                        double hheight = sgc.GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy);
+                        double hheight = sgc.GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy, mountains);
                         Heights[y * Chunk.CHUNK_SIZE + x] = hheight;
                     }
                 }
