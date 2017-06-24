@@ -44,7 +44,15 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             int count = random.Next(1, 5);
             for (int i = 0; i < count; i++)
             {
-                int rangeSize = random.Next(1, 3);
+                int rangeSize;
+                if (random.Next(10) > 5)
+                {
+                     rangeSize = random.Next(1, 6);
+                }
+                else
+                {
+                    rangeSize = random.Next(1, 3);
+                }
                 double ca = random.NextDouble();
                 double cb = random.NextDouble();
                 Vector2i centerMt = new Vector2i(mtChunk.X * Constants.CHUNK_WIDTH + (int)(ca * MountainGridSize), mtChunk.Y * Constants.CHUNK_WIDTH + (int)(cb * MountainGridSize));
