@@ -80,6 +80,14 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             if (chunkPos.X - mountainChunkCorner.X < MountainMaxSizeChunks)
             {
                 GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(-1, 0), chunkPos, seed);
+                if (chunkPos.Y - mountainChunkCorner.Y < MountainMaxSizeChunks)
+                {
+                    GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(-1, -1), chunkPos, seed);
+                }
+                if (mountainChunkCorner.Y + MountainGridSize - chunkPos.Y < MountainMaxSizeChunks)
+                {
+                    GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(-1, 1), chunkPos, seed);
+                }
             }
             if (chunkPos.Y - mountainChunkCorner.Y < MountainMaxSizeChunks)
             {
@@ -88,6 +96,14 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             if (mountainChunkCorner.X + MountainGridSize - chunkPos.X < MountainMaxSizeChunks)
             {
                 GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(1, 0), chunkPos, seed);
+                if (mountainChunkCorner.Y + MountainGridSize - chunkPos.Y < MountainMaxSizeChunks)
+                {
+                    GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(1, 1), chunkPos, seed);
+                }
+                if (chunkPos.Y - mountainChunkCorner.Y < MountainMaxSizeChunks)
+                {
+                    GenMountainPositionsForGridCell(toret, mountainSetLoc + new Vector2i(1, -1), chunkPos, seed);
+                }
             }
             if (mountainChunkCorner.Y + MountainGridSize - chunkPos.Y < MountainMaxSizeChunks)
             {
