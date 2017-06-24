@@ -14,6 +14,7 @@ using Voxalia.Shared;
 using Voxalia.Shared.Collision;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
+using Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers;
 
 namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 {
@@ -32,7 +33,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 
         public const double MountainRangeRadius = 1200;
 
-        public const double MountainMaxSizeBlocks = 1200;
+        public const double MountainMaxSizeBlocks = 2000;
 
         public const double MountainMaxSizeChunks = MountainMaxSizeBlocks / Constants.CHUNK_WIDTH;
 
@@ -47,11 +48,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 int rangeSize;
                 if (random.Next(10) > 5)
                 {
-                     rangeSize = random.Next(1, 6);
+                     rangeSize = random.Next(5, 13);
                 }
                 else
                 {
-                    rangeSize = random.Next(1, 3);
+                    rangeSize = random.Next(3, 8);
                 }
                 double ca = random.NextDouble();
                 double cb = random.NextDouble();
@@ -63,12 +64,15 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 {
                     locs.Add(cmt);
                 }
+                double ph = ch;
                 for (int r = 1; r < rangeSize; r++)
                 {
                     double ra = random.NextDouble() * 2.0 - 1.0;
                     double rb = random.NextDouble() * 2.0 - 1.0;
+                    ra = ra > 0 ? Math.Max(r / (double)rangeSize, ra) : Math.Min(-r / (double)rangeSize, ra);
+                    rb = rb > 0 ? Math.Max(r / (double)rangeSize, rb) : Math.Min(-r / (double)rangeSize, rb);
                     Vector2i rngMt = new Vector2i(centerMt.X +  (int)(ra * MountainRangeRadius), centerMt.Y + (int)(rb * MountainRangeRadius));
-                    double rh = random.NextDouble() * (ch * 0.5) + (ch * 0.5);
+                    double rh = random.NextDouble() * (ph * 0.5) + (ph * 0.5);
                     double rradius = random.NextDouble() * rh * 0.25 + rh * 0.75;
                     MountainData rmt = new MountainData() { Center = rngMt, Height = rh, Radius = rradius };
                     if (rngMt.ToLocation().DistanceSquared(chunkCenter) < (MountainMaxSizeBlocks * MountainMaxSizeBlocks))
@@ -120,12 +124,20 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return toret;
         }
 
+        public static Dictionary<Vector2i, SimpleMountainGenerator> MountainsGenerated = new Dictionary<Vector2i, SimpleMountainGenerator>();
+        
         public double GetMountainHeightAt(MountainData mtd, double dx, double dy)
         {
-            double relX = mtd.Center.X - dx;
-            double relY = mtd.Center.Y - dy;
-            double dist = Math.Sqrt(relX * relX + relY * relY);
-            return Math.Max(0, ((mtd.Radius - dist) / mtd.Radius) * mtd.Height);
+            if (!MountainsGenerated.TryGetValue(new Vector2i(mtd.Center.X, mtd.Center.Y), out SimpleMountainGenerator smg))
+            {
+                smg = SimpleMountainGenerator.PreGenerateMountain(mtd.Center.X, mtd.Center.Y);
+                MountainsGenerated[new Vector2i(mtd.Center.X, mtd.Center.Y)] = smg;
+            }
+            double upScale = mtd.Radius * (2.0 / 512.0);
+            int xCoord = (int)((dx - mtd.Center.X));
+            int yCoord = (int)((dy - mtd.Center.Y));
+            double h = smg.GetHeightAt(xCoord, yCoord, upScale);
+            return h * mtd.Height * (1.0 / 255.0);
         }
 
         public override byte[] GetSuperLOD(int seed, int seed2, int seed3, int seed4, int seed5, Vector3i cpos)
