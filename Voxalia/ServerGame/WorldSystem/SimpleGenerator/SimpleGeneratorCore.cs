@@ -271,7 +271,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return Biomes;
         }
 
-        //public const double MountainHeightMapSize = 4000;
+        public const double OceanHeightMapSize = 8000;
 
         public const double HillHeightMapSize = 1000;
 
@@ -366,15 +366,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 
         public double GetHeightQuick(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, List<MountainData> mountains)
         {
-            /*double mheight = SimplexNoise.Generate(seed4 + (x / MountainHeightMapSize), seed3 + (y / MountainHeightMapSize)) * 2f - 1f;
-            if (mheight > 0.9)
+            double oceanheight = SimplexNoise.Generate(seed4 + (x / OceanHeightMapSize), seed3 + (y / OceanHeightMapSize)) * 2f - 1f;
+            if (oceanheight < -0.9)
             {
-                mheight = (mheight - 0.9) * 7000f;
+                oceanheight = (oceanheight + 0.9) * 4000f;
             }
-            else if (mheight < -0.9)
-            {
-                mheight = (mheight + 0.9) * 4000f;
-            }*/
             double mheight = 0;
             for (int i = 0; i < mountains.Count; i++)
             {
@@ -391,7 +387,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             }
             double lheight = SimplexNoise.Generate(seed2 + (x / GlobalHeightMapSize), Seed + (y / GlobalHeightMapSize)) * 40f - 7f;
             double height = SimplexNoise.Generate(Seed + (x / LocalHeightMapSize), seed2 + (y / LocalHeightMapSize)) * 5f - 2.5f;
-            return mheight + hheight + lheight + height;
+            return oceanheight + mheight + hheight + lheight + height;
         }
 
         public override double GetHeight(int seed, int seed2, int seed3, int seed4, int seed5, double x, double y)

@@ -21,7 +21,9 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 
         public override double GetTemperature(int seed2, int seed3, double x, double y)
         {
-            return SimplexNoise.Generate((double)seed2 + (x / TemperatureMapSize), (double)seed3 + (y / TemperatureMapSize)) * 100f;
+            double tempA = SimplexNoise.Generate((double)seed2 + (x / TemperatureMapSize), (double)seed3 + (y / TemperatureMapSize));
+            double tempB = SimplexNoise.Generate((double)seed3 + (x / TemperatureMapSize), (double)seed2 + (y / TemperatureMapSize));
+            return ((tempA - 0.5) * (tempB - 0.5) * 2.0 + 0.5) * 100.0;
         }
 
         public override double GetDownfallRate(int seed3, int seed4, double x, double y)
@@ -71,31 +73,31 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             double down = GetDownfallRate(seed3, seed4, x, y);
             if (height > 0f && height < 20f)
             {
-                if (down >= 0.8f && temp >= 80f)
+                if (down >= 0.8 && temp >= 80.0)
                 {
                     return RainForest;
                 }
-                if (down >= 0.5f && down < 0.8f && temp >= 60f)
+                if (down >= 0.5 && down < 0.8 && temp >= 60.0)
                 {
                     return Forest;
                 }
-                else if (down >= 0.3f && down < 0.5f && temp >= 90f)
+                else if (down >= 0.3 && down < 0.5 && temp >= 90.0)
                 {
                     return Swamp;
                 }
-                if (down >= 0.3f && down < 0.5f && temp >= 50f && temp < 90f)
+                if (down >= 0.3 && down < 0.5 && temp >= 50.0 && temp < 90.0)
                 {
                     return Plains;
                 }
-                if (down < 0.3f && temp >= 50f)
+                if (down < 0.3 && temp >= 50.0)
                 {
                     return Desert;
                 }
-                if (temp >= 32f)
+                if (temp >= 32.0)
                 {
                     return Plains;
                 }
-                if (down > 0.5f)
+                if (down > 0.5)
                 {
                     return Snow;
                 }
@@ -111,7 +113,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             }
             else if (height >= 40)
             {
-                if (temp > 70)
+                if (temp > 70.0)
                 {
                     return Mountain;
                 }
