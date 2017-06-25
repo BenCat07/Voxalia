@@ -940,8 +940,17 @@ namespace Voxalia.ServerGame.EntitySystem
             Vector2i flat = new Vector2i(cpos.X, cpos.Y);
             if (excessTops.Z > 0)
             {
-                byte[] toper3 = TheRegion.GetTopsArray(flat, 750, 4);
-                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 3, FileHandler.Compress(toper3)));
+                TheRegion.TheWorld.Schedule.StartAsyncTask(() =>
+                {
+                    byte[] toper3 = TheRegion.GetTopsArray(flat, 750, 4);
+                    TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
+                    {
+                        if (!pkick)
+                        {
+                            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 3, FileHandler.Compress(toper3)));
+                        }
+                    });
+                });
             }
             else
             {
@@ -955,17 +964,32 @@ namespace Voxalia.ServerGame.EntitySystem
             Vector2i flat = new Vector2i(cpos.X, cpos.Y);
             if (excessTops.Z <= 0)
             {
-                byte[] toper = TheRegion.GetTopsArray(flat, 30, 2);
-                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, FileHandler.Compress(toper)));
-                if (currentTops.Z > 0)
+                TheRegion.TheWorld.Schedule.StartAsyncTask(() =>
                 {
-                    byte[] toper2 = TheRegion.GetTopsArray(flat, 150, 3);
-                    ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, FileHandler.Compress(toper2)));
-                }
-                else
-                {
-                    ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
-                }
+                    byte[] toper = TheRegion.GetTopsArray(flat, 30, 2);
+                    TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
+                    {
+                        if (!pkick)
+                        {
+                            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, FileHandler.Compress(toper)));
+                        }
+                    });
+                    if (currentTops.Z > 0)
+                    {
+                        byte[] toper2 = TheRegion.GetTopsArray(flat, 150, 3);
+                        TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
+                        {
+                            if (!pkick)
+                            {
+                                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, FileHandler.Compress(toper2)));
+                            }
+                        });
+                    }
+                    else
+                    {
+                        ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
+                    }
+                });
             }
             else
             {

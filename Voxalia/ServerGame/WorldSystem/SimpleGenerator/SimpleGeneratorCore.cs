@@ -124,20 +124,28 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return toret;
         }
 
-        public static Dictionary<Vector2i, SimpleMountainGenerator> MountainsGenerated = new Dictionary<Vector2i, SimpleMountainGenerator>();
-        
+        public ConcurrentDictionary<Vector2i, SimpleMountainGenerator> MountainsGenerated = new ConcurrentDictionary<Vector2i, SimpleMountainGenerator>();
+
+        public Object MountainLock = new Object();
+
+        public readonly Object[] LockMountains = new Object[] { new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object() };
+
+
         public double GetMountainHeightAt(MountainData mtd, double dx, double dy)
         {
-            if (!MountainsGenerated.TryGetValue(new Vector2i(mtd.Center.X, mtd.Center.Y), out SimpleMountainGenerator smg))
+            lock (LockMountains[Math.Abs(mtd.Center.X * 39 + mtd.Center.Y) % LockMountains.Length])
             {
-                smg = SimpleMountainGenerator.PreGenerateMountain(mtd.Center.X, mtd.Center.Y);
-                MountainsGenerated[new Vector2i(mtd.Center.X, mtd.Center.Y)] = smg;
+                if (!MountainsGenerated.TryGetValue(new Vector2i(mtd.Center.X, mtd.Center.Y), out SimpleMountainGenerator smg))
+                {
+                    smg = SimpleMountainGenerator.PreGenerateMountain(mtd.Center.X, mtd.Center.Y);
+                    MountainsGenerated[new Vector2i(mtd.Center.X, mtd.Center.Y)] = smg;
+                }
+                double upScale = mtd.Radius * (2.0 / 512.0);
+                int xCoord = (int)((dx - mtd.Center.X));
+                int yCoord = (int)((dy - mtd.Center.Y));
+                double h = smg.GetHeightAt(xCoord, yCoord, upScale);
+                return h * mtd.Height * (1.0 / 255.0);
             }
-            double upScale = mtd.Radius * (2.0 / 512.0);
-            int xCoord = (int)((dx - mtd.Center.X));
-            int yCoord = (int)((dy - mtd.Center.Y));
-            double h = smg.GetHeightAt(xCoord, yCoord, upScale);
-            return h * mtd.Height * (1.0 / 255.0);
         }
 
         public override byte[] GetSuperLOD(int seed, int seed2, int seed3, int seed4, int seed5, Vector3i cpos)
@@ -453,7 +461,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             Vector2i posser = new Vector2i(pos.X, pos.Y);
             lock (LockHM)
             {
-                if (HMaps.Count > 1024)
+                if (HMaps.Count > 1024) // TODO: Tweakable
                 {
                     HMaps.Clear();
                 }
