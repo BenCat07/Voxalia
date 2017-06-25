@@ -6,6 +6,8 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using Voxalia.Shared;
+
 namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Biomes
 {
     public class SimpleRainForestBiome: SimpleBiome
@@ -13,6 +15,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Biomes
         public override string GetName()
         {
             return "RainForest";
+        }
+
+        public override Material SurfaceBlock()
+        {
+            return Material.GRASS_FOREST;
         }
     }
 }
