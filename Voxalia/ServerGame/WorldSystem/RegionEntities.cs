@@ -209,7 +209,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 Players.Remove((PlayerEntity)e);
                 ((PlayerEntity)e).Kick("Despawned!");
             }
-            if (e.NetworkMe)
+            if (e.ShouldNetwork)
             {
                 DespawnEntityPacketOut desppack = new DespawnEntityPacketOut(e.EID);
                 foreach (PlayerEntity player in Players)

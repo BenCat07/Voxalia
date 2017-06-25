@@ -10,21 +10,23 @@ using System;
 using Voxalia.Shared;
 using BEPUphysics.Character;
 using FreneticGameCore;
+using BEPUutilities;
 
 namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {
-    public class YourPositionPacketOut: AbstractPacketOut
+    public class YourVehiclePacketOut: AbstractPacketOut
     {
-        public YourPositionPacketOut(double delta, int tID, Location pos, Location vel, Stance stance, bool pup)
+        public YourVehiclePacketOut(double delta, int tID, Location pos, Location vel, Location avel, Quaternion quat)
         {
-            UsageType = NetUsageType.PLAYERS;
-            ID = ServerToClientPacket.YOUR_POSITION;
-            Data = new byte[4 + 24 + 24 + 1 + 8];
+            UsageType = NetUsageType.ENTITIES;
+            ID = ServerToClientPacket.YOUR_VEHICLE;
+            Data = new byte[4 + 24 + 24 + 24 + 16 + 8];
             Utilities.IntToBytes(tID).CopyTo(Data, 0);
             pos.ToDoubleBytes().CopyTo(Data, 4);
             vel.ToDoubleBytes().CopyTo(Data, 4 + 24);
-            Data[4 + 24 + 24] = (byte)((stance == Stance.Standing ? 0 : 1) | (pup ? 2: 0));
-            Utilities.DoubleToBytes(delta).CopyTo(Data, 4 + 24 + 24 + 1);
+            avel.ToDoubleBytes().CopyTo(Data, 4 + 24 + 24);
+            Utilities.QuaternionToBytes(quat).CopyTo(Data, 4 + 24 + 24 + 24);
+            Utilities.DoubleToBytes(delta).CopyTo(Data, 4 + 24 + 24 + 24 + 16);
         }
     }
 }

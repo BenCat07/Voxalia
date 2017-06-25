@@ -185,7 +185,8 @@ namespace Voxalia.Shared
         HOLD_ITEM = 3,
         DISCONNECT = 4,
         SET_STATUS = 5,
-        PLEASE_REDEFINE = 6
+        PLEASE_REDEFINE = 6,
+        MY_VEHICLE = 7
     }
 
     /// <summary>
@@ -229,7 +230,7 @@ namespace Voxalia.Shared
         ADD_CLOUD = 33,
         REMOVE_CLOUD = 34,
         ADD_TO_CLOUD = 35,
-        // ...
+        YOUR_VEHICLE = 36,
         SET_STATUS = 37,
         HIGHLIGHT = 38,
         PLAY_SOUND = 39,

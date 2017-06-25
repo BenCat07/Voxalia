@@ -424,6 +424,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                         packet = new AddToCloudPacketIn();
                         usage = NetUsageType.CLOUDS;
                         break;
+                    case ServerToClientPacket.YOUR_VEHICLE:
+                        packet = new YourVehiclePacketIn();
+                        usage = NetUsageType.ENTITIES;
+                        break;
                     case ServerToClientPacket.SET_STATUS:
                         packet = new SetStatusPacketIn();
                         usage = NetUsageType.PLAYERS;

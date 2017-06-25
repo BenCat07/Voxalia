@@ -189,6 +189,7 @@
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\CommandPacketIn.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\DisconnectPacketIn.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\HoldItemPacketIn.cs" />
+    <Compile Include="ServerGame\NetworkSystem\PacketsIn\MyVehiclePacketIn.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\KeysPacketIn.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\PingPacketIn.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\PleaseRedefinePacketIn.cs" />
@@ -232,6 +233,7 @@
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\TeleportPacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\TopsPacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\YourEIDPacketOut.cs" />
+    <Compile Include="ServerGame\NetworkSystem\PacketsOut\YourVehiclePacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\YourPositionPacketOut.cs" />
     <Compile Include="ServerGame\ItemSystem\ItemStack.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\YourStatusPacketOut.cs" />

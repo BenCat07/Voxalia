@@ -256,7 +256,7 @@ namespace Voxalia.ServerGame.EntitySystem
 
         void NetworkTick()
         {
-            if (NetworkMe)
+            if (ShouldNetwork)
             {
                 bool sme = needNetworking;
                 needNetworking = false;
@@ -292,23 +292,16 @@ namespace Voxalia.ServerGame.EntitySystem
                     if (shouldseec && !shouldseel)
                     {
                         player.Known.Add(EID);
-                        player.Network.SendPacket(GetSpawnPacket());
-                        foreach (InternalBaseJoint joint in Joints)
-                        {
-                            if (player.ShouldSeePosition(joint.One.GetPosition()) && player.ShouldSeePosition(joint.Two.GetPosition()))
-                            {
-                                player.Network.SendPacket(new AddJointPacketOut(joint));
-                            }
-                        }
+                        SendSpawnPacket(player);
                     }
                     if (shouldseel && !shouldseec)
                     {
-                        player.Network.SendPacket(new DespawnEntityPacketOut(EID));
                         player.Known.Remove(EID);
+                        SendDespawnPacket(player);
                     }
                     if (sme && shouldseec)
                     {
-                        player.Network.SendPacket(physupd);
+                        SendUpdate(player, physupd);
                     }
                     // TODO
                     /*
@@ -333,6 +326,28 @@ namespace Voxalia.ServerGame.EntitySystem
                 }
                 //wasEverVis = true;
             }
+        }
+
+        public virtual void SendDespawnPacket(PlayerEntity player)
+        {
+            player.Network.SendPacket(new DespawnEntityPacketOut(EID));
+        }
+
+        public virtual void SendSpawnPacket(PlayerEntity player)
+        {
+            player.Network.SendPacket(GetSpawnPacket());
+            foreach (InternalBaseJoint joint in Joints)
+            {
+                if (player.ShouldSeePosition(joint.One.GetPosition()) && player.ShouldSeePosition(joint.Two.GetPosition()))
+                {
+                    player.Network.SendPacket(new AddJointPacketOut(joint));
+                }
+            }
+        }
+
+        public virtual void SendUpdate(PlayerEntity player, AbstractPacketOut packet)
+        {
+            player.Network.SendPacket(packet);
         }
 
         public virtual void EndTick()

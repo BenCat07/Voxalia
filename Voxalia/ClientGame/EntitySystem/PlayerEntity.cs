@@ -122,6 +122,59 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public double CurrentRemoteGTT = 1.0;
 
+        public struct VehicleStore
+        {
+            public Location Pos, Vel, AVel;
+
+            public Quaternion Quat;
+
+            public double Time;
+        }
+
+        public VehicleStore[] VehicleMarks = new VehicleStore[PACKET_CAP];
+
+        public int CurrentVehiclePacketID = 0;
+
+        public void VehiclePacketFromServer(int ID, Location pos, Location vel, Location avel, Quaternion quat, double gtt)
+        {
+            if (VehicleMarks[ID].Time > 0)
+            {
+                Location off_pos = pos - VehicleMarks[ID].Pos;
+                Location off_vel = vel - VehicleMarks[ID].Vel;
+                Location off_avel = avel - VehicleMarks[ID].AVel;
+                double off_gtt = MathHelper.Clamp(gtt - VehicleMarks[ID].Time, 0.001, 0.3) * 2.0;
+                VehicleMarks[ID].Time = 0;
+                if (!InVehicle)
+                {
+                    return;
+                }
+                PhysicsEntity ve = (Vehicle as PhysicsEntity);
+                if (ve.GetPosition().DistanceSquared(pos) > 25.0 * ve.GetVelocity().LengthSquared())
+                {
+                    ve.SetPosition(pos);
+                    ve.SetVelocity(vel);
+                    ve.SetAngularVelocity(avel);
+                    ve.SetOrientation(quat);
+                }
+                else
+                {
+                    ve.SetPosition(ve.GetPosition() + off_pos * off_gtt);
+                    ve.SetVelocity(ve.GetVelocity() + off_vel * off_gtt);
+                    ve.SetAngularVelocity(ve.GetAngularVelocity() + off_avel * off_gtt);
+                    ve.SetOrientation(Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));
+                }
+            }
+        }
+
+        public void UpdateVehicle()
+        {
+            PhysicsEntity ve = (Vehicle as PhysicsEntity);
+            int id = CurrentVehiclePacketID;
+            CurrentVehiclePacketID = (CurrentVehiclePacketID + 1) % PACKET_CAP;
+            VehicleMarks[id] = new VehicleStore() { Pos = ve.GetPosition(), Vel = ve.GetVelocity(), AVel = ve.GetAngularVelocity(), Quat = ve.GetOrientation(), Time = CurrentRemoteGTT };
+            TheClient.Network.SendPacket(new MyVehiclePacketOut(id));
+        }
+
         public void PacketFromServer(double gtt, int ID, Location pos, Location vel, bool _pup)
         {
             CurrentRemoteGTT = gtt;
@@ -141,7 +194,7 @@ namespace Voxalia.ClientGame.EntitySystem
             Location off_pos = pos - old_pos;
             Location off_vel = vel - old_vel;
             double off_gtt = MathHelper.Clamp(gtt - GTTs[ID], 0.001, 0.3) * 2.0;
-            if ((cur_pos - pos).LengthSquared() > 20.0 * 20.0)
+            if ((cur_pos - pos).LengthSquared() > GetVelocity().LengthSquared() * 25.0)
             {
                 SetPosition(pos);
                 SetVelocity(vel);
@@ -208,6 +261,10 @@ namespace Voxalia.ClientGame.EntitySystem
             Velocities[CurrentMovePacketID] = v;
             GTTs[CurrentMovePacketID] = CurrentRemoteGTT;
             CurrentMovePacketID = (CurrentMovePacketID + 1) % PACKET_CAP;
+            if (InVehicle)
+            {
+                UpdateVehicle();
+            }
         }
 
         public Location ItemDir()

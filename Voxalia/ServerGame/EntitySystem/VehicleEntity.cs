@@ -18,6 +18,7 @@ using Voxalia.ServerGame.JointSystem;
 using BEPUutilities;
 using Voxalia.ServerGame.OtherSystems;
 using FreneticGameCore;
+using Voxalia.ServerGame.NetworkSystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
@@ -52,7 +53,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             vehName = vehicle;
             SetMass(1500);
-            DriverSeat = new Seat(this, Location.UnitZ * 2);
+            DriverSeat = new Seat(this, Location.UnitZ * 2); // TODO: proper placement
             Seats = new List<Seat>()
             {
                 DriverSeat
@@ -67,7 +68,7 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 UseRelease -= TheRegion.Delta;
             }
-            else if (DriverSeat.Sitter != null && DriverSeat.Sitter is PlayerEntity && (DriverSeat.Sitter as PlayerEntity).Use)
+            else if (Driver != null && Driver.Use)
             {
                 DriverSeat.Kick();
                 UseRelease = 0.5;
@@ -82,9 +83,35 @@ namespace Voxalia.ServerGame.EntitySystem
                 return;
             }
             UseRelease = 0.5;
-            DriverSeat.Accept((PhysicsEntity)user);
+            DriverSeat.Accept(user as PhysicsEntity);
         }
 
+        public CharacterEntity Driver
+        {
+            get
+            {
+                return DriverSeat.Sitter as CharacterEntity;
+            }
+        }
+
+        public override void SendUpdate(PlayerEntity player, AbstractPacketOut packet)
+        {
+            if (Driver == null || Driver.EID != player.EID)
+            {
+                base.SendUpdate(player, packet);
+            }
+        }
+
+        public override void SendSpawnPacket(PlayerEntity player)
+        {
+            base.SendSpawnPacket(player);
+            if (Driver != null)
+            {
+                GainControlOfVehiclePacketOut gcovpo = new GainControlOfVehiclePacketOut(Driver, this);
+                player.Network.SendPacket(gcovpo);
+            }
+        }
+        
         public void StopUse(Entity user)
         {
             // Do nothing.
@@ -94,7 +121,6 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             GainControlOfVehiclePacketOut gcovpo = new GainControlOfVehiclePacketOut(character, this);
             TheRegion.SendToVisible(lPos, gcovpo);
-            // TODO: handle players coming into/out-of view of the vehicle + driver!
         }
 
         public virtual void SeatKicked(CharacterEntity character, Seat seat)

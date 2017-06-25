@@ -48,6 +48,7 @@ namespace Voxalia.ServerGame.NetworkSystem
             PacketHelper[ClientToServerPacket.DISCONNECT] = () => new DisconnectPacketIn();
             PacketHelper[ClientToServerPacket.SET_STATUS] = () => new SetStatusPacketIn();
             PacketHelper[ClientToServerPacket.PLEASE_REDEFINE] = () => new PleaseRedefinePacketIn();
+            PacketHelper[ClientToServerPacket.MY_VEHICLE] = () => new MyVehiclePacketIn();
         }
 
         public void Init()
@@ -68,14 +69,14 @@ namespace Voxalia.ServerGame.NetworkSystem
             }
             catch (Exception ex)
             {
-                SysConsole.Output("Trying to open port " + TheServer.Port, ex);
+                SysConsole.Output(OutputType.WARNING, "Trying to open port " + TheServer.Port + ": " + ex.Message);
             }
             if (Socket.OSSupportsIPv6)
             {
                 try
                 {
                     ListenSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Stream, ProtocolType.Tcp);
-                    ListenSocket.SetSocketOption(SocketOptionLevel.IPv6, (SocketOptionName)27 /* IPv6Only */, false);
+                    ListenSocket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.IPv6Only, false);
                     ListenSocket.Bind(new IPEndPoint(IPAddress.IPv6Any, TheServer.Port));
                 }
                 catch (Exception ex)

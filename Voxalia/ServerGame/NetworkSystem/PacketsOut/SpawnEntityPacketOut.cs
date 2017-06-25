@@ -21,7 +21,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
     {
         public SpawnEntityPacketOut(Entity e)
         {
-            if (!e.NetworkMe)
+            if (!e.ShouldNetwork)
             {
                 throw new ArgumentException("Entity is non-networkable!");
             }

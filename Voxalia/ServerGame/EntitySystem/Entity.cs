@@ -17,18 +17,41 @@ using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using LiteDB;
 using FreneticGameCore;
 using FreneticGameCore.EntitySystem;
+using FreneticGameCore.ServerSystem.EntitySystem;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
     /// <summary>
     /// Represents an object within the world.
     /// </summary>
-    public abstract class Entity : BasicEntity
+    public abstract class Entity : ServerEntity
     {
         /// <summary>
         /// The region that holds this entity.
         /// </summary>
         public Region TheRegion;
+
+        /// <summary>
+        /// The world that holds this entity.
+        /// </summary>
+        public World TheWorld
+        {
+            get
+            {
+                return TheRegion.TheWorld;
+            }
+        }
+
+        /// <summary>
+        /// Gets the relevant world scheduler.
+        /// </summary>
+        public Scheduler Schedule
+        {
+            get
+            {
+                return TheWorld.Schedule;
+            }
+        }
         
         /// <summary>
         /// Constructs the entity object.
@@ -36,7 +59,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <param name="tregion">The region it will be in.</param>
         /// <param name="tickme">Whether it ticks at all ever.</param>
         public Entity(Region tregion, bool tickme)
-            : base(null, tickme)
+            : base(null, tickme, true)
         {
             TheRegion = tregion;
             TheServer = tregion.TheServer;
@@ -65,12 +88,6 @@ namespace Voxalia.ServerGame.EntitySystem
         }
 
         /// <summary>
-        /// Can be set false to prevent networking of this entity.
-        /// Should only be set prior to spawn-in.
-        /// </summary>
-        public bool NetworkMe = true; // TODO: Readonly? Toggler method?
-
-        /// <summary>
         /// Return the type of entity this is (as the network thinks of it).
         /// </summary>
         /// <returns>The networked entity type.</returns>
@@ -91,6 +108,17 @@ namespace Voxalia.ServerGame.EntitySystem
         /// The seat this entity is currently sitting in.
         /// </summary>
         public Seat CurrentSeat = null;
+
+        /// <summary>
+        /// The entity this entity is sitting on.
+        /// </summary>
+        public PhysicsEntity SittingOn
+        {
+            get
+            {
+                return CurrentSeat?.SeatHolder;
+            }
+        }
         
         /// <summary>
         /// The seats available to sit in on this entity.
