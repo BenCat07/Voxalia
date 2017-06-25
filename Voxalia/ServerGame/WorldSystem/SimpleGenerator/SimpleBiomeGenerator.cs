@@ -27,7 +27,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             double tempB = SimplexNoise.Generate(seed3 + (x / TemperatureMapSize), seed2 + (y / TemperatureMapSize));
             double temp2A = SimplexNoise.Generate(seed2 + seed3 + (x / TemperatureMapTwoSize), seed3 - seed2 + (y / TemperatureMapTwoSize));
             double temp2 = (temp2A * temp2A) * 2.0 - 1.0;
-            return ((tempA - 0.5) * (tempB - 0.5) * 2.0 + 0.5) * 90.0 + temp2 * 40.0;
+            return ((tempA - 0.5) * (tempB - 0.5) * 2.0 + 0.5) * 80.0 + 10.0 + temp2 * 40.0;
         }
 
         public override double GetDownfallRate(int seed3, int seed4, double x, double y)
