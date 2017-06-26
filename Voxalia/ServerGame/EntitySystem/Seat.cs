@@ -53,9 +53,9 @@ namespace Voxalia.ServerGame.EntitySystem
             OldPosition = Sitter.GetPosition() - SeatHolder.GetPosition();
             Sitter.SetOrientation(SeatHolder.GetOrientation());
             Sitter.SetPosition(SeatHolder.GetPosition() + PositionOffset);
-            if (Sitter is PlayerEntity)
+            if (Sitter is PlayerEntity pe)
             {
-                ((PlayerEntity)Sitter).Teleport(SeatHolder.GetPosition() + PositionOffset); // TODO: Teleport method on all entities!
+                pe.Teleport(SeatHolder.GetPosition() + PositionOffset); // TODO: Teleport method on all entities!
             }
             double len = (double)PositionOffset.Length();
             js = new JointSlider(SeatHolder, sitter, len < 0.01 ? Location.UnitZ : PositionOffset / len);
@@ -64,9 +64,9 @@ namespace Voxalia.ServerGame.EntitySystem
             SeatHolder.TheRegion.AddJoint(js);
             SeatHolder.TheRegion.AddJoint(jbs);
             SeatHolder.TheRegion.AddJoint(jnc);
-            if (SeatHolder is VehicleEntity && sitter is PlayerEntity)
+            if (SeatHolder is VehicleEntity sve && sitter is PlayerEntity tpe)
             {
-                ((VehicleEntity)SeatHolder).Accepted((PlayerEntity)sitter, this);
+                sve.Accepted(tpe, this);
             }
             return true;
         }
@@ -77,9 +77,9 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 return;
             }
-            if (SeatHolder is VehicleEntity && Sitter != null && Sitter is PlayerEntity)
+            if (SeatHolder is VehicleEntity sve && Sitter != null && Sitter is PlayerEntity tpe)
             {
-                ((VehicleEntity)SeatHolder).SeatKicked((PlayerEntity)Sitter, this);
+                sve.SeatKicked(tpe, this);
             }
             SeatHolder.TheRegion.DestroyJoint(js);
             SeatHolder.TheRegion.DestroyJoint(jbs);
@@ -87,9 +87,9 @@ namespace Voxalia.ServerGame.EntitySystem
             js = null;
             jbs = null;
             jnc = null;
-            if (Sitter is PlayerEntity)
+            if (Sitter is PlayerEntity pe)
             {
-                ((PlayerEntity)Sitter).Teleport(OldPosition + SeatHolder.GetPosition());
+                pe.Teleport(OldPosition + SeatHolder.GetPosition());
             }
             else
             {
@@ -102,9 +102,9 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public void HandleInput(CharacterEntity player)
         {
-            if (SeatHolder is VehicleEntity)
+            if (SeatHolder is VehicleEntity sve)
             {
-                ((VehicleEntity)SeatHolder).HandleInput(player);
+                sve.HandleInput(player);
             }
         }
     }

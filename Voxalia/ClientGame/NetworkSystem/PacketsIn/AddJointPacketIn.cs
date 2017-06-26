@@ -63,6 +63,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             pe1.SetOrientation(quat1);
             pe2.SetPosition(pos2);
             pe2.SetOrientation(quat2);
+            // TODO: Registry!
             if (type == 0)
             {
                 if (data.Length != len + 24)

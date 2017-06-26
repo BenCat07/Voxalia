@@ -210,7 +210,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                 {
                     while (true)
                     {
-                        if (PE.pkick)
+                        if (PE.pkick || PE.Network == null)
                         {
                             return;
                         }

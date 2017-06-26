@@ -164,17 +164,5 @@ namespace Voxalia.ServerGame.EntitySystem
             RightLeft = character.XMove;
             FastOrSlow = character.SprintOrWalk;
         }
-
-        public override void Accepted(CharacterEntity character, Seat seat)
-        {
-            base.Accepted(character, seat);
-            character.Desolidify();
-        }
-
-        public override void SeatKicked(CharacterEntity character, Seat seat)
-        {
-            base.SeatKicked(character, seat);
-            character.Solidify();
-        }
     }
 }

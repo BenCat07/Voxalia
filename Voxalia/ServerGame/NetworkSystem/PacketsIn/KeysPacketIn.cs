@@ -110,6 +110,10 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
                 }
                 Player.SetVelocity(vel); // TODO: Validate velocity at all?
             }
+            if (Player.CBody == null)
+            {
+                return false;
+            }
             Player.Network.SendPacket(new YourPositionPacketOut(Player.TheRegion.GlobalTickTime, tid,
                 Player.GetPosition(), Player.GetVelocity(), Player.CBody.StanceManager.CurrentStance, Player.pup));
             return true;
