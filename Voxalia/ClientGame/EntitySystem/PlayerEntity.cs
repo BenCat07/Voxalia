@@ -183,7 +183,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
-            if (InVehicle || Vehicle != null)
+            if (InVehicle && Vehicle != null)
             {
                 GTTs[ID] = -1.0;
                 return;
@@ -262,7 +262,7 @@ namespace Voxalia.ClientGame.EntitySystem
             Velocities[CurrentMovePacketID] = v;
             GTTs[CurrentMovePacketID] = CurrentRemoteGTT;
             CurrentMovePacketID = (CurrentMovePacketID + 1) % PACKET_CAP;
-            if (InVehicle || Vehicle != null)
+            if (InVehicle && Vehicle != null)
             {
                 UpdateVehicle();
             }
@@ -285,7 +285,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public void SetBodyMovement(CharacterController cc)
         {
-            Vector2 movement = InVehicle || Vehicle != null ? Vector2.Zero : new Vector2(XMove, YMove);
+            Vector2 movement = InVehicle && Vehicle != null ? Vector2.Zero : new Vector2(XMove, YMove);
             if (movement.LengthSquared() > 0)
             {
                 movement.Normalize();
