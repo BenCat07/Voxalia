@@ -99,7 +99,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 {
                     return; // Don't fly when there's nobody driving this!
                 }
-                // TODO: Special case for motion on land: only push forward if W key is pressed? Or maybe apply that rule in general?
+                // TODO: Special case for motion on land: only push forward if FORWARD key is pressed? Or maybe apply that rule in general?
                 // Collect the plane's relative vectors
                 BEPUutilities.Vector3 forward = BEPUutilities.Quaternion.Transform(BEPUutilities.Vector3.UnitY, Entity.Orientation);
                 BEPUutilities.Vector3 side = BEPUutilities.Quaternion.Transform(BEPUutilities.Vector3.UnitX, Entity.Orientation);
@@ -121,16 +121,20 @@ namespace Voxalia.ClientGame.EntitySystem
                 entity.AngularVelocity += BEPUutilities.Quaternion.Transform(new BEPUutilities.Vector3(rot_x, rot_y, rot_z), entity.Orientation);
                 // Rotate the entity pre-emptively, and re-apply the movement velocity in this new direction!
                 double vellen = entity.LinearVelocity.Length();
+                if (vellen < 0.01)
+                {
+                    vellen = 0.01;
+                }
                 BEPUutilities.Vector3 normvel = entity.LinearVelocity / vellen;
                 BEPUutilities.Vector3 norm_vel_transf = BEPUutilities.Quaternion.Transform(normvel, BEPUutilities.Quaternion.Inverse(entity.Orientation)); // Probably just 1,0,0 on whichever axis... can be simplified!
                 BEPUutilities.Vector3 inc = entity.AngularVelocity * Delta * 0.5;
                 BEPUutilities.Quaternion quat = new BEPUutilities.Quaternion(inc.X, inc.Y, inc.Z, 0);
                 quat = quat * entity.Orientation;
                 BEPUutilities.Quaternion orient = entity.Orientation;
-                BEPUutilities.Quaternion.Add(ref orient, ref quat, out orient);
-                orient.Normalize();
-                entity.Orientation = orient;
-                entity.LinearVelocity = BEPUutilities.Quaternion.Transform(norm_vel_transf, orient) * vellen;
+                BEPUutilities.Quaternion.Add(ref orient, ref quat, out BEPUutilities.Quaternion torient);
+                torient.Normalize();
+                entity.Orientation = torient;
+                entity.LinearVelocity = BEPUutilities.Quaternion.Transform(norm_vel_transf, torient) * vellen;
                 entity.AngularVelocity *= 0.1;
                 // Apply air drag
                 Entity.ModifyLinearDamping(Plane.PlanePilot.SprintOrWalk < 0.0 ? 0.6 : 0.1); // TODO: arbitrary constant

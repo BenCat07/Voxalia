@@ -103,7 +103,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     return; // Don't fly when there's nobody driving this!
                 }
-                // TODO: Special case for motion on land: only push forward if W key is pressed? Or maybe apply that rule in general?
+                // TODO: Special case for motion on land: only push forward if FORWARD key is pressed? Or maybe apply that rule in general?
                 // Collect the plane's relative vectors
                 Vector3 forward = Quaternion.Transform(Vector3.UnitY, Entity.Orientation);
                 Vector3 side = Quaternion.Transform(Vector3.UnitX, Entity.Orientation);
@@ -125,6 +125,10 @@ namespace Voxalia.ServerGame.EntitySystem
                 entity.AngularVelocity +=  Quaternion.Transform(new Vector3(rot_x, rot_y, rot_z), entity.Orientation);
                 // Rotate the entity pre-emptively, and re-apply the movement velocity in this new direction!
                 double vellen = entity.LinearVelocity.Length();
+                if (vellen < 0.01)
+                {
+                    vellen = 0.01;
+                }
                 Vector3 normvel = entity.LinearVelocity / vellen;
                 Vector3 norm_vel_transf = Quaternion.Transform(normvel, Quaternion.Inverse(entity.Orientation)); // Probably just 1,0,0 on whichever axis... can be simplified!
                 Vector3 inc = entity.AngularVelocity * Delta * 0.5;

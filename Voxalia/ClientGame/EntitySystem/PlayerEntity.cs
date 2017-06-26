@@ -135,7 +135,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public int CurrentVehiclePacketID = 0;
 
-        const double VEH_MINIMUM = 10.0;
+        const double VEH_MINIMUM = 5.0;
 
         public void VehiclePacketFromServer(int ID, Location pos, Location vel, Location avel, Quaternion quat, double gtt, Location prel)
         {
@@ -151,6 +151,7 @@ namespace Voxalia.ClientGame.EntitySystem
                     return;
                 }
                 PhysicsEntity ve = (Vehicle as PhysicsEntity);
+                //SysConsole.Output(OutputType.DEBUG, "Move vehicle : " + (ve.GetPosition().DistanceSquared(pos) > (VEH_MINIMUM * VEH_MINIMUM) * ve.GetVelocity().LengthSquared()) + ", " + ve.GetVelocity().Length() + ", " + ve.GetPosition().Distance(pos));
                 if (ve.GetPosition().DistanceSquared(pos) > (VEH_MINIMUM * VEH_MINIMUM) * ve.GetVelocity().LengthSquared())
                 {
                     ve.SetPosition(pos);
