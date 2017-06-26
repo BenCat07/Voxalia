@@ -307,7 +307,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <summary>
         /// Whether the player has already been kicked.
         /// </summary>
-        bool pkick = false;
+        public bool pkick = false;
         
         /// <summary>
         /// How far (in chunks) the player can see, as a cubic radius, excluding the chunk the player is in.
@@ -987,7 +987,13 @@ namespace Voxalia.ServerGame.EntitySystem
                     }
                     else
                     {
-                        ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
+                        TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
+                        {
+                            if (!pkick)
+                            {
+                                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
+                            }
+                        });
                     }
                 });
             }

@@ -210,6 +210,10 @@ namespace Voxalia.ServerGame.NetworkSystem
                 {
                     while (true)
                     {
+                        if (PE.pkick)
+                        {
+                            return;
+                        }
                         byte[] len_bytes = new byte[4];
                         Array.Copy(recd, len_bytes, 4);
                         int len = Utilities.BytesToInt(len_bytes);
