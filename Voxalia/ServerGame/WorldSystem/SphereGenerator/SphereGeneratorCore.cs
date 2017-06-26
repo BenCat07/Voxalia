@@ -44,7 +44,7 @@ namespace Voxalia.ServerGame.WorldSystem.SphereGenerator
             return Biomes;
         }
 
-        public override double GetHeight(int seed, int seed2, int seed3, int seed4, int seed5, double x, double y)
+        public override double GetHeight(int seed, int seed2, int seed3, int seed4, int seed5, double x, double y, bool precise)
         {
             return 0.0;
         }

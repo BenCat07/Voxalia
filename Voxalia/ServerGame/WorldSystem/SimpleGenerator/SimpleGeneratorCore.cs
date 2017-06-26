@@ -132,7 +132,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         public readonly Object[] LockMountains = new Object[] { new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object() };
 
 
-        public double GetMountainHeightAt(MountainData mtd, double dx, double dy)
+        public double GetMountainHeightAt(MountainData mtd, double dx, double dy, bool precise)
         {
             lock (LockMountains[Math.Abs(mtd.Center.X * 39 + mtd.Center.Y) % LockMountains.Length])
             {
@@ -144,7 +144,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 double upScale = mtd.Radius * (2.0 / 512.0);
                 int xCoord = (int)((dx - mtd.Center.X));
                 int yCoord = (int)((dy - mtd.Center.Y));
-                double h = smg.GetHeightAt(xCoord, yCoord, upScale);
+                double h = smg.GetHeightAt(xCoord, yCoord, upScale, precise);
                 return h * mtd.Height * (1.0 / 255.0);
             }
         }
@@ -173,7 +173,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 for (int y = 0; y < 2; y++)
                 {
-                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y);
+                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, true);
                     SimpleBiome biome = Biomes.BiomeFor(seed2, seed3, seed4, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, hheight) as SimpleBiome;
                     if (hheight > cpos.Z * Chunk.CHUNK_SIZE)
                     {
@@ -235,7 +235,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 for (int y = 0; y < 5; y++)
                 {
-                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y);
+                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, true);
                     SimpleBiome biome = Biomes.BiomeFor(seed2, seed3, seed4, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, hheight) as SimpleBiome;
                     double topf = (hheight - cpos.Z * Chunk.CHUNK_SIZE) / 5.0;
                     int top = (int)Math.Round(topf);
@@ -365,7 +365,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return val > biome.AirDensity();
         }
 
-        public double GetHeightQuick(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, List<MountainData> mountains)
+        public double GetHeightQuick(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, List<MountainData> mountains, bool precise)
         {
             double oceanheight = SimplexNoise.Generate(seed4 + (x / OceanHeightMapSize), seed3 + (y / OceanHeightMapSize)) * 2f - 1f;
             if (oceanheight < -0.9)
@@ -375,7 +375,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             double mheight = 0;
             for (int i = 0; i < mountains.Count; i++)
             {
-                mheight = Math.Max(mheight, GetMountainHeightAt(mountains[i], x, y));
+                mheight = Math.Max(mheight, GetMountainHeightAt(mountains[i], x, y, precise));
             }
             double hheight = SimplexNoise.Generate(seed4 + (x / HillHeightMapSize), seed3 + (y / HillHeightMapSize)) * 2f - 1f;
             if (hheight > 0.9)
@@ -391,12 +391,12 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return oceanheight + mheight + hheight + lheight + height;
         }
 
-        public override double GetHeight(int seed, int seed2, int seed3, int seed4, int seed5, double x, double y)
+        public override double GetHeight(int seed, int seed2, int seed3, int seed4, int seed5, double x, double y, bool precise)
         {
-            return GetHeight(seed, seed2, seed3, seed4, seed5, x, y, null);
+            return GetHeight(seed, seed2, seed3, seed4, seed5, x, y, null, precise);
         }
 
-        public double GetHeight(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, List<MountainData> mountains)
+        public double GetHeight(int Seed, int seed2, int seed3, int seed4, int seed5, double x, double y, List<MountainData> mountains, bool precise)
         {
 #if TIMINGS
             Stopwatch sw = new Stopwatch();
@@ -409,7 +409,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 Vector2i chunkloc = new Vector2i((int)Math.Floor(x * (1.0 / Constants.CHUNK_WIDTH)), (int)Math.Floor(y * (1.0 / Constants.CHUNK_WIDTH)));
                 mountains = GenMountainPositionsAround(chunkloc, Seed);
             }
-            double valBasic = GetHeightQuick(Seed, seed2, seed3, seed4, seed5, x, y, mountains);
+            double valBasic = GetHeightQuick(Seed, seed2, seed3, seed4, seed5, x, y, mountains, precise);
             return valBasic;
 #if TIMINGS
             }
@@ -524,7 +524,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                         // Prepare basics
                         int cx = (int)CPos.X + x;
                         int cy = (int)CPos.Y + y;
-                        double hheight = sgc.GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy, mountains);
+                        double hheight = sgc.GetHeight(Seed, seed2, seed3, seed4, seed5, cx, cy, mountains, true);
                         Heights[y * Chunk.CHUNK_SIZE + x] = hheight;
                     }
                 }

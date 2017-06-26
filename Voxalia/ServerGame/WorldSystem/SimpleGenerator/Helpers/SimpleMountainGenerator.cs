@@ -38,13 +38,17 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
             return smg;
         }
 
-        public double GetHeightAt(int xRel, int yRel, double upScale)
+        public double GetHeightAt(int xRel, int yRel, double upScale, bool precise)
         {
             double xPoint = (xRel) / upScale + AreaSize / 2;
             double yPoint = (yRel) / upScale + AreaSize / 2;
             int xLow = (int)Math.Floor(xPoint);
             int yLow = (int)Math.Floor(yPoint);
             double pLow = HeightPrecise(xLow, yLow);
+            if (!precise)
+            {
+                return pLow;
+            }
             double pXP = HeightPrecise(xLow + 1, yLow);
             double pYP = HeightPrecise(xLow, yLow + 1);
             double pHigh = HeightPrecise(xLow + 1, yLow + 1);

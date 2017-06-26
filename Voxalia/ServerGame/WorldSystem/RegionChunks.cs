@@ -239,7 +239,7 @@ namespace Voxalia.ServerGame.WorldSystem
                                     }
                                     if (mat == 0 || height == int.MaxValue)
                                     {
-                                        height = (int)Generator.GetHeight(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, absCoord.X, absCoord.Y);
+                                        height = (int)Generator.GetHeight(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, absCoord.X, absCoord.Y, false);
                                         Biome b = Generator.GetBiomeGen().BiomeFor(TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, absCoord.X, absCoord.Y, height, height);
                                         if (height > 0)
                                         {
