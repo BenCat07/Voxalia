@@ -58,7 +58,7 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public void PushHeightCorrection(Vector3i chunkPos, byte[] slod)
         {
-            if (chunkPos.Z < 0 || chunkPos.Z >= 256)
+            if (chunkPos.Z < 0 || chunkPos.Z >= 128)
             {
                 return;
             }
@@ -83,17 +83,17 @@ namespace Voxalia.ServerGame.WorldSystem
             byte[] bytes = ChunkManager.GetHeightHelper(chunkPos.X, chunkPos.Y);
             if (bytes == null)
             {
-                bytes = new byte[256 + 256 + 256 * 8 * 2];
+                bytes = new byte[128 + 128 + 128 * 8 * 2];
             }
-            bytes[256 + chunkPos.Z] = 1;
+            bytes[128 + chunkPos.Z] = 1;
             bytes[chunkPos.Z] = b;
-            slod.CopyTo(bytes, 256 + 256 + chunkPos.Z * (8 * 2));
+            slod.CopyTo(bytes, 128 + 128 + chunkPos.Z * (8 * 2));
             ChunkManager.WriteHeightHelper(chunkPos.X, chunkPos.Y, bytes);
             int zers = 0;
             int max = 0;
-            for (int i = 0; i < bytes.Length; i++)
+            for (int i = 0; i < 128; i++)
             {
-                if (bytes[256 + i] != 1)
+                if (bytes[128 + i] != 1)
                 {
                     return;
                 }
@@ -121,49 +121,49 @@ namespace Voxalia.ServerGame.WorldSystem
                 if (!ba && (cap & 2) == 2)
                 {
                     maxA = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
-                    matA = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 1, 2));
+                    matA = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 1, 2));
                     ba = true;
                 }
                 else if (!ba && (cap & 1) == 1)
                 {
                     maxA = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
-                    matA = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 0, 2));
+                    matA = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 0, 2));
                     ba = true;
                 }
                 if (!bb && (cap & 8) == 8)
                 {
                     maxB = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
-                    matB = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 3, 2));
+                    matB = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 3, 2));
                     bb = true;
                 }
                 else if (!bb && (cap & 4) == 4)
                 {
                     maxB = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
-                    matB = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 2, 2));
+                    matB = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 2, 2));
                     bb = true;
                 }
                 if (!bc && (cap & 32) == 32)
                 {
                     maxC = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
-                    matC = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 5, 2));
+                    matC = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 5, 2));
                     bc = true;
                 }
                 else if (!bc && (cap & 16) == 16)
                 {
                     maxC = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
-                    matC = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 4, 2));
+                    matC = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 4, 2));
                     bc = true;
                 }
                 if (!bd && (cap & 128) == 128)
                 {
                     maxD = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
-                    matD = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 7, 2));
+                    matD = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 7, 2));
                     bd = true;
                 }
                 else if (!bd && (cap & 64) == 64)
                 {
                     maxD = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
-                    matD = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 256 + 256 + x * (8 * 2) + 2 * 6, 2));
+                    matD = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 6, 2));
                     bd = true;
                 }
             }
@@ -824,7 +824,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 Flags = ChunkFlags.ISCUSTOM | ChunkFlags.POPULATING,
                 OwningRegion = this,
                 WorldPosition = cpos,
-                LastEdited = GlobalTickTime
+                LastEdited = -1
             };
             if (PopulateChunk(chunk, true, true))
             {
@@ -1095,7 +1095,7 @@ namespace Voxalia.ServerGame.WorldSystem
             try
             {
                 Generator.Populate(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, chunk);
-                chunk.LastEdited = GlobalTickTime;
+                chunk.LastEdited = -1;
                 chunk.Flags &= ~(ChunkFlags.POPULATING | ChunkFlags.ISCUSTOM);
                 chunk.Flags |= ChunkFlags.NEEDS_DETECT;
                 chunk.IsNew = true;

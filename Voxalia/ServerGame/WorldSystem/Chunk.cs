@@ -371,7 +371,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
                 return;
             }
-            if (LastEdited == -1)
+            if (LastEdited < 0.0)
             {
                 BsonDocument ents = GetEntitySaveData();
                 OwningRegion.TheServer.Schedule.StartAsyncTask(() =>
