@@ -162,6 +162,10 @@ namespace Voxalia.ClientGame.EntitySystem
         /// </summary>
         public virtual void DestroyBody()
         {
+            if (Body == null)
+            {
+                return;
+            }
             LVel = new Location(Body.LinearVelocity);
             AVel = new Location(Body.AngularVelocity);
             Friction = GetFriction();
