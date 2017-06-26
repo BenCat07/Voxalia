@@ -144,7 +144,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 Location off_avel = avel - VehicleMarks[ID].AVel;
                 double off_gtt = MathHelper.Clamp(gtt - VehicleMarks[ID].Time, 0.001, 0.3) * 2.0;
                 VehicleMarks[ID].Time = 0;
-                if (!InVehicle)
+                if (!InVehicle || Vehicle == null)
                 {
                     return;
                 }
@@ -183,8 +183,9 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
-            if (InVehicle)
+            if (InVehicle || Vehicle != null)
             {
+                GTTs[ID] = -1.0;
                 return;
             }
             Location cur_pos = GetPosition();
@@ -261,7 +262,7 @@ namespace Voxalia.ClientGame.EntitySystem
             Velocities[CurrentMovePacketID] = v;
             GTTs[CurrentMovePacketID] = CurrentRemoteGTT;
             CurrentMovePacketID = (CurrentMovePacketID + 1) % PACKET_CAP;
-            if (InVehicle)
+            if (InVehicle || Vehicle != null)
             {
                 UpdateVehicle();
             }
@@ -284,7 +285,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public void SetBodyMovement(CharacterController cc)
         {
-            Vector2 movement = InVehicle ? Vector2.Zero : new Vector2(XMove, YMove);
+            Vector2 movement = InVehicle || Vehicle != null ? Vector2.Zero : new Vector2(XMove, YMove);
             if (movement.LengthSquared() > 0)
             {
                 movement.Normalize();
@@ -338,7 +339,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public void TryToJump()
         {
-            if (!InVehicle && Upward && !IsFlying && !pup && CBody.SupportFinder.HasSupport)
+            if (!InVehicle && Vehicle == null && Upward && !IsFlying && !pup && CBody.SupportFinder.HasSupport)
             {
                 CBody.Jump();
                 pup = true;
