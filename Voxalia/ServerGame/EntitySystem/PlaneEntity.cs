@@ -99,7 +99,7 @@ namespace Voxalia.ServerGame.EntitySystem
 
             public override void ExclusiveUpdate()
             {
-                if (Plane.DriverSeat.Sitter == null)
+                if (Plane.Driver == null) // TODO: Engine on/off rather than driver check
                 {
                     return; // Don't fly when there's nobody driving this!
                 }
@@ -130,7 +130,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 orient.Normalize();
                 entity.Orientation = orient;
                 entity.LinearVelocity = Quaternion.Transform(norm_vel_transf, orient) * vellen;
-                entity.AngularVelocity *= 0.1;
+                entity.AngularVelocity *= 0.1; // TODO: DELTA!!!!
                 // Apply air drag
                 Entity.ModifyLinearDamping(Plane.FastOrSlow < 0.0 ? 0.6 : 0.1); // TODO: arbitrary constant
                 Entity.ModifyAngularDamping(0.5); // TODO: arbitrary constant

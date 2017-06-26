@@ -22,68 +22,91 @@ namespace Voxalia.ServerGame.WorldSystem
 {
     public class ChunkDataManager
     {
+        const int DBCount = 10;
+
         public Region TheRegion;
 
-        LiteDatabase Database;
+        LiteDatabase[] ChunksDatabase;
 
-        LiteCollection<BsonDocument> DBChunks;
+        LiteCollection<BsonDocument>[] DBChunks;
 
-        LiteDatabase LODsDatabase;
+        LiteDatabase[] LODsDatabase;
 
-        LiteCollection<BsonDocument> DBLODs;
+        //LiteCollection<BsonDocument> DBLODs;
 
-        LiteCollection<BsonDocument> DBSuperLOD; // TODO: Optimize SuperLOD to contain many chunks at once?
+        LiteCollection<BsonDocument>[] DBSuperLOD; // TODO: Optimize SuperLOD to contain many chunks at once?
 
-        LiteCollection<BsonDocument> DBLODSix; // TODO: Optimize LODSix to contain many chunks at once?
+        LiteCollection<BsonDocument>[] DBLODSix; // TODO: Optimize LODSix to contain many chunks at once?
 
-        LiteDatabase EntsDatabase;
+        LiteDatabase[] EntsDatabase;
 
-        LiteCollection<BsonDocument> DBEnts;
+        LiteCollection<BsonDocument>[] DBEnts;
 
-        LiteDatabase TopsDatabase;
+        LiteDatabase[] TopsDatabase;
 
-        LiteCollection<BsonDocument> DBTops;
+        LiteCollection<BsonDocument>[] DBTops;
 
-        LiteCollection<BsonDocument> DBTopsHigher;
+        LiteCollection<BsonDocument>[] DBTopsHigher;
         
-        LiteCollection<BsonDocument> DBMins;
+        LiteCollection<BsonDocument>[] DBMins;
 
-        LiteDatabase HeightMapDatabase;
+        LiteDatabase[] HeightMapDatabase;
 
-        LiteCollection<BsonDocument> DBHeights;
+        LiteCollection<BsonDocument>[] DBHeights;
 
-        LiteCollection<BsonDocument> DBHHelpers;
+        LiteCollection<BsonDocument>[] DBHHelpers;
 
         public void Init(Region tregion)
         {
             TheRegion = tregion;
-            string dir = "/saves/" + TheRegion.TheWorld.Name + "/";
-            TheRegion.TheServer.Files.CreateDirectory(dir);
-            dir = TheRegion.TheServer.Files.SaveDir + dir;
-            Database = new LiteDatabase("filename=" + dir + "chunks.ldb");
-            DBChunks = Database.GetCollection<BsonDocument>("chunks");
-            LODsDatabase = new LiteDatabase("filename=" + dir + "lod_chunks.ldb");
-            DBLODs = LODsDatabase.GetCollection<BsonDocument>("lodchunks");
-            DBSuperLOD = LODsDatabase.GetCollection<BsonDocument>("superlod");
-            DBLODSix = LODsDatabase.GetCollection<BsonDocument>("lodsix");
-            EntsDatabase = new LiteDatabase("filename=" + dir + "ents.ldb");
-            DBEnts = EntsDatabase.GetCollection<BsonDocument>("ents");
-            TopsDatabase = new LiteDatabase("filename=" + dir + "tops.ldb");
-            DBTops = TopsDatabase.GetCollection<BsonDocument>("tops");
-            DBTopsHigher = TopsDatabase.GetCollection<BsonDocument>("topshigh");
-            DBMins = TopsDatabase.GetCollection<BsonDocument>("mins");
-            HeightMapDatabase = new LiteDatabase("filename=" + dir + "heights.ldb");
-            DBHeights = HeightMapDatabase.GetCollection<BsonDocument>("heights");
-            DBHHelpers = HeightMapDatabase.GetCollection<BsonDocument>("hhelp");
+            string bdir = "/saves/" + TheRegion.TheWorld.Name + "/";
+            TheRegion.TheServer.Files.CreateDirectory(bdir);
+            string dir = TheRegion.TheServer.Files.SaveDir + bdir;
+            ChunksDatabase = new LiteDatabase[DBCount];
+            DBChunks = new LiteCollection<BsonDocument>[DBCount];
+            HeightMapDatabase = new LiteDatabase[DBCount];
+            DBHeights = new LiteCollection<BsonDocument>[DBCount];
+            DBHHelpers = new LiteCollection<BsonDocument>[DBCount];
+            LODsDatabase = new LiteDatabase[DBCount];
+            DBSuperLOD = new LiteCollection<BsonDocument>[DBCount];
+            DBLODSix = new LiteCollection<BsonDocument>[DBCount];
+            EntsDatabase = new LiteDatabase[DBCount];
+            DBEnts = new LiteCollection<BsonDocument>[DBCount];
+            TopsDatabase = new LiteDatabase[DBCount];
+            DBTops = new LiteCollection<BsonDocument>[DBCount];
+            DBTopsHigher = new LiteCollection<BsonDocument>[DBCount];
+            DBMins = new LiteCollection<BsonDocument>[DBCount];
+            for (int i = 0; i < DBCount; i++)
+            {
+                TheRegion.TheServer.Files.CreateDirectory(bdir + "id_" + i + "/");
+                ChunksDatabase[i] = new LiteDatabase("filename=" + dir + "id_" + i + "/chunks.ldb");
+                DBChunks[i] = ChunksDatabase[i].GetCollection<BsonDocument>("chunks");
+                HeightMapDatabase[i] = new LiteDatabase("filename=" + dir + "id_" + i + "/heights.ldb");
+                DBHeights[i] = HeightMapDatabase[i].GetCollection<BsonDocument>("heights");
+                DBHHelpers[i] = HeightMapDatabase[i].GetCollection<BsonDocument>("hhelp");
+                LODsDatabase[i] = new LiteDatabase("filename=" + dir + "id_" + i + "/lod_chunks.ldb");
+                //DBLODs = LODsDatabase.GetCollection<BsonDocument>("lodchunks");
+                DBSuperLOD[i] = LODsDatabase[i].GetCollection<BsonDocument>("superlod");
+                DBLODSix[i] = LODsDatabase[i].GetCollection<BsonDocument>("lodsix");
+                EntsDatabase[i] = new LiteDatabase("filename=" + dir + "id_" + i + "/ents.ldb");
+                DBEnts[i] = EntsDatabase[i].GetCollection<BsonDocument>("ents");
+                TopsDatabase[i] = new LiteDatabase("filename=" + dir + "id_" + i + "/tops.ldb");
+                DBTops[i] = TopsDatabase[i].GetCollection<BsonDocument>("tops");
+                DBTopsHigher[i] = TopsDatabase[i].GetCollection<BsonDocument>("topshigh");
+                DBMins[i] = TopsDatabase[i].GetCollection<BsonDocument>("mins");
+            }
         }
         
         public void Shutdown()
         {
-            Database.Dispose();
-            LODsDatabase.Dispose();
-            EntsDatabase.Dispose();
-            TopsDatabase.Dispose();
-            HeightMapDatabase.Dispose();
+            for (int i = 0; i < DBCount; i++)
+            {
+                ChunksDatabase[i].Dispose();
+                HeightMapDatabase[i].Dispose();
+                LODsDatabase[i].Dispose();
+                EntsDatabase[i].Dispose();
+                TopsDatabase[i].Dispose();
+            }
         }
 
         public BsonValue GetIDFor(int x, int y, int z)
@@ -106,13 +129,18 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public ConcurrentDictionary<Vector2i, byte[]> HeightHelps = new ConcurrentDictionary<Vector2i, byte[]>();
 
+        public static int DBIDFor(int x, int y)
+        {
+            return Math.Abs((x * 17 + y) % DBCount);
+        }
+
         public byte[] GetHeightHelper(int x, int y)
         {
             if (HeightHelps.TryGetValue(new Vector2i(x, y), out byte[] hhe))
             {
                 return hhe;
             }
-            BsonDocument doc = DBHHelpers.FindById(GetIDFor(x, y, 0));
+            BsonDocument doc = DBHHelpers[DBIDFor(x, y)].FindById(GetIDFor(x, y, 0));
             if (doc == null)
             {
                 return null;
@@ -129,7 +157,7 @@ namespace Voxalia.ServerGame.WorldSystem
             Dictionary<string, BsonValue> tbs = newdoc.RawValue;
             tbs["_id"] = id;
             tbs["hh"] = hhelper;
-            DBHHelpers.Upsert(newdoc);
+            DBHHelpers[DBIDFor(x, y)].Upsert(newdoc);
             HeightHelps[new Vector2i(x, y)] = hhelper;
         }
 
@@ -144,7 +172,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return hei;
             }
-            BsonDocument doc = DBHeights.FindById(GetIDFor(x, y, 0));
+            BsonDocument doc = DBHeights[DBIDFor(x, y)].FindById(GetIDFor(x, y, 0));
             if (doc == null)
             {
                 return new Heights() { A = int.MaxValue, B = int.MaxValue, C = int.MaxValue, D = int.MaxValue };
@@ -179,7 +207,7 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["mb"] = (int)h.MB;
             tbs["mc"] = (int)h.MC;
             tbs["md"] = (int)h.MD;
-            DBHeights.Upsert(newdoc);
+            DBHeights[DBIDFor(x, y)].Upsert(newdoc);
             HeightEst[new Vector2i(x, y)] = h;
         }
 
@@ -195,7 +223,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return res;
             }
-            BsonDocument doc = DBLODSix.FindById(GetIDFor(x, y, z));
+            BsonDocument doc = DBLODSix[DBIDFor(x, y)].FindById(GetIDFor(x, y, z));
             if (doc == null)
             {
                 return null;
@@ -214,7 +242,7 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["_id"] = id;
             tbs["blocks"] = new BsonValue(SLOD);
             LODSixes[vec] = SLOD;
-            DBLODSix.Upsert(newdoc);
+            DBLODSix[DBIDFor(x, y)].Upsert(newdoc);
         }
 
         /// <summary>
@@ -230,7 +258,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 return res;
             }
             BsonDocument doc;
-            doc = DBSuperLOD.FindById(GetIDFor(x, y, z));
+            doc = DBSuperLOD[DBIDFor(x, y)].FindById(GetIDFor(x, y, z));
             if (doc == null)
             {
                 return null;
@@ -249,7 +277,7 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["_id"] = id;
             tbs["blocks"] = new BsonValue(SLOD);
             SLODders[vec] = SLOD;
-            DBSuperLOD.Upsert(newdoc);
+            DBSuperLOD[DBIDFor(x, y)].Upsert(newdoc);
         }
         
             // NOTE: Not currently used!
@@ -279,7 +307,7 @@ namespace Voxalia.ServerGame.WorldSystem
         public ChunkDetails GetChunkEntities(int x, int y, int z)
         {
             BsonDocument doc;
-            doc = DBEnts.FindById(GetIDFor(x, y, z));
+            doc = DBEnts[DBIDFor(x, y)].FindById(GetIDFor(x, y, z));
             if (doc == null)
             {
                 return null;
@@ -298,13 +326,13 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["_id"] = id;
             tbs["version"] = new BsonValue(details.Version);
             tbs["entities"] = new BsonValue(/*FileHandler.GZip(*/details.Blocks/*)*/);
-            DBEnts.Upsert(newdoc);
+            DBEnts[DBIDFor(details.X, details.Y)].Upsert(newdoc);
         }
 
         public ChunkDetails GetChunkDetails(int x, int y, int z)
         {
             BsonDocument doc;
-            doc = DBChunks.FindById(GetIDFor(x, y, z));
+            doc = DBChunks[DBIDFor(x, y)].FindById(GetIDFor(x, y, z));
             if (doc == null)
             {
                 return null;
@@ -328,13 +356,13 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["flags"] = new BsonValue((int)details.Flags);
             tbs["blocks"] = new BsonValue(details.Blocks.Length == 0 ? details.Blocks : FileHandler.Compress(details.Blocks));
             tbs["reach"] = new BsonValue(details.Reachables);
-            DBChunks.Upsert(newdoc);
+            DBChunks[DBIDFor(details.X, details.Y)].Upsert(newdoc);
         }
 
         public void ClearChunkDetails(Vector3i details)
         {
             BsonValue id = GetIDFor(details.X, details.Y, details.Z);
-            DBChunks.Delete(id);
+            DBChunks[DBIDFor(details.X, details.Y)].Delete(id);
         }
         
         public void WriteTopsHigher(int x, int y, int z, byte[] tops, byte[] tops_trans)
@@ -345,13 +373,13 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["_id"] = id;
             tbs["tops"] = new BsonValue(FileHandler.Compress(tops));
             tbs["topstrans"] = new BsonValue(FileHandler.Compress(tops_trans));
-            DBTopsHigher.Upsert(newdoc);
+            DBTopsHigher[DBIDFor(x, y)].Upsert(newdoc);
         }
 
         public KeyValuePair<byte[], byte[]> GetTopsHigher(int x, int y, int z)
         {
             BsonDocument doc;
-            doc = DBTopsHigher.FindById(GetIDFor(x, y, z));
+            doc = DBTopsHigher[DBIDFor(x, y)].FindById(GetIDFor(x, y, z));
             if (doc == null)
             {
                 return new KeyValuePair<byte[], byte[]>(null, null);
@@ -369,13 +397,13 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["_id"] = id;
             tbs["tops"] = new BsonValue(FileHandler.Compress(tops));
             tbs["topstrans"] = new BsonValue(FileHandler.Compress(tops_trans));
-            DBTops.Upsert(newdoc);
+            DBTops[DBIDFor(x, y)].Upsert(newdoc);
         }
 
         public KeyValuePair<byte[], byte[]> GetTops(int x, int y)
         {
             BsonDocument doc;
-            doc = DBTops.FindById(GetIDFor(x, y, 0));
+            doc = DBTops[DBIDFor(x, y)].FindById(GetIDFor(x, y, 0));
             if (doc == null)
             {
                 return new KeyValuePair<byte[], byte[]>(null, null);
@@ -398,7 +426,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 return output;
             }
             BsonDocument doc;
-            doc = DBMins.FindById(GetIDFor(x, y, 0));
+            doc = DBMins[DBIDFor(x, y)].FindById(GetIDFor(x, y, 0));
             if (doc == null)
             {
                 return 0;
@@ -414,7 +442,7 @@ namespace Voxalia.ServerGame.WorldSystem
             tbs["_id"] = id;
             tbs["min"] = new BsonValue(min);
             Mins[new Vector2i(x, y)] = min;
-            DBMins.Upsert(newdoc);
+            DBMins[DBIDFor(x, y)].Upsert(newdoc);
         }
 
     }

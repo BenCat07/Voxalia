@@ -1032,7 +1032,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(13, fogDist);
             GL.Uniform2(14, zfar_rel);
             TheClient.Rendering.SetColor(Color4.White);
-            GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
+            GL.Uniform3(10, -ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
             TheClient.s_forw_vox_slod.Bind();
             CheckError("Render/Fast - Uniforms 5.25");
@@ -1043,7 +1043,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(13, fogDist);
             GL.Uniform2(14, zfar_rel);
             TheClient.Rendering.SetColor(Color4.White);
-            GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
+            GL.Uniform3(10, -ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
             TheClient.s_forw_nobones.Bind();
             if (TheClient.CVars.r_forward_lights.ValueB)
@@ -1060,7 +1060,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(13, fogDist);
             GL.Uniform2(14, zfar_rel);
             TheClient.Rendering.SetColor(Color4.White);
-            GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
+            GL.Uniform3(10, -ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
             TheClient.s_forw.Bind();
             if (TheClient.CVars.r_forward_lights.ValueB)
@@ -1077,7 +1077,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(13, fogDist);
             GL.Uniform2(14, zfar_rel);
             TheClient.Rendering.SetColor(Color4.White);
-            GL.Uniform3(10, ClientUtilities.Convert(TheClient.TheSun.Direction));
+            GL.Uniform3(10, -ClientUtilities.Convert(TheClient.TheSun.Direction));
             GL.Uniform3(11, maxLit);
             CheckError("Render/Fast - Uniforms");
             if (TheClient.CVars.r_3d_enable.ValueB || TheClient.VR != null)

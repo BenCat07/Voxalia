@@ -41,7 +41,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         {
             Vector2i mtChunk = new Vector2i((int)(mountainPos.X * MountainGridSize), (int)(mountainPos.Y * MountainGridSize));
             Location chunkCenter = chunkPos.ToLocation() * Constants.CHUNK_WIDTH;
-            MTRandom random = new MTRandom(39, (ulong)(mountainPos.X * 39 + mountainPos.Y));
+            MTRandom random = new MTRandom(39, (ulong)(mountainPos.X * 39 + mountainPos.Y + seed));
             int count = random.Next(1, 5);
             for (int i = 0; i < count; i++)
             {
