@@ -58,7 +58,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 ((PlayerEntity)Sitter).Teleport(SeatHolder.GetPosition() + PositionOffset); // TODO: Teleport method on all entities!
             }
             double len = (double)PositionOffset.Length();
-            js = new JointSlider(SeatHolder, sitter, PositionOffset / len);
+            js = new JointSlider(SeatHolder, sitter, len < 0.01 ? Location.UnitZ : PositionOffset / len);
             jbs = new JointBallSocket(SeatHolder, sitter, sitter.GetPosition());
             jnc = new JointNoCollide(SeatHolder, sitter);
             SeatHolder.TheRegion.AddJoint(js);

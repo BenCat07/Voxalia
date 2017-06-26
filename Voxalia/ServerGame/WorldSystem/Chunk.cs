@@ -516,7 +516,10 @@ namespace Voxalia.ServerGame.WorldSystem
                 byte[] lod = LODBytes(5, false, true);
                 byte[] lodsix = LODBytes(6, false, true);
                 byte[] slod = lod.Length == 0 ? lod : SLODBytes(lod, true);
-                OwningRegion.PushHeightCorrection(WorldPosition, slod);
+                lock (GetLocker())
+                {
+                    OwningRegion.PushHeightCorrection(WorldPosition, slod);
+                }
                 if (blks.Length == 0 && !FromFile)
                 {
                     return;

@@ -53,7 +53,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             vehName = vehicle;
             SetMass(1500);
-            DriverSeat = new Seat(this, Location.UnitZ * 2); // TODO: proper placement
+            DriverSeat = new Seat(this, Location.Zero); // TODO: proper placement
             Seats = new List<Seat>()
             {
                 DriverSeat

@@ -174,7 +174,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 if (!seen)
                 {
                     chk.UnloadTimer += Delta;
-                    if (chk.UnloadTimer > UnloadLimit)
+                    if (chk.UnloadTimer > UnloadLimit && Utilities.UtilRandom.NextDouble() <= UnloadChance) // TODO: Or under memory load?
                     {
                         chk.UnloadSafely();
                         DelMe.Add(chk.WorldPosition);
@@ -193,6 +193,11 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
             }
         }
+
+        /// <summary>
+        /// The chance of an unload happening at any given second for any given chunk.
+        /// </summary>
+        public double UnloadChance = 0.1;
 
         /// <summary>
         /// The maximum time a chunk can be far away from players before it's unloaded.
