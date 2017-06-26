@@ -166,6 +166,11 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
+            if (Body.Space == null)
+            {
+                Body = null;
+                return;
+            }
             LVel = new Location(Body.LinearVelocity);
             AVel = new Location(Body.AngularVelocity);
             Friction = GetFriction();
