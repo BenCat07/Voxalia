@@ -157,7 +157,7 @@ namespace Voxalia.ServerGame.WorldSystem
             List<Vector3i> DelMe = new List<Vector3i>();
             foreach (Chunk chk in LoadedChunks.Values)
             {
-                if (chk.LastEdited >= 0)
+                if (chk.LastEdited >= 0 && Utilities.UtilRandom.NextDouble() <= UnloadChance)
                 {
                     chk.SaveToFile(null);
                 }

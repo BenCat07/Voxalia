@@ -216,11 +216,12 @@ namespace VoxaliaLauncher
             ProcessStartInfo psi = new ProcessStartInfo("Voxalia.exe", "{{Launcher}}")
             {
                 RedirectStandardOutput = true,
+                RedirectStandardError = true,
                 UseShellExecute = false
             };
             // TODO: psi.RedirectStandardInput = true;
             Process p = Process.Start(psi);
-            LauncherLog log = new LauncherLog(this, p.StandardOutput);
+            LauncherLog log = new LauncherLog(this, p.StandardOutput, p.StandardError);
             log.Show();
             log.Location = Location;
             Hide();

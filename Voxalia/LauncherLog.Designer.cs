@@ -76,6 +76,7 @@ namespace VoxaliaLauncher
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Voxalia Log";
             this.Load += new System.EventHandler(this.LauncherLog_Load);
+            this.Load += new System.EventHandler(this.LauncherLog_Load2);
             this.ResumeLayout(false);
             this.PerformLayout();
 

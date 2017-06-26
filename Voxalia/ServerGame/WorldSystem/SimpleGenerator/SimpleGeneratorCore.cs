@@ -124,10 +124,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return toret;
         }
 
+        /// <summary>
+        /// TODO: ocassionally clear this!
+        /// </summary>
         public ConcurrentDictionary<Vector2i, SimpleMountainGenerator> MountainsGenerated = new ConcurrentDictionary<Vector2i, SimpleMountainGenerator>();
-
-        public Object MountainLock = new Object();
-
+        
         public readonly Object[] LockMountains = new Object[] { new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object() };
 
 

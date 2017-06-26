@@ -147,13 +147,16 @@ namespace VoxaliaLauncher
         
         public StreamReader OutputReader;
 
+        public StreamReader OutputReader2;
+
         public LauncherForm OwnerForm;
 
-        public LauncherLog(LauncherForm form, StreamReader input)
+        public LauncherLog(LauncherForm form, StreamReader input, StreamReader einput)
         {
             this.FormClosed += LauncherLog_FormClosed;
             InitializeComponent();
             OutputReader = input;
+            OutputReader2 = einput;
             OwnerForm = form;
             Timer t = new Timer() { Interval = 500 };
             t.Tick += T_Tick;
@@ -306,6 +309,33 @@ namespace VoxaliaLauncher
             while (true)
             {
                 string read = await OutputReader.ReadLineAsync();
+                if (!Visible || IsDisposed || read == null)
+                {
+                    if (checkBox1.Checked)
+                    {
+                        Invoke(new Action(() =>
+                        {
+                            Close();
+                        }));
+                    }
+                    return;
+                }
+                Invoke(new Action(() =>
+                {
+                    if (!Visible || IsDisposed)
+                    {
+                        return;
+                    }
+                    WriteInternal(read);
+                }));
+            }
+        }
+
+        private async void LauncherLog_Load2(object sender, EventArgs e)
+        {
+            while (true)
+            {
+                string read = await OutputReader2.ReadLineAsync();
                 if (!Visible || IsDisposed || read == null)
                 {
                     if (checkBox1.Checked)

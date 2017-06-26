@@ -23,7 +23,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
         public static double[,] GenerateMountain(int x, int y)
         {
             SimpleMountainGenerator smg = new SimpleMountainGenerator();
-            smg.RunMountainGen((ulong)(x * 39 + y));
+            smg.RunMountainGen((ulong)(x * 39 + y), true);
             return smg.HeightMap;
         }
 
@@ -33,7 +33,8 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
             {
                 PreRunImage = false
             };
-            smg.RunMountainGen((ulong)(x * 39 + y));
+            smg.RunMountainGen((ulong)(x * 39 + y), false);
+            smg.ToHandle = null;
             return smg;
         }
 
@@ -58,12 +59,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
             {
                 return 0;
             }
-            if (HeightMap[x, y] > 0)
+            if (HeightMap != null && HeightMap[x, y] > 0)
             {
                 return HeightMap[x, y];
             }
-            FillPoint(Height, new Vector2i(x, y));
-            return HeightMap[x, y];
+            return FillPoint(Height, new Vector2i(x, y));
         }
 
         int AreaSize = 768;
@@ -77,11 +77,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
         int Movement = 5;
         double Roughness = 1.5;
         bool PreRunImage = true;
-        public void RunMountainGen(ulong seed)
+        public void RunMountainGen(ulong seed, bool genmaps)
         {
             random = new MTRandom(seed);
             ADDER = AreaSize * 0.25 / 2 / DetailScaler;
-            RandomMountainHeightMap(AreaSize, Height, Movement, Roughness);
+            RandomMountainHeightMap(AreaSize, Height, Movement, Roughness, genmaps);
         }
 
         MTRandom random;
@@ -97,10 +97,13 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
         List<KeyValuePair<Vector2i, double>> ToHandle = new List<KeyValuePair<Vector2i, double>>();
         double[,] NDists;
 
-        void RandomMountainHeightMap(int Size, int Height, int Movement, double Roughness)
+        void RandomMountainHeightMap(int Size, int Height, int Movement, double Roughness, bool genmaps)
         {
-            HeightMap = new double[Size, Size];
-            NDists = new double[Size, Size];
+            if (genmaps)
+            {
+                HeightMap = new double[Size, Size];
+                NDists = new double[Size, Size];
+            }
 
             int CenterPosition = Size / 2;
             Center = new Vector2i(CenterPosition, CenterPosition);
@@ -291,11 +294,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
             return passes > 0;
         }
 
-        void FillPoint(int Height, Vector2i point)
+        double FillPoint(int Height, Vector2i point)
         {
             if (point.X < 0 || point.Y < 0 || point.X >= AreaSize || point.Y >= AreaSize)
             {
-                return;
+                return 0;
             }
 
             double multo = 1;
@@ -306,7 +309,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
 
             if (!had_success)
             {
-                return;
+                return 0;
             }
             
             double SecondLowestScore = MaxDistance * MaxDistance;
@@ -316,7 +319,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
 
             if (!had_success2)
             {
-                return;
+                return 0;
             }
 
             double fScore, nL;
@@ -365,8 +368,13 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Helpers
 
             double Result = Math.Min(Height, Math.Max(1, resser * 0.15 + (nL - fScore * Math.Max(1.0, (nL) / (Height / 2)) * 1.0) * 0.85 * multo));
 
-            HeightMap[point.X, point.Y] = Result;
-            NDists[point.X, point.Y] = fScore;
+            if (HeightMap != null)
+            {
+                HeightMap[point.X, point.Y] = Result;
+                NDists[point.X, point.Y] = fScore;
+            }
+
+            return Result;
         }
 
         List<double> UsedAngles = new List<double>();
