@@ -115,9 +115,14 @@ namespace Voxalia.ServerGame.EntitySystem
                     entity.ApplyLinearImpulse(ref force);
                 }
                 double dotforw = Vector3.Dot(entity.LinearVelocity, forward);
-                entity.ApplyImpulse(side * 5 + entity.Position, up * -Plane.RightLeft * entity.Mass * dotforw * 0.5 * Delta);
-                entity.ApplyImpulse(forward * 5 + entity.Position, side * ((Plane.IRight ? 1 : 0) + (Plane.ILeft ? -1 : 0)) * entity.Mass * dotforw * 0.5 * Delta);
-                entity.ApplyImpulse(forward * 5 + entity.Position, up * Plane.ForwBack * entity.Mass * 0.5 * Delta * dotforw);
+                //entity.ApplyImpulse(side * 5 + entity.Position, up * -Plane.RightLeft * entity.Mass * dotforw * 0.5 * Delta);
+                //entity.ApplyImpulse(forward * 5 + entity.Position, side * ((Plane.IRight ? 1 : 0) + (Plane.ILeft ? -1 : 0)) * entity.Mass * dotforw * 0.5 * Delta);
+                //entity.ApplyImpulse(forward * 5 + entity.Position, up * Plane.ForwBack * entity.Mass * 0.5 * Delta * dotforw);
+                const double mval = 0.2;
+                double rot_x = -Plane.ForwBack * 0.5 * Delta * dotforw * mval;
+                double rot_y = Plane.RightLeft * dotforw * 0.5 * Delta * mval;
+                double rot_z = -((Plane.IRight ? 1 : 0) + (Plane.ILeft ? -1 : 0)) * dotforw * 0.5 * Delta * mval;
+                entity.AngularVelocity +=  Quaternion.Transform(new Vector3(rot_x, rot_y, rot_z), entity.Orientation);
                 // Rotate the entity pre-emptively, and re-apply the movement velocity in this new direction!
                 double vellen = entity.LinearVelocity.Length();
                 Vector3 normvel = entity.LinearVelocity / vellen;
@@ -126,10 +131,10 @@ namespace Voxalia.ServerGame.EntitySystem
                 Quaternion quat = new Quaternion(inc.X, inc.Y, inc.Z, 0);
                 quat = quat * entity.Orientation;
                 Quaternion orient = entity.Orientation;
-                Quaternion.Add(ref orient, ref quat, out orient);
-                orient.Normalize();
-                entity.Orientation = orient;
-                entity.LinearVelocity = Quaternion.Transform(norm_vel_transf, orient) * vellen;
+                Quaternion.Add(ref orient, ref quat, out Quaternion torient);
+                torient.Normalize();
+                entity.Orientation = torient;
+                entity.LinearVelocity = Quaternion.Transform(norm_vel_transf, torient) * vellen;
                 entity.AngularVelocity *= 0.1; // TODO: DELTA!!!!
                 // Apply air drag
                 Entity.ModifyLinearDamping(Plane.FastOrSlow < 0.0 ? 0.6 : 0.1); // TODO: arbitrary constant

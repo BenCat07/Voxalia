@@ -111,9 +111,14 @@ namespace Voxalia.ClientGame.EntitySystem
                     entity.ApplyLinearImpulse(ref force);
                 }
                 double dotforw = BEPUutilities.Vector3.Dot(entity.LinearVelocity, forward);
-                entity.ApplyImpulse(side * 5 + entity.Position, up * -Plane.PlanePilot.XMove * entity.Mass * dotforw * 0.5 * Delta);
-                entity.ApplyImpulse(forward * 5 + entity.Position, side * ((Plane.PlanePilot.ItemRight ? 1 : 0) + (Plane.PlanePilot.ItemLeft ? -1 : 0)) * entity.Mass * dotforw * 0.5 * Delta);
-                entity.ApplyImpulse(forward * 5 + entity.Position, up * Plane.PlanePilot.YMove * entity.Mass * 0.5 * Delta * dotforw);
+                //entity.ApplyImpulse(side * 5 + entity.Position, up * -Plane.PlanePilot.XMove * entity.Mass * dotforw * 0.5 * Delta);
+                //entity.ApplyImpulse(forward * 5 + entity.Position, side * ((Plane.PlanePilot.ItemRight ? 1 : 0) + (Plane.PlanePilot.ItemLeft ? -1 : 0)) * entity.Mass * dotforw * 0.5 * Delta);
+                //entity.ApplyImpulse(forward * 5 + entity.Position, up * Plane.PlanePilot.YMove * entity.Mass * 0.5 * Delta * dotforw);
+                const double mval = 0.2;
+                double rot_x = -Plane.PlanePilot.YMove * 0.5 * Delta * dotforw * mval;
+                double rot_y = Plane.PlanePilot.XMove * dotforw * 0.5 * Delta * mval;
+                double rot_z = -((Plane.PlanePilot.ItemRight ? 1 : 0) + (Plane.PlanePilot.ItemLeft ? -1 : 0)) * dotforw * 0.5 * Delta * mval;
+                entity.AngularVelocity += BEPUutilities.Quaternion.Transform(new BEPUutilities.Vector3(rot_x, rot_y, rot_z), entity.Orientation);
                 // Rotate the entity pre-emptively, and re-apply the movement velocity in this new direction!
                 double vellen = entity.LinearVelocity.Length();
                 BEPUutilities.Vector3 normvel = entity.LinearVelocity / vellen;
