@@ -16,17 +16,18 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {
     public class YourVehiclePacketOut: AbstractPacketOut
     {
-        public YourVehiclePacketOut(double delta, int tID, Location pos, Location vel, Location avel, Quaternion quat)
+        public YourVehiclePacketOut(double delta, int tID, Location pos, Location vel, Location avel, Quaternion quat, Location prel)
         {
             UsageType = NetUsageType.ENTITIES;
             ID = ServerToClientPacket.YOUR_VEHICLE;
-            Data = new byte[4 + 24 + 24 + 24 + 16 + 8];
+            Data = new byte[4 + 24 + 24 + 24 + 16 + 8 + 24];
             Utilities.IntToBytes(tID).CopyTo(Data, 0);
             pos.ToDoubleBytes().CopyTo(Data, 4);
             vel.ToDoubleBytes().CopyTo(Data, 4 + 24);
             avel.ToDoubleBytes().CopyTo(Data, 4 + 24 + 24);
             Utilities.QuaternionToBytes(quat).CopyTo(Data, 4 + 24 + 24 + 24);
             Utilities.DoubleToBytes(delta).CopyTo(Data, 4 + 24 + 24 + 24 + 16);
+            prel.ToDoubleBytes().CopyTo(Data, 4 + 24 + 24 + 24 + 16 + 8);
         }
     }
 }

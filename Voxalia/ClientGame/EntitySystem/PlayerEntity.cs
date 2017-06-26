@@ -135,7 +135,9 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public int CurrentVehiclePacketID = 0;
 
-        public void VehiclePacketFromServer(int ID, Location pos, Location vel, Location avel, Quaternion quat, double gtt)
+        const double VEH_MINIMUM = 10.0;
+
+        public void VehiclePacketFromServer(int ID, Location pos, Location vel, Location avel, Quaternion quat, double gtt, Location prel)
         {
             if (VehicleMarks[ID].Time > 0)
             {
@@ -149,12 +151,13 @@ namespace Voxalia.ClientGame.EntitySystem
                     return;
                 }
                 PhysicsEntity ve = (Vehicle as PhysicsEntity);
-                if (ve.GetPosition().DistanceSquared(pos) > 25.0 * ve.GetVelocity().LengthSquared())
+                if (ve.GetPosition().DistanceSquared(pos) > (VEH_MINIMUM * VEH_MINIMUM) * ve.GetVelocity().LengthSquared())
                 {
                     ve.SetPosition(pos);
                     ve.SetVelocity(vel);
                     ve.SetAngularVelocity(avel);
                     ve.SetOrientation(quat);
+                    SetPosition(pos + prel);
                 }
                 else
                 {
@@ -162,6 +165,7 @@ namespace Voxalia.ClientGame.EntitySystem
                     ve.SetVelocity(ve.GetVelocity() + off_vel * off_gtt);
                     ve.SetAngularVelocity(ve.GetAngularVelocity() + off_avel * off_gtt);
                     ve.SetOrientation(Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));
+                    SetPosition(ve.GetPosition() + prel);
                 }
             }
         }

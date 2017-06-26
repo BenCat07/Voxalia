@@ -38,6 +38,10 @@ namespace Voxalia.ServerGame.EntitySystem
     {
         public bool ShouldNetworkAnyway(Entity e)
         {
+            if (CurrentSeat != null && CurrentSeat.SeatHolder.EID == e.EID)
+            {
+                return true;
+            }
             return TheRegion.TheWorld.Settings.TreesInDistance && e is PhysicsEntity p && p.GenBlockShadow;
         }
 

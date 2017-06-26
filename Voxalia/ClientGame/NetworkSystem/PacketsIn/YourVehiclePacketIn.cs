@@ -17,7 +17,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
     {
         public override bool ParseBytesAndExecute(byte[] data)
         {
-            if (data.Length != 4 + 24 + 24 + 24 + 16 + 8)
+            if (data.Length != 4 + 24 + 24 + 24 + 16 + 8 + 24)
             {
                 return false;
             }
@@ -35,7 +35,8 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             Location avel = Location.FromDoubleBytes(data, 4 + 24 + 24);
             Quaternion quat = Utilities.BytesToQuaternion(data, 4 + 24 + 24 + 24);
             double gtt = Utilities.BytesToDouble(Utilities.BytesPartial(data, 4 + 24 + 24 + 24 + 16, 8));
-            TheClient.Player.VehiclePacketFromServer(tid, pos, vel, avel, quat, gtt);
+            Location prel = Location.FromDoubleBytes(data, 4 + 24 + 24 + 24 + 16 + 8);
+            TheClient.Player.VehiclePacketFromServer(tid, pos, vel, avel, quat, gtt, prel);
             return true;
         }
     }

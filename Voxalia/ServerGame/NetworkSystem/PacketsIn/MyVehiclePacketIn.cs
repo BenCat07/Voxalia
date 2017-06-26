@@ -32,7 +32,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
             Location avel = data.ReadLocation();
             Quaternion quat = Utilities.BytesToQuaternion(data.ReadBytes(16), 0);*/
             // TODO: use the above values?
-            Player.Network.SendPacket(new YourVehiclePacketOut(Player.TheWorld.GlobalTickTime, tid, Player.SittingOn.GetPosition(), Player.SittingOn.GetVelocity(), Player.SittingOn.GetAngularVelocity(), Player.SittingOn.GetOrientation()));
+            Player.Network.SendPacket(new YourVehiclePacketOut(Player.TheWorld.GlobalTickTime, tid, Player.SittingOn.GetPosition(), Player.SittingOn.GetVelocity(), Player.SittingOn.GetAngularVelocity(), Player.SittingOn.GetOrientation(), Player.GetPosition() - Player.SittingOn.GetPosition()));
             return true;
         }
     }
