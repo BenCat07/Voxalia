@@ -57,6 +57,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Wings = new JointFlyingDisc(this) { IsAPlane = true };
             TheRegion.AddJoint(Wings);
             HandleWheels();
+            Body.LinearDamping = 0.0;
         }
 
         // TODO: Customizable and networked speeds!
@@ -64,7 +65,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             get
             {
-                return GetMass() * 20f;
+                return GetMass() * 15f;
             }
         }
 
@@ -86,7 +87,7 @@ namespace Voxalia.ServerGame.EntitySystem
             // TODO: Raise/lower landing gear if player hits stance button!
             base.Tick();
         }
-
+        
         public class PlaneMotionConstraint : SingleEntityConstraint
         {
             PlaneEntity Plane;
@@ -111,37 +112,21 @@ namespace Voxalia.ServerGame.EntitySystem
                 // Engines!
                 if (Plane.FastOrSlow >= 0.0)
                 {
-                    Vector3 force = forward * (Plane.RegularStrength + Plane.FastStrength) * Delta;
+                    // TODO: Controls raise/lower engine thrust rather than continual control
+                    Vector3 force = forward * (Plane.RegularStrength + Plane.FastStrength * Plane.FastOrSlow) * Delta;
                     entity.ApplyLinearImpulse(ref force);
                 }
                 double dotforw = Vector3.Dot(entity.LinearVelocity, forward);
-                //entity.ApplyImpulse(side * 5 + entity.Position, up * -Plane.RightLeft * entity.Mass * dotforw * 0.5 * Delta);
-                //entity.ApplyImpulse(forward * 5 + entity.Position, side * ((Plane.IRight ? 1 : 0) + (Plane.ILeft ? -1 : 0)) * entity.Mass * dotforw * 0.5 * Delta);
-                //entity.ApplyImpulse(forward * 5 + entity.Position, up * Plane.ForwBack * entity.Mass * 0.5 * Delta * dotforw);
                 double mval = 2.0 * (1.0 / Math.Max(1.0, entity.LinearVelocity.Length()));
                 double rot_x = -Plane.ForwBack * 0.5 * Delta * dotforw * mval;
                 double rot_y = Plane.RightLeft * dotforw * 0.5 * Delta * mval;
-                double rot_z = -((Plane.IRight ? 1 : 0) + (Plane.ILeft ? -1 : 0)) * dotforw * 0.5 * Delta * mval;
+                double rot_z = -((Plane.IRight ? 1 : 0) + (Plane.ILeft ? -1 : 0)) * dotforw * 0.1 * Delta * mval;
                 entity.AngularVelocity +=  Quaternion.Transform(new Vector3(rot_x, rot_y, rot_z), entity.Orientation);
-                // Rotate the entity pre-emptively, and re-apply the movement velocity in this new direction!
                 double vellen = entity.LinearVelocity.Length();
-                if (vellen < 0.01)
-                {
-                    vellen = 0.01;
-                }
-                Vector3 normvel = entity.LinearVelocity / vellen;
-                Vector3 norm_vel_transf = Quaternion.Transform(normvel, Quaternion.Inverse(entity.Orientation)); // Probably just 1,0,0 on whichever axis... can be simplified!
-                Vector3 inc = entity.AngularVelocity * Delta * 0.5;
-                Quaternion quat = new Quaternion(inc.X, inc.Y, inc.Z, 0);
-                quat = quat * entity.Orientation;
-                Quaternion orient = entity.Orientation;
-                Quaternion.Add(ref orient, ref quat, out Quaternion torient);
-                torient.Normalize();
-                //entity.Orientation = torient;
-                //entity.LinearVelocity = Quaternion.Transform(norm_vel_transf, torient) * vellen;
-                //entity.AngularVelocity *= 0.1; // TODO: DELTA!!!!
+                Vector3 newVel = forward * vellen;
+                entity.LinearVelocity += (newVel - entity.LinearVelocity) * Delta * 5.0;
                 // Apply air drag
-                Entity.ModifyLinearDamping(Plane.FastOrSlow < 0.0 ? 0.6 : 0.1); // TODO: arbitrary constant
+                Entity.ModifyLinearDamping(Plane.FastOrSlow < 0.0 ? 0.5 : 0.1); // TODO: arbitrary constant
                 Entity.ModifyAngularDamping(0.995); // TODO: arbitrary constant
                 // Ensure we're active if flying!
                 Entity.ActivityInformation.Activate();

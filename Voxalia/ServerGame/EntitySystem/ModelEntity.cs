@@ -109,7 +109,8 @@ namespace Voxalia.ServerGame.EntitySystem
             }
             if (mode == ModelCollisionMode.CONVEXHULL)
             {
-                Shape = TheServer.Models.handler.MeshToBepuConvex(smodel, out modelVerts); // TODO: Scale!
+                Shape = TheServer.Models.handler.MeshToBepuConvex(smodel, out modelVerts, out BEPUutilities.Vector3 center); // TODO: Scale!
+                offset = new Location(-center);
             }
             else if (mode == ModelCollisionMode.AABB)
             {

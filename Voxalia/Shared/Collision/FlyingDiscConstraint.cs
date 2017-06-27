@@ -63,7 +63,7 @@ namespace Voxalia.Shared.Collision
             double projectedZVel = Vector3.Dot(entity.LinearVelocity + entity.Gravity ?? entity.Space.ForceUpdater.Gravity, up);
             if (IsAPlane)
             {
-                double velLen = Math.Min(entity.LinearVelocity.Length() * 0.01, 1.0); // TODO: 0.01: Arbitrary constant!
+                double velLen = Math.Min(entity.LinearVelocity.Length() * 0.05, 1.0); // TODO: 0.05: Arbitrary constant!
                 cForce = up * (-projectedZVel * dt * velLen * 0.9); // TODO: 0.9: Arbitrary constant!
             }
             else

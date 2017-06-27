@@ -61,13 +61,14 @@ namespace Voxalia.ClientGame.EntitySystem
                     ((FlyingDiscConstraint)((JointFlyingDisc)joint).CurrentJoint).IsAPlane = true;
                 }
             }
+            Body.LinearDamping = 0.0;
         }
 
         public float PlaneFastStrength
         {
             get
             {
-                return GetMass() * 20f;
+                return GetMass() * 15f;
             }
         }
 
@@ -107,37 +108,20 @@ namespace Voxalia.ClientGame.EntitySystem
                 // Engines!
                 if (Plane.PlanePilot.SprintOrWalk >= 0.0)
                 {
-                    BEPUutilities.Vector3 force = forward * (Plane.PlaneRegularStrength +  Plane.PlaneFastStrength) * Delta;
+                    BEPUutilities.Vector3 force = forward * (Plane.PlaneRegularStrength +  Plane.PlaneFastStrength * Plane.PlanePilot.SprintOrWalk) * Delta;
                     entity.ApplyLinearImpulse(ref force);
                 }
                 double dotforw = BEPUutilities.Vector3.Dot(entity.LinearVelocity, forward);
-                //entity.ApplyImpulse(side * 5 + entity.Position, up * -Plane.PlanePilot.XMove * entity.Mass * dotforw * 0.5 * Delta);
-                //entity.ApplyImpulse(forward * 5 + entity.Position, side * ((Plane.PlanePilot.ItemRight ? 1 : 0) + (Plane.PlanePilot.ItemLeft ? -1 : 0)) * entity.Mass * dotforw * 0.5 * Delta);
-                //entity.ApplyImpulse(forward * 5 + entity.Position, up * Plane.PlanePilot.YMove * entity.Mass * 0.5 * Delta * dotforw);
                 double mval = 2.0 * (1.0 / Math.Max(1.0, entity.LinearVelocity.Length()));
                 double rot_x = -Plane.PlanePilot.YMove * 0.5 * Delta * dotforw * mval;
                 double rot_y = Plane.PlanePilot.XMove * dotforw * 0.5 * Delta * mval;
-                double rot_z = -((Plane.PlanePilot.ItemRight ? 1 : 0) + (Plane.PlanePilot.ItemLeft ? -1 : 0)) * dotforw * 0.5 * Delta * mval;
+                double rot_z = -((Plane.PlanePilot.ItemRight ? 1 : 0) + (Plane.PlanePilot.ItemLeft ? -1 : 0)) * dotforw * 0.1 * Delta * mval;
                 entity.AngularVelocity += BEPUutilities.Quaternion.Transform(new BEPUutilities.Vector3(rot_x, rot_y, rot_z), entity.Orientation);
-                // Rotate the entity pre-emptively, and re-apply the movement velocity in this new direction!
                 double vellen = entity.LinearVelocity.Length();
-                if (vellen < 0.01)
-                {
-                    vellen = 0.01;
-                }
-                BEPUutilities.Vector3 normvel = entity.LinearVelocity / vellen;
-                BEPUutilities.Vector3 norm_vel_transf = BEPUutilities.Quaternion.Transform(normvel, BEPUutilities.Quaternion.Inverse(entity.Orientation)); // Probably just 1,0,0 on whichever axis... can be simplified!
-                BEPUutilities.Vector3 inc = entity.AngularVelocity * Delta * 0.5;
-                BEPUutilities.Quaternion quat = new BEPUutilities.Quaternion(inc.X, inc.Y, inc.Z, 0);
-                quat = quat * entity.Orientation;
-                BEPUutilities.Quaternion orient = entity.Orientation;
-                BEPUutilities.Quaternion.Add(ref orient, ref quat, out BEPUutilities.Quaternion torient);
-                torient.Normalize();
-                //entity.Orientation = torient;
-                //entity.LinearVelocity = BEPUutilities.Quaternion.Transform(norm_vel_transf, torient) * vellen;
-                //entity.AngularVelocity *= 0.1;
+                BEPUutilities.Vector3 newVel = forward * vellen;
+                entity.LinearVelocity += (newVel - entity.LinearVelocity) * Delta * 5.0;
                 // Apply air drag
-                Entity.ModifyLinearDamping(Plane.PlanePilot.SprintOrWalk < 0.0 ? 0.6 : 0.1); // TODO: arbitrary constant
+                Entity.ModifyLinearDamping(Plane.PlanePilot.SprintOrWalk < 0.0 ? 0.5 : 0.1); // TODO: arbitrary constant
                 Entity.ModifyAngularDamping(0.995); // TODO: arbitrary constant
                 // Ensure we're active if flying!
                 Entity.ActivityInformation.Activate();
@@ -293,7 +277,8 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             else if (mode == ModelCollisionMode.CONVEXHULL)
             {
-                Shape = TheClient.Models.Handler.MeshToBepuConvex(model.Original, out ignoreme);
+                Shape = TheClient.Models.Handler.MeshToBepuConvex(model.Original, out ignoreme, out BEPUutilities.Vector3 center);
+                Offset = new Location(-center);
             }
             else if (mode == ModelCollisionMode.AABB)
             {

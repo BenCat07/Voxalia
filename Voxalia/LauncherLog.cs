@@ -304,6 +304,8 @@ namespace VoxaliaLauncher
             RTFBs.Add(rtfb);
         }
 
+        public bool IsClosed = false;
+
         private async void LauncherLog_Load(object sender, EventArgs e)
         {
             while (true)
@@ -315,14 +317,18 @@ namespace VoxaliaLauncher
                     {
                         Invoke(new Action(() =>
                         {
-                            Close();
+                            if (!IsClosed)
+                            {
+                                IsClosed = true;
+                                Close();
+                            }
                         }));
                     }
                     return;
                 }
                 Invoke(new Action(() =>
                 {
-                    if (!Visible || IsDisposed)
+                    if (!Visible || IsDisposed || IsClosed)
                     {
                         return;
                     }
@@ -342,14 +348,18 @@ namespace VoxaliaLauncher
                     {
                         Invoke(new Action(() =>
                         {
-                            Close();
+                            if (!IsClosed)
+                            {
+                                IsClosed = true;
+                                Close();
+                            }
                         }));
                     }
                     return;
                 }
                 Invoke(new Action(() =>
                 {
-                    if (!Visible || IsDisposed)
+                    if (!Visible || IsDisposed || IsClosed)
                     {
                         return;
                     }

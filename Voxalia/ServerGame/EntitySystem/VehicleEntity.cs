@@ -52,6 +52,7 @@ namespace Voxalia.ServerGame.EntitySystem
             : base("vehicles/" + vehicle + "_base", tregion)
         {
             vehName = vehicle;
+            mode = ModelCollisionMode.CONVEXHULL;
             SetMass(1500);
             DriverSeat = new Seat(this, Location.Zero); // TODO: proper placement
             Seats = new List<Seat>()
