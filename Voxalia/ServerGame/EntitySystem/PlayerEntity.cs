@@ -140,14 +140,14 @@ namespace Voxalia.ServerGame.EntitySystem
             }
             Damageable().SetMaxHealth(config.GetFloat("maxhealth", 100).Value);
             Damageable().SetHealth(config.GetFloat("health", 100).Value);
-            if (config.GetString("flying", "false").ToLowerFast() == "true") // TODO: ReadBoolean?
+            if (config.GetBool("flying", false).Value)
             {
                 TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
                 {
                     Fly();
                 }, 0.1);
             }
-            SecureMovement = config.GetString("secure_movement", "true").ToLowerFast() == "true"; // TODO: ReadBoolean?
+            SecureMovement = config.GetBool("secure_movement", true).Value;
             if (config.HasKey("permissions"))
             {
                 Permissions = config.GetSection("permissions");
@@ -170,10 +170,10 @@ namespace Voxalia.ServerGame.EntitySystem
             config.Set("gamemode", Mode.ToString());
             config.Set("maxhealth", Damageable().GetMaxHealth());
             config.Set("health", Damageable().GetHealth());
-            config.Set("flying", IsFlying ? "true": "false"); // TODO: Boolean safety
+            config.Set("flying", IsFlying);
             config.Set("velocity", GetVelocity().ToString());
             config.Set("position", GetPosition().ToString());
-            config.Set("secure_movement", SecureMovement ? "true" : "false"); // TODO: Boolean safety
+            config.Set("secure_movement", SecureMovement);
             config.Set("world", TheRegion.TheWorld.Name);
             for (int i = 0; i < (int)NetUsageType.COUNT; i++)
             {
