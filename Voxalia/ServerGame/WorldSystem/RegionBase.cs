@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using Voxalia.Shared;
 using Voxalia.ServerGame.ServerMainSystem;
@@ -279,7 +280,14 @@ namespace Voxalia.ServerGame.WorldSystem
             sw.Stop();
             TheServer.EntityTimeC += sw.Elapsed.TotalMilliseconds;
             TheServer.EntityTimes++;
+            while (ChunkFixQueue.TryDequeue(out Vector3i res))
+            {
+                Chunk chkres = GetChunk(res);
+                chkres?.LateSpawn();
+            }
         }
+
+        public ConcurrentQueue<Vector3i> ChunkFixQueue = new ConcurrentQueue<Vector3i>();
         
         /// <summary>
         /// The server object holding this region.

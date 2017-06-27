@@ -1613,7 +1613,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     TheRegion.GetSuperLODChunkData_Background(cworldPos, (b) =>
                     {
-                        if (!pkick)
+                        if (!pkick && ChunksAwareOf.TryGetValue(cworldPos, out ChunkAwarenessInfo cait) && cait.LOD == 15)
                         {
                             ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, b, 15));
                         }
@@ -1623,7 +1623,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     TheRegion.GetLODSixChunkData_Background(cworldPos, (b) =>
                     {
-                        if (!pkick)
+                        if (!pkick && ChunksAwareOf.TryGetValue(cworldPos, out ChunkAwarenessInfo cait) && cait.LOD == 6)
                         {
                             ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, b, 6));
                         }
@@ -1639,7 +1639,7 @@ namespace Voxalia.ServerGame.EntitySystem
                             {
                                 SendTops(topcoord);
                             }
-                            if (!ChunksAwareOf.TryGetValue(cworldPos, out ChunkAwarenessInfo cait) || cait.LOD == posMult)
+                            if (ChunksAwareOf.TryGetValue(cworldPos, out ChunkAwarenessInfo cait) && cait.LOD == posMult)
                             {
                                 ChunkNetwork.SendPacket(new ChunkInfoPacketOut(chn, posMult));
                             }

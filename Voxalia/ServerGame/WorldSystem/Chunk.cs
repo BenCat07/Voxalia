@@ -231,6 +231,14 @@ namespace Voxalia.ServerGame.WorldSystem
             if (BlocksInternal == null)
             {
                 BlocksInternal = new BlockInternal[Constants.CHUNK_BLOCK_COUNT];
+                OwningRegion.ChunkFixQueue.Enqueue(WorldPosition);
+            }
+        }
+
+        public void LateSpawn()
+        {
+            if( FCO == null && BlocksInternal != null)
+            {
                 FCO = new FullChunkObject(WorldPosition.ToVector3() * CHUNK_SIZE, BlocksInternal);
                 FCO.CollisionRules.Group = CollisionUtil.WorldSolid;
                 OwningRegion.AddChunk(FCO);
@@ -260,12 +268,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
-            if (BlocksInternal != null)
-            {
-                FCO = new FullChunkObject(WorldPosition.ToVector3() * CHUNK_SIZE, BlocksInternal);
-                FCO.CollisionRules.Group = CollisionUtil.WorldSolid;
-                OwningRegion.AddChunk(FCO);
-            }
+            LateSpawn();
             OwningRegion.AddCloudsToNewChunk(this);
             OwningRegion.NoticeChunkForUpperArea(WorldPosition);
             ChunkDetect();
