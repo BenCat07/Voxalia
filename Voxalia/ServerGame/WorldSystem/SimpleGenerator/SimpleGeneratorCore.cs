@@ -175,7 +175,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 for (int y = 0; y < 2; y++)
                 {
-                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, true);
+                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, false);
                     SimpleBiome biome = Biomes.BiomeFor(seed2, seed3, seed4, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, hheight) as SimpleBiome;
                     if (hheight > cpos.Z * Chunk.CHUNK_SIZE)
                     {
@@ -237,7 +237,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 for (int y = 0; y < 5; y++)
                 {
-                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, true);
+                    double hheight = GetHeight(seed, seed2, seed3, seed4, seed5, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, false);
                     SimpleBiome biome = Biomes.BiomeFor(seed2, seed3, seed4, cpos.X * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * x, cpos.Y * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.25 * y, cpos.Z * Chunk.CHUNK_SIZE + Chunk.CHUNK_SIZE * 0.5, hheight) as SimpleBiome;
                     double topf = (hheight - cpos.Z * Chunk.CHUNK_SIZE) / 5.0;
                     int top = (int)Math.Round(topf);
