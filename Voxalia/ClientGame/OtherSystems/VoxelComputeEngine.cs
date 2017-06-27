@@ -505,6 +505,7 @@ namespace Voxalia.ClientGame.OtherSystems
 
         public void Calc(params Chunk[] chs)
         {
+            chs = chs.Where((c) => !c.LOADING).ToArray();
             int maxRad = TheClient.CVars.r_renderdist.ValueI;
             Vector3i centerChunk = TheClient.TheRegion.ChunkLocFor(TheClient.Player.GetPosition());
             centerChunk = new Vector3i(-centerChunk.X, -centerChunk.Y, -centerChunk.Z);
@@ -749,7 +750,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     int resd = transp ? resdTRANSP : resdSOLID;
                     if (resd < 0 || resd > 100 * 1000 * 1000)
                     {
-                        SysConsole.Output(OutputType.WARNING, "Tried to render chunk of " + resd + " polygons! Denied! (May read as float: " + 
+                        SysConsole.Output(OutputType.WARNING, "Tried to render chunk of " + resd + " vertices! Denied! (May read as float: " + 
                             BitConverter.ToSingle(BitConverter.GetBytes((uint)resd), 0) + ")");
                         return;
                     }
