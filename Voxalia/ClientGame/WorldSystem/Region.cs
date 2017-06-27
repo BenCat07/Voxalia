@@ -785,7 +785,10 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             joint.One.Joints.Remove(joint);
             joint.Two.Joints.Remove(joint);
-            joint.Disable();
+            if (joint.Enabled)
+            {
+                joint.Disable();
+            }
             if (joint is BaseJoint pjoint)
             {
                 if (pjoint.CurrentJoint != null)
