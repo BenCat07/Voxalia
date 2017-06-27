@@ -399,6 +399,8 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 cid = TheServer.cID;
             }
+            TPS = tpsc;
+            tpsc = 0;
             if (cid != previous_eid)
             {
                 previous_eid = cid;
@@ -422,6 +424,13 @@ namespace Voxalia.ServerGame.WorldSystem
             }
         }
 
+        int tpsc = 0;
+
+        /// <summary>
+        /// The current tick rate of the server.
+        /// </summary>
+        public int TPS = 0;
+
         /// <summary>
         /// Used to track the <see cref="OncePerSecondActions"/> time.
         /// </summary>
@@ -440,6 +449,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <param name="delta">How much time has passed since the last tick.</param>
         public void Tick(double delta)
         {
+            tpsc++;
             Delta = delta;
             GlobalTickTime += delta;
             ops += delta;

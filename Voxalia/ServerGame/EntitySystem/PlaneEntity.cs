@@ -124,7 +124,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 entity.AngularVelocity +=  Quaternion.Transform(new Vector3(rot_x, rot_y, rot_z), entity.Orientation);
                 double vellen = entity.LinearVelocity.Length();
                 Vector3 newVel = forward * vellen;
-                entity.LinearVelocity += (newVel - entity.LinearVelocity) * Delta * 5.0;
+                entity.LinearVelocity += (newVel - entity.LinearVelocity) * MathHelper.Clamp(Delta, 0.01, 0.3) * 5.0;
                 // Apply air drag
                 Entity.ModifyLinearDamping(Plane.FastOrSlow < 0.0 ? 0.5 : 0.1); // TODO: arbitrary constant
                 Entity.ModifyAngularDamping(0.995); // TODO: arbitrary constant

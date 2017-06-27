@@ -1633,7 +1633,10 @@ namespace Voxalia.ServerGame.EntitySystem
                             {
                                 SendTops(topcoord);
                             }
-                            ChunkNetwork.SendPacket(new ChunkInfoPacketOut(chn, posMult));
+                            if (!ChunksAwareOf.TryGetValue(cworldPos, out ChunkAwarenessInfo cait) || cait.LOD == posMult)
+                            {
+                                ChunkNetwork.SendPacket(new ChunkInfoPacketOut(chn, posMult));
+                            }
                         }
                     });
                 }

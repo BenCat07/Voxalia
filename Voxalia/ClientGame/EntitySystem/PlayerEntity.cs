@@ -159,7 +159,7 @@ namespace Voxalia.ClientGame.EntitySystem
                     ve.SetAngularVelocity(avel);
                     ve.SetOrientation(quat);
                     SetPosition(pos + prel);
-                    SysConsole.Output(OutputType.DEBUG, "Overcorrecting to " + pos);
+                    SysConsole.Output(OutputType.DEBUG, "Overcorrecting to " + pos.GetBlockLocation() + ", offset of " + (ve.GetPosition() - pos).GetBlockLocation());
                 }
                 else
                 {

@@ -2280,6 +2280,17 @@ namespace Voxalia.ClientGame.ClientMainSystem
 #endif
                     }
                 }
+                Vector3i cur = TheRegion.ChunkLocFor(Player.GetPosition());
+                for (int x = -2; x <= 2; x++)
+                {
+                    for (int y = -2; y <= 2; y++)
+                    {
+                        for (int z = -2; z <= 2; z++)
+                        {
+                            Rendering.RenderLineBox((cur + new Vector3i(x, y, z)).ToLocation() * Chunk.CHUNK_SIZE, (cur + new Vector3i(x + 1, y + 1, z + 1)).ToLocation() * Chunk.CHUNK_SIZE);
+                        }
+                    }
+                }
                 GL.LineWidth(1);
                 Rendering.SetColor(Color4.White);
             }

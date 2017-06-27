@@ -449,14 +449,14 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             }
         }
 
-        public Object LockHM = new Object();
+        public Object[] LockHM = new Object[10] { new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), };
 
         public Dictionary<Vector2i, HeightMap> HMaps = new Dictionary<Vector2i, HeightMap>(2048);
 
         public HeightMap GetHeightMap(Vector3i pos, int Seed, int seed2, int seed3, int seed4, int seed5)
         {
             Vector2i posser = new Vector2i(pos.X, pos.Y);
-            lock (LockHM)
+            lock (LockHM[Math.Abs(pos.X * 17 + pos.Y) % LockHM.Length])
             {
                 if (HMaps.Count > 1024) // TODO: Tweakable
                 {
@@ -534,6 +534,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         public byte[] OreShapes = new byte[] { 0, 64, 65, 66, 67, 68 };
 
         public int MaxNonAirHeight = 100;
+        
+        /// <summary>
+        /// A fair limit on how far above the center of a chunk any point in that chunk might be.
+        /// </summary>
+        public double MaxSuddenSlope = 90;
 
         public override void Populate(int Seed, int seed2, int seed3, int seed4, int seed5, Chunk chunk)
         {
@@ -591,6 +596,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 return;
             }
             Location cpos = chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
+            double EstimatedHeight = GetHeight(Seed, seed2, seed3, seed4, seed5, cpos.X + Constants.CHUNK_WIDTH / 2, cpos.Y + Constants.CHUNK_WIDTH / 2, null, false);
+            if (EstimatedHeight + MaxSuddenSlope < cpos.Z)
+            {
+                return;
+            }
             HeightMap hm = GetHeightMap(chunk.WorldPosition, Seed, seed2, seed3, seed4, seed5);
             // TODO: Special case for too far down as well.
             for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
