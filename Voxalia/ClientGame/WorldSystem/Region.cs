@@ -788,7 +788,11 @@ namespace Voxalia.ClientGame.WorldSystem
             joint.Disable();
             if (joint is BaseJoint pjoint)
             {
-                PhysicsWorld.Remove(pjoint.CurrentJoint);
+                if (pjoint.CurrentJoint != null)
+                {
+                    PhysicsWorld.Remove(pjoint.CurrentJoint);
+                    pjoint.CurrentJoint = null;
+                }
             }
         }
 

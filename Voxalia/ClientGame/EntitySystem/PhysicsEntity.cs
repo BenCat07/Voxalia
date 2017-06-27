@@ -178,9 +178,10 @@ namespace Voxalia.ClientGame.EntitySystem
             WorldTransform = Body.WorldTransform;
             for (int i = 0; i < Joints.Count; i++)
             {
-                if (Joints[i] is BaseJoint joint)
+                if (Joints[i] is BaseJoint joint && joint.CurrentJoint != null)
                 {
                     TheRegion.PhysicsWorld.Remove(joint.CurrentJoint);
+                    joint.CurrentJoint = null;
                 }
             }
             TheRegion.PhysicsWorld.Remove(Body);

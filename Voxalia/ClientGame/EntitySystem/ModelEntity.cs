@@ -114,7 +114,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 //entity.ApplyImpulse(side * 5 + entity.Position, up * -Plane.PlanePilot.XMove * entity.Mass * dotforw * 0.5 * Delta);
                 //entity.ApplyImpulse(forward * 5 + entity.Position, side * ((Plane.PlanePilot.ItemRight ? 1 : 0) + (Plane.PlanePilot.ItemLeft ? -1 : 0)) * entity.Mass * dotforw * 0.5 * Delta);
                 //entity.ApplyImpulse(forward * 5 + entity.Position, up * Plane.PlanePilot.YMove * entity.Mass * 0.5 * Delta * dotforw);
-                const double mval = 0.2;
+                double mval = 2.0 * (1.0 / Math.Max(1.0, entity.LinearVelocity.Length()));
                 double rot_x = -Plane.PlanePilot.YMove * 0.5 * Delta * dotforw * mval;
                 double rot_y = Plane.PlanePilot.XMove * dotforw * 0.5 * Delta * mval;
                 double rot_z = -((Plane.PlanePilot.ItemRight ? 1 : 0) + (Plane.PlanePilot.ItemLeft ? -1 : 0)) * dotforw * 0.5 * Delta * mval;
@@ -133,12 +133,12 @@ namespace Voxalia.ClientGame.EntitySystem
                 BEPUutilities.Quaternion orient = entity.Orientation;
                 BEPUutilities.Quaternion.Add(ref orient, ref quat, out BEPUutilities.Quaternion torient);
                 torient.Normalize();
-                entity.Orientation = torient;
-                entity.LinearVelocity = BEPUutilities.Quaternion.Transform(norm_vel_transf, torient) * vellen;
-                entity.AngularVelocity *= 0.1;
+                //entity.Orientation = torient;
+                //entity.LinearVelocity = BEPUutilities.Quaternion.Transform(norm_vel_transf, torient) * vellen;
+                //entity.AngularVelocity *= 0.1;
                 // Apply air drag
                 Entity.ModifyLinearDamping(Plane.PlanePilot.SprintOrWalk < 0.0 ? 0.6 : 0.1); // TODO: arbitrary constant
-                Entity.ModifyAngularDamping(0.5); // TODO: arbitrary constant
+                Entity.ModifyAngularDamping(0.995); // TODO: arbitrary constant
                 // Ensure we're active if flying!
                 Entity.ActivityInformation.Activate();
             }
