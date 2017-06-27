@@ -24,6 +24,43 @@ namespace Voxalia.ServerGame.WorldSystem
     {
         byte[] LSAir = new byte[Constants.CHUNK_BLOCK_COUNT * 2 / (15 * 15 * 15)];
 
+        byte[] L6Air = new byte[Constants.CHUNK_BLOCK_COUNT * 2 / (6 * 6 * 6)];
+
+        public void GetSuperLODChunkData_Background(Vector3i cpos, Action<byte[]> callback)
+        {
+            TheWorld.Schedule.StartAsyncTask(() =>
+            {
+                byte[] b = ChunkManager.GetSuperLODChunkDetails(cpos.X, cpos.Y, cpos.Z);
+                if (b != null)
+                {
+                    if (b.Length == 0)
+                    {
+                        callback?.Invoke(LSAir);
+                    }
+                    callback?.Invoke(b);
+                }
+                // TODO: Maybe save this value to the ChunkManager?
+                callback?.Invoke(Generator.GetSuperLOD(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos));
+            });
+        }
+
+        public void GetLODSixChunkData_Background(Vector3i cpos, Action<Byte[]> callback)
+        {
+            TheWorld.Schedule.StartAsyncTask(() =>
+            {
+                byte[] b = ChunkManager.GetLODSixChunkDetails(cpos.X, cpos.Y, cpos.Z);
+                if (b != null)
+                {
+                    if (b.Length == 0)
+                    {
+                        callback?.Invoke(L6Air);
+                    }
+                    callback?.Invoke(b);
+                }
+                callback?.Invoke(Generator.GetLODSix(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos));
+            });
+        }
+
         public byte[] GetSuperLODChunkData(Vector3i cpos)
         {
             byte[] b = ChunkManager.GetSuperLODChunkDetails(cpos.X, cpos.Y, cpos.Z);
@@ -38,8 +75,6 @@ namespace Voxalia.ServerGame.WorldSystem
             // TODO: Maybe save this value to the ChunkManager?
             return Generator.GetSuperLOD(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
         }
-
-        byte[] L6Air = new byte[Constants.CHUNK_BLOCK_COUNT * 2 / (6 * 6 * 6)];
 
         public byte[] GetLODSixChunkData(Vector3i cpos)
         {

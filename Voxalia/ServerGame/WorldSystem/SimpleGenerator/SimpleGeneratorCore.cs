@@ -71,7 +71,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                     double rb = random.NextDouble() * 2.0 - 1.0;
                     ra = ra > 0 ? Math.Max(r / (double)rangeSize, ra) : Math.Min(-r / (double)rangeSize, ra);
                     rb = rb > 0 ? Math.Max(r / (double)rangeSize, rb) : Math.Min(-r / (double)rangeSize, rb);
-                    Vector2i rngMt = new Vector2i(centerMt.X +  (int)(ra * MountainRangeRadius), centerMt.Y + (int)(rb * MountainRangeRadius));
+                    Vector2i rngMt = new Vector2i(centerMt.X + (int)(ra * MountainRangeRadius), centerMt.Y + (int)(rb * MountainRangeRadius));
                     double rh = random.NextDouble() * (ph * 0.5) + (ph * 0.5);
                     double rradius = random.NextDouble() * rh * 0.25 + rh * 0.75;
                     MountainData rmt = new MountainData() { Center = rngMt, Height = rh, Radius = rradius };
@@ -129,9 +129,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         /// </summary>
         public ConcurrentDictionary<Vector2i, SimpleMountainGenerator> MountainsGenerated = new ConcurrentDictionary<Vector2i, SimpleMountainGenerator>();
         
-        public readonly Object[] LockMountains = new Object[] { new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object() };
-
-
+        public readonly Object[] LockMountains = new Object[40] { new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(),
+                                                                  new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(),
+                                                                  new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(),
+                                                                  new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object() };
+        
         public double GetMountainHeightAt(MountainData mtd, double dx, double dy, bool precise)
         {
             lock (LockMountains[Math.Abs(mtd.Center.X * 39 + mtd.Center.Y) % LockMountains.Length])
@@ -449,16 +451,19 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             }
         }
 
-        public Object[] LockHM = new Object[10] { new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), };
+        public Object[] LockHM = new Object[40] { new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(),
+                                                  new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(),
+                                                  new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(),
+                                                  new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object()  };
 
-        public Dictionary<Vector2i, HeightMap> HMaps = new Dictionary<Vector2i, HeightMap>(2048);
+        public ConcurrentDictionary<Vector2i, HeightMap> HMaps = new ConcurrentDictionary<Vector2i, HeightMap>();
 
         public HeightMap GetHeightMap(Vector3i pos, int Seed, int seed2, int seed3, int seed4, int seed5)
         {
             Vector2i posser = new Vector2i(pos.X, pos.Y);
-            lock (LockHM[Math.Abs(pos.X * 17 + pos.Y) % LockHM.Length])
+            lock (LockHM[Math.Abs(pos.X * 39 + pos.Y) % LockHM.Length])
             {
-                if (HMaps.Count > 1024) // TODO: Tweakable
+                if (HMaps.Count > 1024) // TODO: 1024 -> Tweakable
                 {
                     HMaps.Clear();
                 }

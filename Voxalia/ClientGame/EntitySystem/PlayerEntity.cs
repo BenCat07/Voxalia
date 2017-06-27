@@ -151,24 +151,15 @@ namespace Voxalia.ClientGame.EntitySystem
                     return;
                 }
                 PhysicsEntity ve = (Vehicle as PhysicsEntity);
-                //SysConsole.Output(OutputType.DEBUG, "Move vehicle : " + (ve.GetPosition().DistanceSquared(pos) > (VEH_MINIMUM * VEH_MINIMUM) * ve.GetVelocity().LengthSquared()) + ", " + ve.GetVelocity().Length() + ", " + ve.GetPosition().Distance(pos));
-                if (ve.GetPosition().DistanceSquared(pos) > (VEH_MINIMUM * VEH_MINIMUM) * ve.GetVelocity().LengthSquared())
+                if ((off_pos / off_gtt).LengthSquared() > vel.LengthSquared() * VEH_MINIMUM)
                 {
-                    ve.SetPosition(pos);
-                    ve.SetVelocity(vel);
-                    ve.SetAngularVelocity(avel);
-                    ve.SetOrientation(quat);
-                    SetPosition(pos + prel);
-                    SysConsole.Output(OutputType.DEBUG, "Overcorrecting to " + pos.GetBlockLocation() + ", offset of " + (ve.GetPosition() - pos).GetBlockLocation());
+                    SysConsole.Output(OutputType.DEBUG, "Own-Vehicle is insufficiently correcting! (System lag?)");
                 }
-                else
-                {
-                    ve.SetPosition(ve.GetPosition() + off_pos * off_gtt);
-                    ve.SetVelocity(ve.GetVelocity() + off_vel * off_gtt);
-                    ve.SetAngularVelocity(ve.GetAngularVelocity() + off_avel * off_gtt);
-                    ve.SetOrientation(Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));
-                    SetPosition(ve.GetPosition() + prel);
-                }
+                ve.SetPosition(ve.GetPosition() + off_pos * off_gtt);
+                ve.SetVelocity(ve.GetVelocity() + off_vel * off_gtt);
+                ve.SetAngularVelocity(ve.GetAngularVelocity() + off_avel * off_gtt);
+                ve.SetOrientation(Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));
+                SetPosition(ve.GetPosition() + prel);
             }
         }
 

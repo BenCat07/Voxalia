@@ -952,13 +952,11 @@ namespace Voxalia.ServerGame.EntitySystem
                         if (!pkick)
                         {
                             ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 3, FileHandler.Compress(toper3)));
+                            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, new byte[0]));
+                            ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
                         }
                     });
                 });
-            }
-            else
-            {
-                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 3, new byte[0]));
             }
         }
 
@@ -978,7 +976,10 @@ namespace Voxalia.ServerGame.EntitySystem
                             ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, FileHandler.Compress(toper)));
                         }
                     });
-                    if (currentTops.Z > 0)
+                });
+                if (currentTops.Z > 0)
+                {
+                    Schedule.StartAsyncTask(() =>
                     {
                         byte[] toper2 = TheRegion.GetTopsArray(flat, 150, 3);
                         TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
@@ -986,25 +987,16 @@ namespace Voxalia.ServerGame.EntitySystem
                             if (!pkick)
                             {
                                 ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, FileHandler.Compress(toper2)));
+                                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 3, new byte[0]));
                             }
                         });
-                    }
-                    else
-                    {
-                        TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
-                        {
-                            if (!pkick)
-                            {
-                                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
-                            }
-                        });
-                    }
-                });
-            }
-            else
-            {
-                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 1, new byte[0]));
-                ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
+                    });
+                }
+                else
+                {
+                    ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 2, new byte[0]));
+                    ChunkNetwork.SendPacket(new TopsDataPacketOut(flat, 3, new byte[0]));
+                }
             }
         }
         
@@ -1014,7 +1006,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// </summary>
         bool ChunkMarchAndSend()
         {
-            const int MULTIPLIER = 15;
+            const int MULTIPLIER = 10;
             // TODO: Player configurable multiplier (with server limiter)!
             int maxChunks = TheServer.Settings.Net_ChunksPerTick * MULTIPLIER;
             int chunksFound = 0;
@@ -1118,7 +1110,8 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     return false;
                 }
-                bool nullRep = true;
+                bool nullRep = true; // TODO: need for this? Creates delays to calculate its value
+                /*
                 if (Math.Abs(cur.X - start.X) > (ViewRadiusInChunks + ViewRadExtra5) * 2
                     || Math.Abs(cur.Y - start.Y) > (ViewRadiusInChunks + ViewRadExtra5) * 2
                     || Math.Abs(cur.Z - start.Z) > (ViewRadiusInChunks + ViewRadExtra5Height) * 2)
@@ -1150,7 +1143,7 @@ namespace Voxalia.ServerGame.EntitySystem
                             break;
                         }
                     }
-                }
+                }*/
                 for (int i = 0; i < MoveDirs.Length; i++)
                 {
                     Vector3i t = cur + MoveDirs[i];
@@ -1615,13 +1608,26 @@ namespace Voxalia.ServerGame.EntitySystem
                 bool async = chi == null && dist > (Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE * 2 * 2);
                 Vector2i topcoord = new Vector2i(cworldPos.X, cworldPos.Y);
                 bool sendTop = TopsAwareof.Add(topcoord);
+                ChunksAwareOf[cworldPos] = new ChunkAwarenessInfo() { ChunkPos = cworldPos, LOD = posMult };
                 if (posMult == 15)
                 {
-                    ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, TheRegion.GetSuperLODChunkData(cworldPos), 15));
+                    TheRegion.GetSuperLODChunkData_Background(cworldPos, (b) =>
+                    {
+                        if (!pkick)
+                        {
+                            ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, b, 15));
+                        }
+                    });
                 }
                 else if (posMult == 6)
                 {
-                    ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, TheRegion.GetLODSixChunkData(cworldPos), 6));
+                    TheRegion.GetLODSixChunkData_Background(cworldPos, (b) =>
+                    {
+                        if (!pkick)
+                        {
+                            ChunkNetwork.SendPacket(new ChunkInfoPacketOut(cworldPos, b, 6));
+                        }
+                    });
                 }
                 else if (async)
                 {
@@ -1649,8 +1655,6 @@ namespace Voxalia.ServerGame.EntitySystem
                     }
                     ChunkNetwork.SendPacket(new ChunkInfoPacketOut(chk, posMult));
                 }
-                ChunksAwareOf.Remove(cworldPos);
-                ChunksAwareOf.Add(cworldPos, new ChunkAwarenessInfo() { ChunkPos = cworldPos, LOD = posMult });
                 return true;
             }
             return false;
