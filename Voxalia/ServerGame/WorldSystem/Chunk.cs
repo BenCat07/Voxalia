@@ -99,7 +99,6 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public Chunk()
         {
-            BlocksInternal = new BlockInternal[Constants.CHUNK_BLOCK_COUNT];
         }
 
         /// <summary>
@@ -117,7 +116,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// All blocks currently in this chunk.
         /// </summary>
-        public BlockInternal[] BlocksInternal;
+        public BlockInternal[] BlocksInternal = null;
 
         /// <summary>
         /// Calculates the best (most opaque) block material for a lowered Level-Of-Detail version of the chunk.
@@ -184,6 +183,7 @@ namespace Voxalia.ServerGame.WorldSystem
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetBlockAt(int x, int y, int z, BlockInternal det)
         {
+            LateCheckValid();
             BlocksInternal[BlockIndex(x, y, z)] = det;
         }
 
@@ -197,6 +197,10 @@ namespace Voxalia.ServerGame.WorldSystem
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BlockInternal GetBlockAt(int x, int y, int z)
         {
+            if (BlocksInternal == null)
+            {
+                return BlockInternal.AIR;
+            }
             return BlocksInternal[BlockIndex(x, y, z)];
         }
 
@@ -219,6 +223,17 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 DetectChunkAccess();
                 Flags &= ~ChunkFlags.NEEDS_DETECT;
+            }
+        }
+
+        public void LateCheckValid()
+        {
+            if (BlocksInternal == null)
+            {
+                BlocksInternal = new BlockInternal[Constants.CHUNK_BLOCK_COUNT];
+                FCO = new FullChunkObject(WorldPosition.ToVector3() * CHUNK_SIZE, BlocksInternal);
+                FCO.CollisionRules.Group = CollisionUtil.WorldSolid;
+                OwningRegion.AddChunk(FCO);
             }
         }
         
@@ -245,9 +260,12 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
-            FCO = new FullChunkObject(WorldPosition.ToVector3() * CHUNK_SIZE, BlocksInternal);
-            FCO.CollisionRules.Group = CollisionUtil.WorldSolid;
-            OwningRegion.AddChunk(FCO);
+            if (BlocksInternal != null)
+            {
+                FCO = new FullChunkObject(WorldPosition.ToVector3() * CHUNK_SIZE, BlocksInternal);
+                FCO.CollisionRules.Group = CollisionUtil.WorldSolid;
+                OwningRegion.AddChunk(FCO);
+            }
             OwningRegion.AddCloudsToNewChunk(this);
             OwningRegion.NoticeChunkForUpperArea(WorldPosition);
             ChunkDetect();
@@ -266,6 +284,10 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <returns>The save data.</returns>
         public byte[] GetChunkSaveData(bool canZero = false)
         {
+            if (BlocksInternal == null)
+            {
+                return new byte[0];
+            }
             bool any = false;
             byte[] bytes = new byte[BlocksInternal.Length * 5];
             for (int i = 0; i < BlocksInternal.Length; i++)
@@ -426,7 +448,7 @@ namespace Voxalia.ServerGame.WorldSystem
         }
 
         /// <summary>
-        /// An array of booleans indicating which directs a chunk can be reached through.
+        /// An array of booleans indicating which directions a chunk can be reached through.
         /// </summary>
         public bool[] Reachability = new bool[(int)ChunkReachability.COUNT] { true, true, true, true, true, true, true, true, true, true, true, true, true, true, true };
 
@@ -632,6 +654,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 throw new Exception("invalid save data VERSION: " + det.Version + " and " + ents.Version + "!");
             }
             Flags = det.Flags & ~(ChunkFlags.POPULATING);
+            SetBlockAt(0, 0, 0, BlockInternal.AIR); // Ensure generated
             if (det.Blocks.Length > 0)
             {
                 for (int i = 0; i < BlocksInternal.Length; i++)

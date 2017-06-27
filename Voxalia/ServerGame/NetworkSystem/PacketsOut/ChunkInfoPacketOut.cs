@@ -65,27 +65,34 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             if (lod == 1)
             {
                 bool isAir = true;
-                data_orig = new byte[chunk.BlocksInternal.Length * 4];
-                for (int x = 0; x < chunk.BlocksInternal.Length; x++)
-                {
-                    ushort mat = chunk.BlocksInternal[x]._BlockMaterialInternal;
-                    if (mat != 0)
-                    {
-                        isAir = false;
-                    }
-                    data_orig[x * 2] = (byte)(mat & 0xFF);
-                    data_orig[x * 2 + 1] = (byte)((mat >> 8) & 0xFF);
-                }
-                if (isAir)
+                if (chunk.BlocksInternal == null)
                 {
                     data_orig = null;
                 }
                 else
                 {
-                    for (int i = 0; i < chunk.BlocksInternal.Length; i++)
+                    data_orig = new byte[chunk.BlocksInternal.Length * 4];
+                    for (int x = 0; x < chunk.BlocksInternal.Length; x++)
                     {
-                        data_orig[chunk.BlocksInternal.Length * 2 + i] = chunk.BlocksInternal[i].BlockData;
-                        data_orig[chunk.BlocksInternal.Length * 3 + i] = chunk.BlocksInternal[i]._BlockPaintInternal;
+                        ushort mat = chunk.BlocksInternal[x]._BlockMaterialInternal;
+                        if (mat != 0)
+                        {
+                            isAir = false;
+                        }
+                        data_orig[x * 2] = (byte)(mat & 0xFF);
+                        data_orig[x * 2 + 1] = (byte)((mat >> 8) & 0xFF);
+                    }
+                    if (isAir)
+                    {
+                        data_orig = null;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < chunk.BlocksInternal.Length; i++)
+                        {
+                            data_orig[chunk.BlocksInternal.Length * 2 + i] = chunk.BlocksInternal[i].BlockData;
+                            data_orig[chunk.BlocksInternal.Length * 3 + i] = chunk.BlocksInternal[i]._BlockPaintInternal;
+                        }
                     }
                 }
             }

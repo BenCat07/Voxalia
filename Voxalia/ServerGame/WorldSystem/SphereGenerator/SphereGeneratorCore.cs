@@ -62,11 +62,6 @@ namespace Voxalia.ServerGame.WorldSystem.SphereGenerator
             Location cCenter = (chunk.WorldPosition.ToLocation() + new Location(0.5, 0.5, 0.5)) * Constants.CHUNK_WIDTH;
             if (cCenter.LengthSquared() > scale * 4.0)
             {
-                // TODO: Is this excessive?
-                for (int i = 0; i < chunk.BlocksInternal.Length; i++)
-                {
-                    chunk.BlocksInternal[i] = BlockInternal.AIR;
-                }
                 return;
             }
             double one_over_scale = 1.0 / scale;

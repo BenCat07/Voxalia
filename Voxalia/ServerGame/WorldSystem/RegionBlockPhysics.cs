@@ -94,6 +94,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return BlockInternal.AIR;
             }
+            ch.SetBlockAt(0, 0, 0, ch.GetBlockAt(0, 0, 0)); // Ensure generated
             int ind = ch.BlockIndex(x, y, z);
             if (rec)
             {

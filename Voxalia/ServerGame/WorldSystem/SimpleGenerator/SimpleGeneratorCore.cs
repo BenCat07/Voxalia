@@ -435,7 +435,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 if (!flags.HasFlag(BlockFlags.EDITED) && !flags.HasFlag(BlockFlags.PROTECTED))
                 {
                     // TODO: lock?
-                    ch.BlocksInternal[chunk.BlockIndex(x, y, z)] = bi;
+                    ch.SetBlockAt(x, y, z, bi);
                 }
             }
             else
@@ -444,7 +444,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 BlockFlags flags = ((BlockFlags)orig.BlockLocalData);
                 if (!flags.HasFlag(BlockFlags.EDITED) && !flags.HasFlag(BlockFlags.PROTECTED))
                 {
-                    chunk.BlocksInternal[chunk.BlockIndex(X, Y, Z)] = bi;
+                    chunk.SetBlockAt(X, Y, Z, bi);
                 }
             }
         }
@@ -557,7 +557,8 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 if (chunk.WorldPosition.Z == 0)
                 {
-                    for (int i = 0; i < chunk.BlocksInternal.Length; i++)
+                    chunk.SetBlockAt(0, 0, 0, BlockInternal.AIR);
+                    for (int i = 0; i < Constants.CHUNK_BLOCK_COUNT; i++)
                     {
                         chunk.BlocksInternal[i] = new BlockInternal((ushort)Material.STONE, 0, 0, 0);
                     }
@@ -573,36 +574,30 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 }
                 else if (chunk.WorldPosition.Z < 0)
                 {
-                    for (int i = 0; i < chunk.BlocksInternal.Length; i++)
+                    chunk.SetBlockAt(0, 0, 0, BlockInternal.AIR);
+                    for (int i = 0; i < Constants.CHUNK_BLOCK_COUNT; i++)
                     {
                         chunk.BlocksInternal[i] = new BlockInternal((ushort)Material.STONE, 0, 0, 0);
                     }
                 }
-                else
-                {
-                    for (int i = 0; i < chunk.BlocksInternal.Length; i++)
-                    {
-                        chunk.BlocksInternal[i] = BlockInternal.AIR;
-                    }
-                }
+                // else: air!
                 return;
             }
             if (chunk.WorldPosition.Z > MaxNonAirHeight)
             {
-                for (int i = 0; i < chunk.BlocksInternal.Length; i++)
-                {
-                    chunk.BlocksInternal[i] = BlockInternal.AIR;
-                }
+                // AIR!
                 return;
             }
             Location cpos = chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
             double EstimatedHeight = GetHeight(Seed, seed2, seed3, seed4, seed5, cpos.X + Constants.CHUNK_WIDTH / 2, cpos.Y + Constants.CHUNK_WIDTH / 2, null, false);
             if (EstimatedHeight + MaxSuddenSlope < cpos.Z)
             {
+                // TODO: Special case for the chunk being too far down as well? No height map in that case!
                 return;
             }
+            // About to be populated: ensure chunk has a valid block set.
+            chunk.SetBlockAt(0, 0, 0, BlockInternal.AIR);
             HeightMap hm = GetHeightMap(chunk.WorldPosition, Seed, seed2, seed3, seed4, seed5);
-            // TODO: Special case for too far down as well.
             for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
             {
                 for (int y = 0; y < Chunk.CHUNK_SIZE; y++)
