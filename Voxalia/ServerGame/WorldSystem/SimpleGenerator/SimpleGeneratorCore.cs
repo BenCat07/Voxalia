@@ -595,7 +595,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             }
             Location cpos = chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE;
             double EstimatedHeight = GetHeight(Seed, seed2, seed3, seed4, seed5, cpos.X + Constants.CHUNK_WIDTH / 2, cpos.Y + Constants.CHUNK_WIDTH / 2, null, false);
-            if (EstimatedHeight + MaxSuddenSlope < cpos.Z)
+            if (Math.Max(0, EstimatedHeight + MaxSuddenSlope) < cpos.Z)
             {
                 // TODO: Special case for the chunk being too far down as well? No height map in that case!
                 return;
