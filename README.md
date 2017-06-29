@@ -30,6 +30,7 @@ View the [FAQ](/FAQ.md) for more information!
 | ------------- | ------ |
 | AppVeyor | [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/inbj8vbo0fx4a8io/branch/master?svg=true)](https://ci.appveyor.com/project/mcmonkey4eva/voxalia/branch/master) |
 | Website ([Freneticllc.com](https://freneticllc.com)) | [![Website](https://img.shields.io/website-up-down-green-red/https/freneticllc.com.svg)](https://freneticllc.com) |
+| Website ([Voxalia.net](https://voxalia.net)) | [![Website](https://img.shields.io/website-up-down-green-red/https/voxalia.net.svg)](https://voxalia.net) |
 | Issues Open | [![Issues_Open](https://img.shields.io/github/issues/FreneticLLC/Voxalia.svg)](https://github.com/FreneticLLC/Voxalia/issues) |
 
 ## Windows Install Notes
