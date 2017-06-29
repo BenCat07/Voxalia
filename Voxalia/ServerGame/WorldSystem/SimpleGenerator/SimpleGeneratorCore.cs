@@ -42,7 +42,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             Vector2i mtChunk = new Vector2i((int)(mountainPos.X * MountainGridSize), (int)(mountainPos.Y * MountainGridSize));
             Location chunkCenter = chunkPos.ToLocation() * Constants.CHUNK_WIDTH;
             MTRandom random = new MTRandom(39, (ulong)(mountainPos.X * 39 + mountainPos.Y + seed));
-            int count = random.Next(1, 5);
+            int count = random.Next(1, 3);
             for (int i = 0; i < count; i++)
             {
                 int rangeSize;
@@ -56,7 +56,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 }
                 double ca = random.NextDouble();
                 double cb = random.NextDouble();
-                Vector2i centerMt = new Vector2i(mtChunk.X * Constants.CHUNK_WIDTH + (int)(ca * MountainGridSize), mtChunk.Y * Constants.CHUNK_WIDTH + (int)(cb * MountainGridSize));
+                Vector2i centerMt = new Vector2i(mtChunk.X * Constants.CHUNK_WIDTH + (int)(ca * MountainGridSize * Constants.CHUNK_WIDTH), mtChunk.Y * Constants.CHUNK_WIDTH + (int)(cb * MountainGridSize * Constants.CHUNK_WIDTH));
                 double ch = random.NextDouble() * 512 + 512;
                 double cradius = random.NextDouble() * ch * 0.25 + ch * 0.75;
                 MountainData cmt = new MountainData() { Center = centerMt, Height = ch, Radius = cradius };
