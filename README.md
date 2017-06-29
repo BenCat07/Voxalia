@@ -32,6 +32,7 @@ View the [FAQ](/FAQ.md) for more information!
 | Website ([Freneticllc.com](https://freneticllc.com)) | [![Website](https://img.shields.io/website-up-down-green-red/https/freneticllc.com.svg)](https://freneticllc.com) |
 | Website ([Voxalia.net](https://voxalia.net)) | [![Website](https://img.shields.io/website-up-down-green-red/https/voxalia.net.svg)](https://voxalia.net) |
 | Issues Open | [![Issues_Open](https://img.shields.io/github/issues/FreneticLLC/Voxalia.svg)](https://github.com/FreneticLLC/Voxalia/issues) |
+| CLA Assistant | [![CLA assistant](https://cla-assistant.io/readme/badge/FreneticLLC/Voxalia)](https://cla-assistant.io/FreneticLLC/Voxalia) |
 
 ## Windows Install Notes
 

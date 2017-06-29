@@ -7,7 +7,7 @@ See the [ISSUE_TEMPLATE](/ISSUE_TEMPLATE) file for details on posting issues.
 
 ## Signing
 
-Please sign [the Contributor License Agreement](https://www.clahub.com/agreements/FreneticLLC/Voxalia).
+Please sign [the Contributor License Agreement](https://cla-assistant.io/FreneticLLC/Voxalia).
 
 ## Pull Requests
 
