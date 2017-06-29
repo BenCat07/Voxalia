@@ -65,7 +65,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             get
             {
-                return GetMass() * 15f;
+                return GetMass() * 13f;
             }
         }
 
@@ -73,7 +73,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             get
             {
-                return GetMass() * 5f;
+                return GetMass() * 4f;
             }
         }
         
@@ -124,7 +124,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 entity.AngularVelocity +=  Quaternion.Transform(new Vector3(rot_x, rot_y, rot_z), entity.Orientation);
                 double vellen = entity.LinearVelocity.Length();
                 Vector3 newVel = forward * vellen;
-                entity.LinearVelocity += (newVel - entity.LinearVelocity) * MathHelper.Clamp(Delta, 0.01, 0.3) * 5.0;
+                entity.LinearVelocity += (newVel - entity.LinearVelocity) * MathHelper.Clamp(Delta, 0.01, 0.3) * Math.Min(1.0, vellen * 0.01);
                 // Apply air drag
                 Entity.ModifyLinearDamping(Plane.FastOrSlow < 0.0 ? 0.5 : 0.1); // TODO: arbitrary constant
                 Entity.ModifyAngularDamping(0.995); // TODO: arbitrary constant
