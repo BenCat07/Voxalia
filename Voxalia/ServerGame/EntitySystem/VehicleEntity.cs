@@ -32,6 +32,20 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public string vehName;
 
+        public void HandleWheelsInput(CharacterEntity character)
+        {
+            // TODO: Share with clients properly.
+            // TODO: Dynamic multiplier values.
+            foreach (JointVehicleMotor motor in DrivingMotors)
+            {
+                motor.Motor.Settings.VelocityMotor.GoalVelocity = character.YMove * 100;
+            }
+            foreach (JointVehicleMotor motor in SteeringMotors)
+            {
+                motor.Motor.Settings.Servo.Goal = MathHelper.Pi * -0.2f * character.XMove;
+            }
+        }
+
         List<Model3DNode> GetNodes(Model3DNode node)
         {
             List<Model3DNode> nodes = new List<Model3DNode>()
@@ -157,13 +171,16 @@ namespace Voxalia.ServerGame.EntitySystem
                     if (name.Contains("wheel"))
                     {
                         Matrix mat = nodes[i].MatrixA;
+                        mat.Transpose();
                         Model3DNode tnode = nodes[i].Parent;
                         while (tnode != null)
                         {
-                            mat = tnode.MatrixA * mat;
+                            Matrix mb = tnode.MatrixA;
+                            mb.Transpose();
+                            mat = mat * mb;
                             tnode = tnode.Parent;
                         }
-                        Location pos = GetPosition() + new Location(mat.M14, mat.M34, mat.M24) + offset; // NOTE: wtf happened to this matrix?
+                        Location pos = GetPosition() + new Location(mat.M41, -mat.M43, mat.M42) + offset;
                         VehiclePartEntity wheel = new VehiclePartEntity(TheRegion, "vehicles/" + vehName + "_wheel", true);
                         wheel.SetPosition(pos);
                         wheel.SetOrientation(Quaternion.Identity);
@@ -206,7 +223,6 @@ namespace Voxalia.ServerGame.EntitySystem
             JointSlider pointOnLineJoint = new JointSlider(this, wheel, -new Location(up));
             JointLAxisLimit suspensionLimit = new JointLAxisLimit(this, wheel, 0f, 0.1f, wheel.GetPosition(), wheel.GetPosition(), -new Location(up));
             JointPullPush spring = new JointPullPush(this, wheel, -new Location(up), true);
-            BEPUphysics.CollisionRuleManagement.CollisionRules.AddRule(wheel.Body, this.Body, BEPUphysics.CollisionRuleManagement.CollisionRule.NoBroadPhase); // TODO: How necessary is this? Should we replicate this clientside?
             if (driving)
             {
                 JointSpinner spinner = new JointSpinner(this, wheel, new Location(-left));
@@ -226,6 +242,8 @@ namespace Voxalia.ServerGame.EntitySystem
                 TheRegion.AddJoint(motor);
                 return motor;
             }
+            JointNoCollide jnc = new JointNoCollide(this, wheel);
+            TheRegion.AddJoint(jnc);
             return null;
         }
     }

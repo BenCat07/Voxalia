@@ -151,7 +151,7 @@ namespace Voxalia.ClientGame.EntitySystem
                     return;
                 }
                 PhysicsEntity ve = (Vehicle as PhysicsEntity);
-                if ((off_pos / off_gtt).LengthSquared() > vel.LengthSquared() * VEH_MINIMUM)
+                if ((off_pos / off_gtt).LengthSquared() > vel.LengthSquared() * VEH_MINIMUM + VEH_MINIMUM)
                 {
                     SysConsole.Output(OutputType.DEBUG, "Own-Vehicle is insufficiently correcting! (System lag?)");
                 }

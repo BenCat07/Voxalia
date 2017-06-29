@@ -68,7 +68,7 @@ namespace Voxalia.ClientGame.EntitySystem
         {
             get
             {
-                return GetMass() * 13f;
+                return GetMass() * 10f;
             }
         }
 
@@ -76,7 +76,7 @@ namespace Voxalia.ClientGame.EntitySystem
         {
             get
             {
-                return GetMass() * 4f;
+                return GetMass() * 3f;
             }
         }
 
@@ -119,9 +119,11 @@ namespace Voxalia.ClientGame.EntitySystem
                 entity.AngularVelocity += BEPUutilities.Quaternion.Transform(new BEPUutilities.Vector3(rot_x, rot_y, rot_z), entity.Orientation);
                 double vellen = entity.LinearVelocity.Length();
                 BEPUutilities.Vector3 newVel = forward * vellen;
-                entity.LinearVelocity += (newVel - entity.LinearVelocity) * BEPUutilities.MathHelper.Clamp(Delta, 0.01, 0.3) * Math.Min(1.0, vellen * 0.01);
+                double forwVel = BEPUutilities.Vector3.Dot(entity.LinearVelocity, forward);
+                double root = Math.Sqrt(Math.Sign(forwVel) * forwVel);
+                entity.LinearVelocity += (newVel - entity.LinearVelocity) * BEPUutilities.MathHelper.Clamp(Delta, 0.01, 0.3) * Math.Min(2.0, root * 0.05);
                 // Apply air drag
-                Entity.ModifyLinearDamping(Plane.PlanePilot.SprintOrWalk < 0.0 ? 0.5 : 0.1); // TODO: arbitrary constant
+                Entity.ModifyLinearDamping(Plane.PlanePilot.SprintOrWalk < 0.0 ? 0.5 : 0.1); // TODO: arbitrary constants
                 Entity.ModifyAngularDamping(0.995); // TODO: arbitrary constant
                 // Ensure we're active if flying!
                 Entity.ActivityInformation.Activate();

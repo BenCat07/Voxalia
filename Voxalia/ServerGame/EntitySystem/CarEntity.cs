@@ -46,15 +46,7 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public override void HandleInput(CharacterEntity character)
         {
-            // TODO: Dynamic multiplier values.
-            foreach (JointVehicleMotor motor in DrivingMotors)
-            {
-                motor.Motor.Settings.VelocityMotor.GoalVelocity = character.YMove * 100;
-            }
-            foreach (JointVehicleMotor motor in SteeringMotors)
-            {
-                motor.Motor.Settings.Servo.Goal = MathHelper.Pi * -0.2f * character.XMove;
-            }
+            HandleWheelsInput(character);
         }
     }
 }
