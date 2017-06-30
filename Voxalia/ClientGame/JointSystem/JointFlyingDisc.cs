@@ -29,5 +29,13 @@ namespace Voxalia.ClientGame.JointSystem
         {
             return new FlyingDiscConstraint(Ent1.Body);
         }
+
+        public override bool PullsAlong
+        {
+            get
+            {
+                return false;
+            }
+        }
     }
 }

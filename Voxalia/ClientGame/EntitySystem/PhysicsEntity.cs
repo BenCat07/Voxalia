@@ -98,6 +98,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public void MoveToOffsetWithJoints(Location pos, Location vel, Quaternion new_orient)
         {
+            relative_fixed.Add(EID);
             SetPosition(GetPosition() + pos);
             SetVelocity(GetVelocity() + vel);
             SetOrientation(new_orient);

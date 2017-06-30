@@ -153,7 +153,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 PhysicsEntity ve = (Vehicle as PhysicsEntity);
                 if ((off_pos / off_gtt).LengthSquared() > vel.LengthSquared() * VEH_MINIMUM + VEH_MINIMUM)
                 {
-                    SysConsole.Output(OutputType.DEBUG, "Own-Vehicle is insufficiently correcting! (System lag?)");
+                    SysConsole.Output(OutputType.DEBUG, "Own-Vehicle is insufficiently correcting! (Server lag?)");
                 }
                 //ve.SetPosition(ve.GetPosition() + off_pos * off_gtt);
                 //ve.SetVelocity(ve.GetVelocity() + off_vel * off_gtt);

@@ -33,8 +33,8 @@ namespace Voxalia.ServerGame.JointSystem
         public override SolverUpdateable GetBaseJoint()
         {
             PointOnLineJoint polj = new PointOnLineJoint(Ent1.Body, Ent2.Body, Ent2.GetPosition().ToBVector(), Direction.Normalize().ToBVector(), Ent2.GetPosition().ToBVector());
-            polj.SpringSettings.Stiffness = DEF_STIFF * 400;
-            polj.SpringSettings.Damping = DEF_DAMP * 400;
+            //polj.SpringSettings.Stiffness = DEF_STIFF * 400;
+            //polj.SpringSettings.Damping = DEF_DAMP * 400;
             return polj;
         }
         
