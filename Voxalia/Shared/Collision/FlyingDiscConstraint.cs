@@ -60,16 +60,20 @@ namespace Voxalia.Shared.Collision
             // Note: Assuming Z is the axis of the flat plane of the disc.
             // TODO: Don't assume this!
             Vector3 up = Quaternion.Transform(Vector3.UnitZ, Entity.Orientation);
-            double projectedZVel = Vector3.Dot(entity.LinearVelocity + entity.Gravity ?? entity.Space.ForceUpdater.Gravity, up);
-            if (IsAPlane)
+            if (IsAPlane) // TODO: Separate planes and discs?
             {
-                double sgn = Math.Sign(projectedZVel);
-                double ln2 = Math.Sqrt(sgn * projectedZVel);
-                double velLen = Math.Min((entity.LinearVelocity.Length() - ln2) * 0.01, 1.0); // TODO: 0.01, 1.0: Arbitrary constants!
-                cForce = up * (-ln2 * sgn * dt * velLen * 0.9); // TODO: 0.9: Arbitrary constant!
+                // NOTE: Assuming Y is forward.
+                // TODO: Don't assume this!
+                // TODO: Factor in gravity: flying upside down should work!
+                Vector3 forward = Quaternion.Transform(Vector3.UnitY, Entity.Orientation);
+                double projectedForwardVel = Vector3.Dot(entity.LinearVelocity, forward);
+                double forw_sgn = Math.Sign(projectedForwardVel);
+                double forw_root = Math.Sqrt(forw_sgn * projectedForwardVel);
+                cForce = up * (forw_root * dt * 2.0); // TODO: 2.0 -> Arbitrary constant!
             }
             else
             {
+                double projectedZVel = Vector3.Dot(entity.LinearVelocity + entity.Gravity ?? entity.Space.ForceUpdater.Gravity, up);
                 double velLen = 1f - ((1f / Math.Max(entity.LinearVelocity.LengthSquared(), 1f)));
                 cForce = up * (-projectedZVel * velLen * dt * 0.75); // TODO: 0.75: Arbitrary constant!
             }
