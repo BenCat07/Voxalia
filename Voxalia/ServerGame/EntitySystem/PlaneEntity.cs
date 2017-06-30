@@ -112,10 +112,11 @@ namespace Voxalia.ServerGame.EntitySystem
                 // Engines!
                 if (Plane.FastOrSlow >= 0.0)
                 {
-                    // TODO: Controls raise/lower engine thrust rather than continual control
+                    // TODO: Controls raise/lower engine thrust rather than continual direct control
                     Vector3 force = forward * (Plane.RegularStrength + Plane.FastStrength * Plane.FastOrSlow) * Delta;
                     entity.ApplyLinearImpulse(ref force);
                 }
+                // TODO: For very low forward velocities, turn weaker
                 double dotforw = Vector3.Dot(entity.LinearVelocity, forward);
                 double mval = 2.0 * (1.0 / Math.Max(1.0, entity.LinearVelocity.Length()));
                 double rot_x = -Plane.ForwBack * 0.5 * Delta * dotforw * mval;
@@ -154,7 +155,7 @@ namespace Voxalia.ServerGame.EntitySystem
             ForwBack = character.YMove;
             RightLeft = character.XMove;
             FastOrSlow = character.SprintOrWalk;
-            HandleWheelsInput(character);
+            HandleWheelsSpecificInput(FastOrSlow, (ILeft ? -1 : 0) + (IRight ? 1 : 0));
         }
     }
 }

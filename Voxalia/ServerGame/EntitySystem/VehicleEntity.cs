@@ -34,15 +34,20 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public void HandleWheelsInput(CharacterEntity character)
         {
+            HandleWheelsSpecificInput(character.YMove, character.XMove);
+        }
+
+        public void HandleWheelsSpecificInput(double ymove, double xmove)
+        {
             // TODO: Share with clients properly.
             // TODO: Dynamic multiplier values.
             foreach (JointVehicleMotor motor in DrivingMotors)
             {
-                motor.Motor.Settings.VelocityMotor.GoalVelocity = character.YMove * 100;
+                motor.Motor.Settings.VelocityMotor.GoalVelocity = ymove * 100;
             }
             foreach (JointVehicleMotor motor in SteeringMotors)
             {
-                motor.Motor.Settings.Servo.Goal = MathHelper.Pi * -0.2f * character.XMove;
+                motor.Motor.Settings.Servo.Goal = MathHelper.Pi * -0.2f * xmove;
             }
         }
 
@@ -162,7 +167,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     return;
                 }
-                SetOrientation(Quaternion.Identity);
+                SetOrientation(Quaternion.Identity); // TODO: Track and reset orientation maybe?
                 List<Model3DNode> nodes = GetNodes(scene.RootNode);
                 List<VehiclePartEntity> frontwheels = new List<VehiclePartEntity>();
                 for (int i = 0; i < nodes.Count; i++)
@@ -180,7 +185,7 @@ namespace Voxalia.ServerGame.EntitySystem
                             mat = mat * mb;
                             tnode = tnode.Parent;
                         }
-                        Location pos = GetPosition() + new Location(mat.M41, -mat.M43, mat.M42) + offset;
+                        Location pos = GetPosition() + new Location(mat.M41, -mat.M43, mat.M42) + offset; // TODO: matrix gone funky?
                         VehiclePartEntity wheel = new VehiclePartEntity(TheRegion, "vehicles/" + vehName + "_wheel", true);
                         wheel.SetPosition(pos);
                         wheel.SetOrientation(Quaternion.Identity);
@@ -190,12 +195,12 @@ namespace Voxalia.ServerGame.EntitySystem
                         wheel.mode = ModelCollisionMode.CONVEXHULL;
                         TheRegion.SpawnEntity(wheel);
                         wheel.SetPosition(pos);
-                        if (name.After("wheel").StartsWith("f"))
+                        if (name.After("wheel").Contains("f"))
                         {
                             SteeringMotors.Add(ConnectWheel(wheel, false, true));
                             frontwheels.Add(wheel);
                         }
-                        else if (name.After("wheel").StartsWith("b"))
+                        else if (name.After("wheel").Contains("b"))
                         {
                             DrivingMotors.Add(ConnectWheel(wheel, true, true));
                         }

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BEPUphysics;
+using BEPUphysics.CollisionRuleManagement;
 using BEPUphysics.Entities;
 using BEPUphysics.Constraints;
 using BEPUphysics.Constraints.SingleEntity;
@@ -52,7 +53,11 @@ namespace Voxalia.Shared.Collision
 
         public bool IgnoreThis(BroadPhaseEntry entry)
         {
-            if (entry is EntityCollidable && ((EntityCollidable)entry).Entity == Entity)
+            if (entry is EntityCollidable ec && ec.Entity == Entity)
+            {
+                return false;
+            }
+            if (CollisionRules.GetCollisionRule(entity.CollisionInformation, entry) == CollisionRule.NoBroadPhase)
             {
                 return false;
             }

@@ -39,12 +39,13 @@ namespace Voxalia.ServerGame.EntitySystem
             : base(model, tregion)
         {
             IsWheel = is_wheel;
-            SetFriction(3.5f);
+            SetFriction(3.5f); // TODO: Arbitrary constant
         }
 
         public override void SpawnBody()
         {
             base.SpawnBody();
+            // TODO: Only if this is a wheel? Why is this in this location at all?
             TheRegion.AddJoint(new ConstWheelStepUp(this, StepHeight));
         }
 
