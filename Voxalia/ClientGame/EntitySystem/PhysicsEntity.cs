@@ -90,6 +90,34 @@ namespace Voxalia.ClientGame.EntitySystem
         {
             return entry.CollisionRules.Group == CollisionUtil.Water;
         }
+
+        public void MoveToOffsetWithJoints(Location pos, Location vel)
+        {
+            SetPosition(GetPosition() + pos);
+            SetVelocity(GetVelocity() + vel);
+            for (int i = 0; i < Joints.Count; i++)
+            {
+                if (Joints[i].PullsAlong)
+                {
+                    if (Joints[i].One.EID == EID)
+                    {
+                        Joints[i].Two.SetPosition(Joints[i].Two.GetPosition() + pos);
+                        if (Joints[i].Two is PhysicsEntity pe)
+                        {
+                            pe.SetVelocity(pe.GetVelocity() + vel);
+                        }
+                    }
+                    else
+                    {
+                        Joints[i].One.SetPosition(Joints[i].One.GetPosition() + pos);
+                        if (Joints[i].One is PhysicsEntity pe)
+                        {
+                            pe.SetVelocity(pe.GetVelocity() + vel);
+                        }
+                    }
+                }
+            }
+        }
         
         public override void Tick()
         {

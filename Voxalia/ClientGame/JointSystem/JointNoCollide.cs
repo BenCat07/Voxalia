@@ -43,5 +43,13 @@ namespace Voxalia.ClientGame.JointSystem
         {
             // Do nothing.
         }
+
+        public override bool PullsAlong
+        {
+            get
+            {
+                return false;
+            }
+        }
     }
 }

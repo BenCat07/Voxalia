@@ -155,11 +155,12 @@ namespace Voxalia.ClientGame.EntitySystem
                 {
                     SysConsole.Output(OutputType.DEBUG, "Own-Vehicle is insufficiently correcting! (System lag?)");
                 }
-                ve.SetPosition(ve.GetPosition() + off_pos * off_gtt);
-                ve.SetVelocity(ve.GetVelocity() + off_vel * off_gtt);
+                //ve.SetPosition(ve.GetPosition() + off_pos * off_gtt);
+                //ve.SetVelocity(ve.GetVelocity() + off_vel * off_gtt);
+                MoveToOffsetWithJoints(off_pos * off_gtt, off_vel * off_gtt);
                 ve.SetAngularVelocity(ve.GetAngularVelocity() + off_avel * off_gtt);
                 ve.SetOrientation(Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));
-                SetPosition(ve.GetPosition() + prel);
+                //SetPosition(ve.GetPosition() + prel);
             }
         }
 

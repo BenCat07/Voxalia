@@ -38,6 +38,7 @@ namespace Voxalia.ServerGame.EntitySystem
     {
         public bool ShouldNetworkAnyway(Entity e)
         {
+            // TODO: Distant vehicles or vehicle parts should be specially force-networked?
             if (CurrentSeat != null && CurrentSeat.SeatHolder.EID == e.EID)
             {
                 return true;

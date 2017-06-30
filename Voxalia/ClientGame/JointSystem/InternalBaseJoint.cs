@@ -22,5 +22,13 @@ namespace Voxalia.ClientGame.JointSystem
         public abstract void Enable();
 
         public bool Enabled = false;
+
+        public virtual bool PullsAlong
+        {
+            get
+            {
+                return true;
+            }
+        }
     }
 }
