@@ -142,8 +142,8 @@ float fix_sqr(in float inTemp)
 #if MCM_VOX
 vec4 read_texture(in sampler2DArray samp_in, in vec3 texcrd)
 {
-	//return textureLod(samp_in, texcrd, textureQueryLod(samp_in, fi.texcoord.xy).x);
-	return texture(samp_in, texcrd);
+	return textureLod(samp_in, texcrd, textureQueryLod(samp_in, fi.texcoord.xy).x);
+	//return texture(samp_in, texcrd);
 }
 #else
 #if MCM_GEOM_ACTIVE

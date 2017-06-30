@@ -64,24 +64,26 @@ namespace Voxalia.ClientGame.GraphicsSystems
             TextureID = GL.GenTexture();
             TWidth = cvars.r_blocktexturewidth.ValueI;
             GL.BindTexture(TextureTarget.Texture2DArray, TextureID);
-            // TODO: Fix or replace mipmapping?
-            int levels = 1;// TheClient.CVars.r_block_mipmaps.ValueB ? 4 : 1;
+            int levels = TheClient.CVars.r_block_mipmaps.ValueB ? 8 : 1; // TODO: 8 -> Setting
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, MaterialHelpers.Textures.Length);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)(cvars.r_blocktexturelinear.ValueB ? TextureMinFilter.Linear: TextureMinFilter.Nearest));
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)(cvars.r_blocktexturelinear.ValueB ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Nearest));
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)(cvars.r_blocktexturelinear.ValueB ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
             HelpTextureID = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, HelpTextureID);
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, MaterialHelpers.Textures.Length);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
             NormalTextureID = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, NormalTextureID);
             GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, MaterialHelpers.Textures.Length);
-            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
+            GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
@@ -208,7 +210,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     a();
                 }
             }
-            /*if (TheClient.CVars.r_block_mipmaps.ValueB)
+            if (TheClient.CVars.r_block_mipmaps.ValueB)
             {
                 Action mipmap = () =>
                 {
@@ -228,7 +230,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     mipmap();
                 }
-            }*/
+            }
             GL.BindTexture(TextureTarget.Texture2DArray, 0);
         }
 
