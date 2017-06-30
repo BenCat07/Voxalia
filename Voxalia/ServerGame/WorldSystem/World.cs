@@ -83,6 +83,19 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public WorldSettings Settings;
 
+        public void SaveConfig()
+        {
+            long cid;
+            lock (TheServer.CIDLock)
+            {
+                cid = TheServer.cID;
+            }
+            Config.Set("general.minimum_eid", cid);
+            Config.Set("general.time", GlobalTickTime);
+            string fname = "saves/" + Name + "/world.fds";
+            TheServer.Files.JournalWriteText(fname, Config.SaveToString());
+        }
+
         /// <summary>
         /// Loads the world configuration onto this world object.
         /// Is called as part of the startup sequence for a world.
@@ -111,7 +124,7 @@ namespace Voxalia.ServerGame.WorldSystem
             Config.Default("general.generator_scale", 1.0);
             Settings = new WorldSettings();
             Settings.LoadFromSection(TheServer, Config);
-            GlobalTickTime = Config.GetLong("general.time", 0).Value;
+            GlobalTickTime = Config.GetDouble("general.time", 0).Value;
             CFGEdited = true;
             Seed = Config.GetInt("general.seed", DefaultSeed).Value;
             SpawnPoint = Location.FromString(Config.GetString("general.spawnpoint", DefaultSpawnPoint));
@@ -123,6 +136,7 @@ namespace Voxalia.ServerGame.WorldSystem
             Seed3 = (seedGen.Next(SeedMax) - SeedMax / 2);
             Seed4 = (seedGen.Next(SeedMax) - SeedMax / 2);
             Seed5 = (seedGen.Next(SeedMax) - SeedMax / 2);
+            SaveConfig();
         }
 
         /// <summary>
@@ -345,19 +359,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return;
             }
-            Config.Set("general.time", GlobalTickTime); // TODO: update this value and save occasionally, even if the config is unedited - in case of bad shutdown!
-            string cfg = Config.SaveToString();
-            // TODO: Journaling save.
-            lock (SaveWorldCFGLock)
-            {
-                TheServer.Files.WriteText("saves/" + Name + "/world.fds", cfg);
-            }
-            long cid;
-            lock (TheServer.CIDLock)
-            {
-                cid = TheServer.cID;
-            }
-            TheServer.Files.WriteText("saves/" + Name + "/eid.txt", cid.ToString());
+            SaveConfig();
             MainRegion.UnloadFully();
             MainRegion = null;
             UnloadCallback?.Invoke();
@@ -378,17 +380,7 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             MainRegion.FinalShutdown();
         }
-
-        /// <summary>
-        /// The world configuration is saved around this lock object.
-        /// </summary>
-        Object SaveWorldCFGLock = new Object();
-
-        /// <summary>
-        /// The last known entity ID. Used to track whether the current EID has changed.
-        /// </summary>
-        long previous_eid = 0;
-
+        
         /// <summary>
         /// Called once per second to manage any non-priority world operations, such as saving data.
         /// </summary>
@@ -401,28 +393,15 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             TPS = tpsc;
             tpsc = 0;
-            if (cid != previous_eid)
+            cfgsec++;
+            if (cfgsec > 30)
             {
-                previous_eid = cid;
-                Schedule.StartAsyncTask(() =>
-                {
-                    TheServer.Files.WriteText("saves/" + Name + "/eid.txt", cid.ToString());
-                });
-            }
-            if (CFGEdited)
-            {
-                Config.Set("general.time", GlobalTickTime); // TODO: update this value and save occasionally, even if the config is unedited - in case of bad shutdown!
-                string cfg = Config.SaveToString();
-                Schedule.StartAsyncTask(() =>
-                {
-                    // TODO: Journaling save.
-                    lock (SaveWorldCFGLock)
-                    {
-                        TheServer.Files.WriteText("saves/" + Name + "/world.fds", cfg);
-                    }
-                });
+                cfgsec = 0;
+                SaveConfig();
             }
         }
+
+        int cfgsec = 0;
 
         int tpsc = 0;
 
