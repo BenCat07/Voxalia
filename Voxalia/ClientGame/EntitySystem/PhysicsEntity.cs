@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Collections.Generic;
 using BEPUutilities;
 using BEPUphysics.CollisionShapes;
 using Voxalia.ClientGame.JointSystem;
@@ -91,34 +92,73 @@ namespace Voxalia.ClientGame.EntitySystem
             return entry.CollisionRules.Group == CollisionUtil.Water;
         }
 
-        public void MoveToOffsetWithJoints(Location pos, Location vel)
+        //private List<KeyValuePair<PhysicsEntity, RigidTransform>> relatives_joffs = new List<KeyValuePair<PhysicsEntity, RigidTransform>>();
+
+        private HashSet<long> relative_fixed = new HashSet<long>();
+
+        public void MoveToOffsetWithJoints(Location pos, Location vel, Quaternion new_orient)
         {
             SetPosition(GetPosition() + pos);
             SetVelocity(GetVelocity() + vel);
+            SetOrientation(new_orient);
             for (int i = 0; i < Joints.Count; i++)
             {
-                if (Joints[i].PullsAlong)
+                if (Joints[i].PullsAlong) // TODO: Maybe a dedicated 'pull along' joint for simplifying this, and reducing erroneous pulls?
                 {
                     if (Joints[i].One.EID == EID)
                     {
-                        Joints[i].Two.SetPosition(Joints[i].Two.GetPosition() + pos);
-                        if (Joints[i].Two is PhysicsEntity pe)
+                        if (!relative_fixed.Contains(Joints[i].Two.EID))
                         {
-                            pe.SetVelocity(pe.GetVelocity() + vel);
+                            relative_fixed.Add(Joints[i].Two.EID);
+                            Joints[i].Two.SetPosition(Joints[i].Two.GetPosition() + pos);
+                            if (Joints[i].Two is PhysicsEntity pe)
+                            {
+                                pe.SetVelocity(pe.GetVelocity() + vel);
+                            }
                         }
                     }
                     else
                     {
-                        Joints[i].One.SetPosition(Joints[i].One.GetPosition() + pos);
-                        if (Joints[i].One is PhysicsEntity pe)
+                        if (!relative_fixed.Contains(Joints[i].One.EID))
                         {
-                            pe.SetVelocity(pe.GetVelocity() + vel);
+                            relative_fixed.Add(Joints[i].One.EID);
+                            Joints[i].One.SetPosition(Joints[i].One.GetPosition() + pos);
+                            if (Joints[i].One is PhysicsEntity pe)
+                            {
+                                pe.SetVelocity(pe.GetVelocity() + vel);
+                            }
                         }
                     }
                 }
             }
+            relative_fixed.Clear();
+            //relatives_joffs.Clear();
         }
-        
+
+        public void WeakenThisAndJointed(bool strong = false)
+        {
+            StrongArmNetworking = strong;
+            for (int i = 0; i < Joints.Count; i++)
+            {
+                if (Joints[i].PullsAlong)
+                {
+                    if (Joints[i].One is PhysicsEntity pe)
+                    {
+                        pe.StrongArmNetworking = strong;
+                    }
+                    if (Joints[i].Two is PhysicsEntity pe2)
+                    {
+                        pe2.StrongArmNetworking = strong;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether this particular entity is 'strong arm' networked, meaning it will be forced to the correct position. Otherwise, it will be weakly networked.
+        /// </summary>
+        public bool StrongArmNetworking = true;
+
         public override void Tick()
         {
             if (AutoGravityScale > 0.0)

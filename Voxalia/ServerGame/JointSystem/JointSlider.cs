@@ -26,9 +26,16 @@ namespace Voxalia.ServerGame.JointSystem
             Direction = dir;
         }
 
+        const int DEF_STIFF = 600000;
+
+        const int DEF_DAMP = 90000;
+
         public override SolverUpdateable GetBaseJoint()
         {
-            return new PointOnLineJoint(Ent1.Body, Ent2.Body, Ent2.GetPosition().ToBVector(), Direction.Normalize().ToBVector(), Ent2.GetPosition().ToBVector());
+            PointOnLineJoint polj = new PointOnLineJoint(Ent1.Body, Ent2.Body, Ent2.GetPosition().ToBVector(), Direction.Normalize().ToBVector(), Ent2.GetPosition().ToBVector());
+            polj.SpringSettings.Stiffness = DEF_STIFF * 400;
+            polj.SpringSettings.Damping = DEF_DAMP * 400;
+            return polj;
         }
         
         public Location Direction;

@@ -42,6 +42,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             player.Vehicle = null;
             vehicle.HeloPilot = null;
             vehicle.PlanePilot = null;
+            vehicle.WeakenThisAndJointed(true);
             return true;
         }
     }

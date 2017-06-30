@@ -62,6 +62,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 }
             }
             Body.LinearDamping = 0.0;
+            WeakenThisAndJointed();
         }
 
         public float PlaneFastStrength

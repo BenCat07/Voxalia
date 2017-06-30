@@ -87,19 +87,19 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             else if (type == 2)
             {
-                if (e is PlayerEntity)
+                // TODO: Wheels!
+                if (e is PlayerEntity player)
                 {
                     long planeid = dr.ReadLong();
                     Entity plane = TheClient.TheRegion.GetEntity(planeid);
-                    if (!(plane is ModelEntity))
+                    if (!(plane is ModelEntity planemod))
                     {
                         dr.Close();
                         return false;
                     }
-                    ((PlayerEntity)e).InVehicle = true;
-                    ((PlayerEntity)e).Vehicle = plane;
-                    ModelEntity planemod = (ModelEntity)plane;
-                    planemod.TurnIntoPlane((PlayerEntity)e);
+                    player.InVehicle = true;
+                    player.Vehicle = plane;
+                    planemod.TurnIntoPlane(player);
                     dr.Close();
                     return true;
                 }
