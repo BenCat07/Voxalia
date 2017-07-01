@@ -241,14 +241,14 @@ namespace Voxalia.ServerGame.EntitySystem
             TheRegion.AddJoint(pointOnLineJoint);
             TheRegion.AddJoint(suspensionLimit);
             TheRegion.AddJoint(spring);
+            JointNoCollide jnc = new JointNoCollide(this, wheel);
+            TheRegion.AddJoint(jnc);
             if (powered)
             {
                 JointVehicleMotor motor = new JointVehicleMotor(this, wheel, new Location(driving ? left : up), !driving);
                 TheRegion.AddJoint(motor);
                 return motor;
             }
-            JointNoCollide jnc = new JointNoCollide(this, wheel);
-            TheRegion.AddJoint(jnc);
             return null;
         }
     }

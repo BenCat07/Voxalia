@@ -107,6 +107,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 cg = 16;
             }
             Data[4 + 24 + 24 + 16 + 24 + 4 + 4 + 1] = cg;
+            // TODO: Make generic or replace this
             Utilities.DoubleToBytes(TheRegion.Generator is SphereGeneratorCore ? TheRegion.TheWorld.GeneratorScale : 0.0).CopyTo(Data, 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1);
             return Data;
         }

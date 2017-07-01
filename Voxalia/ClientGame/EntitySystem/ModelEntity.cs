@@ -299,6 +299,7 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             else
             {
+                // TODO: Recentering logic
                 List<BEPUutilities.Vector3> vecs = TheClient.Models.Handler.GetCollisionVertices(model.Original);
                 // Location zero = new Location(vecs[0].X, vecs[0].Y, vecs[0].Z);
                 double distSq = 0;
