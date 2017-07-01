@@ -195,6 +195,7 @@ namespace Voxalia.ServerGame.EntitySystem
                         wheel.mode = ModelCollisionMode.CONVEXHULL;
                         TheRegion.SpawnEntity(wheel);
                         wheel.SetPosition(pos);
+                        wheel.SetOrientation(Quaternion.Identity);
                         if (name.After("wheel").Contains("f"))
                         {
                             SteeringMotors.Add(ConnectWheel(wheel, false, true));
@@ -226,7 +227,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Vector3 left = Quaternion.Transform(new Vector3(-1, 0, 0), wheel.GetOrientation());
             Vector3 up = Quaternion.Transform(new Vector3(0, 0, 1), wheel.GetOrientation());
             JointSlider pointOnLineJoint = new JointSlider(this, wheel, -new Location(up));
-            JointLAxisLimit suspensionLimit = new JointLAxisLimit(this, wheel, 0f, 0.1f, wheel.GetPosition(), wheel.GetPosition(), -new Location(up));
+            JointLAxisLimit suspensionLimit = new JointLAxisLimit(this, wheel, 0f, 0.1, wheel.GetPosition(), wheel.GetPosition(), -new Location(up)); // TODO: 0.1 -> arbitrary constant
             JointPullPush spring = new JointPullPush(this, wheel, -new Location(up), true);
             if (driving)
             {

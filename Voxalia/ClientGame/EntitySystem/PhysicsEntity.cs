@@ -85,6 +85,8 @@ namespace Voxalia.ClientGame.EntitySystem
         
         public Location InternalOffset;
 
+        public Location ServerKnownLocation;
+
         public CollisionGroup CGroup;
 
         bool IgnoreEverythingButWater(BroadPhaseEntry entry)

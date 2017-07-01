@@ -34,6 +34,11 @@ namespace Voxalia.ClientGame.JointSystem
 
         public override void Disable()
         {
+            if ((One as PhysicsEntity).Body == null || (Two as PhysicsEntity).Body == null)
+            {
+                base.Disable();
+                return;
+            }
             CollisionRules.RemoveRule(((PhysicsEntity)One).Body.CollisionInformation, ((PhysicsEntity)Two).Body.CollisionInformation);
             CollisionRules.RemoveRule(((PhysicsEntity)Two).Body.CollisionInformation, ((PhysicsEntity)One).Body.CollisionInformation);
             base.Disable();

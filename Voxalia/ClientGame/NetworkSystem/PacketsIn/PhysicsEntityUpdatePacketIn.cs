@@ -32,6 +32,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             long eID = Utilities.BytesToLong(Utilities.BytesPartial(data, 24 + 24 + 16 + 24 + 1, 8));
             if (TheClient.TheRegion.GetEntity(eID) is PhysicsEntity e)
             {
+                e.ServerKnownLocation = pos;
                 if (e.StrongArmNetworking)
                 {
                     e.SetPosition(pos);

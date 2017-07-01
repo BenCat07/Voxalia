@@ -157,6 +157,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 }
                 //ve.SetPosition(ve.GetPosition() + off_pos * off_gtt);
                 //ve.SetVelocity(ve.GetVelocity() + off_vel * off_gtt);
+                ve.ServerKnownLocation = pos;
                 ve.MoveToOffsetWithJoints(off_pos * off_gtt, off_vel * off_gtt, Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));
                 ve.SetAngularVelocity(ve.GetAngularVelocity() + off_avel * off_gtt);
                 //ve.SetOrientation(Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));

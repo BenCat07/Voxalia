@@ -436,14 +436,14 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             double maxr = TheClient.CVars.r_modeldistance.ValueF;
             double distsq = GetPosition().DistanceSquared(TheClient.MainWorldView.RenderRelative);
-            if (distsq > maxr * maxr)
+            if (GenBlockShadows && distsq > maxr * maxr) // TODO: LOD-able option?
             {
                 // TODO: Rotation?
                 model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()));
                 return;
             }
             Matrix4d orient = GetOrientationMatrix();
-            Matrix4d mat = (Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * orient * transform * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition())));
+            Matrix4d mat = (Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * transform * orient * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition())));
             TheClient.MainWorldView.SetMatrix(2, mat);
             if (!TheClient.MainWorldView.RenderingShadows)
             {
