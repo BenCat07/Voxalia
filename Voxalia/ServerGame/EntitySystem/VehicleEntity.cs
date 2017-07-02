@@ -185,7 +185,7 @@ namespace Voxalia.ServerGame.EntitySystem
                             mat = mat * mb;
                             tnode = tnode.Parent;
                         }
-                        Location pos = GetPosition() + new Location(mat.M41, -mat.M43, mat.M42) + offset; // TODO: matrix gone funky?
+                        Location pos = GetPosition() + new Location(Body.CollisionInformation.LocalPosition) + new Location(mat.M41, -mat.M43, mat.M42) + offset; // TODO: matrix gone funky?
                         VehiclePartEntity wheel = new VehiclePartEntity(TheRegion, "vehicles/" + vehName + "_wheel", true);
                         wheel.SetPosition(pos);
                         wheel.SetOrientation(Quaternion.Identity);

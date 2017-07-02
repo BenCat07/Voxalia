@@ -57,6 +57,7 @@ namespace Voxalia.ServerGame.EntitySystem
             TheRegion.PhysicsWorld.Add(Motion);
             Wings = new JointFlyingDisc(this) { IsAPlane = true };
             TheRegion.AddJoint(Wings);
+            Body.CollisionInformation.LocalPosition = Vector3.UnitY * -3; // TODO: Find correct value (from wheels system?) and transmit to clients
             HandleWheels();
             Body.LinearDamping = 0.0;
         }

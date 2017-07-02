@@ -48,11 +48,9 @@ namespace Voxalia.Shared.Collision
         
         public bool ConvexCast(ConvexShape castShape, ref RigidTransform startingTransform, ref Vector3 sweepnorm, double slen, MaterialSolidity solidness, out RayHit hit)
         {
-            RigidTransform rt;
-            RigidTransform.MultiplyByInverse(ref startingTransform, ref worldTransform, out rt);
+            RigidTransform.MultiplyByInverse(ref startingTransform, ref worldTransform, out RigidTransform rt);
             Vector3 swp = Quaternion.Transform(sweepnorm, Quaternion.Inverse(worldTransform.Orientation));
-            RayHit rh;
-            bool h = ChunkShape.ConvexCast(castShape, ref rt, ref swp, slen, solidness, out rh);
+            bool h = ChunkShape.ConvexCast(castShape, ref rt, ref swp, slen, solidness, out RayHit rh);
             RigidTransform.Transform(ref rh.Location, ref worldTransform, out hit.Location);
             hit.Normal = rh.Normal;
             hit.T = rh.T;
