@@ -314,16 +314,9 @@ vec3 lightsFromBlocksFor(in vec3 fpos, in vec3 fnorm)
 }
 #endif
 
-void crunch_verts(in uvec3 pos, in uint start)
-{
-	uint id = blockID(pos);
-	uvec4 curBLK = posses[id];
-	// Guaranteed to render (by indexmark != 0), don't check RendersAtAll.
-	vec3 fpos = vec3(pos);
-	int shInd = int(shapeIndex(curBLK, pos));
-	int vertCount = int(f_shapes[shInd]);
-	uint mat = blockMat(curBLK.x);
 #if MODE_TWO
+float getLightsRel(in uvec3 pos, in uvec4 curBLK)
+{
 	float lightter = float(curBLK.y);
 	float lits = 1.0;
 	float opt_a = 1.0;
@@ -362,7 +355,18 @@ void crunch_verts(in uvec3 pos, in uint start)
 		}
 	}
 	lightter /= lits;
+	return lightter;
+}
 #endif
+void crunch_verts(in uvec3 pos, in uint start)
+{
+	uint id = blockID(pos);
+	uvec4 curBLK = posses[id];
+	// Guaranteed to render (by indexmark != 0), don't check RendersAtAll.
+	vec3 fpos = vec3(pos);
+	int shInd = int(shapeIndex(curBLK, pos));
+	int vertCount = int(f_shapes[shInd]);
+	uint mat = blockMat(curBLK.x);
 	for (int i = 0; i < vertCount; i += 3)
 	{
 		int it3 = i;
@@ -399,24 +403,12 @@ void crunch_verts(in uvec3 pos, in uint start)
 		f_tangent[start + it3 + 2] = vec4(tng, 0.0);
 #endif
 #if MODE_TWO
-		uvec4 p_c = n1.z < 0.0 ? curBLK : (n1.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
-				(n1.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
-				(n1.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :
-				(n1.y < -0.6 ? getAtRel(uvec3(pos.x, pos.y - 1, pos.z + 1)) :
-				getAtRel(uvec3(pos.x, pos.y, pos.z + 1))))));
-		f_color[start + it3 + 0] = vec4(vec3(float(max(p_c.y, lightter)) / 255.0) + lightsFromBlocksFor(v1, n1), 1.0);
-		p_c = n2.z < 0.0 ? curBLK : (n2.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
-				(n2.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
-				(n2.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :
-				(n2.y < -0.6 ? getAtRel(uvec3(pos.x, pos.y - 1, pos.z + 1)) :
-				getAtRel(uvec3(pos.x, pos.y, pos.z + 1))))));
-		f_color[start + it3 + 1] = vec4(vec3(float(max(p_c.y, lightter)) / 255.0) + lightsFromBlocksFor(v2, n2), 1.0);
-		p_c = n3.z < 0.0 ? curBLK : (n3.x > 0.6 ? getAtRel(uvec3(pos.x + 1, pos.y, pos.z + 1)) :
-				(n3.x < -0.6 ? getAtRel(uvec3(pos.x - 1, pos.y, pos.z + 1)) :
-				(n3.y > 0.6 ? getAtRel(uvec3(pos.x, pos.y + 1, pos.z + 1)) :
-				(n3.y < -0.6 ? getAtRel(uvec3(pos.x, pos.y - 1, pos.z + 1)) :
-				getAtRel(uvec3(pos.x, pos.y, pos.z + 1))))));
-		f_color[start + it3 + 2] = vec4(vec3(float(max(p_c.y, lightter)) / 255.0) + lightsFromBlocksFor(v3, n3), 1.0);
+		uvec4 p_c = getAtRel(uvec3(round(v1)));
+		f_color[start + it3 + 0] = vec4(vec3(float(max(p_c.y, getLightsRel(uvec3(round(v1)), curBLK))) / 255.0) + lightsFromBlocksFor(v1, n1), 1.0);
+		p_c = getAtRel(uvec3(round(v2)));
+		f_color[start + it3 + 1] = vec4(vec3(float(max(p_c.y, getLightsRel(uvec3(round(v2)), curBLK))) / 255.0) + lightsFromBlocksFor(v2, n2), 1.0);
+		p_c = getAtRel(uvec3(round(v3)));
+		f_color[start + it3 + 2] = vec4(vec3(float(max(p_c.y, getLightsRel(uvec3(round(v3)), curBLK))) / 255.0) + lightsFromBlocksFor(v3, n3), 1.0);
 		vec4 r_tcol = tcolors_val[blockPaint(curBLK.w)];
 		f_indices[start + it3] = start + it3;
 		f_tcol[start + it3] = r_tcol;
