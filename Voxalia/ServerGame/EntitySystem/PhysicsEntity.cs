@@ -63,7 +63,7 @@ namespace Voxalia.ServerGame.EntitySystem
             return base.GetRAMUsage() + 200;
         }
 
-        public const int PhysicsNetLength = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1 + 8;
+        public const int PhysicsNetLength = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1 + 8 + 24;
 
         public byte[] GetPhysicsNetData()
         {
@@ -107,8 +107,9 @@ namespace Voxalia.ServerGame.EntitySystem
                 cg = 16;
             }
             Data[4 + 24 + 24 + 16 + 24 + 4 + 4 + 1] = cg;
-            // TODO: Make generic or replace this
-            Utilities.DoubleToBytes(TheRegion.Generator is SphereGeneratorCore ? TheRegion.TheWorld.GeneratorScale : 0.0).CopyTo(Data, 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1);
+            const int coord = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1;
+            Utilities.DoubleToBytes(TheRegion.Generator is SphereGeneratorCore ? TheRegion.TheWorld.GeneratorScale : 0.0).CopyTo(Data, coord); // TODO: Make generic or replace this
+            new Location(Body.CollisionInformation.LocalPosition).ToDoubleBytes().CopyTo(Data, coord + 8);
             return Data;
         }
 

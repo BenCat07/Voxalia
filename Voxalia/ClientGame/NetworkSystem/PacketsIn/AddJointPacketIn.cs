@@ -37,12 +37,12 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             Entity pe2 = TheClient.TheRegion.GetEntity(EID2);
             if (pe1 == null)
             {
-                SysConsole.Output(OutputType.WARNING, "Joint Packet: Invalid EID-1 " + EID1);
+                SysConsole.Output(OutputType.WARNING, "Joint Packet: Invalid EID-1 " + EID1 + " for " + type);
                 return false;
             }
             if (pe2 == null)
             {
-                SysConsole.Output(OutputType.WARNING, "Joint Packet: Invalid EID-2 " + EID2);
+                SysConsole.Output(OutputType.WARNING, "Joint Packet: Invalid EID-2 " + EID2 + " for " + type);
                 return false;
             }
             Location pos1 = Location.FromDoubleBytes(data, 1 + 8 + 8 + 8);

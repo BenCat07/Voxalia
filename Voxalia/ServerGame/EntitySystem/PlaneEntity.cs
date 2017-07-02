@@ -53,13 +53,12 @@ namespace Voxalia.ServerGame.EntitySystem
         public override void SpawnBody()
         {
             base.SpawnBody();
+            Body.LinearDamping = 0.0;
+            HandleWheels();
             Motion = new PlaneMotionConstraint(this);
             TheRegion.PhysicsWorld.Add(Motion);
             Wings = new JointFlyingDisc(this) { IsAPlane = true };
             TheRegion.AddJoint(Wings);
-            Body.CollisionInformation.LocalPosition = Vector3.UnitY * -3; // TODO: Find correct value (from wheels system?) and transmit to clients
-            HandleWheels();
-            Body.LinearDamping = 0.0;
         }
 
         // TODO: Customizable and networked speeds!

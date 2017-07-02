@@ -197,6 +197,7 @@ namespace Voxalia.ClientGame.EntitySystem
             Body.LinearVelocity = new Vector3((float)LVel.X, (float)LVel.Y, (float)LVel.Z);
             Body.WorldTransform = WorldTransform; // TODO: Position + Quaternion
             Body.PositionUpdateMode = BEPUphysics.PositionUpdating.PositionUpdateMode.Passive;
+            Body.CollisionInformation.LocalPosition = LocalPositionOffset.ToBVector();
             if (!CanRotate)
             {
                 Body.AngularDamping = 1;
@@ -483,7 +484,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public double AutoGravityScale = 0.0;
 
-        public const int PhysicsNetworkDataLength = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1 + 8;
+        public const int PhysicsNetworkDataLength = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1 + 8 + 24;
 
         public bool ApplyPhysicsNetworkData(byte[] dat)
         {
@@ -532,10 +533,17 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 CGroup = CollisionUtil.Player;
             }
-            // TODO: non-entity property
-            AutoGravityScale = Utilities.BytesToDouble(Utilities.BytesPartial(dat, 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1, 8));
+            const int coord = 4 + 24 + 24 + 16 + 24 + 4 + 4 + 1 + 1;
+            AutoGravityScale = Utilities.BytesToDouble(Utilities.BytesPartial(dat, coord, 8));// TODO: non-entity property
             TheClient.Player.AutoGravityScale = AutoGravityScale;
+            LocalPositionOffset = Location.FromDoubleBytes(dat, coord + 8);
+            if (Body != null)
+            {
+                Body.CollisionInformation.LocalPosition = LocalPositionOffset.ToBVector();
+            }
             return true;
         }
+
+        public Location LocalPositionOffset = Location.Zero;
     }
 }

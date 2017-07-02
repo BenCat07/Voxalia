@@ -170,6 +170,33 @@ namespace Voxalia.ServerGame.EntitySystem
                 SetOrientation(Quaternion.Identity); // TODO: Track and reset orientation maybe?
                 List<Model3DNode> nodes = GetNodes(scene.RootNode);
                 List<VehiclePartEntity> frontwheels = new List<VehiclePartEntity>();
+                Location centerOfMass = Location.Zero;
+                double mass = 0;
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    string name = nodes[i].Name.ToLowerFast();
+                    if (name.Contains("wheel"))
+                    {
+                        Matrix mat = nodes[i].MatrixA;
+                        mat.Transpose();
+                        Model3DNode tnode = nodes[i].Parent;
+                        while (tnode != null)
+                        {
+                            Matrix mb = tnode.MatrixA;
+                            mb.Transpose();
+                            mat = mat * mb;
+                            tnode = tnode.Parent;
+                        }
+                        centerOfMass += (new Location(mat.M41, -mat.M43, mat.M42) + offset) * 30; // TODO: Arbitrary constant
+                        mass += 30; // TODO: Arbitrary constant
+                    }
+                }
+                if (mass > 0)
+                {
+                    centerOfMass /= mass;
+                }
+                Body.CollisionInformation.LocalPosition = -centerOfMass.ToBVector();
+                ForceNetwork();
                 for (int i = 0; i < nodes.Count; i++)
                 {
                     string name = nodes[i].Name.ToLowerFast();
@@ -191,9 +218,10 @@ namespace Voxalia.ServerGame.EntitySystem
                         wheel.SetOrientation(Quaternion.Identity);
                         wheel.Gravity = Gravity;
                         wheel.CGroup = CGroup;
-                        wheel.SetMass(30);
+                        wheel.SetMass(30); // TODO: Arbitrary constant
                         wheel.mode = ModelCollisionMode.CONVEXHULL;
                         TheRegion.SpawnEntity(wheel);
+                        wheel.ForceNetwork();
                         wheel.SetPosition(pos);
                         wheel.SetOrientation(Quaternion.Identity);
                         if (name.After("wheel").Contains("f"))
@@ -223,6 +251,7 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public JointVehicleMotor ConnectWheel(VehiclePartEntity wheel, bool driving, bool powered)
         {
+            TheRegion.AddJoint(new ConstWheelStepUp(wheel, wheel.StepHeight));
             wheel.SetFriction(2.5f);
             Vector3 left = Quaternion.Transform(new Vector3(-1, 0, 0), wheel.GetOrientation());
             Vector3 up = Quaternion.Transform(new Vector3(0, 0, 1), wheel.GetOrientation());

@@ -45,8 +45,6 @@ namespace Voxalia.ServerGame.EntitySystem
         public override void SpawnBody()
         {
             base.SpawnBody();
-            // TODO: Only if this is a wheel? Why is this in this location at all?
-            TheRegion.AddJoint(new ConstWheelStepUp(this, StepHeight));
         }
 
         public void TryToStepUp()

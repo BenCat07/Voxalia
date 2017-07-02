@@ -63,7 +63,6 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             Body.LinearDamping = 0.0;
             WeakenThisAndJointed();
-            Body.CollisionInformation.LocalPosition = BEPUutilities.Vector3.UnitY * -3;
         }
 
         public float PlaneFastStrength
@@ -444,7 +443,9 @@ namespace Voxalia.ClientGame.EntitySystem
                 return;
             }
             Matrix4d orient = GetOrientationMatrix();
-            Matrix4d mat = (Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * transform * orient * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition() + new Location(Body.CollisionInformation.LocalPosition))));
+            Matrix4d mat = (Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * transform
+                * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(new Location(Body.CollisionInformation.LocalPosition)))
+                * orient * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition())));
             TheClient.MainWorldView.SetMatrix(2, mat);
             if (!TheClient.MainWorldView.RenderingShadows)
             {

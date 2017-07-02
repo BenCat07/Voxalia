@@ -151,7 +151,6 @@ namespace Voxalia.ServerGame.WorldSystem
             e.TheRegion = this;
             if (e is PhysicsEntity && !(e is PlayerEntity))
             {
-                ((PhysicsEntity)e).ForceNetwork();
                 ((PhysicsEntity)e).SpawnBody();
                 ((PhysicsEntity)e).ForceNetwork();
             }
@@ -159,20 +158,20 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 ((PrimitiveEntity)e).Spawn();
             }
-            if (e is PlayerEntity)
+            if (e is PlayerEntity pe)
             {
-                TheServer.Players.Add((PlayerEntity)e);
-                Players.Add((PlayerEntity)e);
-                for (int i = 0; i < TheServer.Networking.Strings.Strings.Count; i++)
+                TheServer.Players.Add(pe); // TODO: Handle elsewhere
+                Players.Add(pe);
+                for (int i = 0; i < TheServer.Networking.Strings.Strings.Count; i++) // TODO: Net strings handle elsewhere
                 {
-                    ((PlayerEntity)e).Network.SendPacket(new NetStringPacketOut(TheServer.Networking.Strings.Strings[i]));
+                    (pe).Network.SendPacket(new NetStringPacketOut(TheServer.Networking.Strings.Strings[i]));
                 }
-                ((PlayerEntity)e).SpawnBody();
-                ((PlayerEntity)e).Network.SendPacket(new YourEIDPacketOut(e.EID));
+                (pe).SpawnBody();
+                (pe).Network.SendPacket(new YourEIDPacketOut(e.EID));
                 //((PlayerEntity)e).Network.SendPacket(new CVarSetPacketOut(TheServer.CVars.g_timescale, TheServer));
-                ((PlayerEntity)e).SetAnimation("human/stand/idle01", 0);
-                ((PlayerEntity)e).SetAnimation("human/stand/idle01", 1);
-                ((PlayerEntity)e).SetAnimation("human/stand/idle01", 2);
+                (pe).SetAnimation("human/stand/idle01", 0);// TODO: handle elsewhere -> SpawnBody?
+                (pe).SetAnimation("human/stand/idle01", 1);
+                (pe).SetAnimation("human/stand/idle01", 2);
             }
         }
 
