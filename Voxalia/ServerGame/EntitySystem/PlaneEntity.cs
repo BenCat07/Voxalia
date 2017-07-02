@@ -19,6 +19,7 @@ using BEPUphysics.Constraints;
 using BEPUphysics.Constraints.SingleEntity;
 using Voxalia.ServerGame.JointSystem;
 using LiteDB;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.EntitySystem
 {

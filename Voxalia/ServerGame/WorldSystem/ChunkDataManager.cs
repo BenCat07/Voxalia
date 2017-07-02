@@ -444,6 +444,5 @@ namespace Voxalia.ServerGame.WorldSystem
             Mins[new Vector2i(x, y)] = min;
             DBMins[DBIDFor(x, y)].Upsert(newdoc);
         }
-
     }
 }

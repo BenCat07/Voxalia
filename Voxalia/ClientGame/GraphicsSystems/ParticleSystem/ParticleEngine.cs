@@ -199,6 +199,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                             wid = cloud.Points.Count;
                         }
                         posn += wid;
+                        // TODO: Replace async nonsense?
                         tasks[id] = Task.Factory.StartNew(() =>
                         {
                             for (int i = 0; i < cloud.Points.Count; i++)

@@ -453,7 +453,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 TheClient.Textures.White.Bind();
             }
-            if (!TheClient.MainWorldView.RenderingShadows && (TheClient.CVars.r_fast.ValueB || !TheClient.CVars.r_lighting.ValueB)) // TODO: handle for forward lighting?
+            if (!TheClient.MainWorldView.RenderingShadows && ((TheClient.CVars.r_fast.ValueB && !TheClient.CVars.r_forward_lights.ValueB) || !TheClient.CVars.r_lighting.ValueB))
             {
                 OpenTK.Vector4 sadj = TheRegion.GetSunAdjust();
                 float skyl = TheRegion.GetSkyLightBase(GetPosition() + new Location(0, 0, ModelMax.Z));
