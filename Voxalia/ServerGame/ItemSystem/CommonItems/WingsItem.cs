@@ -50,12 +50,11 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 return;
             }
             PlayerEntity player = entity as PlayerEntity;
-            RayCastResult rh;
             if (player.Wings != null && player.Wings.DriverSeat.Sitter != player)
             {
                 CloseWings(player);
             }
-            if (player.TheRegion.SpecialCaseRayTrace(player.GetPosition(), -Location.UnitZ, 1, MaterialSolidity.FULLSOLID, DontLandOnPlanes, out rh))
+            if (player.TheRegion.SpecialCaseRayTrace(player.GetPosition(), -Location.UnitZ, 1, MaterialSolidity.FULLSOLID, DontLandOnPlanes, out RayCastResult rh))
             {
                 CloseWings(player);
             }
@@ -67,6 +66,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
 
         public void OpenWings(PlayerEntity player)
         {
+            // TODO: Fix wings item!
+            /*
             PlaneEntity plane = new PlaneEntity("planeifound", player.TheRegion); // TODO: Player-wings model!
             plane.SetMass(100);
             plane.SetPosition(player.GetPosition());
@@ -79,7 +80,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             player.TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
             {
                 plane.SetOrientation(Quaternion.CreateFromAxisAngle(Vector3.UnitX, -90.0 * Utilities.PI180));
-            }, 0.05);
+            }, 0.05);*/
         }
 
         public void CloseWings(PlayerEntity player)

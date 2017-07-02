@@ -19,11 +19,70 @@ using BEPUutilities;
 using Voxalia.ServerGame.OtherSystems;
 using FreneticGameCore;
 using Voxalia.ServerGame.NetworkSystem;
+using FreneticDataSyntax;
 
 namespace Voxalia.ServerGame.EntitySystem
 {
     public abstract class VehicleEntity : ModelEntity, EntityUseable
     {
+        public static VehicleEntity CreateVehicleFor(Region tregion, string name)
+        {
+            if (!tregion.TheServer.Files.Exists("info/vehicles/" + name + ".fds"))
+            {
+                return null;
+            }
+            string dat = tregion.TheServer.Files.ReadText("info/vehicles/" + name + ".fds");
+            FDSSection sect = new FDSSection(dat);
+            FDSSection vehicleSect = sect.GetSection("vehicle");
+            string typer = vehicleSect.GetString("type");
+            if (string.IsNullOrWhiteSpace(typer))
+            {
+                SysConsole.Output(OutputType.WARNING, "Invalid vehicle type!");
+                return null;
+            }
+            if (typer == "plane")
+            {
+                string model = vehicleSect.GetString("model");
+                if (string.IsNullOrWhiteSpace(model))
+                {
+                    SysConsole.Output(OutputType.WARNING, "Invalid vehicle model!");
+                    return null;
+                }
+                PlaneEntity pe = new PlaneEntity(vehicleSect.GetString("name"), tregion, model)
+                {
+                    SourceName = name,
+                    SourceFile = sect
+                };
+                FDSSection forceSect = vehicleSect.GetSection("forces");
+                pe.FastStrength = forceSect.GetDouble("strong").Value;
+                pe.RegularStrength = forceSect.GetDouble("weak").Value;
+                pe.StrPitch = forceSect.GetDouble("pitch").Value;
+                pe.StrRoll = forceSect.GetDouble("roll").Value;
+                pe.StrYaw = forceSect.GetDouble("yaw").Value;
+                pe.WheelStrength = forceSect.GetDouble("wheels").Value;
+                pe.TurnStrength = forceSect.GetDouble("turn").Value;
+                pe.ForwardHelper = vehicleSect.GetDouble("forwardness_helper").Value;
+                pe.LiftHelper = vehicleSect.GetDouble("lift_helper").Value;
+                return pe;
+            }
+            else
+            {
+                SysConsole.Output(OutputType.WARNING, "Invalid vehicle type: " + typer);
+                return null;
+            }
+        }
+
+        public override NetworkEntityType GetNetType()
+        {
+            return NetworkEntityType.VEHICLE;
+        }
+
+        // TODO: Save with just the entity source file name?
+
+        public string SourceName;
+
+        public FDSSection SourceFile;
+
         public List<JointVehicleMotor> DrivingMotors = new List<JointVehicleMotor>();
 
         public List<JointVehicleMotor> SteeringMotors = new List<JointVehicleMotor>();
@@ -37,17 +96,17 @@ namespace Voxalia.ServerGame.EntitySystem
             HandleWheelsSpecificInput(character.YMove, character.XMove);
         }
 
+        public double WheelStrength = 100, TurnStrength = 0.2;
+
         public void HandleWheelsSpecificInput(double ymove, double xmove)
         {
-            // TODO: Share with clients properly.
-            // TODO: Dynamic multiplier values.
             foreach (JointVehicleMotor motor in DrivingMotors)
             {
-                motor.Motor.Settings.VelocityMotor.GoalVelocity = ymove * 100;
+                motor.Motor.Settings.VelocityMotor.GoalVelocity = ymove * WheelStrength;
             }
             foreach (JointVehicleMotor motor in SteeringMotors)
             {
-                motor.Motor.Settings.Servo.Goal = MathHelper.Pi * -0.2f * xmove;
+                motor.Motor.Settings.Servo.Goal = MathHelper.Pi * -TurnStrength * xmove;
             }
         }
 
@@ -67,8 +126,8 @@ namespace Voxalia.ServerGame.EntitySystem
             return nodes;
         }
 
-        public VehicleEntity(string vehicle, Region tregion)
-            : base("vehicles/" + vehicle + "_base", tregion)
+        public VehicleEntity(string vehicle, Region tregion, string model = null)
+            : base(model ?? "vehicles/" + vehicle + "_base", tregion)
         {
             vehName = vehicle;
             mode = ModelCollisionMode.CONVEXHULL;
@@ -157,6 +216,10 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             if (!hasWheels)
             {
+                string wheelsModFront = SourceFile.GetString("vehicle.wheels.front.model");
+                string wheelsModBack = SourceFile.GetString("vehicle.wheels.back.model");
+                double wheelsSuspFront = SourceFile.GetDouble("vehicle.wheels.front.suspension", 0.1).Value;
+                double wheelsSuspBack = SourceFile.GetDouble("vehicle.wheels.back.suspension", 0.1).Value;
                 Model mod = TheServer.Models.GetModel(model);
                 if (mod == null) // TODO: mod should return a cube when all else fails?
                 {
@@ -213,7 +276,7 @@ namespace Voxalia.ServerGame.EntitySystem
                             tnode = tnode.Parent;
                         }
                         Location pos = GetPosition() + new Location(Body.CollisionInformation.LocalPosition) + new Location(mat.M41, -mat.M43, mat.M42) + offset; // TODO: matrix gone funky?
-                        VehiclePartEntity wheel = new VehiclePartEntity(TheRegion, "vehicles/" + vehName + "_wheel", true);
+                        VehiclePartEntity wheel = new VehiclePartEntity(TheRegion, (name.After("wheel").Contains("f") ? wheelsModFront : wheelsModBack) ?? "vehicles/" + vehName + "_wheel", true);
                         wheel.SetPosition(pos);
                         wheel.SetOrientation(Quaternion.Identity);
                         wheel.Gravity = Gravity;
@@ -226,16 +289,16 @@ namespace Voxalia.ServerGame.EntitySystem
                         wheel.SetOrientation(Quaternion.Identity);
                         if (name.After("wheel").Contains("f"))
                         {
-                            SteeringMotors.Add(ConnectWheel(wheel, false, true));
+                            SteeringMotors.Add(ConnectWheel(wheel, false, true, wheelsSuspFront));
                             frontwheels.Add(wheel);
                         }
                         else if (name.After("wheel").Contains("b"))
                         {
-                            DrivingMotors.Add(ConnectWheel(wheel, true, true));
+                            DrivingMotors.Add(ConnectWheel(wheel, true, true, wheelsSuspBack));
                         }
                         else
                         {
-                            ConnectWheel(wheel, true, false);
+                            ConnectWheel(wheel, true, false, wheelsSuspBack);
                         }
                         wheel.Body.ActivityInformation.Activate();
                     }
@@ -249,14 +312,14 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
-        public JointVehicleMotor ConnectWheel(VehiclePartEntity wheel, bool driving, bool powered)
+        public JointVehicleMotor ConnectWheel(VehiclePartEntity wheel, bool driving, bool powered, double susp)
         {
             TheRegion.AddJoint(new ConstWheelStepUp(wheel, wheel.StepHeight));
             wheel.SetFriction(2.5f);
             Vector3 left = Quaternion.Transform(new Vector3(-1, 0, 0), wheel.GetOrientation());
             Vector3 up = Quaternion.Transform(new Vector3(0, 0, 1), wheel.GetOrientation());
             JointSlider pointOnLineJoint = new JointSlider(this, wheel, -new Location(up));
-            JointLAxisLimit suspensionLimit = new JointLAxisLimit(this, wheel, 0f, 0.1, wheel.GetPosition(), wheel.GetPosition(), -new Location(up)); // TODO: 0.1 -> arbitrary constant
+            JointLAxisLimit suspensionLimit = new JointLAxisLimit(this, wheel, 0f, susp, wheel.GetPosition(), wheel.GetPosition(), -new Location(up)); // TODO: 0.1 -> arbitrary constant
             JointPullPush spring = new JointPullPush(this, wheel, -new Location(up), true);
             if (driving)
             {

@@ -54,10 +54,16 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 ve.SetPosition(entry.Player.GetEyePosition() + entry.Player.ForwardVector() * 5);
                 entry.Player.TheRegion.SpawnEntity(ve);
             }
-            else if (arg0 == "spawnPlane" && entry.InputArguments.Count > 1)
+            /*else if (arg0 == "spawnPlane" && entry.InputArguments.Count > 1)
             {
                 PlaneEntity ve = new PlaneEntity(entry.InputArguments[1], entry.Player.TheRegion);
                 ve.SetPosition(entry.Player.GetEyePosition() + entry.Player.ForwardVector() * 5);
+                entry.Player.TheRegion.SpawnEntity(ve);
+            }*/
+            else if (arg0 == "spawnVehicle" && entry.InputArguments.Count > 1)
+            {
+                VehicleEntity ve = VehicleEntity.CreateVehicleFor(entry.Player.TheRegion, entry.InputArguments[1]);
+                ve.SetPosition(entry.Player.GetEyePosition() + entry.Player.ForwardVector() * 7);
                 entry.Player.TheRegion.SpawnEntity(ve);
             }
             else if (arg0 == "heloTilt" && entry.InputArguments.Count > 1)

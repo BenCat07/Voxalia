@@ -51,6 +51,8 @@ namespace Voxalia.Shared.Collision
         /// </summary>
         public bool IsAPlane = false;
 
+        public double PlaneLiftHelper = 2.0;
+
         public override void Update(double dt)
         {
             if (!Entity.ActivityInformation.IsActive)
@@ -69,7 +71,7 @@ namespace Voxalia.Shared.Collision
                 double projectedForwardVel = Vector3.Dot(entity.LinearVelocity, forward);
                 double forw_sgn = Math.Sign(projectedForwardVel);
                 double forw_root = Math.Sqrt(forw_sgn * projectedForwardVel);
-                cForce = up * (forw_root * dt * 2.0); // TODO: 2.0 -> Arbitrary constant!
+                cForce = up * (forw_root * dt * PlaneLiftHelper);
             }
             else
             {

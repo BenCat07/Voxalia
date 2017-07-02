@@ -202,6 +202,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 Body.AngularDamping = 1;
             }
+            Body.LinearDamping = 0;
             // TODO: Other settings
             // TODO: Gravity
             Body.Tag = this;

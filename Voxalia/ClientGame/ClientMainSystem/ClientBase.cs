@@ -323,6 +323,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             EntityConstructors[NetworkEntityType.MODEL] = new ModelEntityConstructor();
             EntityConstructors[NetworkEntityType.HOVER_MESSAGE] = new HoverMessageEntityConstructor();
             EntityConstructors[NetworkEntityType.SMASHER_PRIMITIVE] = new SmasherPrimitiveEntityConstructor();
+            EntityConstructors[NetworkEntityType.VEHICLE] = new VehicleEntityConstructor();
         }
 
         Stopwatch SWLoading = new Stopwatch();

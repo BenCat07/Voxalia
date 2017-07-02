@@ -52,34 +52,31 @@ namespace Voxalia.ClientGame.EntitySystem
         public void TurnIntoPlane(PlayerEntity pilot) // TODO: Character!
         {
             PlanePilot = pilot;
-            Plane = new PlaneMotionConstraint(this);
-            TheRegion.PhysicsWorld.Add(Plane);
-            foreach (InternalBaseJoint joint in Joints) // TODO: Just track this detail on the joint itself ffs
+            if (Plane == null)
             {
-                if (joint is JointFlyingDisc)
+                Plane = new PlaneMotionConstraint(this);
+                TheRegion.PhysicsWorld.Add(Plane);
+                foreach (InternalBaseJoint joint in Joints) // TODO: Just track this detail on the joint itself ffs
                 {
-                    ((FlyingDiscConstraint)((JointFlyingDisc)joint).CurrentJoint).IsAPlane = true;
+                    if (joint is JointFlyingDisc)
+                    {
+                        ((FlyingDiscConstraint)((JointFlyingDisc)joint).CurrentJoint).IsAPlane = true;
+                        ((FlyingDiscConstraint)((JointFlyingDisc)joint).CurrentJoint).PlaneLiftHelper = LiftHelper;
+                    }
                 }
             }
-            Body.LinearDamping = 0.0;
             WeakenThisAndJointed();
         }
 
-        public float PlaneFastStrength
-        {
-            get
-            {
-                return GetMass() * 10f;
-            }
-        }
+        public double ForwardHelper;
 
-        public float PlaneRegularStrength
-        {
-            get
-            {
-                return GetMass() * 3f;
-            }
-        }
+        public double LiftHelper;
+
+        public double PlaneFastStrength = 1000;
+
+        public double PlaneRegularStrength = 100;
+
+        public double StrPitch, StrRoll, StrYaw;
 
         public PlaneMotionConstraint Plane = null;
 
@@ -474,6 +471,42 @@ namespace Voxalia.ClientGame.EntitySystem
             byte moder = data[PhysicsEntity.PhysicsNetworkDataLength + 4];
             me.mode = (ModelCollisionMode)moder;
             me.scale = Location.FromDoubleBytes(data, PhysicsEntity.PhysicsNetworkDataLength + 4 + 1);
+            return me;
+        }
+    }
+
+    public class VehicleEntityConstructor : EntityTypeConstructor
+    {
+        const int MODDAT_LEN = 4 + 1 + 24 + 1 + PhysicsEntity.PhysicsNetworkDataLength;
+
+        public override Entity Create(Region tregion, byte[] data)
+        {
+            ModelEntity me = new ModelEntity(tregion.TheClient.Network.Strings.StringForIndex(Utilities.BytesToInt(Utilities.BytesPartial(data, PhysicsEntity.PhysicsNetworkDataLength, 4))), tregion);
+            me.ApplyPhysicsNetworkData(data);
+            byte moder = data[PhysicsEntity.PhysicsNetworkDataLength + 4];
+            me.mode = (ModelCollisionMode)moder;
+            me.scale = Location.FromDoubleBytes(data, PhysicsEntity.PhysicsNetworkDataLength + 4 + 1);
+            VehicleType vt = (VehicleType)data[data.Length - 1];
+            if (vt == VehicleType.PLANE)
+            {
+                me.ForwardHelper = Utilities.BytesToDouble(Utilities.BytesPartial(data, MODDAT_LEN + 0 * 8, 8));
+                me.LiftHelper = Utilities.BytesToDouble(Utilities.BytesPartial(data, MODDAT_LEN + 1 * 8, 8));
+                me.PlaneFastStrength = Utilities.BytesToDouble(Utilities.BytesPartial(data, MODDAT_LEN + 2 * 8, 8));
+                me.PlaneRegularStrength = Utilities.BytesToDouble(Utilities.BytesPartial(data, MODDAT_LEN + 3 * 8, 8));
+                me.StrPitch = Utilities.BytesToDouble(Utilities.BytesPartial(data, MODDAT_LEN + 4 * 8, 8));
+                me.StrRoll = Utilities.BytesToDouble(Utilities.BytesPartial(data, MODDAT_LEN + 5 * 8, 8));
+                me.StrYaw = Utilities.BytesToDouble(Utilities.BytesPartial(data, MODDAT_LEN + 6 * 8, 8));
+                // TODO: Properly predict wheels?
+                //me.WheelStrength = Utilities.BytesToDouble(Utilities.BytesPartial(data, MODDAT_LEN + 7 * 8, 8));
+                //me.TurnStrength = Utilities.BytesToDouble(Utilities.BytesPartial(data, MODDAT_LEN + 8 * 8, 8));
+                me.TurnIntoPlane(null);
+
+            }
+            else
+            {
+                // ???
+                SysConsole.Output(OutputType.WARNING, "Unknown vehicle type spawned!");
+            }
             return me;
         }
     }

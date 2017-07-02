@@ -1,0 +1,24 @@
+vehicle:
+	name: Plane - Airman2
+	type: plane
+	mass: 1000.0
+	model: vehicles/plane_airman2_base
+	forces:
+		# 10 * mass
+		strong: 10000
+		# 3 * mass
+		weak: 3000
+		pitch: 0.5
+		roll: 0.5
+		yaw: 0.1
+		wheels: 100
+		turn: 0.2
+	forwardness_helper: 0.05
+	lift_helper: 2.0
+	wheels:
+		front:
+			model: vehicles/plane_airman2_wheel
+			suspension: 0.01
+		back:
+			model: vehicles/plane_airman2_wheel
+			suspension: 0.01

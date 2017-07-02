@@ -39,6 +39,14 @@ namespace Voxalia.Shared
     }
 
     /// <summary>
+    /// Types of vehicles.
+    /// </summary>
+    public enum VehicleType : byte
+    {
+        PLANE = 1
+    }
+
+    /// <summary>
     /// Types of network bandwidth consumption.
     /// </summary>
     public enum NetUsageType : byte
@@ -254,7 +262,8 @@ namespace Voxalia.Shared
         STATIC_BLOCK = 8,
         MODEL = 9,
         HOVER_MESSAGE = 10,
-        SMASHER_PRIMITIVE = 11
+        SMASHER_PRIMITIVE = 11,
+        VEHICLE = 12
     }
 
     /// <summary>
