@@ -1084,14 +1084,14 @@ namespace Voxalia.ClientGame.WorldSystem
                         {
                             above = GetChunk(ch.WorldPosition + new Vector3i(0, 0, i));
                         }
-                        //TheClient.Schedule.StartAsyncTask(() =>
+                        TheClient.Schedule.StartAsyncTask(() =>
                         {
                             LightForChunks(ch, above);
-                            //TheClient.Schedule.ScheduleSyncTask(() =>
+                            TheClient.Schedule.ScheduleSyncTask(() =>
                             {
                                 LightingNow.Remove(ch.WorldPosition);
-                            }//);
-                        }//, true);
+                            });
+                        }, true);
                     }
                 }
                 crn_ctr += Delta;
