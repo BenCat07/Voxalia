@@ -8,6 +8,7 @@
 
 using System;
 using System.Text;
+using System.Linq;
 using System.Collections.Generic;
 using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
@@ -605,51 +606,34 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             TheClient.Schedule.ScheduleSyncTask(() =>
             {
-                Chunk above = null;
-                for (int i = 1; i < 5 && above == null; i++) // TODO: 5 -> View height limit
-                {
-                    above = GetChunk(ch.WorldPosition + new Vector3i(0, 0, i));
-                }
                 DoNotRenderYet(ch);
-                for (int i = 1; i > 5; i++) // TODO: 5 -> View height limit
+                CalcingLights.Add(ch.WorldPosition);
+                for (int i = 1; i < 5; i++) // TODO: 5 -> View height limit
                 {
                     Chunk below = GetChunk(ch.WorldPosition + new Vector3i(0, 0, -i));
                     if (below != null)
                     {
                         DoNotRenderYet(below);
+                        CalcingLights.Add(below.WorldPosition);
                     }
                     else
                     {
                         break;
                     }
                 }
-                TheClient.Schedule.StartAsyncTask(() =>
-                {
-                    LightForChunks(ch, above);
-                });
             });
         }
+
+        public HashSet<Vector3i> CalcingLights = new HashSet<Vector3i>();
 
         public void LightForChunks(Chunk ch, Chunk above)
         {
             ch.CalcSkyLight(above);
             TheClient.Schedule.ScheduleSyncTask(() =>
             {
+                CalcingLights.Remove(ch.WorldPosition);
                 ch.AddToWorld();
                 ch.CreateVBO();
-                // TODO: If chunk previously could read downward, then still render downward (once, then forget that info)!
-                if (!ch.Reachability[(int)ChunkReachability.ZP_ZM])
-                {
-                    return;
-                }
-                Chunk below = GetChunk(ch.WorldPosition + new Vector3i(0, 0, -1));
-                if (below != null)
-                {
-                    TheClient.Schedule.StartAsyncTask(() =>
-                    {
-                        LightForChunks(below, ch);
-                    });
-                }
             });
         }
 
@@ -1076,12 +1060,40 @@ namespace Voxalia.ClientGame.WorldSystem
 
         public double CrunchSpikeTime = 0;
 
+        public HashSet<Vector3i> LightingNow = new HashSet<Vector3i>();
+
         public void CheckForRenderNeed()
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
             lock (RenderingNow)
             {
+                foreach (Vector3i veccer in CalcingLights.OrderBy((vec) => (vec.ToLocation() * Chunk.CHUNK_SIZE).DistanceSquared(TheClient.Player.GetPosition())))
+                {
+                    if (LightingNow.Count() < TheClient.CVars.r_chunksatonce.ValueI)
+                    {
+                        CalcingLights.Remove(veccer);
+                        Chunk ch = GetChunk(veccer);
+                        if (ch == null)
+                        {
+                            continue;
+                        }
+                        LightingNow.Add(veccer);
+                        Chunk above = null;
+                        for (int i = 1; i < 5 && above == null; i++) // TODO: 5 -> View height limit
+                        {
+                            above = GetChunk(ch.WorldPosition + new Vector3i(0, 0, i));
+                        }
+                        //TheClient.Schedule.StartAsyncTask(() =>
+                        {
+                            LightForChunks(ch, above);
+                            //TheClient.Schedule.ScheduleSyncTask(() =>
+                            {
+                                LightingNow.Remove(ch.WorldPosition);
+                            }//);
+                        }//, true);
+                    }
+                }
                 crn_ctr += Delta;
                 bool renderNews = false;
                 if (crn_ctr > 0.5)

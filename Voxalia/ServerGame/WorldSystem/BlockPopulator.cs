@@ -28,5 +28,7 @@ namespace Voxalia.ServerGame.WorldSystem
         public abstract void ClearTimings();
 
         public abstract BiomeGenerator GetBiomeGen();
+
+        public abstract void Tick();
     }
 }

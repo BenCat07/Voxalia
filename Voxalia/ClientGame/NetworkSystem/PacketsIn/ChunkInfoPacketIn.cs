@@ -66,7 +66,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                     {
                         TheClient.TheRegion.PreppingNow.Add(new Vector3i(x, y, z));
                     }
-                    TheClient.Schedule.StartAsyncTask(() =>
+                    //TheClient.Schedule.StartAsyncTask(() =>
                     {
                         try
                         {
@@ -81,7 +81,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                                 TheClient.TheRegion.PreppingNow.Remove(new Vector3i(x, y, z));
                             }
                         }
-                    }, true);
+                    }//, true);
                 };
                 TheClient.TheRegion.PrepChunks.Add(new KeyValuePair<Vector3i, Action>(new Vector3i(x, y, z), act));
             }
@@ -125,7 +125,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 chk.PROCESSED = false;
                 lock (TheClient.TheRegion.PreppingNow)
                 {
-                    TheClient.Schedule.StartAsyncTask(() =>
+                    //TheClient.Schedule.StartAsyncTask(() =>
                     {
                         try
                         {
@@ -140,7 +140,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                                 TheClient.TheRegion.PreppingNow.Remove(chk.WorldPosition);
                             }
                         }
-                    }, true);
+                    }//, true);
                 }
             };
             TheClient.Schedule.ScheduleSyncTask(act);

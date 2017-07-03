@@ -2496,7 +2496,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         + ", FBO: " + MainWorldView.FBOSpikeTime.ToString(timeformat) + ", Lights: " + MainWorldView.LightsSpikeTime.ToString(timeformat) + ", 2D: " + TWODSpikeTime.ToString(timeformat)
                         + ", Tick: " + TickSpikeTime.ToString(timeformat) + ", Finish: " + FinishSpikeTime.ToString(timeformat) + ", Total: " + TotalSpikeTime.ToString(timeformat) + ", Crunch: " + TheRegion.CrunchSpikeTime.ToString(timeformat)
                         + "\nChunks loaded: " + TheRegion.LoadedChunks.Count + ", Chunks rendering currently: " + TheRegion.RenderingNow.Count + ", chunks waiting: " + TheRegion.NeedsRendering.Count + ", Entities loaded: " + TheRegion.Entities.Count
-                        + "\nChunks prepping currently: " + TheRegion.PreppingNow.Count + ", chunks waiting for prep: " + TheRegion.PrepChunks.Count + ", SLOD chunk sets loaded: " + TheRegion.SLODs.Count
+                        + "\nChunks prepping currently: " + TheRegion.PreppingNow.Count + ", chunks waiting for prep: " + TheRegion.PrepChunks.Count + ", SLOD chunk sets loaded: " + TheRegion.SLODs.Count + ", chunks awaiting lighting: " + TheRegion.CalcingLights.Count
                         + "\nPosition: " + Player.GetPosition().ToBasicString() + ", velocity: " + Player.GetVelocity().ToBasicString() + ", direction: " + Player.Direction.ToBasicString()
                         + "\nExposure: " + MainWorldView.MainEXP + ", Target Block: " + cpos + ", Target Block Type: " + TheRegion.GetBlockMaterial(cpos),
                         Window.Width - 10), new Location(0, 0, 0), Window.Height, 1, false, "^r^!^e^7");

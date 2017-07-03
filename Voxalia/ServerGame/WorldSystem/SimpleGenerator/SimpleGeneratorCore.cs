@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Diagnostics;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
@@ -454,20 +455,25 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         public Object[] LockHM = new Object[40] { new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(),
                                                   new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(),
                                                   new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(),
-                                                  new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object()  };
+                                                  new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object(), new Object() };
 
         public ConcurrentDictionary<Vector2i, HeightMap> HMaps = new ConcurrentDictionary<Vector2i, HeightMap>();
 
+        public override void Tick()
+        {
+            if (HMaps.Count > 4096) // TODO: 4096 -> Tweakable
+            {
+                HMaps.Clear();
+            }
+        }
+
         public HeightMap GetHeightMap(Vector3i pos, int Seed, int seed2, int seed3, int seed4, int seed5)
         {
+            Thread.CurrentThread.Priority = ThreadPriority.Normal; // Ensure we're not in a slow mode, as we're locking get height maps now...
             Vector2i posser = new Vector2i(pos.X, pos.Y);
             lock (LockHM[Math.Abs(pos.X * 39 + pos.Y) % LockHM.Length])
             {
-                if (HMaps.Count > 1024) // TODO: 1024 -> Tweakable
-                {
-                    HMaps.Clear();
-                }
-                else if (HMaps.TryGetValue(posser, out HeightMap hm))
+                if (HMaps.TryGetValue(posser, out HeightMap hm))
                 {
                     return hm;
                 }

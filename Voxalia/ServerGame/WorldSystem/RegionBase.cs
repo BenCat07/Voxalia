@@ -193,6 +193,7 @@ namespace Voxalia.ServerGame.WorldSystem
                     PushTopsEdited(bua.Key, bua.Value);
                 }
             }
+            Generator.Tick();
         }
 
         /// <summary>

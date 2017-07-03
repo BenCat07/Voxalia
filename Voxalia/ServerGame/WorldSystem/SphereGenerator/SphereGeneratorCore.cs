@@ -49,6 +49,10 @@ namespace Voxalia.ServerGame.WorldSystem.SphereGenerator
             return 0.0;
         }
 
+        public override void Tick()
+        {
+        }
+
         public override List<Tuple<string, double>> GetTimings()
         {
             List<Tuple<string, double>> res = new List<Tuple<string, double>>();
