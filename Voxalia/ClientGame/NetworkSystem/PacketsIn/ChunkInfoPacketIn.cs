@@ -81,7 +81,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                                 TheClient.TheRegion.PreppingNow.Remove(new Vector3i(x, y, z));
                             }
                         }
-                    });
+                    }, true);
                 };
                 TheClient.TheRegion.PrepChunks.Add(new KeyValuePair<Vector3i, Action>(new Vector3i(x, y, z), act));
             }
@@ -140,7 +140,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                                 TheClient.TheRegion.PreppingNow.Remove(chk.WorldPosition);
                             }
                         }
-                    });
+                    }, true);
                 }
             };
             TheClient.Schedule.ScheduleSyncTask(act);
