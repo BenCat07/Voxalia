@@ -253,6 +253,21 @@ namespace Voxalia.ServerGame.EntitySystem
                         centerOfMass += (new Location(mat.M41, -mat.M43, mat.M42) + offset) * 30; // TODO: Arbitrary constant
                         mass += 30; // TODO: Arbitrary constant
                     }
+                    else if (name.Contains("flap"))
+                    {
+                        Matrix mat = nodes[i].MatrixA;
+                        mat.Transpose();
+                        Model3DNode tnode = nodes[i].Parent;
+                        while (tnode != null)
+                        {
+                            Matrix mb = tnode.MatrixA;
+                            mb.Transpose();
+                            mat = mat * mb;
+                            tnode = tnode.Parent;
+                        }
+                        centerOfMass += (new Location(mat.M41, -mat.M43, mat.M42) + offset) * 20; // TODO: Arbitrary constant
+                        mass += 20; // TODO: Arbitrary constant
+                    }
                 }
                 if (mass > 0)
                 {
@@ -276,7 +291,7 @@ namespace Voxalia.ServerGame.EntitySystem
                             tnode = tnode.Parent;
                         }
                         Location pos = GetPosition() + new Location(Body.CollisionInformation.LocalPosition) + new Location(mat.M41, -mat.M43, mat.M42) + offset; // TODO: matrix gone funky?
-                        VehiclePartEntity wheel = new VehiclePartEntity(TheRegion, (name.After("wheel").Contains("f") ? wheelsModFront : wheelsModBack) ?? "vehicles/" + vehName + "_wheel", true);
+                        VehiclePartEntity wheel = new VehiclePartEntity(TheRegion, (name.After("wheel").Contains("f") ? wheelsModFront : wheelsModBack), true);
                         wheel.SetPosition(pos);
                         wheel.SetOrientation(Quaternion.Identity);
                         wheel.Gravity = Gravity;
@@ -302,6 +317,33 @@ namespace Voxalia.ServerGame.EntitySystem
                         }
                         wheel.Body.ActivityInformation.Activate();
                     }
+                    else if (name.Contains("flap"))
+                    {
+                        Matrix mat = nodes[i].MatrixA;
+                        mat.Transpose();
+                        Model3DNode tnode = nodes[i].Parent;
+                        while (tnode != null)
+                        {
+                            Matrix mb = tnode.MatrixA;
+                            mb.Transpose();
+                            mat = mat * mb;
+                            tnode = tnode.Parent;
+                        }
+                        Location pos = GetPosition() + new Location(Body.CollisionInformation.LocalPosition) + new Location(mat.M41, -mat.M43, mat.M42) + offset; // TODO: matrix gone funky?
+                        FDSSection flapDat = SourceFile.GetSection("vehicle.flaps").GetSection(name.After("flap").Replace("_", ""));
+                        VehiclePartEntity flap = new VehiclePartEntity(TheRegion, flapDat.GetString("model"), true);
+                        flap.SetPosition(pos);
+                        flap.SetOrientation(Quaternion.Identity);
+                        flap.Gravity = Gravity;
+                        flap.CGroup = CGroup;
+                        flap.SetMass(20);
+                        flap.mode = ModelCollisionMode.CONVEXHULL;
+                        TheRegion.SpawnEntity(flap);
+                        flap.ForceNetwork();
+                        flap.SetPosition(pos);
+                        flap.SetOrientation(Quaternion.Identity);
+                        ConnectFlap(flap, flapDat);
+                    }
                 }
                 if (frontwheels.Count == 2)
                 {
@@ -309,6 +351,55 @@ namespace Voxalia.ServerGame.EntitySystem
                     TheRegion.AddJoint(js);
                 }
                 hasWheels = true;
+            }
+        }
+
+        public List<JointVehicleMotor> Flaps_RollR = new List<JointVehicleMotor>();
+
+        public List<JointVehicleMotor> Flaps_RollL = new List<JointVehicleMotor>();
+
+        public List<JointVehicleMotor> Flaps_Yaw = new List<JointVehicleMotor>();
+        
+        public List<JointVehicleMotor> Flaps_Pitch = new List<JointVehicleMotor>();
+
+        public void ConnectFlap(VehiclePartEntity flap, FDSSection flapDat)
+        {
+            JointBallSocket jbs = new JointBallSocket(this, flap, flap.GetPosition()); // TODO: necessity?
+            TheRegion.AddJoint(jbs);
+            JointNoCollide jnc = new JointNoCollide(this, flap);
+            TheRegion.AddJoint(jnc);
+            string mode = flapDat.GetString("mode");
+            if (mode == "roll/l")
+            {
+                JointHinge jh = new JointHinge(this, flap, new Location(1, 0, 0));
+                TheRegion.AddJoint(jh);
+                JointVehicleMotor jvm = new JointVehicleMotor(this, flap, new Location(1, 0, 0), true);
+                TheRegion.AddJoint(jvm);
+                Flaps_RollL.Add(jvm);
+            }
+            else if (mode == "roll/r")
+            {
+                JointHinge jh = new JointHinge(this, flap, new Location(1, 0, 0));
+                TheRegion.AddJoint(jh);
+                JointVehicleMotor jvm = new JointVehicleMotor(this, flap, new Location(1, 0, 0), true);
+                TheRegion.AddJoint(jvm);
+                Flaps_RollR.Add(jvm);
+            }
+            else if (mode == "yaw")
+            {
+                JointHinge jh = new JointHinge(this, flap, new Location(0, 0, 1));
+                TheRegion.AddJoint(jh);
+                JointVehicleMotor jvm = new JointVehicleMotor(this, flap, new Location(0, 0, 1), true);
+                TheRegion.AddJoint(jvm);
+                Flaps_Yaw.Add(jvm);
+            }
+            else if (mode == "pitch")
+            {
+                JointHinge jh = new JointHinge(this, flap, new Location(1, 0, 0));
+                TheRegion.AddJoint(jh);
+                JointVehicleMotor jvm = new JointVehicleMotor(this, flap, new Location(1, 0, 0), true);
+                TheRegion.AddJoint(jvm);
+                Flaps_Pitch.Add(jvm);
             }
         }
 

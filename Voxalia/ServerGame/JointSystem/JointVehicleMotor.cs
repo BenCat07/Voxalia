@@ -35,7 +35,7 @@ namespace Voxalia.ServerGame.JointSystem
             if (IsSteering)
             {
                 Motor.Settings.Mode = MotorMode.Servomechanism;
-                Motor.Basis.SetWorldAxes(Vector3.UnitZ, Vector3.UnitX);
+                Motor.Basis.SetWorldAxes(Vector3.UnitZ, Vector3.UnitX); // TODO: is this sufficient for all situations?! Can this be removed?
                 Motor.TestAxis = Vector3.UnitX;
                 Motor.Settings.Servo.BaseCorrectiveSpeed = 5;
             }

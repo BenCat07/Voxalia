@@ -257,6 +257,18 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 TheClient.TheRegion.AddJoint(jnc);
                 return true;
             }
+            else if (type == 15)
+            {
+                if (data.Length != len + 24)
+                {
+                    SysConsole.Output(OutputType.WARNING, "Joint packet: Bad length!");
+                    return false;
+                }
+                Location hinge = Location.FromDoubleBytes(data, len);
+                JointHinge jlal = new JointHinge((PhysicsEntity)pe1, (PhysicsEntity)pe2, hinge) { JID = JID };
+                TheClient.TheRegion.AddJoint(jlal);
+                return true;
+            }
             else
             {
                 SysConsole.Output(OutputType.WARNING, "Unknown joint type " + type);

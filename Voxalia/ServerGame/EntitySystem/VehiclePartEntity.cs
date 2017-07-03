@@ -14,6 +14,7 @@ using Voxalia.ServerGame.WorldSystem;
 using Voxalia.Shared;
 using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.JointSystem;
+using BEPUutilities;
 using LiteDB;
 
 namespace Voxalia.ServerGame.EntitySystem
@@ -45,6 +46,7 @@ namespace Voxalia.ServerGame.EntitySystem
         public override void SpawnBody()
         {
             base.SpawnBody();
+            Body.CollisionInformation.LocalPosition = -offset.ToBVector();
         }
 
         public void TryToStepUp()

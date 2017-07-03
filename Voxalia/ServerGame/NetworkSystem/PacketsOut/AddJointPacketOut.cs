@@ -120,6 +120,12 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
                 Data = new byte[len];
                 Data[0] = 14;
             }
+            else if (joint is JointHinge)
+            {
+                Data = new byte[len + 24];
+                Data[0] = 15;
+                ((JointHinge)joint).WorldHinge.ToDoubleBytes().CopyTo(Data, len);
+            }
             Utilities.LongToBytes(joint.One.EID).CopyTo(Data, 1);
             Utilities.LongToBytes(joint.Two.EID).CopyTo(Data, 1 + 8);
             Utilities.LongToBytes(joint.JID).CopyTo(Data, 1 + 8 + 8);

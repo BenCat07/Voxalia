@@ -1,0 +1,45 @@
+vehicle:
+	name: Plane - Airman - Ultralight - Mark 3
+	type: plane
+	mass: 1000.0
+	model: vehicles/planes/plane_airman_bodysystem
+	forces:
+		# 10 * mass
+		strong: 10000
+		# 3 * mass
+		weak: 3000
+		pitch: 0.5
+		roll: 0.5
+		yaw: 0.1
+		wheels: 100
+		turn: 0.2
+	forwardness_helper: 0.05
+	lift_helper: 2.0
+	wheels:
+		front:
+			model: vehicles/planes/plane_airman2_wheel
+			suspension: 0.01
+		back:
+			model: vehicles/planes/plane_airman2_wheel
+			suspension: 0.01
+	flaps:
+		f01l:
+			model: vehicles/planes/plane_airman_flap_f01l
+			mode: roll/l
+			max_angle: 30
+		f02r:
+			model: vehicles/planes/plane_airman_flap_f02r
+			mode: roll/r
+			max_angle: 30
+		b01u:
+			model: vehicles/planes/plane_airman_flap_b01u
+			mode: yaw
+			max_angle: 45
+		b02r:
+			model: vehicles/planes/plane_airman_flap_b02r
+			mode: pitch
+			max_angle: 60
+		b03l:
+			model: vehicles/planes/plane_airman_flap_b03l
+			mode: pitch
+			max_angle: 60
