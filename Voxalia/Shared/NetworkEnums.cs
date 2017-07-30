@@ -181,7 +181,15 @@ namespace Voxalia.Shared
         YP_YM = 14,
         COUNT = 15
     }
-
+    
+    /// <summary>
+    /// For the joint update packet.
+    /// </summary>
+    public enum JointUpdateMode : byte
+    {
+        SERVO_GOAL = 0,
+    }
+    
     /// <summary>
     /// Packets that go from the client to the server.
     /// </summary>
@@ -243,7 +251,8 @@ namespace Voxalia.Shared
         HIGHLIGHT = 38,
         PLAY_SOUND = 39,
         LOD_MODEL = 40,
-        LOSE_CONTROL_OF_VEHICLE = 41
+        LOSE_CONTROL_OF_VEHICLE = 41,
+        JOINT_UPDATE = 42
     }
 
     /// <summary>

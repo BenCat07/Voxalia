@@ -195,6 +195,7 @@
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\PingPacketIn.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\PleaseRedefinePacketIn.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsIn\SetStatusPacketIn.cs" />
+    <Compile Include="ServerGame\NetworkSystem\PacketsOut\JointUpdatePacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\TopsDataPacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\AddCloudPacketOut.cs" />
     <Compile Include="ServerGame\NetworkSystem\PacketsOut\AddJointPacketOut.cs" />

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Voxalia.ServerGame.EntitySystem;
+using Voxalia.ServerGame.NetworkSystem.PacketsOut;
 using Voxalia.Shared;
 using BEPUutilities;
 using BEPUphysics.Constraints;
@@ -27,6 +28,12 @@ namespace Voxalia.ServerGame.JointSystem
             Ent2 = e2;
             Direction = dir;
             IsSteering = isSteering;
+        }
+
+        public void SetGoal(double goal)
+        {
+            (CurrentJoint as RevoluteMotor).Settings.Servo.Goal = goal;
+            Ent1.TheRegion.SendToVisible(Ent1.GetPosition(), new JointUpdatePacketOut(JID, JointUpdateMode.SERVO_GOAL, goal));
         }
 
         public override SolverUpdateable GetBaseJoint()

@@ -31,6 +31,11 @@ namespace Voxalia.ClientGame.JointSystem
 
         public RevoluteMotor Motor;
 
+        public void SetGoal(double val)
+        {
+            (CurrentJoint as RevoluteMotor).Settings.Servo.Goal = val;
+        }
+
         public override SolverUpdateable GetBaseJoint()
         {
             Motor = new RevoluteMotor(Ent1.Body, Ent2.Body, Direction.ToBVector());

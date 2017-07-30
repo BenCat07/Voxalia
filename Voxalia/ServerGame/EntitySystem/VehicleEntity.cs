@@ -91,6 +91,26 @@ namespace Voxalia.ServerGame.EntitySystem
 
         public string vehName;
 
+        public void HandleFlapsInput(double yawmove, double pitchmove, double rollmove)
+        {
+            foreach (VehicleFlap vf in Flaps_Yaw)
+            {
+                vf.JVM.SetGoal(yawmove * Utilities.PI180 * vf.MaxAngle);
+            }
+            foreach (VehicleFlap vf in Flaps_Pitch)
+            {
+                vf.JVM.SetGoal(pitchmove * Utilities.PI180 * vf.MaxAngle);
+            }
+            foreach (VehicleFlap vf in Flaps_RollL)
+            {
+                vf.JVM.SetGoal(rollmove * -Utilities.PI180 * vf.MaxAngle);
+            }
+            foreach (VehicleFlap vf in Flaps_RollR)
+            {
+                vf.JVM.SetGoal(rollmove * Utilities.PI180 * vf.MaxAngle);
+            }
+        }
+
         public void HandleWheelsInput(CharacterEntity character)
         {
             HandleWheelsSpecificInput(character.YMove, character.XMove);
@@ -354,13 +374,20 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
-        public List<JointVehicleMotor> Flaps_RollR = new List<JointVehicleMotor>();
+        public class VehicleFlap
+        {
+            public JointVehicleMotor JVM;
 
-        public List<JointVehicleMotor> Flaps_RollL = new List<JointVehicleMotor>();
+            public double MaxAngle;
+        }
 
-        public List<JointVehicleMotor> Flaps_Yaw = new List<JointVehicleMotor>();
+        public List<VehicleFlap> Flaps_RollR = new List<VehicleFlap>();
+
+        public List<VehicleFlap> Flaps_RollL = new List<VehicleFlap>();
+
+        public List<VehicleFlap> Flaps_Yaw = new List<VehicleFlap>();
         
-        public List<JointVehicleMotor> Flaps_Pitch = new List<JointVehicleMotor>();
+        public List<VehicleFlap> Flaps_Pitch = new List<VehicleFlap>();
 
         public void ConnectFlap(VehiclePartEntity flap, FDSSection flapDat)
         {
@@ -369,13 +396,18 @@ namespace Voxalia.ServerGame.EntitySystem
             JointNoCollide jnc = new JointNoCollide(this, flap);
             TheRegion.AddJoint(jnc);
             string mode = flapDat.GetString("mode");
+            VehicleFlap vf = new VehicleFlap()
+            {
+                MaxAngle = flapDat.GetDouble("max_angle", 10).Value
+            };
             if (mode == "roll/l")
             {
                 JointHinge jh = new JointHinge(this, flap, new Location(1, 0, 0));
                 TheRegion.AddJoint(jh);
                 JointVehicleMotor jvm = new JointVehicleMotor(this, flap, new Location(1, 0, 0), true);
                 TheRegion.AddJoint(jvm);
-                Flaps_RollL.Add(jvm);
+                vf.JVM = jvm;
+                Flaps_RollL.Add(vf);
             }
             else if (mode == "roll/r")
             {
@@ -383,7 +415,8 @@ namespace Voxalia.ServerGame.EntitySystem
                 TheRegion.AddJoint(jh);
                 JointVehicleMotor jvm = new JointVehicleMotor(this, flap, new Location(1, 0, 0), true);
                 TheRegion.AddJoint(jvm);
-                Flaps_RollR.Add(jvm);
+                vf.JVM = jvm;
+                Flaps_RollR.Add(vf);
             }
             else if (mode == "yaw")
             {
@@ -391,7 +424,8 @@ namespace Voxalia.ServerGame.EntitySystem
                 TheRegion.AddJoint(jh);
                 JointVehicleMotor jvm = new JointVehicleMotor(this, flap, new Location(0, 0, 1), true);
                 TheRegion.AddJoint(jvm);
-                Flaps_Yaw.Add(jvm);
+                vf.JVM = jvm;
+                Flaps_Yaw.Add(vf);
             }
             else if (mode == "pitch")
             {
@@ -399,7 +433,8 @@ namespace Voxalia.ServerGame.EntitySystem
                 TheRegion.AddJoint(jh);
                 JointVehicleMotor jvm = new JointVehicleMotor(this, flap, new Location(1, 0, 0), true);
                 TheRegion.AddJoint(jvm);
-                Flaps_Pitch.Add(jvm);
+                vf.JVM = jvm;
+                Flaps_Pitch.Add(vf);
             }
         }
 

@@ -448,6 +448,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                         packet = new LoseControlOfVehiclePacketIn();
                         usage = NetUsageType.ENTITIES;
                         break;
+                    case ServerToClientPacket.JOINT_UPDATE:
+                        packet = new JointUpdatePacketIn();
+                        usage = NetUsageType.ENTITIES;
+                        break;
                     default:
                         throw new Exception("Invalid packet ID: " + packetID);
                 }
@@ -458,7 +462,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                 ServerToClientPacket pid = packetID;
                 if (asyncable)
                 {
-                    // TODO: StartASyncTask?
+                    // TODO: StartAsyncTask?
                     if (!packet.ParseBytesAndExecute(data))
                     {
                         SysConsole.Output(OutputType.ERROR, "Bad async packet (ID=" + pid + ") data!");

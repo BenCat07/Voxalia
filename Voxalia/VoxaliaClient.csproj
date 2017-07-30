@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="ClientGame\EntitySystem\SmasherPrimitiveEntity.cs" />
     <Compile Include="ClientGame\JointSystem\JointHinge.cs" />
+    <Compile Include="ClientGame\NetworkSystem\PacketsIn\JointUpdatePacketIn.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsIn\TopsDataPacketIn.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsIn\YourVehiclePacketIn.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsOut\MyVehiclePacketOut.cs" />

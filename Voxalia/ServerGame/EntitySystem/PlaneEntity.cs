@@ -170,6 +170,7 @@ namespace Voxalia.ServerGame.EntitySystem
             RightLeft = character.XMove;
             FastOrSlow = character.SprintOrWalk;
             HandleWheelsSpecificInput(FastOrSlow, (ILeft ? -1 : 0) + (IRight ? 1 : 0));
+            HandleFlapsInput(((IRight ? 1 : 0) + (ILeft ? -1 : 0)), ForwBack, RightLeft);
         }
     }
 }
