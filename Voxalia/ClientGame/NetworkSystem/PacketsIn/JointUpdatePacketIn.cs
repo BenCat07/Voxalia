@@ -34,6 +34,9 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 case JointUpdateMode.SERVO_GOAL:
                     (jointo as JointVehicleMotor).SetGoal(val);
                     break;
+                case JointUpdateMode.SERVO_SPEED:
+                    (jointo as JointVehicleMotor).SetCorrectiveSpeed(val);
+                    break;
             }
             return true;
         }

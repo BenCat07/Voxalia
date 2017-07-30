@@ -34,6 +34,14 @@ namespace Voxalia.ServerGame.JointSystem
         {
             (CurrentJoint as RevoluteMotor).Settings.Servo.Goal = goal;
             Ent1.TheRegion.SendToVisible(Ent1.GetPosition(), new JointUpdatePacketOut(JID, JointUpdateMode.SERVO_GOAL, goal));
+            // TODO: Mark this stat for auto-transmission to new clients!
+        }
+
+        public void SetCorrectiveSpeed(double spd)
+        {
+            (CurrentJoint as RevoluteMotor).Settings.Servo.BaseCorrectiveSpeed = spd;
+            Ent1.TheRegion.SendToVisible(Ent1.GetPosition(), new JointUpdatePacketOut(JID, JointUpdateMode.SERVO_SPEED, spd));
+            // TODO: Mark this stat for auto-transmission to new clients!
         }
 
         public override SolverUpdateable GetBaseJoint()

@@ -95,18 +95,22 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             foreach (VehicleFlap vf in Flaps_Yaw)
             {
+                vf.JVM.SetCorrectiveSpeed(vf.Speed);
                 vf.JVM.SetGoal(yawmove * Utilities.PI180 * vf.MaxAngle);
             }
             foreach (VehicleFlap vf in Flaps_Pitch)
             {
+                vf.JVM.SetCorrectiveSpeed(vf.Speed);
                 vf.JVM.SetGoal(pitchmove * Utilities.PI180 * vf.MaxAngle);
             }
             foreach (VehicleFlap vf in Flaps_RollL)
             {
+                vf.JVM.SetCorrectiveSpeed(vf.Speed);
                 vf.JVM.SetGoal(rollmove * -Utilities.PI180 * vf.MaxAngle);
             }
             foreach (VehicleFlap vf in Flaps_RollR)
             {
+                vf.JVM.SetCorrectiveSpeed(vf.Speed);
                 vf.JVM.SetGoal(rollmove * Utilities.PI180 * vf.MaxAngle);
             }
         }
@@ -379,6 +383,8 @@ namespace Voxalia.ServerGame.EntitySystem
             public JointVehicleMotor JVM;
 
             public double MaxAngle;
+
+            public double Speed;
         }
 
         public List<VehicleFlap> Flaps_RollR = new List<VehicleFlap>();
@@ -398,7 +404,8 @@ namespace Voxalia.ServerGame.EntitySystem
             string mode = flapDat.GetString("mode");
             VehicleFlap vf = new VehicleFlap()
             {
-                MaxAngle = flapDat.GetDouble("max_angle", 10).Value
+                MaxAngle = flapDat.GetDouble("max_angle", 10).Value,
+                Speed = flapDat.GetDouble("corrective_speed", 2.25).Value
             };
             if (mode == "roll/l")
             {

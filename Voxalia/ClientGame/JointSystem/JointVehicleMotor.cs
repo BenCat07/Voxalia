@@ -36,6 +36,11 @@ namespace Voxalia.ClientGame.JointSystem
             (CurrentJoint as RevoluteMotor).Settings.Servo.Goal = val;
         }
 
+        public void SetCorrectiveSpeed(double spd)
+        {
+            (CurrentJoint as RevoluteMotor).Settings.Servo.BaseCorrectiveSpeed = spd;
+        }
+
         public override SolverUpdateable GetBaseJoint()
         {
             Motor = new RevoluteMotor(Ent1.Body, Ent2.Body, Direction.ToBVector());

@@ -188,6 +188,7 @@ namespace Voxalia.Shared
     public enum JointUpdateMode : byte
     {
         SERVO_GOAL = 0,
+        SERVO_SPEED = 1
     }
     
     /// <summary>

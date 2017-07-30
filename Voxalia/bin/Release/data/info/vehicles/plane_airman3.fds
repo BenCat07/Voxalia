@@ -34,12 +34,12 @@ vehicle:
 		b01u:
 			model: vehicles/planes/plane_airman_flap_b01u
 			mode: yaw
-			max_angle: 45
+			max_angle: 20
 		b02r:
 			model: vehicles/planes/plane_airman_flap_b02r
 			mode: pitch
-			max_angle: 60
+			max_angle: 30
 		b03l:
 			model: vehicles/planes/plane_airman_flap_b03l
 			mode: pitch
-			max_angle: 60
+			max_angle: 30
