@@ -181,12 +181,32 @@ void main()
 		{
 			col.xyz = vec3(1.0) - col.xyz;
 		}
+		// TODO: color shifts effect normals, specular, ...
 		else if (fi.tcol.x > 0.51)
 		{
-			reflecto = 0.75;
-			extra_specular = 1.0;
+			if (fi.tcol.x > (146.0 / 255.0))
+			{
+				if (fi.tcol.x > (148.0 / 255.0))
+				{
+					vec2 tcfix = vec2(mod(fi.texcoord.x * 3.0, 1.0), mod(fi.texcoord.y * 3.0, 1.0));
+					tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
+					tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
+					col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				}
+				else
+				{
+					vec2 tcfix = vec2(mod(fi.texcoord.x * 2.0, 1.0), mod(fi.texcoord.y * 2.0, 1.0));
+					tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
+					tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
+					col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				}
+			}
+			else
+			{
+				reflecto = 0.75;
+				extra_specular = 1.0;
+			}
 		}
-		// TODO: color shifts effect normals, specular, ...
 		else if (fi.tcol.y > (172.0 / 255.0))
 		{
 			if (fi.tcol.y > (174.0 / 255.0))

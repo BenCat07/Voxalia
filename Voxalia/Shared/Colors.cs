@@ -102,6 +102,8 @@ namespace Voxalia.Shared
         public static Color CONVEYOR3 = Color.FromArgb(0, 127, 173, 127);
         public static Color CONVEYOR4 = Color.FromArgb(0, 127, 175, 127);
         public static Color TAN = Color.FromArgb(210, 180, 140);
+        public static Color TILED_TWO = Color.FromArgb(0, 147, 127, 127);
+        public static Color TILED_THREE = Color.FromArgb(0, 149, 127, 127);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
@@ -226,9 +228,9 @@ namespace Voxalia.Shared
             Register("LIME", LIME);
             Register("SKY_BLUE", SKY_BLUE);
             Register("VERY_DARK_GRAY", VERY_DARK_GRAY);
-            Register("SLIGHTLY_BRIGHT", WHITE); // TODO: SLIGHTLY_BRIGHT ? (1.5)
-            Register("BRIGHT", WHITE); // BRIGHT ? (2.0)
-            Register("VERY_BRIGHT", WHITE); // VERY_BRIGHT ? (1.25)
+            Register("SLIGHTLY_BRIGHT", WHITE); // TODO: SLIGHTLY_BRIGHT ? (1.25)
+            Register("BRIGHT", WHITE); // BRIGHT ? (1.5)
+            Register("VERY_BRIGHT", WHITE); // VERY_BRIGHT ? (2.0)
             TRANS1 = Register("TRANSPARENT_GREEN", TRANSPARENT_GREEN);
             Register("TRANSPARENT_BLUE", TRANSPARENT_BLUE);
             Register("TRANSPARENT_RED", TRANSPARENT_RED);
@@ -276,7 +278,9 @@ namespace Voxalia.Shared
             Register("NOISEY", NOISEY);
             Register("CONVEYOR3", CONVEYOR3);
             Register("CONVEYOR4", CONVEYOR4);
-            Register("TAN", TAN); // 80
+            Register("TAN", TAN);
+            Register("TILED_TWO", TILED_TWO);
+            Register("TILED_THREE", TILED_THREE); // 82
             // TODO: Rest to 127
         }
     }

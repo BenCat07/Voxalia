@@ -94,8 +94,28 @@ void main()
 		}
 		else if (f.tcol.x > 0.51)
 		{
-			spec = 1.0;
-			//refl = 0.75;
+			if (f.tcol.x > (146.0 / 255.0))
+			{
+				if (f.tcol.x > (148.0 / 255.0))
+				{
+					vec2 tcfix = vec2(mod(f.texcoord.x * 3.0, 1.0), mod(f.texcoord.y * 3.0, 1.0));
+					tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
+					tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
+					tcolor = texture(tex, vec3(tcfix, f.texcoord.z));
+				}
+				else
+				{
+					vec2 tcfix = vec2(mod(f.texcoord.x * 2.0, 1.0), mod(f.texcoord.y * 2.0, 1.0));
+					tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
+					tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
+					tcolor = texture(tex, vec3(tcfix, f.texcoord.z));
+				}
+			}
+			else
+			{
+				spec = 1.0;
+				//refl = 0.75;
+			}
 		}
 		// TODO: color shifts effect normals, specular, ...
 		else if (f.tcol.y > (172.0 / 255.0))
