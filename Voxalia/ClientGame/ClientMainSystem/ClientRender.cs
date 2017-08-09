@@ -299,7 +299,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             s_forw_vox = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TH" + forw_extra);
             s_forw_trans = Shaders.GetShader("forward" + def + ",MCM_TRANSP" + forw_extra);
             s_forw_trans_nobones = Shaders.GetShader("forward" + def + ",MCM_TRANSP,MCM_NO_BONES" + forw_extra);
-            s_forw_vox_trans = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TRANSP" + forw_extra);
+            s_forw_vox_trans = Shaders.GetShader("forward" + def + ",MCM_VOX,MCM_TRANSP,MCM_TH" + forw_extra);
             if (AllowLL)
             {
                 s_transponly_ll = Shaders.GetShader("transponly" + def + ",MCM_LL");

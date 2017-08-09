@@ -94,6 +94,9 @@ const vec4 tcolors_val[] = vec4[](
 	// TODO: up to 127
 );
 
+const uint TRANSP_START = 33;
+const uint TRANSP_END = 41;
+
 uint blockPaint(in uint bpnt)
 {
 	return bpnt & 127;
@@ -131,7 +134,6 @@ bool matHasAnyOpaque(in uint mat)
 
 bool matIsOpaque(in uint mat)
 {
-	// TODO: Transparent painted blocks are NOT opaque!
 	return imageLoad(texture_ids, ivec2(blockMat(mat), 6 * 7 + 1)).x > 0.5;
 }
 
@@ -159,9 +161,8 @@ bool shapeCovers(in uint shapeRel, in uint shapeC, in uint sideC)
 bool isOpaque(in uvec4 blk, in uvec4 curBLK, in uint sideC)
 {
 	uint mat = blockMat(blk.x);
-	// TODO: paint color check!
-	return blockDamage(blk.x) == 0 && (matIsOpaque(mat) || mat == blockMat(curBLK.x))
-			&& shapeCovers(blk.z, curBLK.z, sideC);
+	uint tpnt = blockPaint(blk.w);
+	return blockDamage(blk.x) == 0 && (matIsOpaque(mat) || mat == blockMat(curBLK.x))  && (tpnt < TRANSP_START || tpnt > TRANSP_END) && shapeCovers(blk.z, curBLK.z, sideC);
 }
 
 uint shapeIndex(in uvec4 curBLK, in uvec3 pos)
@@ -204,7 +205,8 @@ int count_visible_verts(in uvec3 pos)
 	}
 #else
 #if MCM_TRANSP
-	if (matIsOpaque(curBLK.x))
+	uint tpnt = blockPaint(curBLK.w);
+	if (matIsOpaque(curBLK.x) && (tpnt < TRANSP_START || tpnt > TRANSP_END))
 	{
 		return 0;
 	}
