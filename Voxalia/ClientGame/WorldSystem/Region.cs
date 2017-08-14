@@ -1084,14 +1084,17 @@ namespace Voxalia.ClientGame.WorldSystem
                         {
                             above = GetChunk(ch.WorldPosition + new Vector3i(0, 0, i));
                         }
-                        TheClient.Schedule.StartAsyncTask(() =>
+                        if (above == null || !above.LOADING)
                         {
-                            LightForChunks(ch, above);
-                            TheClient.Schedule.ScheduleSyncTask(() =>
+                            TheClient.Schedule.StartAsyncTask(() =>
                             {
-                                LightingNow.Remove(ch.WorldPosition);
-                            });
-                        }, true);
+                                LightForChunks(ch, above);
+                                TheClient.Schedule.ScheduleSyncTask(() =>
+                                {
+                                    LightingNow.Remove(ch.WorldPosition);
+                                });
+                            }, true);
+                        }
                     }
                 }
                 crn_ctr += Delta;
@@ -1119,14 +1122,21 @@ namespace Voxalia.ClientGame.WorldSystem
                             Chunk ch = GetChunk(temp);
                             if (ch != null && (!ch.IsNew || renderNews))
                             {
-                                if (NeedsRendering.Count < 50 || ch.PosMultiplier != 15)
+                                if (!ch.LightCalced)
                                 {
-                                    done++;
+                                    CalcingLights.Add(ch.WorldPosition);
                                 }
-                                RenderingNow.Add(temp);
-                                ch.MakeVBONow(false);
-                                compers.Add(ch);
-                                removes.Add(temp);
+                                else
+                                {
+                                    if (NeedsRendering.Count < 50 || ch.PosMultiplier != 15)
+                                    {
+                                        done++;
+                                    }
+                                    RenderingNow.Add(temp);
+                                    ch.MakeVBONow(false);
+                                    compers.Add(ch);
+                                    removes.Add(temp);
+                                }
                             }
                             else if (ch == null)
                             {

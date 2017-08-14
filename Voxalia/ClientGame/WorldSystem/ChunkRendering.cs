@@ -86,7 +86,7 @@ namespace Voxalia.ClientGame.WorldSystem
                             MaterialSpawnType mst = bi.Material.GetSpawnType();
                             if (mst == MaterialSpawnType.FIRE)
                             {
-                                cents.Add(new FireEntity(WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(x, y, z - 1), null, OwningRegion));
+                                cents.Add(new FireEntity(WorldPosition.ToLocation() * CHUNK_SIZE + new Location(x, y, z - 1), null, OwningRegion));
                             }
                         }
                     }
@@ -107,6 +107,8 @@ namespace Voxalia.ClientGame.WorldSystem
             Lits = tLits.ToArray();
             return OwningRegion.NeedToRender(this);
         }
+
+        public bool LightCalced = false;
         
         public void CalcSkyLight(Chunk above)
         {
@@ -120,6 +122,7 @@ namespace Voxalia.ClientGame.WorldSystem
                     }
                 }
             }
+            LightCalced = true;
             if (CSize != CHUNK_SIZE)
             {
                 return;
