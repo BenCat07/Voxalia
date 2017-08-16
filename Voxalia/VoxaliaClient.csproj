@@ -352,9 +352,6 @@
     <None Include="shaders\fbo_vox.vs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="shaders\forward.vs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="shaders\shadowvox.vs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -370,9 +367,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="shaders\fbo_vox.fs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="shaders\forward.fs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="shaders\shadowvox.fs">
