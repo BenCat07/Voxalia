@@ -20,7 +20,7 @@ namespace Voxalia.Shared
     /// </summary>
     public static class Colors
     {
-        // TODO: Replace System.Drawing.Color with more efficient system?
+        // TODO: Replace System.Drawing.Color with more efficient or powerful system?
         public static Color WHITE = Color.FromArgb(255, 255, 255);
         public static Color BLACK = Color.FromArgb(7, 7, 7);
         public static Color GREEN = Color.FromArgb(0, 255, 0);

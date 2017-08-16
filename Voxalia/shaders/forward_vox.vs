@@ -21,12 +21,10 @@ layout (location = 1) in vec4 normal;
 layout (location = 2) in vec4 texcoords;
 layout (location = 3) in vec4 tangent;
 layout (location = 4) in vec4 color;
-#if MCM_GEOM_ACTIVE
-#else
-layout (location = 5) in vec4 Weights;
-layout (location = 6) in vec4 BoneID;
-layout (location = 7) in vec4 Weights2;
-layout (location = 8) in vec4 BoneID2;
+layout (location = 5) in vec4 tcol;
+#if MCM_TH
+layout (location = 6) in vec4 thv;
+layout (location = 7) in vec4 thw;
 #endif
 
 #if MCM_GEOM_ACTIVE
@@ -40,11 +38,10 @@ out struct vox_fout
 #else
 	vec3 pos;
 #endif
-#if MCM_GEOM_THREED_TEXTURE
 	vec3 texcoord;
-#else
-	vec2 texcoord;
-#endif
+	vec4 tcol;
+	vec4 thv;
+	vec4 thw;
 	vec4 color;
 #if MCM_GEOM_ACTIVE
 } f;
@@ -66,11 +63,6 @@ layout (location = 3) uniform vec4 v_color = vec4(1.0);
 // ...
 layout (location = 6) uniform float time;
 // ...
-#if MCM_GEOM_ACTIVE
-#else
-layout (location = 100) uniform mat4 simplebone_matrix = mat4(1.0);
-layout (location = 101) uniform mat4 boneTrans[MAX_BONES];
-#endif
 
 void main()
 {
@@ -78,57 +70,25 @@ void main()
 	mv_mat_simple[3][0] = 0.0;
 	mv_mat_simple[3][1] = 0.0;
 	mv_mat_simple[3][2] = 0.0;
-#if MCM_GEOM_ACTIVE
-#if MCM_GEOM_THREED_TEXTURE
-	f.texcoord = texcoords.xyz;
-#else
-	f.texcoord = texcoords.xy;
-#endif
-	vec4 normo = mv_mat_simple * vec4(normal.xyz, 1.0);
-	f.tbn = transpose(mat3(vec3(0.0), vec3(0.0), normo.xyz)); // TODO: Improve for decals?!
-	f.color = color * v_color;
-	gl_Position = mv_matrix * vec4(position.xyz, 1.0);
-#else // MCM_GEOM_ACTIVE
-	vec4 pos1;
-	vec4 norm1;
-	fi.texcoord = texcoords.xy;
-#if MCM_NO_BONES
-	const float rem = 0.0;
-#else
-	float rem = Weights[0] + Weights[1] + Weights[2] + Weights[3] + Weights2[0] + Weights2[1] + Weights2[2] + Weights2[3];
-#endif
-	if (rem > 0.01)
-	{
-		mat4 BT = mat4(1.0);
-		BT = boneTrans[int(BoneID[0])] * Weights[0];
-		BT += boneTrans[int(BoneID[1])] * Weights[1];
-		BT += boneTrans[int(BoneID[2])] * Weights[2];
-		BT += boneTrans[int(BoneID[3])] * Weights[3];
-		BT += boneTrans[int(BoneID2[0])] * Weights2[0];
-		BT += boneTrans[int(BoneID2[1])] * Weights2[1];
-		BT += boneTrans[int(BoneID2[2])] * Weights2[2];
-		BT += boneTrans[int(BoneID2[3])] * Weights2[3];
-		BT += mat4(1.0) * (1.0 - rem);
-		pos1 = vec4(position.xyz, 1.0) * BT;
-		norm1 = vec4(normal.xyz, 1.0) * BT;
-	}
-	else
-	{
-		pos1 = vec4(position.xyz, 1.0);
-		norm1 = vec4(normal.xyz, 1.0);
-	}
-	pos1 *= simplebone_matrix;
-	norm1 *= simplebone_matrix;
-	vec4 fnorm = mv_mat_simple * norm1;
-    fi.color = color_for(mv_matrix * vec4(pos1.xyz, 1.0), color * v_color);
-	vec4 posser = mv_matrix * vec4(pos1.xyz, 1.0);
-	fi.pos = posser.xyz;
-	gl_Position = proj_matrix * posser;
-	vec3 tf_normal = (mv_mat_simple * vec4(norm1.xyz, 0.0)).xyz; // TODO: Should BT be here?
-	vec3 tf_tangent = (mv_mat_simple * vec4(tangent.xyz, 0.0)).xyz; // TODO: Should BT be here?
-	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent.xyz, norm1.xyz), 0.0)).xyz; // TODO: Should BT be here?
+	vec4 vpos = vec4(position.xyz, 1.0);
+	fi.texcoord = texcoords.xyz;
+	vec3 tf_normal = (mv_mat_simple * vec4(normal.xyz, 0.0)).xyz;
+	vec3 tf_tangent = (mv_mat_simple * vec4(tangent.xyz, 0.0)).xyz;
+	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent.xyz, normal.xyz), 0.0)).xyz;
 	fi.tbn = transpose(mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
-#endif // else - MCM_GEOM_ACTIVE
+	vec4 vpos_mv = mv_matrix * vpos;
+#if MCM_TH
+	fi.thv = thv;
+	fi.thw = thw;
+	fi.tcol = color_for(vpos_mv, tcol);
+#else
+	fi.thv = vec4(abs(position.w), abs(texcoords.w), abs(normal.w), abs(tangent.w));
+	fi.thw = vec4(position.w < 0 ? 0.0 : 1.0, texcoords.w < 0 ? 0.0 : 1.0, normal.w < 0 ? 0.0 : 1.0, tangent.w < 0 ? 0.0 : 1.0);
+	fi.tcol = vec4(1.0);
+#endif
+    fi.color = color_for(vpos_mv, color * v_color);
+	fi.pos = vpos_mv.xyz;
+	gl_Position = proj_matrix * vpos_mv;
 }
 
 const float min_cstrobe = 3.0 / 255.0;
