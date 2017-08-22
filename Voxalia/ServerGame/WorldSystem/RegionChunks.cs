@@ -806,6 +806,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 return;
             }
             Material mat = (Material)bi.BlockMaterial;
+            ch.LateCheckValid();
             ch.BlocksInternal[ch.BlockIndex(x, y, z)].BlockLocalData |= (byte)BlockFlags.PROTECTED;
             if (mat != (ushort)Material.AIR)
             {
