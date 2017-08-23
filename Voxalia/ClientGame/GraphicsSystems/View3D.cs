@@ -1461,7 +1461,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.UniformMatrix4(2, false, ref IdentityMatrix);
             GL.Uniform1(7, AudioLevel);
             GL.Uniform2(8, new Vector2(TheClient.sl_min, TheClient.sl_max));
-            TheClient.s_fbov = TheClient.s_fbovslod.Bind();
+            TheClient.s_fbovslod = TheClient.s_fbovslod.Bind();
             CheckError("Render - GBuffer - Uniforms - 0.5");
             GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
             GL.UniformMatrix4(1, false, ref PrimaryMatrix);

@@ -277,6 +277,8 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 
         public const double OceanHeightMapSize = 8000;
 
+        public const double FlatHeightMapSIze = 2000;
+
         public const double HillHeightMapSize = 1000;
 
         public const double GlobalHeightMapSize = 400;
@@ -375,6 +377,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 oceanheight = (oceanheight + 0.9) * 4000f;
             }
+            // Note: Can use positive values of oceanheight for hills or weirdly shaped mountions optionally...
             double mheight = 0;
             for (int i = 0; i < mountains.Count; i++)
             {
@@ -389,8 +392,19 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             {
                 hheight = (hheight + 0.9) * 400f;
             }
+            double dampener = SimplexNoise.Generate(Seed + (x / FlatHeightMapSIze), seed5 + (y / FlatHeightMapSIze));
+            if (dampener < 0.75 && dampener > -0.75)
+            {
+                dampener = 1;
+            }
+            else
+            {
+                dampener = 1.0 - (4.0 * (Math.Abs(dampener) - 0.75));
+            }
             double lheight = SimplexNoise.Generate(seed2 + (x / GlobalHeightMapSize), Seed + (y / GlobalHeightMapSize)) * 40f - 7f;
             double height = SimplexNoise.Generate(Seed + (x / LocalHeightMapSize), seed2 + (y / LocalHeightMapSize)) * 5f - 2.5f;
+            lheight = (lheight - 10) * dampener + 10;
+            height *= dampener;
             return oceanheight + mheight + hheight + lheight + height;
         }
 
