@@ -98,6 +98,10 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                     entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Flying!");
                 }
             }
+            else if (arg0 == "suicide")
+            {
+                entry.Player.Damageable().SetHealth(0);
+            }
             else if (arg0 == "playerDebug")
             {
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "YOU: " + entry.Player.Name + ", tractionForce: " + entry.Player.CBody.TractionForce
