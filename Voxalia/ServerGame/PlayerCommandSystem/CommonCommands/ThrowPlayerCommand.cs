@@ -25,6 +25,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
         public override void Execute(PlayerCommandEntry entry)
         {
             ItemStack stack = entry.Player.Items.GetItemForSlot(entry.Player.Items.cItem);
+            // Don't throw bound items...
             if (stack.IsBound)
             {
                 if (stack.Info.Name == "open_hand") // TODO: Better handling of special cases -> Info.Throw() ?
@@ -43,6 +44,14 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "^1Can't throw this."); // TODO: Language, entry.output, etc.
                 return;
             }
+            // Ensure no spam...
+            if (entry.Player.LastThrowTime > entry.Player.TheRegion.GlobalTickTime - 3)
+            {
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "^1Thrown too rapidly!");
+                return;
+            }
+            entry.Player.LastThrowTime = entry.Player.TheRegion.GlobalTickTime;
+            // Actually throw it now...
             ItemStack item = stack.Duplicate();
             item.Count = 1;
             PhysicsEntity ie = entry.Player.TheRegion.ItemToEntity(item);

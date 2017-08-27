@@ -43,6 +43,14 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "^1Can't drop this."); // TODO: Language, entry.output, etc.
                 return;
             }
+            // Ensure no spam...
+            if (entry.Player.LastThrowTime > entry.Player.TheRegion.GlobalTickTime - 3)
+            {
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "^1Dropping too rapidly!");
+                return;
+            }
+            entry.Player.LastThrowTime = entry.Player.TheRegion.GlobalTickTime;
+            // Actually drop it now...
             ItemStack item = stack.Duplicate();
             item.Count = 1;
             PhysicsEntity ie = entry.Player.TheRegion.ItemToEntity(item);

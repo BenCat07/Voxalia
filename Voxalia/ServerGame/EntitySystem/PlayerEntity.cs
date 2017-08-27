@@ -47,6 +47,11 @@ namespace Voxalia.ServerGame.EntitySystem
         }
 
         /// <summary>
+        /// Represents the time that the player last used the throw or drop item commands.
+        /// </summary>
+        public double LastThrowTime = 0;
+
+        /// <summary>
         /// The player's current session key that they used to connect.
         /// Only useful during the login sequence.
         /// </summary>
