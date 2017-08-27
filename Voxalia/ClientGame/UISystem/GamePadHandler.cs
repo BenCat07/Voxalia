@@ -77,19 +77,19 @@ namespace Voxalia.ClientGame.UISystem
                 if (cap.IsConnected)
                 {
                     GamePadState state = GamePad.GetState(i);
-                    if (cap.HasRightXThumbStick)
+                    if (cap.HasRightXThumbStick && Math.Abs(state.ThumbSticks.Right.X) > 0.1)
                     {
                         TotalDirectionX -= state.ThumbSticks.Right.X;
                     }
-                    if (cap.HasRightYThumbStick)
+                    if (cap.HasRightYThumbStick && Math.Abs(state.ThumbSticks.Right.Y) > 0.1)
                     {
                         TotalDirectionY += state.ThumbSticks.Right.Y;
                     }
-                    if (cap.HasLeftXThumbStick)
+                    if (cap.HasLeftXThumbStick && Math.Abs(state.ThumbSticks.Left.X) > 0.1)
                     {
                         TotalMovementX += state.ThumbSticks.Left.X;
                     }
-                    if (cap.HasLeftYThumbStick)
+                    if (cap.HasLeftYThumbStick && Math.Abs(state.ThumbSticks.Left.Y) > 0.1)
                     {
                         TotalMovementY += state.ThumbSticks.Left.Y;
                     }
