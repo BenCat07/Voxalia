@@ -85,6 +85,18 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             {
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Ents: " + entry.Player.TheRegion.Entities.Count);
             }
+            else if (arg0 == "autoThrow")
+            {
+                ItemStack stack = entry.Player.Items.GetItemForSlot(entry.Player.Items.cItem);
+                ItemStack item = stack.Duplicate();
+                item.Count = 1;
+                PhysicsEntity ie = entry.Player.TheRegion.ItemToEntity(item);
+                Location fvel = entry.Player.ItemDir;
+                ie.SetPosition(entry.Player.ItemSource() + fvel * 2);
+                ie.SetOrientation(entry.Player.GetOrientation());
+                ie.SetVelocity(fvel * 15);
+                entry.Player.TheRegion.SpawnEntity(ie);
+            }
             else if (arg0 == "fly")
             {
                 if (entry.Player.IsFlying)
