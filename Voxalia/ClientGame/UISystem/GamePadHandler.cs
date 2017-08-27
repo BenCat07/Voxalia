@@ -93,37 +93,37 @@ namespace Voxalia.ClientGame.UISystem
                     {
                         TotalMovementY += state.ThumbSticks.Left.Y;
                     }
-                    if (cap.HasLeftTrigger)
-                    {
-                        SprintOrWalk -= state.Triggers.Left;
-                    }
-                    if (cap.HasRightTrigger)
-                    {
-                        SprintOrWalk += state.Triggers.Right;
-                    }
-                    if (cap.HasAButton && state.Buttons.A == ButtonState.Pressed)
-                    {
-                        ChangeLeft = true;
-                    }
-                    if (cap.HasBButton && state.Buttons.B == ButtonState.Pressed)
-                    {
-                        ChangeRight = true;
-                    }
-                    if (cap.HasXButton && state.Buttons.X == ButtonState.Pressed)
-                    {
-                        UseKey = true;
-                    }
-                    if (cap.HasYButton && state.Buttons.Y == ButtonState.Pressed)
-                    {
-                        ReloadKey = true;
-                    }
-                    if (cap.HasLeftShoulderButton && state.Buttons.LeftShoulder == ButtonState.Pressed)
+                    if (cap.HasLeftTrigger && state.Triggers.Left > 0.8)
                     {
                         SecondaryKey = true;
                     }
-                    if (cap.HasRightShoulderButton && state.Buttons.RightShoulder == ButtonState.Pressed)
+                    if (cap.HasRightTrigger && state.Triggers.Right > 0.8)
                     {
                         PrimaryKey = true;
+                    }
+                    if (cap.HasYButton && state.Buttons.Y == ButtonState.Pressed)
+                    {
+                        UseKey = true;
+                    }
+                    if (cap.HasXButton && state.Buttons.X == ButtonState.Pressed)
+                    {
+                        ReloadKey = true;
+                    }
+                    if (cap.HasAButton && state.Buttons.A == ButtonState.Pressed)
+                    {
+                        JumpKey = true;
+                    }
+                    if (cap.HasBButton && state.Buttons.B == ButtonState.Pressed)
+                    {
+                        // TODO: Crouch system.
+                    }
+                    if (cap.HasLeftShoulderButton && state.Buttons.LeftShoulder == ButtonState.Pressed)
+                    {
+                        ChangeLeft = true;
+                    }
+                    if (cap.HasRightShoulderButton && state.Buttons.RightShoulder == ButtonState.Pressed)
+                    {
+                        ChangeRight = true;
                     }
                     if (cap.HasDPadUpButton && state.DPad.Up == ButtonState.Pressed)
                     {
@@ -140,10 +140,6 @@ namespace Voxalia.ClientGame.UISystem
                     if (cap.HasDPadRightButton && state.DPad.Right == ButtonState.Pressed)
                     {
                         ItemRight = true;
-                    }
-                    if (cap.HasLeftStickButton && state.Buttons.LeftStick == ButtonState.Pressed)
-                    {
-                        JumpKey = true;
                     }
                 }
             }
