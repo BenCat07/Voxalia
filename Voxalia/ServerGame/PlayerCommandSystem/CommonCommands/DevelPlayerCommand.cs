@@ -101,6 +101,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             else if (arg0 == "suicide")
             {
                 entry.Player.Damageable().SetHealth(0);
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "You have killed yourself!");
             }
             else if (arg0 == "playerDebug")
             {
