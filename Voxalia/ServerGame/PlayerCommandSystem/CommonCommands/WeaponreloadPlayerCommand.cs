@@ -24,9 +24,9 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
         public override void Execute(PlayerCommandEntry entry)
         {
             ItemStack item = entry.Player.Items.GetItemForSlot(entry.Player.Items.cItem);
-            if (item.Info is BaseGunItem)
+            if (item.Info is BaseGunItem bgi)
             {
-                ((BaseGunItem)item.Info).Reload(entry.Player, item);
+                bgi.Reload(entry.Player, item);
             }
             else if (item.Info is BowItem)
             {

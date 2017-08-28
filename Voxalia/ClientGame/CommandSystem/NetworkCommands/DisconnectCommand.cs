@@ -26,7 +26,7 @@ namespace Voxalia.ClientGame.CommandSystem.NetworkCommands
         public static void Execute(CommandQueue queue, CommandEntry entry)
         {
             Client TheClient = (entry.Command as DisconnectCommand).TheClient;
-            TheClient.Network.Disconnect(TheClient.Network.ConnectionThread, TheClient.Network.ConnectionCanceller, TheClient.Network.ConnectionSocket, TheClient.Network.ChunkSocket);
+            TheClient.Network.Disconnect();
         }
     }
 }

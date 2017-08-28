@@ -24,7 +24,6 @@ namespace Voxalia.ClientGame.AudioSystem
     {
         public static bool TrySpeech = true;
 
-
         public static void Speak(string text, bool male, int rate)
         {
             Task.Factory.StartNew(() =>

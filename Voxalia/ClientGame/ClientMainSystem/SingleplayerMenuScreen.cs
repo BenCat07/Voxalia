@@ -60,7 +60,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             AddChild(new UIButton("ui/menus/buttons/sp", "== " + name + " ==", TheClient.FontSets.Standard, () =>
             {
                 UIConsole.WriteLine("Opening singleplayer game: " + name);
-                TheClient.Network.Disconnect(TheClient.Network.ConnectionThread, TheClient.Network.ConnectionCanceller, TheClient.Network.ConnectionSocket, TheClient.Network.ChunkSocket);
+                TheClient.Network.Disconnect();
                 if (TheClient.LocalServer != null)
                 {
                     UIConsole.WriteLine("Shutting down pre-existing server.");
@@ -89,7 +89,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     }
                 });
             }, UIAnchor.TOP_LEFT, () => 600, () => 70, () => 10, () => ypos));
-
         }
 
         public override void SwitchTo()
