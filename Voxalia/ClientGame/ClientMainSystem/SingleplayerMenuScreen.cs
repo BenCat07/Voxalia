@@ -18,13 +18,18 @@ using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
-    class SingleplayerMenuScreen: UIScreen
+    class SingleplayerMenuScreen : UIScreen
     {
         public SingleplayerMenuScreen(Client tclient) : base(tclient)
         {
             ResetOnRender = false;
             AddChild(new UIButton("ui/menus/buttons/basic", "Back", TheClient.FontSets.SlightlyBigger, () => TheClient.ShowMainMenu(), UIAnchor.BOTTOM_LEFT, () => 350, () => 70, () => 10, () => -100));
-            int start = 150;
+            AddChild(new UIButton("ui/menus/buttons/basic", "New Game", TheClient.FontSets.SlightlyBigger, () =>
+            {
+                AddGame("g" + Utilities.UtilRandom.Next(10000));
+
+            }, UIAnchor.BOTTOM_LEFT, () => 350, () => 70, () => 10, () => -200));
+            CurrentY = 150;
             IEnumerable<string> found = Directory.EnumerateDirectories(Environment.CurrentDirectory);
             HashSet<string> fullList = new HashSet<string>();
             foreach (string fnd in found)
@@ -37,46 +42,54 @@ namespace Voxalia.ClientGame.ClientMainSystem
             foreach (string fnd in fullList)
             {
                 string str = fnd;
-                int curr = start;
                 if (str.StartsWith("server_"))
                 {
                     str = str.Substring("server_".Length);
-                    AddChild(new UIButton("ui/menus/buttons/sp", "== " + str + " ==", TheClient.FontSets.Standard, () =>
-                    {
-                        UIConsole.WriteLine("Opening singleplayer game: " + str);
-                        TheClient.Network.Disconnect(TheClient.Network.ConnectionThread, TheClient.Network.ConnectionCanceller, TheClient.Network.ConnectionSocket, TheClient.Network.ChunkSocket);
-                        if (TheClient.LocalServer != null)
-                        {
-                            UIConsole.WriteLine("Shutting down pre-existing server.");
-                            TheClient.LocalServer.ShutDown();
-                            TheClient.LocalServer = null;
-                        }
-                        TheClient.LocalServer = new Server(28010);
-                        Server.Central = TheClient.LocalServer;
-                        TheClient.ShowLoading();
-                        TheClient.Schedule.StartAsyncTask(() =>
-                        {
-                            try
-                            {
-                                TheClient.LocalServer.StartUp(str, () =>
-                                {
-                                    TheClient.Schedule.ScheduleSyncTask(() =>
-                                    {
-                                        TheClient.Network.Connect("localhost", "28010", false, str);
-                                    }, 1.0);
-                                });
-                            }
-                            catch (Exception ex)
-                            {
-                                Utilities.CheckException(ex);
-                                SysConsole.Output("Running singleplayer game server", ex);
-                            }
-                        });
-                    }, UIAnchor.TOP_LEFT, () => 600, () => 70, () => 10, () => curr));
-                    start += 100;
+                    AddGame(str);
                 }
             }
             AddChild(new UILabel("^!^e^0  Voxalia\nSingleplayer", TheClient.FontSets.SlightlyBigger, UIAnchor.TOP_CENTER, () => 0, () => 0));
+        }
+
+        public int CurrentY;
+
+        public void AddGame(string name)
+        {
+            int ypos = CurrentY;
+            CurrentY += 100;
+            AddChild(new UIButton("ui/menus/buttons/sp", "== " + name + " ==", TheClient.FontSets.Standard, () =>
+            {
+                UIConsole.WriteLine("Opening singleplayer game: " + name);
+                TheClient.Network.Disconnect(TheClient.Network.ConnectionThread, TheClient.Network.ConnectionCanceller, TheClient.Network.ConnectionSocket, TheClient.Network.ChunkSocket);
+                if (TheClient.LocalServer != null)
+                {
+                    UIConsole.WriteLine("Shutting down pre-existing server.");
+                    TheClient.LocalServer.ShutDown();
+                    TheClient.LocalServer = null;
+                }
+                TheClient.LocalServer = new Server(28010);
+                Server.Central = TheClient.LocalServer;
+                TheClient.ShowLoading();
+                TheClient.Schedule.StartAsyncTask(() =>
+                {
+                    try
+                    {
+                        TheClient.LocalServer.StartUp(name, () =>
+                        {
+                            TheClient.Schedule.ScheduleSyncTask(() =>
+                            {
+                                TheClient.Network.Connect("localhost", "28010", false, name);
+                            }, 1.0);
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        Utilities.CheckException(ex);
+                        SysConsole.Output("Running singleplayer game server", ex);
+                    }
+                });
+            }, UIAnchor.TOP_LEFT, () => 600, () => 70, () => 10, () => ypos));
+
         }
 
         public override void SwitchTo()
