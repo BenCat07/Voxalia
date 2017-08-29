@@ -6,7 +6,9 @@
 // hold any right or permission to use this software until such time as the official license is identified.
 //
 
+using System;
 using FreneticScript;
+using FreneticGameCore;
 using Voxalia.ServerGame.ServerMainSystem;
 using Voxalia.Shared;
 using FreneticGameCore.Files;
@@ -21,7 +23,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             ID = ServerToClientPacket.CVAR_SET;
             DataStream ds = new DataStream();
             DataWriter dw = new DataWriter(ds);
-            dw.WriteInt(tserver.Networking.Strings.IndexForString(var.Name.ToLowerFastFS()));
+            dw.WriteInt(tserver.Networking.Strings.IndexForString(var.Name.ToLowerFast()));
             dw.WriteFullString(var.Value);
             Data = ds.ToArray();
         }

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Voxalia.ServerGame.WorldSystem;
 using FreneticScript;
 using Voxalia.ServerGame.EntitySystem;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ServerMainSystem
 {
@@ -51,7 +52,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// <returns>A world object.</returns>
         public World LoadWorld(string name)
         {
-            string nl = name.ToLowerFastFS();
+            string nl = name.ToLowerFast();
             for (int i = 0; i < LoadedWorlds.Count; i++)
             {
                 if (LoadedWorlds[i].Name == nl)
@@ -155,7 +156,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// <returns>The world, or null.</returns>
         public World GetWorld(string name)
         {
-            name = name.ToLowerFastFS();
+            name = name.ToLowerFast();
             // TODO: LoadedWorlds -> Dictionary!
             for (int i = 0; i < LoadedWorlds.Count; i++)
             {

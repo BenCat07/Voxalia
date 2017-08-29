@@ -8,7 +8,7 @@
 
 using Voxalia.Shared;
 using BEPUphysics.Character;
-using FreneticScript;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
 {
@@ -27,8 +27,8 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             {
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "^r^1/stance <stance>"); // TODO: ShowUsage
                 return;
-            }
-            string stance = entry.InputArguments[0].ToLowerFastFS();
+            } 
+            string stance = entry.InputArguments[0].ToLowerFast();
             // TOOD: Implement!
             if (stance == "stand")
             {
