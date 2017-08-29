@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.GraphicsSystems;
-using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
+using FreneticGameGraphics.LightingSystem;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
@@ -21,6 +21,7 @@ using BEPUphysics.CollisionShapes.ConvexShapes;
 using Voxalia.Shared;
 using Voxalia.ClientGame.ClientMainSystem;
 using FreneticGameCore;
+using FreneticGameGraphics.ClientSystem;
 
 namespace Voxalia.ClientGame.EntitySystem
 {
@@ -43,9 +44,9 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 // TODO: ??? GL.Uniform4(7, new Vector4(GColor.R * Brightness, GColor.G * Brightness, GColor.B * Brightness, 1f));
             }
-            TheClient.Rendering.SetMinimumLight(Brightness);
+            TheClient.Rendering.SetMinimumLight(Brightness, TheClient.MainWorldView);
             base.Render();
-            TheClient.Rendering.SetMinimumLight(0);
+            TheClient.Rendering.SetMinimumLight(0, TheClient.MainWorldView);
             if (TheClient.MainWorldView.FBOid == FBOID.MAIN)
             {
                 // TODO: ??? GL.Uniform4(7, new Vector4(0f, 0f, 0f, 0f));
@@ -60,7 +61,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public override void SpawnBody()
         {
-            light = new PointLight(GetPosition(), 64, 15, new Location(GColor.R, GColor.G, GColor.B) * Brightness);
+            light = new PointLight(GetPosition(), 15, new Location(GColor.R, GColor.G, GColor.B) * Brightness);
             //light.SetCastShadows(false);
             TheClient.MainWorldView.Lights.Add(light);
             base.SpawnBody();

@@ -109,7 +109,7 @@ namespace Voxalia.ClientGame.EntitySystem
             TheClient.SetEnts();
             GL.BindTexture(TextureTarget.Texture2D, GLTexture);
             GL.Disable(EnableCap.CullFace);
-            TheClient.Rendering.RenderBillboard(Position, Scale * new Location(size.X * -0.01, size.Y * 0.01, 1f), TheClient.MainWorldView.CameraPos, (float)Math.PI * 0.5f);
+            TheClient.Rendering.RenderBillboard(Position, Scale * new Location(size.X * -0.01, size.Y * 0.01, 1f), TheClient.MainWorldView.CameraPos, TheClient.MainWorldView, (float)Math.PI * 0.5f);
             GL.Enable(EnableCap.CullFace);
         }
 

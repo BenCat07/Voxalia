@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using OpenTK;
 using Voxalia.Shared;
 using Voxalia.ClientGame.GraphicsSystems;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -22,7 +23,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public void RenderLoader(float x, float y, float size, double delta)
         {
             RenderLoadIconV2(x, y, size, delta);
-            View3D.CheckError("RenderLoader");
+            GraphicsUtil.CheckError("RenderLoader");
         }
 
         const float LI1_SPOKE_REL = 1.0f / 16.0f;
@@ -46,7 +47,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             for (int i = 0; i < spokes; i++)
             {
                 rot = rot % (Math.PI * 0.5);
-                Rendering.SetColor(new Vector4(0f, 0.1f, 0.4f, 1f));
+                Rendering.SetColor(new Vector4(0f, 0.1f, 0.4f, 1f), MainWorldView);
                 Matrix4 matrot = Matrix4.CreateRotationZ(-(float)(rot * 4.0));
                 Textures.Black.Bind();
                 Rendering.RenderRectangleCentered(x - sz, y - sz, x + sz, y + sz, sz, sz, matrot);
@@ -56,7 +57,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 sz -= LI1_SPOKE_SIZE;
                 rot *= 2.0;
             }
-            Rendering.SetColor(Vector4.One);
+            Rendering.SetColor(Vector4.One, MainWorldView);
         }
 
         const int LI2_SPOKES = 10;
@@ -86,7 +87,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             for (int i = 0; i < LI2_SPOKES; i++)
             {
                 rot = rot % (Math.PI * 0.5);
-                Rendering.SetColor(fcol);
+                Rendering.SetColor(fcol, MainWorldView);
                 Matrix4 matrot = Matrix4.CreateRotationZ(-(float)(rot * 4.0));
                 Textures.Black.Bind();
                 Rendering.RenderRectangleCentered(x - sz, y - sz, x + sz, y + sz, sz, sz, matrot);
@@ -96,7 +97,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 sz -= LI2_ONE_OVER_SPOKES * 0.25f * size;
                 rot *= 2.0;
             }
-            Rendering.SetColor(Vector4.One);
+            Rendering.SetColor(Vector4.One, MainWorldView);
         }
     }
 }

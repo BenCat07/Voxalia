@@ -417,19 +417,19 @@ namespace Voxalia.ClientGame.UISystem
                 // Standard console box
                 //  GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
                 ConsoleTexture.Bind();
-                Client.Central.Rendering.SetColor(Color4.White);
+                Client.Central.Rendering.SetColor(Color4.White, Client.Central.MainWorldView);
                 Client.Central.Rendering.RenderRectangle(0, 0, Client.Central.Window.Width, Client.Central.Window.Height / 2);
                 // Scrollbar
                 Client.Central.Textures.White.Bind();
                 Client.Central.Rendering.RenderRectangle(0, 0, 2, Client.Central.Window.Height / 2);
-                Client.Central.Rendering.SetColor(Color4.Red);
+                Client.Central.Rendering.SetColor(Color4.Red, Client.Central.MainWorldView);
                 float Y = Client.Central.Window.Height / 2;
                 float percentone = -(float)ScrolledLine / (float)Lines;
                 float percenttwo = -((float)ScrolledLine - (float)Client.Central.Window.Height / Client.Central.FontSets.Standard.font_default.Height) / (float)Lines;
                 Client.Central.Rendering.RenderRectangle(0, (int)(Y - Y * percenttwo), 2, (int)(Y - Y * percentone));
                 // Bottom line
                 Client.Central.Textures.White.Bind();
-                Client.Central.Rendering.SetColor(Color4.Cyan);
+                Client.Central.Rendering.SetColor(Color4.Cyan, Client.Central.MainWorldView);
                 Client.Central.Rendering.RenderRectangle(0, (Client.Central.Window.Height / 2) - 1, Client.Central.Window.Width, Client.Central.Window.Height / 2);
                 // Typing text
                 string typed = Typing;
@@ -445,7 +445,7 @@ namespace Voxalia.ClientGame.UISystem
                     }
                     typed = typed.Replace("^", "^^n");
                 }
-                Client.Central.Rendering.SetColor(Color4.White);
+                Client.Central.Rendering.SetColor(Color4.White, Client.Central.MainWorldView);
                 Client.Central.FontSets.Standard.DrawColoredText(typed, TypingLoc);
                 // Cursor
                 if (keymark_add)
@@ -508,11 +508,11 @@ namespace Voxalia.ClientGame.UISystem
                                     float hei = (float)lens.Y;
                                     float x = (rectent.Value.X + len > Client.Central.Window.Width) ? 0 : rectent.Value.X;
                                     float y = rectent.Value.Y + sh;
-                                    Client.Central.Rendering.SetColor(Color4.Blue);
+                                    Client.Central.Rendering.SetColor(Color4.Blue, Client.Central.MainWorldView);
                                     Client.Central.Rendering.RenderRectangle(x, y, x + len + 5, y + 5 + hei);
-                                    Client.Central.Rendering.SetColor(Color4.LightGray);
+                                    Client.Central.Rendering.SetColor(Color4.LightGray, Client.Central.MainWorldView);
                                     Client.Central.Rendering.RenderRectangle(x + 1, y + 1, x + len + 4, y + 4 + hei);
-                                    Client.Central.Rendering.SetColor(Color4.White);
+                                    Client.Central.Rendering.SetColor(Color4.White, Client.Central.MainWorldView);
                                     Client.Central.FontSets.Standard.DrawColoredText("^)" + renderme, new Location(x, y, 0));
                                 }
                             }

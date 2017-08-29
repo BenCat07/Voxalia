@@ -13,6 +13,7 @@ using System;
 using Voxalia.ClientGame.GraphicsSystems;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.Shared;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.UISystem.MenuSystem
 {
@@ -45,10 +46,10 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             {
                 GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0f, 0.5f, 0.5f, 1f });
                 GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });
-                View3D.CheckError("RenderScreen - Reset");
+                GraphicsUtil.CheckError("RenderScreen - Reset");
             }
             base.RenderChildren(delta, xoff, yoff);
-            View3D.CheckError("RenderScreen - Children");
+            GraphicsUtil.CheckError("RenderScreen - Children");
         }
 
         public virtual void SwitchTo()

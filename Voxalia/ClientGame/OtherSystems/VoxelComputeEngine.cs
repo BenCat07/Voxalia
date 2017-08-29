@@ -89,7 +89,7 @@ namespace Voxalia.ClientGame.OtherSystems
             Program_TopsCruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 15\n");
             Program_Tops2Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 75\n");
             Program_Tops3Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 375\n");
-            View3D.CheckError("Compute - Startup - Shaders");
+            GraphicsUtil.CheckError("Compute - Startup - Shaders");
             float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 7)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
             {
@@ -120,7 +120,7 @@ namespace Voxalia.ClientGame.OtherSystems
             GL.BindTexture(TextureTarget.Texture2D, 0);
             GL.Finish();
             GL.MemoryBarrier(MemoryBarrierFlags.AllBarrierBits);
-            View3D.CheckError("Compute - Startup - Texture");
+            GraphicsUtil.CheckError("Compute - Startup - Texture");
             for (int i = 0; i < Reppers.Length; i++)
             {
                 int csize = Reppers[i];
@@ -161,7 +161,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, (Constants.CHUNK_BLOCK_COUNT) * sizeof(int), btemp, BufferUsageHint.StaticDraw);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
             }
-            View3D.CheckError("Compute - Startup - Empty Buffers");
+            GraphicsUtil.CheckError("Compute - Startup - Empty Buffers");
             float[] preBuf = new float[256 * 12];
             for (int i = 0; i < 256; i++)
             {
@@ -227,7 +227,7 @@ namespace Voxalia.ClientGame.OtherSystems
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, Buf_Shapes);
             GL.BufferData(BufferTarget.ShaderStorageBuffer, resX.Length * sizeof(float), resX, BufferUsageHint.StaticRead);
             GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-            View3D.CheckError("Compute - Startup - Shape Buffer");
+            GraphicsUtil.CheckError("Compute - Startup - Shape Buffer");
         }
 
         public static readonly Vector3i[] Relatives = new Vector3i[]
@@ -381,7 +381,7 @@ namespace Voxalia.ClientGame.OtherSystems
             };
             GL.BindVertexArray(0);
             cslod.Contained = contained;
-            View3D.CheckError("Calculate SLOD Combo");
+            GraphicsUtil.CheckError("Calculate SLOD Combo");
             return true;
         }
 
@@ -564,38 +564,38 @@ namespace Voxalia.ClientGame.OtherSystems
                         ch.Render_BufsRel[x] = rel.Render_VoxelBuffer[lookuper[ch.CSize]];
                     }
                 }
-                View3D.CheckError("Compute - Prep -1");
+                GraphicsUtil.CheckError("Compute - Prep -1");
                 // Combine buffers
                 sw1a.Start();
                 int fbufVoxels = tbufs[chz];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, fbufVoxels);
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, len * 7 * sizeof(uint), IntPtr.Zero, hintter);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-                View3D.CheckError("Compute - Prep -0.6");
+                GraphicsUtil.CheckError("Compute - Prep -0.6");
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 0, fbufVoxels);
-                View3D.CheckError("Compute - Prep -0.5");
+                GraphicsUtil.CheckError("Compute - Prep -0.5");
                 for (int i = 0; i < 7; i++)
                 {
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1 + i, ch.Render_BufsRel[i]);
                 }
-                View3D.CheckError("Compute - Prep -0.4");
+                GraphicsUtil.CheckError("Compute - Prep -0.4");
                 GL.UseProgram(Program_Combo[lookuper[ch.CSize]]);
-                View3D.CheckError("Compute - Prep -0.37");
+                GraphicsUtil.CheckError("Compute - Prep -0.37");
                 GL.DispatchCompute(1, ch.CSize, 1);
-                View3D.CheckError("Compute - Prep -0.35");
+                GraphicsUtil.CheckError("Compute - Prep -0.35");
                 GL.UseProgram(0);
-                View3D.CheckError("Compute - Prep -0.3");
+                GraphicsUtil.CheckError("Compute - Prep -0.3");
                 for (int i = 0; i < 8; i++)
                 {
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, i, 0);
                 }
                 ch.Render_FBB = fbufVoxels;
-                View3D.CheckError("Compute - Prep -0.25");
+                GraphicsUtil.CheckError("Compute - Prep -0.25");
                 sw1a.Stop();
             }
             sw1.Stop();
             sw2.Start();
-            View3D.CheckError("Compute - Prep 0");
+            GraphicsUtil.CheckError("Compute - Prep 0");
             GL.BindImageTexture(0, Texture_IDs, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
             // Create a results buffer
             GL.GenBuffers(chs.Length * 4, tbufs);
@@ -613,7 +613,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 resses[0] = 0;
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, sizeof(uint), resses, hintter);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-                View3D.CheckError("Compute - Run - Setup A");
+                GraphicsUtil.CheckError("Compute - Run - Setup A");
                 // Run the shader
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, ch.Render_FBB);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, resBuf);
@@ -621,7 +621,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, Buf_Shapes);
                 GL.DispatchCompute(1, ch.CSize, 1);
                 ch.Render_ResBuf = resBuf;
-                View3D.CheckError("Compute - Run - Ran A");
+                GraphicsUtil.CheckError("Compute - Run - Ran A");
                 // TRANSPARENT MODE:
                 ch.Render_IndBufTRANSP = tbufs[chz * 4 + 2];
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, ch.Render_IndBufTRANSP);
@@ -633,20 +633,20 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.BufferData(BufferTarget.ShaderStorageBuffer, sizeof(uint), ressesTRANSP, hintter);
                 GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                 GL.UseProgram(Program_CounterTRANSP[lookuper[ch.CSize]]);
-                View3D.CheckError("Compute - Run - Setup B");
+                GraphicsUtil.CheckError("Compute - Run - Setup B");
                 // Run the shader
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, resBufTRANSP);
                 GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, ch.Render_IndBufTRANSP);
                 GL.DispatchCompute(1, ch.CSize, 1);
                 ch.Render_ResBufTRANSP = resBufTRANSP;
-                View3D.CheckError("Compute - Run - Ran B");
+                GraphicsUtil.CheckError("Compute - Run - Ran B");
             }
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, 0);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 3, 0);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, 0);
             GL.UseProgram(0);
-            View3D.CheckError("Compute - Run");
+            GraphicsUtil.CheckError("Compute - Run");
             // Gather results
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderStorageBarrierBit);
             /*if (!TheClient.Shaders.MCM_GOOD_GRAPHICS)
@@ -668,7 +668,7 @@ namespace Voxalia.ClientGame.OtherSystems
             }
             sw2.Stop();
             sw3.Start();
-            View3D.CheckError("Compute - Read Count");
+            GraphicsUtil.CheckError("Compute - Read Count");
             // Start new buffers
             for (int chz = 0; chz < chs.Length; chz++)
             {
@@ -746,7 +746,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 }
                 Action<bool> calc = (transp) =>
                 {
-                    View3D.CheckError("Compute - Pre New Buffers");
+                    GraphicsUtil.CheckError("Compute - Pre New Buffers");
                     int resd = transp ? resdTRANSP : resdSOLID;
                     if (resd < 0 || resd > 100 * 1000 * 1000)
                     {
@@ -776,10 +776,10 @@ namespace Voxalia.ClientGame.OtherSystems
                     int bufc = ch.PosMultiplier == 1 ? 11 : 7;
                     uint[] newBufs = EBuf;
                     GL.GenBuffers(bufc, newBufs);
-                    View3D.CheckError("Compute - New Buffers - Prep");
+                    GraphicsUtil.CheckError("Compute - New Buffers - Prep");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[0]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
-                    View3D.CheckError("Compute - New Buffers - 0");
+                    GraphicsUtil.CheckError("Compute - New Buffers - 0");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[1]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[2]);
@@ -788,7 +788,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[4]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
-                    View3D.CheckError("Compute - New Buffers - 4");
+                    GraphicsUtil.CheckError("Compute - New Buffers - 4");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[5]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     if (ch.PosMultiplier == 1)
@@ -802,12 +802,12 @@ namespace Voxalia.ClientGame.OtherSystems
                         GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[10]);
                         GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * Vector4.SizeInBytes, empty, hintter);
                     }
-                    View3D.CheckError("Compute - New Buffers - 7");
+                    GraphicsUtil.CheckError("Compute - New Buffers - 7");
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, newBufs[ch.PosMultiplier == 1 ? 8 : 6]);
                     GL.BufferData(BufferTarget.ShaderStorageBuffer, resd * sizeof(uint), empty, hintter);
                     GL.BindBuffer(BufferTarget.ShaderStorageBuffer, 0);
-                    View3D.CheckError("Compute - New Buffers");
+                    GraphicsUtil.CheckError("Compute - New Buffers");
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, ch.Render_FBB);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, transp ? ch.Render_IndBufTRANSP : ch.Render_IndBuf);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, Buf_Shapes);
@@ -836,7 +836,7 @@ namespace Voxalia.ClientGame.OtherSystems
                         GL.DispatchCompute(1, ch.CSize, 1);
                     }
                     GL.UseProgram(0);
-                    View3D.CheckError("Compute - Crunch");
+                    GraphicsUtil.CheckError("Compute - Crunch");
                     // Unbind new buffers
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, 0);
@@ -845,7 +845,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 5, 0);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 6, 0);
                     GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 7, 0);
-                    View3D.CheckError("Compute - End Buffs");
+                    GraphicsUtil.CheckError("Compute - End Buffs");
                     // Prep VAO
                     int vao = GL.GenVertexArray();
                     GL.BindVertexArray(vao);
@@ -943,7 +943,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 }
             }
             GL.BindImageTexture(0, 0, 0, false, 0, TextureAccess.ReadOnly, SizedInternalFormat.R32f);
-            View3D.CheckError("Compute - Finalize");
+            GraphicsUtil.CheckError("Compute - Finalize");
             sw3.Stop();
         }
 
@@ -959,7 +959,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 GL.DeleteProgram(Program_Cruncher3[i]);
             }
             GL.DeleteBuffer(Buf_Shapes);
-            View3D.CheckError("Compute - Shutdown");
+            GraphicsUtil.CheckError("Compute - Shutdown");
         }
     }
 }

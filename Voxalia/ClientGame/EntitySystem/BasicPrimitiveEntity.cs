@@ -16,6 +16,7 @@ using Voxalia.ClientGame.GraphicsSystems.ParticleSystem;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.OtherSystems;
 using FreneticGameCore;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.EntitySystem
 {
@@ -85,7 +86,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 TheClient.Textures.White.Bind();
             }
-            TheClient.Rendering.SetMinimumLight(0f);
+            TheClient.Rendering.SetMinimumLight(0f, TheClient.MainWorldView);
             BEPUutilities.Matrix matang = BEPUutilities.Matrix.CreateFromQuaternion(Angles);
             //matang.Transpose();
             Matrix4d matang4 = new Matrix4d(matang.M11, matang.M12, matang.M13, matang.M14,

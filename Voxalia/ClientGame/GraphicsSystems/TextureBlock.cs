@@ -220,7 +220,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
                     GL.BindTexture(TextureTarget.Texture2DArray, HelpTextureID);
                     GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
-                    View3D.CheckError("Mipmapping");
+                    GraphicsUtil.CheckError("Mipmapping");
                 };
                 if (delayable)
                 {

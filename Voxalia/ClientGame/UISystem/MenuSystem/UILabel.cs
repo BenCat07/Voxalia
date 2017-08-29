@@ -48,12 +48,12 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             {
                 Location meas = TextFont.MeasureFancyLinesOfText(tex);
                 Client TheClient = GetClient();
-                TheClient.Rendering.SetColor(BackColor);
+                TheClient.Rendering.SetColor(BackColor, TheClient.MainWorldView);
                 TheClient.Rendering.RenderRectangle(bx, by, bx + (float)meas.X, by + (float)meas.Y);
-                TheClient.Rendering.SetColor(Vector4.One);
+                TheClient.Rendering.SetColor(Vector4.One, TheClient.MainWorldView);
             }
             TextFont.DrawColoredText(tex, new Location(bx, by, 0), int.MaxValue, 1, false, BColor);
-            View3D.CheckError("RenderScreen - Label");
+            GraphicsUtil.CheckError("RenderScreen - Label");
         }
     }
 }

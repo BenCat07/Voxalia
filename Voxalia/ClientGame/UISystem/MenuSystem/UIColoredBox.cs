@@ -41,11 +41,11 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             TheClient.Shaders.ColorMultShader.Bind();
             if (Color.W > 0.0f)
             {
-                TheClient.Rendering.SetColor(Color);
+                TheClient.Rendering.SetColor(Color, TheClient.MainWorldView);
                 TheClient.Textures.White.Bind();
                 TheClient.Rendering.RenderRectangle(x, y, x + w, y + h);
             }
-            TheClient.Rendering.SetColor(Vector4.One);
+            TheClient.Rendering.SetColor(Vector4.One, TheClient.MainWorldView);
             GL.BindTexture(TextureTarget.Texture2D, GetTexture());
             if (Flip)
             {

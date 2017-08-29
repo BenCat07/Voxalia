@@ -16,7 +16,6 @@ using Voxalia.Shared;
 using Voxalia.ClientGame.WorldSystem;
 using FreneticScript.TagHandlers;
 using Voxalia.Shared.Collision;
-using Voxalia.ClientGame.AudioSystem;
 using FreneticScript.TagHandlers.Objects;
 using Voxalia.ClientGame.EntitySystem;
 using Voxalia.ClientGame.GraphicsSystems;
@@ -27,6 +26,7 @@ using FreneticGameCore;
 using FreneticGameCore.Collision;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
+using FreneticGameGraphics.AudioSystem;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {
@@ -226,7 +226,8 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                 case "earRing":
                     {
                         double time = NumberTag.TryFor(entry.GetArgumentObject(queue, 1)).Internal;
-                        TheClient.Sounds.Deafen(time);
+                        // TODO: Fix!
+                        //TheClient.Sounds.Deafen(time);
                         break;
                     }
                 case "topInfo":

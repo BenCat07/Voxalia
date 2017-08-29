@@ -107,17 +107,6 @@
     <Compile Include="ClientGame\OtherSystems\VoxelComputeEngine.cs" />
     <Compile Include="ClientGame\WorldSystem\RegionPlants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ClientGame\AudioSystem\ActiveSound.cs" />
-    <Compile Include="ClientGame\AudioSystem\Enforcer\AudioEnforcer.cs" />
-    <Compile Include="ClientGame\AudioSystem\Enforcer\AudioState.cs" />
-    <Compile Include="ClientGame\AudioSystem\Enforcer\LiveAudioClip.cs" />
-    <Compile Include="ClientGame\AudioSystem\Enforcer\LiveAudioInstance.cs" />
-    <Compile Include="ClientGame\AudioSystem\OggDecodeStream.cs" />
-    <Compile Include="ClientGame\AudioSystem\OpusWrapper\OpusAPI.cs" />
-    <Compile Include="ClientGame\AudioSystem\OpusWrapper\OpusDecoder.cs" />
-    <Compile Include="ClientGame\AudioSystem\OpusWrapper\OpusEncoder.cs" />
-    <Compile Include="ClientGame\AudioSystem\SoundEffect.cs" />
-    <Compile Include="ClientGame\AudioSystem\SoundEngine.cs" />
     <Compile Include="ClientGame\ClientMainSystem\Client2DEffects.cs" />
     <Compile Include="ClientGame\ClientMainSystem\ClientBase.cs" />
     <Compile Include="ClientGame\ClientMainSystem\ClientChat.cs" />
@@ -183,24 +172,13 @@
     <Compile Include="ClientGame\EntitySystem\PrimitiveEntity.cs" />
     <Compile Include="ClientGame\EntitySystem\PrimitiveModelEntity.cs" />
     <Compile Include="ClientGame\EntitySystem\StaticBlockEntity.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\LightingSystem\Light.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\LightingSystem\LightObject.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\LightingSystem\LightOrtho.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\LightingSystem\LightPoint.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\LightingSystem\PointLight.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\LightingSystem\SkyLight.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\LightingSystem\SpotLight.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ModelLODHelper.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ParticleSystem\ParticleEffectType.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ParticleSystem\ParticleEngine.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ParticleSystem\ParticleEffect.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\ModelEngine.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ParticleSystem\ParticleHelper.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\Renderer.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\RenderSurface4Part.cs" />
     <Compile Include="ClientGame\GraphicsSystems\TextureBlock.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ChunkVBO.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\View3D.cs" />
     <Compile Include="ClientGame\GraphicsSystems\VRSupport.cs" />
     <Compile Include="ClientGame\JointSystem\BaseFJoint.cs" />
     <Compile Include="ClientGame\JointSystem\BaseJoint.cs" />
@@ -276,7 +254,6 @@
     <Compile Include="ClientGame\OtherSystems\ChatMessage.cs" />
     <Compile Include="ClientGame\OtherSystems\ClientUtilities.cs" />
     <Compile Include="ClientGame\OtherSystems\ItemStack.cs" />
-    <Compile Include="ClientGame\AudioSystem\TextToSpeech.cs" />
     <Compile Include="ClientGame\UISystem\GamePadHandler.cs" />
     <Compile Include="ClientGame\UISystem\KeyHandler.cs" />
     <Compile Include="ClientGame\UISystem\MenuSystem\UIButton.cs" />
@@ -290,7 +267,6 @@
     <Compile Include="ClientGame\UISystem\MenuSystem\UILabel.cs" />
     <Compile Include="ClientGame\UISystem\MenuSystem\UIScrollBox.cs" />
     <Compile Include="ClientGame\UISystem\MenuSystem\UITextLink.cs" />
-    <Compile Include="ClientGame\AudioSystem\MicrophoneHandler.cs" />
     <Compile Include="ClientGame\UISystem\MouseHandler.cs" />
     <Compile Include="ClientGame\UISystem\RawGamePad.cs" />
     <Compile Include="ClientGame\UISystem\UIConsole.cs" />
@@ -388,12 +364,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="shaders\vox_helper.inc">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="shaders\postfast.vs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="shaders\postfast.fs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="shaders\vox_slodcombo.comp">

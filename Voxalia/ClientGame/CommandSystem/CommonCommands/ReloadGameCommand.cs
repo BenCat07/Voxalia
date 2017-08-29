@@ -99,7 +99,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             if (arg == "audio" || is_all)
             {
                 success = true;
-                TheClient.Sounds.Init(TheClient, TheClient.CVars);
+                TheClient.Sounds.Init(TheClient.Engine);
             }
             if (!success)
             {

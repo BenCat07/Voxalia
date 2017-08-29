@@ -9,7 +9,7 @@
 using System;
 using Voxalia.Shared;
 using Voxalia.ClientGame.EntitySystem;
-using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
+using FreneticGameGraphics.LightingSystem;
 using FreneticGameCore;
 
 namespace Voxalia.ClientGame.NetworkSystem.PacketsIn

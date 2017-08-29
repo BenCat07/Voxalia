@@ -21,6 +21,7 @@ using FreneticGameCore.Files;
 using Voxalia.Shared.Collision;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.EntitySystem
 {
@@ -61,21 +62,21 @@ namespace Voxalia.ClientGame.EntitySystem
         public override void Render()
         {
             TheClient.SetEnts();
-            TheClient.Rendering.SetColor(TheClient.Rendering.AdaptColor(ClientUtilities.Convert(GetPosition()), color));
-            TheClient.Rendering.SetMinimumLight(0.0f);
+            TheClient.Rendering.SetColor(TheClient.Rendering.AdaptColor(ClientUtilities.Convert(GetPosition()), color), TheClient.MainWorldView);
+            TheClient.Rendering.SetMinimumLight(0.0f, TheClient.MainWorldView);
             ActualModelRender();
             if (ShouldShine)
             {
-                TheClient.Rendering.EnableShine(false);
-                TheClient.Rendering.SetColor(new Vector4(ShineColor.X, ShineColor.Y, ShineColor.Z, ShineColor.W * 0.25f));
+                TheClient.Rendering.EnableShine(TheClient.MainWorldView, false);
+                TheClient.Rendering.SetColor(new Vector4(ShineColor.X, ShineColor.Y, ShineColor.Z, ShineColor.W * 0.25f), TheClient.MainWorldView);
                 ActualModelRender();
-                TheClient.Rendering.DisableShine();
+                TheClient.Rendering.DisableShine(TheClient.MainWorldView);
             }
-            TheClient.Rendering.SetColor(Color4.White);
+            TheClient.Rendering.SetColor(Color4.White, TheClient.MainWorldView);
             if (IsTyping)
             {
                 TheClient.Textures.GetTexture("ui/game/typing").Bind(); // TODO: store!
-                TheClient.Rendering.RenderBillboard(GetPosition() + new Location(0, 0, 4), new Location(2), TheClient.MainWorldView.CameraPos);
+                TheClient.Rendering.RenderBillboard(GetPosition() + new Location(0, 0, 4), new Location(2), TheClient.MainWorldView.CameraPos, TheClient.MainWorldView);
             }
         }
     }

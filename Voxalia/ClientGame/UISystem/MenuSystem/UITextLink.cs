@@ -95,16 +95,16 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
                 float y = GetY() + yoff;
                 Icon.Bind();
                 Client TheClient = GetClient();
-                TheClient.Rendering.SetColor(IconColor);
+                TheClient.Rendering.SetColor(IconColor, TheClient.MainWorldView);
                 TheClient.Rendering.RenderRectangle(x, y, x + TextFont.font_default.Height, y + TextFont.font_default.Height);
                 TextFont.DrawColoredText(tt, new Location(x + TextFont.font_default.Height, y, 0), int.MaxValue, 1, false, BColor);
-                TheClient.Rendering.SetColor(OpenTK.Vector4.One);
+                TheClient.Rendering.SetColor(OpenTK.Vector4.One, TheClient.MainWorldView);
             }
             else
             {
                 TextFont.DrawColoredText(tt, new Location(GetX() + xoff, GetY() + yoff, 0), int.MaxValue, 1, false, BColor);
             }
-            View3D.CheckError("RenderScreen - TextLink");
+            GraphicsUtil.CheckError("RenderScreen - TextLink");
         }
     }
 }

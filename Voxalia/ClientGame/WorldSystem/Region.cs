@@ -31,6 +31,7 @@ using FreneticGameCore;
 using FreneticGameGraphics;
 using FreneticGameGraphics.GraphicsHelpers;
 using FreneticGameCore.Collision;
+using FreneticGameGraphics.ClientSystem;
 
 namespace Voxalia.ClientGame.WorldSystem
 {
@@ -640,10 +641,10 @@ namespace Voxalia.ClientGame.WorldSystem
         public void RenderEffects()
         {
             GL.LineWidth(5);
-            TheClient.Rendering.SetColor(Color4.White);
+            TheClient.Rendering.SetColor(Color4.White, TheClient.MainWorldView);
             for (int i = 0; i < Highlights.Length; i++)
             {
-                TheClient.Rendering.RenderLineBox(Highlights[i].Min, Highlights[i].Max);
+                TheClient.Rendering.RenderLineBox(Highlights[i].Min, Highlights[i].Max, TheClient.MainWorldView);
             }
             GL.LineWidth(1);
         }
@@ -667,8 +668,8 @@ namespace Voxalia.ClientGame.WorldSystem
         {
             if (!TheClient.MainWorldView.RenderingShadows)
             {
-                TheClient.Rendering.SetColor(OpenTK.Vector4.One); // TODO: Necessity?
-                TheClient.Rendering.SetMinimumLight(0f); // TODO: Necessity?
+                TheClient.Rendering.SetColor(OpenTK.Vector4.One, TheClient.MainWorldView); // TODO: Necessity?
+                TheClient.Rendering.SetMinimumLight(0f, TheClient.MainWorldView); // TODO: Necessity?
             }
             if (TheClient.RenderTextures)
             {

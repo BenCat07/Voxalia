@@ -11,12 +11,13 @@ using Voxalia.Shared;
 using Voxalia.ClientGame.EntitySystem;
 using BEPUutilities;
 using Voxalia.ClientGame.WorldSystem;
-using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.Shared.Collision;
 using Voxalia.ClientGame.GraphicsSystems;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
+using FreneticGameGraphics.LightingSystem;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -104,21 +105,21 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 ThePlanet.Destroy();
                 MainWorldView.Lights.Remove(ThePlanet);
             }
-            View3D.CheckError("Load - World - Deletes");
+            GraphicsUtil.CheckError("Load - World - Deletes");
             int wid = CVars.r_shadowquality.ValueI;
             TheSun = new SkyLight(Location.Zero, MaximumStraightBlockDistance() * 2, SunLightDef, new Location(0, 0, -1), MaximumStraightBlockDistance() * 2 + Chunk.CHUNK_SIZE * 2, false, wid);
             MainWorldView.Lights.Add(TheSun);
-            View3D.CheckError("Load - World - Sun");
+            GraphicsUtil.CheckError("Load - World - Sun");
             // TODO: Separate cloud quality CVar?
             TheSunClouds = new SkyLight(Location.Zero, MaximumStraightBlockDistance() * 2, CloudSunLightDef, new Location(0, 0, -1), MaximumStraightBlockDistance() * 2 + Chunk.CHUNK_SIZE * 2, true, wid);
             MainWorldView.Lights.Add(TheSunClouds);
-            View3D.CheckError("Load - World - Clouds");
+            GraphicsUtil.CheckError("Load - World - Clouds");
             // TODO: Separate planet quality CVar?
             ThePlanet = new SkyLight(Location.Zero, MaximumStraightBlockDistance() * 2, PlanetLightDef, new Location(0, 0, -1), MaximumStraightBlockDistance() * 2 + Chunk.CHUNK_SIZE * 2, false, wid);
             MainWorldView.Lights.Add(ThePlanet);
-            View3D.CheckError("Load - World - Planet");
+            GraphicsUtil.CheckError("Load - World - Planet");
             OnCloudShadowChanged(null, null);
-            View3D.CheckError("Load - World - Changed");
+            GraphicsUtil.CheckError("Load - World - Changed");
         }
 
         /// <summary>
@@ -198,6 +199,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void TickWorld(double delta)
         {
+            Engine.SunAdjustDirection = TheSun.Direction;
+            Engine.SunAdjustBackupLight = new OpenTK.Vector4(TheSun.InternalLights[0].color, 1.0f);
+            Engine.MainView.SunLight_Minimum = sl_min;
+            Engine.MainView.SunLight_Maximum = sl_max;
             rTicks++;
             if (rTicks >= CVars.r_shadowpace.ValueI)
             {

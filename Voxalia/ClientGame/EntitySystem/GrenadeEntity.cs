@@ -12,13 +12,14 @@ using System.Linq;
 using System.Text;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.GraphicsSystems;
-using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
+using FreneticGameGraphics.LightingSystem;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using Voxalia.ClientGame.OtherSystems;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using Voxalia.Shared;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.EntitySystem
 {
@@ -44,9 +45,9 @@ namespace Voxalia.ClientGame.EntitySystem
             TheClient.Textures.White.Bind();
             Matrix4d mat = Matrix4d.Scale(0.05f, 0.2f, 0.05f) * GetTransformationMatrix();
             TheClient.MainWorldView.SetMatrix(2, mat);
-            TheClient.Rendering.SetColor(GColor);
+            TheClient.Rendering.SetColor(GColor, TheClient.MainWorldView);
             model.Draw();
-            TheClient.Rendering.SetColor(Color4.White);
+            TheClient.Rendering.SetColor(Color4.White, TheClient.MainWorldView);
         }
     }
 

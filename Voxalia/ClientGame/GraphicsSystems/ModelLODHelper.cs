@@ -20,6 +20,7 @@ using Voxalia.Shared.Collision;
 using Voxalia.ClientGame.OtherSystems;
 using FreneticGameCore.Collision;
 using FreneticGameCore;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.GraphicsSystems
 {
@@ -92,7 +93,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             Matrix4 view = Matrix4.LookAt(Vector3.Zero, forw, up);
             Matrix4 mat = view * ClientUtilities.Convert(ortho);
             TheClient.MainWorldView.StandardBlend();
-            TheClient.s_forw.Bind();
+            TheClient.Engine.Shaders3D.s_forw.Bind();
             GL.UniformMatrix4(1, false, ref mat);
             GL.UniformMatrix4(2, false, ref oTrans);
             GL.Uniform4(3, Vector4.One);
@@ -100,7 +101,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.Uniform1(16, 1f);
             model.BoneSafe();
             model.Draw();
-            TheClient.s_forw_trans.Bind();
+            TheClient.Engine.Shaders3D.s_forw_trans.Bind();
             GL.UniformMatrix4(1, false, ref mat);
             GL.UniformMatrix4(2, false, ref oTrans);
             GL.Uniform4(3, Vector4.One);

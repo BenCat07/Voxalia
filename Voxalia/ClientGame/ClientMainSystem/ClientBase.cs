@@ -19,7 +19,6 @@ using Voxalia.ClientGame.UISystem;
 using Voxalia.ClientGame.CommandSystem;
 using System.Diagnostics;
 using Voxalia.ClientGame.NetworkSystem;
-using Voxalia.ClientGame.AudioSystem;
 using Voxalia.ClientGame.GraphicsSystems.ParticleSystem;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ServerGame.ServerMainSystem;
@@ -31,6 +30,8 @@ using FreneticGameCore;
 using FreneticGameGraphics;
 using FreneticGameGraphics.GraphicsHelpers;
 using Voxalia.ClientGame.OtherSystems;
+using FreneticGameGraphics.ClientSystem;
+using FreneticGameGraphics.AudioSystem;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -248,12 +249,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// The system that manages misc. rendering tasks for the client.
         /// </summary>
-        public /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Renderer Rendering;
+        public Renderer Rendering;
 
         /// <summary>
         /// The system that manages 3D models on the client.
         /// </summary>
-        public /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.ModelEngine Models;
+        public ModelEngine Models;
 
         /// <summary>
         /// The system that manages 3D model animation sets on the client.
@@ -263,7 +264,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// The system that manages sounds (audio) on the client.
         /// </summary>
-        public SoundEngine Sounds;
+        public SoundEngine Sounds = new SoundEngine();
 
         /// <summary>
         /// The system that manages particle effects (quick simple 3D-rendered-only objects) for the client.
@@ -356,6 +357,69 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         Texture load_screen;
 
+        public GameEngine3D Engine;
+        
+        /// <summary>
+        /// Configures the game engine placeholder.
+        /// </summary>
+        void FakeEngine()
+        {
+            Engine = new GameEngine3D("SHOULD NEVER SHOW")
+            {
+                MainView = MainWorldView,
+                Textures = Textures,
+                Models = Models,
+                Animations = Animations,
+                Shaders = Shaders,
+                Rendering = Rendering,
+                ZFar = ZFar,
+                ZFarOut = ZFarOut,
+                FogMaxDist = FogMaxDist,
+                AllowLL = AllowLL,
+                Sounds = Sounds,
+                Files = Files,
+                FontSets = FontSets,
+                GLFonts = Fonts,
+            };
+            CVars.r_dynamicshadows.OnChanged += (o, e) => Engine.EnableDynamicShadows = CVars.r_dynamicshadows.ValueB;
+            CVars.r_dynamicshadows.OnChanged(null, null);
+            CVars.r_znear.OnChanged += (o, e) => Engine.ZNear = CVars.r_znear.ValueF;
+            CVars.r_znear.OnChanged(null, null);
+            CVars.r_fov.OnChanged += (o, e) => Engine.FOV = CVars.r_fov.ValueF;
+            CVars.r_fov.OnChanged(null, null);
+            CVars.r_decals.OnChanged += (o, e) => Engine.DisplayDecals = CVars.r_decals.ValueB;
+            CVars.r_decals.OnChanged(null, null);
+            CVars.r_forwardreflections.OnChanged += (o, e) => Engine.ForwardReflections = CVars.r_forwardreflections.ValueB;
+            CVars.r_forwardreflections.OnChanged(null, null);
+            CVars.r_forward_lights.OnChanged += (o, e) => Engine.Forward_Lights = CVars.r_forward_lights.ValueB;
+            CVars.r_forward_lights.OnChanged(null, null);
+            CVars.r_forward_shadows.OnChanged += (o, e) => Engine.Forward_Shadows = CVars.r_forward_shadows.ValueB;
+            CVars.r_forward_shadows.OnChanged(null, null);
+            CVars.r_forward_normals.OnChanged += (o, e) => Engine.Forward_Normals = CVars.r_forward_normals.ValueB;
+            CVars.r_forward_normals.OnChanged(null, null);
+            CVars.r_exposure.OnChanged += (o, e) => Engine.Exposure = CVars.r_exposure.ValueF;
+            CVars.r_exposure.OnChanged(null, null);
+            CVars.r_brighttransp.OnChanged += (o, e) => Engine.Deferred_BrightTransp = CVars.r_brighttransp.ValueB;
+            CVars.r_brighttransp.OnChanged(null, null);
+            CVars.r_grayscale.OnChanged += (o, e) => Engine.Deferred_Grayscale = CVars.r_grayscale.ValueB;
+            CVars.r_grayscale.OnChanged(null, null);
+            CVars.r_toonify.OnChanged += (o, e) => Engine.Deferred_Toonify = CVars.r_toonify.ValueB;
+            CVars.r_toonify.OnChanged(null, null);
+            CVars.r_motionblur.OnChanged += (o, e) => Engine.Deferred_MotionBlur = CVars.r_motionblur.ValueB;
+            CVars.r_motionblur.OnChanged(null, null);
+            CVars.r_ssao.OnChanged += (o, e) => Engine.Deferred_SSAO = CVars.r_ssao.ValueB;
+            CVars.r_ssao.OnChanged(null, null);
+            CVars.r_shadows.OnChanged += (o, e) => Engine.Deferred_Shadows = CVars.r_shadows.ValueB;
+            CVars.r_shadows.OnChanged(null, null);
+            CVars.r_hdr.OnChanged += (o, e) => Engine.Deferred_HDR = CVars.r_hdr.ValueB;
+            CVars.r_hdr.OnChanged(null, null);
+            CVars.r_transplighting.OnChanged += (o, e) => Engine.Deferred_TransparentLights = CVars.r_transplighting.ValueB;
+            CVars.r_transplighting.OnChanged(null, null);
+            CVars.r_lighting.OnChanged += (o, e) => Engine.Deferred_Lights = CVars.r_lighting.ValueB;
+            CVars.r_lighting.OnChanged(null, null);
+            // TODO: Update SunAdjust data
+        }
+
         /// <summary>
         /// Called when the window is loading, only to be used by the startup process.
         /// </summary>
@@ -364,11 +428,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.CLIENTINIT, "Window generated!");
             DPIScale = Window.Width / CVars.r_width.ValueF;
             SysConsole.Output(OutputType.CLIENTINIT, "DPIScale is " + DPIScale + "!");
+            SysConsole.Output(OutputType.CLIENTINIT, "Setting up a game engine backend placeholder...");
+            FakeEngine();
             SysConsole.Output(OutputType.CLIENTINIT, "Loading base textures...");
             PreInitRendering();
             Textures = new TextureEngine();
             Textures.InitTextureSystem(Files);
             ItemFrame = Textures.GetTexture("ui/hud/item_frame");
+            Engine.Textures = Textures;
             SysConsole.Output(OutputType.CLIENTINIT, "Loading shaders...");
             Shaders = new ShaderEngine();
             GLVendor = GL.GetString(StringName.Vendor);
@@ -381,10 +448,21 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Shaders.MCM_GOOD_GRAPHICS = false;
             }
             Shaders.InitShaderSystem();
-            View3D.CheckError("Load - Shaders");
+            Engine.Shaders = Shaders;
+            Engine.GetShaders();
+            GraphicsUtil.CheckError("Load - Shaders");
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading animation engine...");
+            Animations = new AnimationEngine();
+            Engine.Animations = Animations;
+            SysConsole.Output(OutputType.CLIENTINIT, "Loading model engine...");
+            Models = new ModelEngine();
+            Models.Init(Animations, Engine);
+            LODHelp = new ModelLODHelper(this);
+            Engine.Models = Models;
             SysConsole.Output(OutputType.CLIENTINIT, "Loading rendering helper...");
-            Rendering = new /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Renderer(Textures, Shaders);
+            Rendering = new Renderer(Textures, Shaders, Models);
             Rendering.Init();
+            Engine.Rendering = Rendering;
             SysConsole.Output(OutputType.CLIENTINIT, "Preparing load screen...");
             load_screen = Textures.GetTexture("ui/menus/loadscreen");
             Establish2D();
@@ -393,35 +471,31 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.CLIENTINIT, "Loading block textures...");
             TBlock = new TextureBlock();
             TBlock.Generate(this, CVars, Textures, false);
-            View3D.CheckError("Load - Textures");
+            GraphicsUtil.CheckError("Load - Textures");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading fonts...");
             Fonts = new GLFontEngine(Shaders);
             Fonts.Init(Files);
             FontSets = new FontSetEngine(Fonts);
             FontSets.Init((subdat) => Languages.GetText(Files, subdat), () => Ortho, () => GlobalTickTimeLocal);
-            View3D.CheckError("Load - Fonts");
+            GraphicsUtil.CheckError("Load - Fonts");
             PassLoadScreen();
-            SysConsole.Output(OutputType.CLIENTINIT, "Loading animation engine...");
-            Animations = new AnimationEngine();
-            SysConsole.Output(OutputType.CLIENTINIT, "Loading model engine...");
-            Models = new /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.ModelEngine();
-            Models.Init(Animations, this);
-            LODHelp = new ModelLODHelper(this);
+            Engine.FontSets = FontSets;
+            Engine.GLFonts = Fonts;
             SysConsole.Output(OutputType.CLIENTINIT, "Loading general graphics settings...");
             CVars.r_vsync.OnChanged += OnVsyncChanged;
             OnVsyncChanged(CVars.r_vsync, EventArgs.Empty);
             CVars.r_cloudshadows.OnChanged += OnCloudShadowChanged;
             CVars.r_transpll.OnChanged += OnLLChanged;
             OnLLChanged(CVars.r_transpll, EventArgs.Empty);
-            View3D.CheckError("Load - General Graphics");
+            GraphicsUtil.CheckError("Load - General Graphics");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading UI engine...");
             UIConsole.InitConsole(); // TODO: make this non-static
             InitChatSystem();
             PassLoadScreen();
-            View3D.CheckError("Load - UI");
+            GraphicsUtil.CheckError("Load - UI");
             SysConsole.Output(OutputType.CLIENTINIT, "Preparing rendering engine...");
             InitRendering();
-            View3D.CheckError("Load - Rendering");
+            GraphicsUtil.CheckError("Load - Rendering");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading particle effect engine...");
             Particles = new ParticleHelper(this) { Engine = new ParticleEngine(this) };
             SysConsole.Output(OutputType.CLIENTINIT, "Preparing mouse and keyboard handlers...");
@@ -429,19 +503,18 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Gamepad = new GamePadHandler();
             Gamepad.Init(this);
             PassLoadScreen();
-            View3D.CheckError("Load - Keyboard/mouse");
+            GraphicsUtil.CheckError("Load - Keyboard/mouse");
             SysConsole.Output(OutputType.CLIENTINIT, "Building the sound system...");
-            Sounds = new SoundEngine();
-            Sounds.Init(this, CVars);
-            View3D.CheckError("Load - Sound");
+            Sounds.Init(Engine);
+            GraphicsUtil.CheckError("Load - Sound");
             SysConsole.Output(OutputType.CLIENTINIT, "Building game world...");
             BuildWorld();
             PassLoadScreen();
-            View3D.CheckError("Load - World");
+            GraphicsUtil.CheckError("Load - World");
             SysConsole.Output(OutputType.CLIENTINIT, "Preparing networking...");
             Network = new NetworkBase(this);
             RegisterDefaultEntityTypes();
-            View3D.CheckError("Load - Net");
+            GraphicsUtil.CheckError("Load - Net");
             PassLoadScreen();
             SysConsole.Output(OutputType.CLIENTINIT, "Loading Voxel computer...");
             try
@@ -544,7 +617,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             SysConsole.Output(OutputType.CLIENTINIT, "Showing main menu...");
             ShowMainMenu();
-            View3D.CheckError("Load - Final");
+            GraphicsUtil.CheckError("Load - Final");
             SysConsole.Output(OutputType.CLIENTINIT, "Ready and looping!");
         }
 
@@ -653,7 +726,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void OnEchoVolumeChanged(object obj, EventArgs e)
         {
-            if (Sounds.Microphone == null)
+            // TODO: Fix!
+            /*if (Sounds.Microphone == null)
             {
                 return;
             }
@@ -668,7 +742,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     Sounds.Microphone.StartEcho();
                 }
                 Sounds.Microphone.Volume = Math.Min(CVars.a_echovolume.ValueF, 1f);
-            }
+            }*/
         }
 
         /// <summary>
@@ -778,7 +852,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 return;
             }
             GL.Viewport(0, 0, Window.Width, Window.Height);
-            MainWorldView.Generate(this, Window.Width, Window.Height);
+            MainWorldView.Generate(Engine, Window.Width, Window.Height);
             FixInvRender();
             TWOD_FixTexture();
         }

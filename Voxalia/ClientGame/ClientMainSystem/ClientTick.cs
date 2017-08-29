@@ -386,6 +386,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 Delta = delt * CVars.g_timescale.ValueD;
                 GlobalTickTimeLocal += Delta;
+                Engine.GlobalTickTime = GlobalTickTimeLocal;
                 try
                 {
                     opsat += Delta;

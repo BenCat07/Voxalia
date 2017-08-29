@@ -23,6 +23,8 @@ using Voxalia.ClientGame.JointSystem;
 using FreneticScript.TagHandlers.Objects;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
+using FreneticGameGraphics.ClientSystem;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.EntitySystem
 {
@@ -776,7 +778,7 @@ namespace Voxalia.ClientGame.EntitySystem
         // TODO: Merge with base.Render() as much as possible!
         public override void Render()
         {
-            View3D.CheckError("Render - Player - Pre");
+            GraphicsUtil.CheckError("Render - Player - Pre");
             Location renderrelpos = GetWeldSpot();
             if (TheClient.IsMainMenu || !TheClient.CVars.r_drawself.ValueB)
             {
@@ -791,32 +793,33 @@ namespace Voxalia.ClientGame.EntitySystem
                 }
                 else
                 {
-                    TheClient.Rendering.RenderLine(ServerLocation, renderrelpos);
-                    View3D.CheckError("Render - Player - Line");
-                    TheClient.Rendering.RenderLineBox(ServerLocation + new Location(-0.2), ServerLocation + new Location(0.2));
-                    if (View3D.CheckError("Render - Player - LineBox"))
+                    TheClient.Rendering.RenderLine(ServerLocation, renderrelpos, TheClient.MainWorldView);
+                    GraphicsUtil.CheckError("Render - Player - Line");
+                    TheClient.Rendering.RenderLineBox(ServerLocation + new Location(-0.2), ServerLocation + new Location(0.2), TheClient.MainWorldView);
+                    GraphicsUtil.CheckError("Render - Player - LineBox");
+                    /*if (GraphicsUtil.CheckError("Render - Player - LineBox"))
                     {
                         SysConsole.Output(OutputType.DEBUG, "Caught: " + (ServerLocation + new Location(-0.2)) + "::: " + (ServerLocation + new Location(0.2)));
-                    }
+                    }*/
                 }
             }
             if (TheClient.VR != null)
             {
                 return;
             }
-            View3D.CheckError("Render - Player - 0");
+            GraphicsUtil.CheckError("Render - Player - 0");
             OpenTK.Matrix4d mat = OpenTK.Matrix4d.Scale(1.5f)
                 * OpenTK.Matrix4d.CreateRotationZ((Direction.Yaw * Utilities.PI180))
                 * PlayerAngleMat
                 * OpenTK.Matrix4d.CreateTranslation(ClientUtilities.ConvertD(renderrelpos));
             TheClient.MainWorldView.SetMatrix(2, mat);
-            TheClient.Rendering.SetMinimumLight(0.0f);
+            TheClient.Rendering.SetMinimumLight(0.0f, TheClient.MainWorldView);
             model.CustomAnimationAdjustments = new Dictionary<string, OpenTK.Matrix4>(SavedAdjustmentsOTK)
             {
                 // TODO: safe (no-collision) rotation check?
                 { "spine04", GetAdjustmentOTK("spine04") * OpenTK.Matrix4.CreateRotationX(-(float)(Direction.Pitch / 2f * Utilities.PI180)) }
             };
-            View3D.CheckError("Render - Player - 1");
+            GraphicsUtil.CheckError("Render - Player - 1");
             if (!TheClient.MainWorldView.RenderingShadows && TheClient.CVars.g_firstperson.ValueB)
             {
                 model.CustomAnimationAdjustments["neck01"] = GetAdjustmentOTK("neck01") * OpenTK.Matrix4.CreateRotationX(-(float)(160f * Utilities.PI180));
@@ -828,7 +831,7 @@ namespace Voxalia.ClientGame.EntitySystem
             model.Draw(aHTime, hAnim, aTTime, tAnim, aLTime, lAnim);
             Model mod = TheClient.GetItemForSlot(TheClient.QuickBarPos).Mod;
             bool hasjp = HasJetpack();
-            View3D.CheckError("Render - Player - 2");
+            GraphicsUtil.CheckError("Render - Player - 2");
             if (!hasjp && tAnim != null && mod != null)
             {
                 mat = OpenTK.Matrix4d.CreateTranslation(ClientUtilities.ConvertD(renderrelpos));
@@ -852,7 +855,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 bonemat = OpenTK.Matrix4.Identity;
                 GL.UniformMatrix4(100, false, ref bonemat);
             }
-            View3D.CheckError("Render - Player - 3");
+            GraphicsUtil.CheckError("Render - Player - 3");
             if (hasjp)
             {
                 // TODO: Abstractify!
@@ -875,13 +878,13 @@ namespace Voxalia.ClientGame.EntitySystem
                 bonemat = OpenTK.Matrix4.Identity;
                 GL.UniformMatrix4(100, false, ref bonemat);
             }
-            View3D.CheckError("Render - Player - 4");
+            GraphicsUtil.CheckError("Render - Player - 4");
             if (IsTyping)
             {
                 TheClient.Textures.GetTexture("ui/game/typing").Bind(); // TODO: store!
-                TheClient.Rendering.RenderBillboard(renderrelpos + new Location(0, 0, 4), new Location(2), TheClient.MainWorldView.CameraPos);
+                TheClient.Rendering.RenderBillboard(renderrelpos + new Location(0, 0, 4), new Location(2), TheClient.MainWorldView.CameraPos, TheClient.MainWorldView);
             }
-            View3D.CheckError("Render - Player - Post");
+            GraphicsUtil.CheckError("Render - Player - Post");
         }
 
         public float ViewBackMod()

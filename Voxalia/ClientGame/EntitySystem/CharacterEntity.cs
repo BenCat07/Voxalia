@@ -19,7 +19,7 @@ using BEPUphysics;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using BEPUphysics.BroadPhaseEntries;
 using BEPUphysics.Constraints.SingleEntity;
-using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
+using FreneticGameGraphics.LightingSystem;
 using Voxalia.ClientGame.WorldSystem;
 using Voxalia.ClientGame.OtherSystems;
 using BEPUphysics.Character;

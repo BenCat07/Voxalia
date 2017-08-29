@@ -31,6 +31,7 @@ using FreneticGameCore;
 using FreneticGameGraphics;
 using FreneticGameGraphics.GraphicsHelpers;
 using FreneticGameCore.Collision;
+using FreneticGameGraphics.ClientSystem;
 
 namespace Voxalia.ClientGame.WorldSystem
 {
@@ -91,30 +92,30 @@ namespace Voxalia.ClientGame.WorldSystem
             }
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 1, 0);
             GL.BindBufferBase(BufferRangeTarget.ShaderStorageBuffer, 2, 0);
-            View3D.CheckError("Squishing Grass");
+            GraphicsUtil.CheckError("Squishing Grass");
         }
         
         public void RenderGrass()
         {
             if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_SOLID)
             {
-                TheClient.s_forw_grass = TheClient.s_forw_grass.Bind();
+                TheClient.Engine.Shaders3D.s_forw_grass = TheClient.Engine.Shaders3D.s_forw_grass.Bind();
                 GL.Uniform1(6, (float)TheClient.GlobalTickTimeLocal);
                 GL.Uniform4(12, new Vector4(ClientUtilities.Convert(TheClient.MainWorldView.FogCol), TheClient.MainWorldView.FogAlpha));
                 float fogDist = 1.0f / TheClient.FogMaxDist();
                 fogDist *= fogDist;
                 GL.Uniform1(13, fogDist);
-                GL.Uniform2(14, new Vector2(TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
+                //GL.Uniform2(14, new Vector2(TheClient.CVars.r_znear.ValueF, TheClient.ZFar()));
                 GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
             }
             else if (TheClient.MainWorldView.FBOid == FBOID.MAIN)
             {
-                TheClient.s_fbo_grass = TheClient.s_fbo_grass.Bind();
+                TheClient.Engine.Shaders3D.s_fbo_grass = TheClient.Engine.Shaders3D.s_fbo_grass.Bind();
                 GL.UniformMatrix4(1, false, ref TheClient.MainWorldView.PrimaryMatrix);
             }
             else if (TheClient.MainWorldView.FBOid == FBOID.SHADOWS && TheClient.MainWorldView.TranspShadows)
             {
-                TheClient.s_shadow_grass = TheClient.s_shadow_grass.Bind();
+                TheClient.Engine.Shaders3D.s_shadow_grass = TheClient.Engine.Shaders3D.s_shadow_grass.Bind();
             }
             else
             {
@@ -131,7 +132,7 @@ namespace Voxalia.ClientGame.WorldSystem
             GL.Uniform1(6, (float)GlobalTickTimeLocal);
             GL.Uniform3(7, ClientUtilities.Convert(ActualWind));
             GL.Uniform1(8, TheClient.CVars.r_plantdistance.ValueF * TheClient.CVars.r_plantdistance.ValueF);
-            TheClient.Rendering.SetColor(GetSunAdjust());
+            TheClient.Rendering.SetColor(GetSunAdjust(), TheClient.MainWorldView);
             foreach (Chunk chunk in chToRender)
             {
                 if (chunk.Plant_VAO != -1)

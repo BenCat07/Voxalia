@@ -22,6 +22,7 @@ using Voxalia.ClientGame.WorldSystem;
 using FreneticGameCore;
 using FreneticGameGraphics;
 using FreneticGameGraphics.GraphicsHelpers;
+using FreneticGameGraphics.ClientSystem;
 
 namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 {
@@ -112,13 +113,13 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
 
         public void Render(double mind, double maxd, bool outview = false)
         {
-            View3D.CheckError("Rendering - Particles - Pre");
+            GraphicsUtil.CheckError("Rendering - Particles - Pre");
             if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP || TheClient.MainWorldView.FBOid.IsMainTransp()
                 || (TheClient.MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS && TheClient.MainWorldView.TranspShadows))
             {
                 double mindsq = mind * mind;
                 double maxdsq = maxd * maxd;
-                View3D.CheckError("Rendering - Particles - PreFX");
+                GraphicsUtil.CheckError("Rendering - Particles - PreFX");
                 List<Vector3> pos = new List<Vector3>();
                 List<Vector4> col = new List<Vector4>();
                 List<Vector2> tcs = new List<Vector2>();
@@ -157,7 +158,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                         ActiveEffects.RemoveAt(i--);
                     }
                 }
-                View3D.CheckError("Rendering - Particles - PreClouds");
+                GraphicsUtil.CheckError("Rendering - Particles - PreClouds");
                 ParticleData pd = new ParticleData();
                 if (TheClient.CVars.r_clouds.ValueB)
                 {
@@ -226,17 +227,17 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     pos.AddRange(pd.Poses);
                     col.AddRange(pd.Cols);
                     tcs.AddRange(pd.TCs);
-                    View3D.CheckError("Rendering - Particles - PostClouds");
+                    GraphicsUtil.CheckError("Rendering - Particles - PostClouds");
                 }
                 if (TheClient.MainWorldView.FBOid == FBOID.FORWARD_TRANSP)
                 {
-                    TheClient.s_forw_particles = TheClient.s_forw_particles.Bind();
+                    TheClient.Engine.Shaders3D.s_forw_particles = TheClient.Engine.Shaders3D.s_forw_particles.Bind();
                     Matrix4 mat = outview ? TheClient.MainWorldView.OutViewMatrix : TheClient.MainWorldView.PrimaryMatrix;
                     GL.UniformMatrix4(1, false, ref mat);
                 }
                 else if (TheClient.MainWorldView.FBOid == FBOID.DYNAMIC_SHADOWS)
                 {
-                    TheClient.s_shadow_parts = TheClient.s_shadow_parts.Bind();
+                    TheClient.Engine.Shaders3D.s_shadow_parts = TheClient.Engine.Shaders3D.s_shadow_parts.Bind();
                 }
                 else
                 {
@@ -245,22 +246,22 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     {
                         if (TheClient.CVars.r_transpll.ValueB)
                         {
-                            TheClient.s_transponlylitsh_ll_particles = TheClient.s_transponlylitsh_ll_particles.Bind();
+                            TheClient.Engine.Shaders3D.s_transponlylitsh_ll_particles = TheClient.Engine.Shaders3D.s_transponlylitsh_ll_particles.Bind();
                         }
                         else
                         {
-                            TheClient.s_transponlylitsh_particles = TheClient.s_transponlylitsh_particles.Bind();
+                            TheClient.Engine.Shaders3D.s_transponlylitsh_particles = TheClient.Engine.Shaders3D.s_transponlylitsh_particles.Bind();
                         }
                     }
                     else
                     {
                         if (TheClient.CVars.r_transpll.ValueB)
                         {
-                            TheClient.s_transponlylit_ll_particles = TheClient.s_transponlylit_ll_particles.Bind();
+                            TheClient.Engine.Shaders3D.s_transponlylit_ll_particles = TheClient.Engine.Shaders3D.s_transponlylit_ll_particles.Bind();
                         }
                         else
                         {
-                            TheClient.s_transponlylit_particles = TheClient.s_transponlylit_particles.Bind();
+                            TheClient.Engine.Shaders3D.s_transponlylit_particles = TheClient.Engine.Shaders3D.s_transponlylit_particles.Bind();
                         }
                     }
                     GL.ActiveTexture(TextureUnit.Texture1);
@@ -268,7 +269,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     Matrix4 mat = outview ? TheClient.MainWorldView.OutViewMatrix : TheClient.MainWorldView.PrimaryMatrix;
                     GL.UniformMatrix4(1, false, ref mat);
                 }
-                View3D.CheckError("Rendering - Particles - 1");
+                GraphicsUtil.CheckError("Rendering - Particles - 1");
                 Matrix4 ident = Matrix4.Identity;
                 GL.UniformMatrix4(2, false, ref ident);
                 GL.ActiveTexture(TextureUnit.Texture0);
@@ -281,7 +282,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 {
                     posind[i] = i;
                 }
-                View3D.CheckError("Rendering - Particles - 2");
+                GraphicsUtil.CheckError("Rendering - Particles - 2");
                 Part_C = posind.Length;
                 GL.BindBuffer(BufferTarget.ArrayBuffer, Part_VBO_Pos);
                 GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)(posset.Length * Vector3.SizeInBytes), posset, BufferUsageHint.StaticDraw);
@@ -314,7 +315,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 GL.BindTexture(TextureTarget.Texture2D, 0);
                 GL.ActiveTexture(TextureUnit.Texture0);
                 GL.BindTexture(TextureTarget.Texture2D, 0);
-                View3D.CheckError("Rendering - Particles - 3");
+                GraphicsUtil.CheckError("Rendering - Particles - 3");
             }
         }
     }

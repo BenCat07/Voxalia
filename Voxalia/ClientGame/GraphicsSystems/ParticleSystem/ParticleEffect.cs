@@ -224,8 +224,8 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             Vector4 scolor2 = new Vector4((float)Color2.X * light.X, (float)Color2.Y * light.Y, (float)Color2.Z * light.Z, Alpha * light.W);
             Vector4 rcol = scolor * rel + scolor2 * (1 - rel);
             rcol = Vector4.Max(rcol, new Vector4(MinimumLight, MinimumLight, MinimumLight, 0f));
-            TheClient.Rendering.SetColor(rcol);
-            TheClient.Rendering.SetMinimumLight(MinimumLight);
+            TheClient.Rendering.SetColor(rcol, TheClient.MainWorldView);
+            TheClient.Rendering.SetMinimumLight(MinimumLight, TheClient.MainWorldView);
             switch (Type)
             {
                 case ParticleEffectType.LINE:
@@ -235,7 +235,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                         {
                             GL.LineWidth(dat);
                         }
-                        TheClient.Rendering.RenderLine(start, End(this));
+                        TheClient.Rendering.RenderLine(start, End(this), TheClient.MainWorldView);
                         if (dat != 1)
                         {
                             GL.LineWidth(1);
@@ -244,7 +244,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     break;
                 case ParticleEffectType.CYLINDER:
                     {
-                        TheClient.Rendering.RenderCylinder(start, End(this), FData(this));
+                        TheClient.Rendering.RenderCylinder(start, End(this), FData(this), TheClient.MainWorldView);
                     }
                     break;
                 case ParticleEffectType.LINEBOX:
@@ -254,7 +254,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                         {
                             GL.LineWidth(dat);
                         }
-                        TheClient.Rendering.RenderLineBox(start, End(this));
+                        TheClient.Rendering.RenderLineBox(start, End(this), TheClient.MainWorldView);
                         if (dat != 1)
                         {
                             GL.LineWidth(1);
@@ -277,7 +277,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                     break;
                 case ParticleEffectType.SQUARE:
                     {
-                        TheClient.Rendering.RenderBillboard(start, End(this), TheClient.MainWorldView.CameraPos);
+                        TheClient.Rendering.RenderBillboard(start, End(this), TheClient.MainWorldView.CameraPos, TheClient.MainWorldView);
                     }
                     break;
                 default:

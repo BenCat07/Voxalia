@@ -21,6 +21,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.EntitySystem
 {
@@ -76,7 +77,7 @@ namespace Voxalia.ClientGame.EntitySystem
             Matrix4d orient = GetOrientationMatrix();
             Matrix4d mat = (Matrix4d.Scale(ClientUtilities.ConvertD(scale)) * orient * Matrix4d.CreateTranslation(ClientUtilities.ConvertD(GetPosition())));
             TheClient.MainWorldView.SetMatrix(2, mat);
-            TheClient.Rendering.SetMinimumLight(0.0f);
+            TheClient.Rendering.SetMinimumLight(0.0f, TheClient.MainWorldView);
             if (model.Meshes[0].vbo.Tex == null)
             {
                 TheClient.Textures.White.Bind();

@@ -19,6 +19,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
+using FreneticGameGraphics.ClientSystem;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.WorldSystem
 {
@@ -1070,9 +1072,9 @@ namespace Voxalia.ClientGame.WorldSystem
             {
                 Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(WorldPosition.ToLocation() * CHUNK_SIZE));
                 OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
-                View3D.CheckError("Chunk - Render - Prep Matrix");
+                GraphicsUtil.CheckError("Chunk - Render - Prep Matrix");
                 _VBO.Render();
-                View3D.CheckError("Chunk - Render - VBO");
+                GraphicsUtil.CheckError("Chunk - Render - VBO");
             }
             if (OwningRegion.TheClient.MainWorldView.FBOid == FBOID.REFRACT)
             {
@@ -1081,9 +1083,9 @@ namespace Voxalia.ClientGame.WorldSystem
                 {
                     Matrix4d mat = Matrix4d.CreateTranslation(ClientUtilities.ConvertD(WorldPosition.ToLocation() * CHUNK_SIZE));
                     OwningRegion.TheClient.MainWorldView.SetMatrix(2, mat);
-                    View3D.CheckError("Chunk - Render - Refract - Prep Matrix");
+                    GraphicsUtil.CheckError("Chunk - Render - Refract - Prep Matrix");
                     _VBO.Render();
-                    View3D.CheckError("Chunk - Render - Refract - VBO");
+                    GraphicsUtil.CheckError("Chunk - Render - Refract - VBO");
                 }
             }
         }

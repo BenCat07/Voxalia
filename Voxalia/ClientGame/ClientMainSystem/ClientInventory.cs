@@ -11,8 +11,10 @@ using Voxalia.ClientGame.UISystem.MenuSystem;
 using Voxalia.ClientGame.GraphicsSystems;
 using OpenTK;
 using Voxalia.ClientGame.OtherSystems;
-using Voxalia.ClientGame.GraphicsSystems.LightingSystem;
 using FreneticGameCore;
+using FreneticGameGraphics.ClientSystem;
+using FreneticGameGraphics.GraphicsHelpers;
+using FreneticGameGraphics.LightingSystem;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -66,7 +68,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             MainItemView.Width = Window.Width;
             MainItemView.Height = Window.Height;
             MainItemView.GenerateFBO();
-            MainItemView.Generate(this, Window.Width, Window.Height); // TODO: Change Width/Height here and above to actual viewed size?
+            MainItemView.Generate(Engine, Window.Width, Window.Height); // TODO: Change Width/Height here and above to actual viewed size?
         }
 
         public void InitInventory()
@@ -204,7 +206,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 MainWorldView = MainItemView;
                 MainItemView.Render();
                 MainWorldView = temp;
-                View3D.CheckError("ItemRender");
+                GraphicsUtil.CheckError("ItemRender");
             }
         }
 

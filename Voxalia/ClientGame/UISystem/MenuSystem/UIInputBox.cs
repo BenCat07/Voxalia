@@ -204,7 +204,7 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             int y = GetY() + yoff;
             int w = (int)GetWidth();
             TheClient.Textures.White.Bind();
-            TheClient.Rendering.SetColor(Color);
+            TheClient.Rendering.SetColor(Color, TheClient.MainWorldView);
             TheClient.Rendering.RenderRectangle(x - 1, y - 1, x + w + 1, y + Fonts.font_default.Height + 1);
             GL.Enable(EnableCap.ScissorTest);
             GL.Scissor(x, TheClient.Window.Height - (y + (int)Fonts.font_default.Height), w, (int)Fonts.font_default.Height);
@@ -212,10 +212,10 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
             {
                 float textw = Fonts.MeasureFancyText(typed.Substring(0, MinCursor + c));
                 float textw2 = Fonts.MeasureFancyText(typed.Substring(0, MaxCursor + cmax));
-                TheClient.Rendering.SetColor(new Color4(0f, 0.2f, 1f, 0.5f));
+                TheClient.Rendering.SetColor(new Color4(0f, 0.2f, 1f, 0.5f), TheClient.MainWorldView);
                 TheClient.Rendering.RenderRectangle(x + textw, y, x + textw2 + 1, y + Fonts.font_default.Height);
             }
-            TheClient.Rendering.SetColor(Color4.White);
+            TheClient.Rendering.SetColor(Color4.White, TheClient.MainWorldView);
             Fonts.DrawColoredText((typed.Length == 0 ? ("^)^i" + Info) : ("^0" + typed)), new Location(x, y, 0));
             GL.Scissor(0, 0, TheClient.Window.Width, TheClient.Window.Height); // TODO: Bump around a stack, for embedded scroll groups?
             GL.Disable(EnableCap.ScissorTest);

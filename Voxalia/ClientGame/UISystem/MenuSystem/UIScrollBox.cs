@@ -87,9 +87,9 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
                 int h = (int)GetHeight();
                 int w = (int)GetWidth();
                 Client TheClient = GetClient();
-                TheClient.Rendering.SetColor(Color);
+                TheClient.Rendering.SetColor(Color, TheClient.MainWorldView);
                 TheClient.Rendering.RenderRectangle(x, y, x + w, y + h);
-                TheClient.Rendering.SetColor(new Vector4(1f));
+                TheClient.Rendering.SetColor(new Vector4(1f), TheClient.MainWorldView);
             }
         }
 

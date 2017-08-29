@@ -84,12 +84,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
             if (touched || pressed)
             {
                 BaseTexture.Engine.White.Bind();
-                tclient.Rendering.SetColor(pressed ? PressSpotColor : TouchSpotColor);
+                tclient.Rendering.SetColor(pressed ? PressSpotColor : TouchSpotColor, tclient.MainWorldView);
                 Vector2 hsize = pressed ? PressSpotHalfSize : TouchSpotHalfSize;
                 tclient.Rendering.RenderRectangle(cont.TrackPad.X - hsize.X, cont.TrackPad.Y - hsize.X, cont.TrackPad.X + hsize.X, cont.TrackPad.Y + hsize.Y);
             }
             GL.BindTexture(TextureTarget.Texture2D, 0);
-            tclient.Rendering.SetColor(Color4.White);
+            tclient.Rendering.SetColor(Color4.White, tclient.MainWorldView);
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, tclient.MainWorldView.cFBO);
             GL.Enable(EnableCap.CullFace);
             tclient.MainWorldView.FixVP();
@@ -142,7 +142,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 throw new Exception("Failed to start VR: Invalid render target size!");
             }
             w *= 2;
-            TheClient.MainWorldView.Generate(TheClient, (int)w, (int)h);
+            TheClient.MainWorldView.Generate(TheClient.Engine, (int)w, (int)h);
             TheClient.MainWorldView.GenerateFBO();
             SysConsole.Output(OutputType.INFO, "Switching to VR mode: " + w + "/" + h);
             Compositor = OpenVR.Compositor;

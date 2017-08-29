@@ -23,6 +23,7 @@ using Voxalia.ClientGame.JointSystem;
 using BEPUphysics.BroadPhaseEntries.MobileCollidables;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.EntitySystem
 {
@@ -386,7 +387,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 {
                     return;
                 }
-                model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()));
+                model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()), TheClient.MainWorldView);
             }
         }
 
@@ -411,7 +412,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public override void RenderWithOffsetLOD(Location pos)
         {
-            model.DrawLOD(GetPosition() + pos + ClientUtilities.ConvertD(transform.ExtractTranslation()));
+            model.DrawLOD(GetPosition() + pos + ClientUtilities.ConvertD(transform.ExtractTranslation()), TheClient.MainWorldView);
         }
 
         /// <summary>
@@ -436,7 +437,7 @@ namespace Voxalia.ClientGame.EntitySystem
             if (GenBlockShadows && distsq > maxr * maxr) // TODO: LOD-able option?
             {
                 // TODO: Rotation?
-                model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()));
+                model.DrawLOD(GetPosition() + ClientUtilities.ConvertD(transform.ExtractTranslation()), TheClient.MainWorldView);
                 return;
             }
             Matrix4d orient = GetOrientationMatrix();
@@ -446,7 +447,7 @@ namespace Voxalia.ClientGame.EntitySystem
             TheClient.MainWorldView.SetMatrix(2, mat);
             if (!TheClient.MainWorldView.RenderingShadows)
             {
-                TheClient.Rendering.SetMinimumLight(0.0f);
+                TheClient.Rendering.SetMinimumLight(0.0f, TheClient.MainWorldView);
             }
             if (model.Meshes[0].vbo.Tex == null)
             {
@@ -456,7 +457,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 OpenTK.Vector4 sadj = TheRegion.GetSunAdjust();
                 float skyl = TheRegion.GetSkyLightBase(GetPosition() + new Location(0, 0, ModelMax.Z));
-                TheClient.Rendering.SetColor(new OpenTK.Vector4(sadj.X * skyl, sadj.Y * skyl, sadj.Z * skyl, 1.0f));
+                TheClient.Rendering.SetColor(new OpenTK.Vector4(sadj.X * skyl, sadj.Y * skyl, sadj.Z * skyl, 1.0f), TheClient.MainWorldView);
             }
             model.Draw(); // TODO: Animation(s)?
         }

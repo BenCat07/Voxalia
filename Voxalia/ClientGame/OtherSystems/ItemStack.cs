@@ -110,7 +110,7 @@ namespace Voxalia.ClientGame.OtherSystems
             return Tex?.Name;
         }
 
-        public /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Model Mod;
+        public Model Mod;
 
         public override string GetModelName()
         {
@@ -138,18 +138,18 @@ namespace Voxalia.ClientGame.OtherSystems
             {
                 TheClient.isVox = false;
                 TheClient.SetVox();
-                TheClient.Rendering.SetMinimumLight(0.9f);
+                TheClient.Rendering.SetMinimumLight(0.9f, TheClient.MainWorldView);
                 RenderedBlock.WorldTransform = BEPUutilities.Matrix.CreateScale(size.ToBVector() * 0.70f)
                     * rot1
                     * BEPUutilities.Matrix.CreateTranslation(pos.ToBVector());
                 RenderedBlock.Render();
-                TheClient.Rendering.SetMinimumLight(0f);
+                TheClient.Rendering.SetMinimumLight(0f, TheClient.MainWorldView);
             }
             else if (RenderedModel != null)
             {
                 TheClient.isVox = true;
                 TheClient.SetEnts();
-                TheClient.Rendering.SetMinimumLight(0.9f);
+                TheClient.Rendering.SetMinimumLight(0.9f, TheClient.MainWorldView);
                 BEPUutilities.RigidTransform rt = BEPUutilities.RigidTransform.Identity;
                 RenderedModel.Shape.GetBoundingBox(ref rt, out BEPUutilities.BoundingBox bb);
                 BEPUutilities.Vector3 scale = BEPUutilities.Vector3.Max(bb.Max, -bb.Min);
@@ -158,7 +158,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     * rot1
                     * BEPUutilities.Matrix.CreateTranslation(pos.ToBVector());
                 RenderedModel.RenderSimpler();
-                TheClient.Rendering.SetMinimumLight(0f);
+                TheClient.Rendering.SetMinimumLight(0f, TheClient.MainWorldView);
             }
         }
 
@@ -180,7 +180,7 @@ namespace Voxalia.ClientGame.OtherSystems
                 }
             }
             Tex.Bind();
-            TheClient.Rendering.SetColor(TheClient.Rendering.AdaptColor(ClientUtilities.Convert(TheClient.Player.GetPosition()), GetColor()));
+            TheClient.Rendering.SetColor(TheClient.Rendering.AdaptColor(ClientUtilities.Convert(TheClient.Player.GetPosition()), GetColor()), TheClient.MainWorldView);
             TheClient.Rendering.RenderRectangle((int)pos.X, (int)pos.Y, (int)(pos.X + size.X), (int)(pos.Y + size.Y));
         }
     }
