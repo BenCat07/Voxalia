@@ -134,6 +134,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         string BSaveStr = null;
 
         /// <summary>
+        /// Gamepad binds save data.
+        /// </summary>
+        string GPBSaveStr = null;
+
+        /// <summary>
         /// Fires once per second, every second, for the client.
         /// </summary>
         public void OncePerSecondActions()
@@ -170,7 +175,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 edited = true;
                 KeyHandler.Modified = false;
-                first = false;
                 StringBuilder keybindsave = new StringBuilder(KeyHandler.keystonames.Count * 100);
                 keybindsave.Append("wait 0.5;\n");
                 foreach (KeyValuePair<string, Key> keydat in KeyHandler.namestokeys)
@@ -190,8 +194,33 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     BSaveStr = keybindsave.ToString();
                 }
             }
+            if (Gamepad.Modified || first)
+            {
+                edited = true;
+                Gamepad.Modified = false;
+                StringBuilder gamepadbindsave = new StringBuilder(GamePadHandler.GP_BUTTON_COUNT * 256);
+                gamepadbindsave.Append("wait 0.5;\n");
+                for (int i = 0; i < GamePadHandler.GP_BUTTON_COUNT; i++)
+                {
+                    CommandScript cs = Gamepad.ButtonBinds[i];
+                    GamePadButton button = (GamePadButton)i;
+                    if (cs == null)
+                    {
+                        gamepadbindsave.Append("gp_unbind \"" + button.ToString().ToLowerFast() + "\";\n");
+                    }
+                    else
+                    {
+                        gamepadbindsave.Append("gp_bindblock \"" + button.ToString().ToLowerFast() + "\"\n{\n" + cs.FullString("\t") + "}\n");
+                    }
+                }
+                lock (saveLock)
+                {
+                    GPBSaveStr = gamepadbindsave.ToString();
+                }
+            }
             if (edited)
             {
+                first = false;
                 Schedule.StartAsyncTask(SaveCFG);
             }
             ops_spike++;
@@ -322,7 +351,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 lock (saveLock)
                 {
-                    Files.WriteText("clientdefaultsettings.cfg", HSaveStr + CSaveStr + BSaveStr);
+                    Files.WriteText("clientdefaultsettings.cfg", HSaveStr + CSaveStr + BSaveStr + GPBSaveStr);
                 }
             }
             catch (Exception ex)
@@ -381,7 +410,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                             }
                         }
                     }
-                    GamePadHandler.Tick(Delta);
+                    Gamepad.Tick(Delta);
                     MouseHandler.Tick();
                     UIConsole.Tick();
                     Commands.Tick();

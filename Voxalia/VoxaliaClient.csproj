@@ -94,6 +94,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClientGame\CommandSystem\UICommands\GP_BindBlockCommand.cs" />
+    <Compile Include="ClientGame\CommandSystem\UICommands\GP_BindCommand.cs" />
+    <Compile Include="ClientGame\CommandSystem\UICommands\GP_UnbindCommand.cs" />
     <Compile Include="ClientGame\EntitySystem\SmasherPrimitiveEntity.cs" />
     <Compile Include="ClientGame\JointSystem\JointHinge.cs" />
     <Compile Include="ClientGame\NetworkSystem\PacketsIn\JointUpdatePacketIn.cs" />

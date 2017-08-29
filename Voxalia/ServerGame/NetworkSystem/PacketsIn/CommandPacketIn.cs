@@ -18,7 +18,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsIn
         public override bool ParseBytesAndExecute(DataReader data)
         {
             Player.NoteDidAction();
-            string[] datums = data.ReadString(data.Available).SplitFast('\n');
+            string[] datums = data.ReadString(data.Available).SplitFastFS('\n');
             List<string> args =  datums.ToList();
             string cmd = args[0];
             args.RemoveAt(0);

@@ -349,6 +349,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
         }
 
+        /// <summary>
+        /// Gamepad helper code.
+        /// </summary>
+        public GamePadHandler Gamepad;
+
         Texture load_screen;
 
         /// <summary>
@@ -419,9 +424,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             View3D.CheckError("Load - Rendering");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading particle effect engine...");
             Particles = new ParticleHelper(this) { Engine = new ParticleEngine(this) };
-            SysConsole.Output(OutputType.CLIENTINIT, "Preparing mouse, keyboard, and gamepad handlers...");
+            SysConsole.Output(OutputType.CLIENTINIT, "Preparing mouse and keyboard handlers...");
             KeyHandler.Init();
-            GamePadHandler.Init();
+            Gamepad = new GamePadHandler();
+            Gamepad.Init(this);
             PassLoadScreen();
             View3D.CheckError("Load - Keyboard/mouse");
             SysConsole.Output(OutputType.CLIENTINIT, "Building the sound system...");

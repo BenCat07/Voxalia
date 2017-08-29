@@ -16,44 +16,47 @@ using FreneticScript.TagHandlers;
 namespace Voxalia.ClientGame.CommandSystem.UICommands
 {
     /// <summary>
-    /// A quick command to bind a key.
+    /// A quick command to bind a gamepad button.
     /// </summary>
-    public class BindCommand : AbstractCommand
+    public class GP_BindCommand : AbstractCommand
     {
         public Client TheClient;
 
-        public BindCommand(Client tclient)
+        public GP_BindCommand(Client tclient)
         {
             TheClient = tclient;
-            Name = "bind";
-            Description = "Binds a script to a key.";
-            Arguments = "<key> [binding]";
+            Name = "gp_bind";
+            Description = "Binds a script to a gamepad button.";
+            Arguments = "<button> [binding]";
             MinimumArguments = 1;
             MaximumArguments = 2;
         }
 
         public static void Execute(CommandQueue queue, CommandEntry entry)
         {
-            Client TheClient = (entry.Command as BindCommand).TheClient;
+            Client TheClient = (entry.Command as GP_BindCommand).TheClient;
             string key = entry.GetArgument(queue, 0);
-            Key k = KeyHandler.GetKeyForName(key);
-            // TODO: Bad key error
+            if (!Enum.TryParse(key, true, out GamePadButton btn))
+            {
+                queue.HandleError(entry, "Unknown button: " + key);
+                return;
+            }
             if (entry.Arguments.Count == 1)
             {
-                CommandScript cs = KeyHandler.GetBind(k);
+                CommandScript cs = TheClient.Gamepad.ButtonBinds[(int)btn];
                 if (cs == null)
                 {
-                    queue.HandleError(entry, "That key is not bound, or does not exist.");
+                    queue.HandleError(entry, "That button is not bound, or does not exist.");
                 }
                 else
                 {
-                    entry.Info(queue, TagParser.Escape(KeyHandler.keystonames[k] + ": {\n" + cs.FullString() + "}"));
+                    entry.InfoOutput(queue, btn + ": {\n" + cs.FullString() + "}");
                 }
             }
             else if (entry.Arguments.Count >= 2)
             {
-                KeyHandler.BindKey(k, entry.GetArgument(queue, 1));
-                entry.Good(queue, "Keybind updated for " + KeyHandler.keystonames[k] + ".");
+                TheClient.Gamepad.BindButton(btn, entry.GetArgument(queue, 1));
+                entry.GoodOutput(queue, "Keybind updated for " + btn + ".");
             }
         }
     }

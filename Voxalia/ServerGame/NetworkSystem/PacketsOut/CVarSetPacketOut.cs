@@ -21,7 +21,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             ID = ServerToClientPacket.CVAR_SET;
             DataStream ds = new DataStream();
             DataWriter dw = new DataWriter(ds);
-            dw.WriteInt(tserver.Networking.Strings.IndexForString(var.Name.ToLowerFast()));
+            dw.WriteInt(tserver.Networking.Strings.IndexForString(var.Name.ToLowerFastFS()));
             dw.WriteFullString(var.Value);
             Data = ds.ToArray();
         }

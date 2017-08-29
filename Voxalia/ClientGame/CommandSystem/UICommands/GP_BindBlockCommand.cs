@@ -17,9 +17,9 @@ using FreneticScript.TagHandlers;
 namespace Voxalia.ClientGame.CommandSystem.UICommands
 {
     /// <summary>
-    /// A quick command to bind a key to a complex script.
+    /// A quick command to bind a gamepad button to a complex script.
     /// </summary>
-    public class BindblockCommand : AbstractCommand
+    public class GP_BindblockCommand : AbstractCommand
     {
         public override void AdaptBlockFollowers(CommandEntry entry, List<CommandEntry> input, List<CommandEntry> fblock)
         {
@@ -30,12 +30,12 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
 
         public Client TheClient;
 
-        public BindblockCommand(Client tclient)
+        public GP_BindblockCommand(Client tclient)
         {
             TheClient = tclient;
-            Name = "bindblock";
-            Description = "Binds a script block to a key.";
-            Arguments = "<key>";
+            Name = "gp_bindblock";
+            Description = "Binds a script block to a gamepad button.";
+            Arguments = "<button>";
         }
 
         public static void Execute(CommandQueue queue, CommandEntry entry)
@@ -45,7 +45,7 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
                 ShowUsage(queue, entry);
                 return;
             }
-            Client TheClient = (entry.Command as BindblockCommand).TheClient;
+            Client TheClient = (entry.Command as GP_BindblockCommand).TheClient;
             string key = entry.GetArgument(queue, 0);
             if (key == "\0CALLBACK")
             {
@@ -56,10 +56,13 @@ namespace Voxalia.ClientGame.CommandSystem.UICommands
                 queue.HandleError(entry, "Must have a block of commands!");
                 return;
             }
-            Key k = KeyHandler.GetKeyForName(key);
-            // TODO: Bad key error
-            KeyHandler.BindKey(k, entry.InnerCommandBlock, entry.BlockStart);
-            entry.Good(queue, "Keybind updated for " + KeyHandler.keystonames[k] + ".");
+            if (!Enum.TryParse(key, true, out GamePadButton btn))
+            {
+                queue.HandleError(entry, "Unknown button: " + key);
+                return;
+            }
+            TheClient.Gamepad.BindButton(btn, entry.InnerCommandBlock, entry.BlockStart);
+            entry.GoodOutput(queue, "Keybind updated for " + btn + ".");
             CommandStackEntry cse = queue.CommandStack.Peek();
             cse.Index = entry.BlockEnd + 2;
         }

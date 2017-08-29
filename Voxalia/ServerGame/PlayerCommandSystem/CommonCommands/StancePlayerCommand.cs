@@ -28,7 +28,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "^r^1/stance <stance>"); // TODO: ShowUsage
                 return;
             }
-            string stance = entry.InputArguments[0].ToLowerFast();
+            string stance = entry.InputArguments[0].ToLowerFastFS();
             // TOOD: Implement!
             if (stance == "stand")
             {

@@ -381,19 +381,7 @@ namespace Voxalia.ClientGame.EntitySystem
             cc.TractionForce = CBTractionForce * frictionmod * Mass;
             cc.VerticalMotionConstraint.MaximumGlueForce = CBGlueForce * Mass;
         }
-
-        public bool PGPJump;
-        public bool PGPPrimary;
-        public bool PGPSecondary;
-        public bool PGPDPadLeft;
-        public bool PGPDPadRight;
-        public bool PGPUse;
-        public bool PGPILeft;
-        public bool PGPIRight;
-        public bool PGPIUp;
-        public bool PGPIDown;
-        public bool PGPReload;
-
+        
         public bool Forward;
         public bool Backward;
         public bool Leftward;
@@ -426,39 +414,29 @@ namespace Voxalia.ClientGame.EntitySystem
             Body.ActivityInformation.Activate();
             if (ServerFlags.HasFlag(YourStatusFlags.NO_ROTATE))
             {
+                // TODO: Logic for this section?
                 tyaw = MouseHandler.MouseDelta.X;
                 tpitch = MouseHandler.MouseDelta.Y;
-                tyaw += GamePadHandler.TotalDirectionX * 90f * TheRegion.Delta;
-                tpitch += GamePadHandler.TotalDirectionY * 45f * TheRegion.Delta;
+                tyaw += TheClient.Gamepad.DirectionControl.X * 90f * TheRegion.Delta;
+                tpitch += TheClient.Gamepad.DirectionControl.Y * 45f * TheRegion.Delta;
             }
             else
             {
                 Direction.Yaw += MouseHandler.MouseDelta.X;
                 Direction.Pitch += MouseHandler.MouseDelta.Y;
-                Direction.Yaw += GamePadHandler.TotalDirectionX * 90f * TheRegion.Delta;
-                Direction.Pitch += GamePadHandler.TotalDirectionY * 45f * TheRegion.Delta;
+                Direction.Yaw += TheClient.Gamepad.DirectionControl.X * 90f * TheRegion.Delta;
+                Direction.Pitch += TheClient.Gamepad.DirectionControl.Y * 45f * TheRegion.Delta;
             }
+            SprintOrWalk = 0.0f;
+            // TODO: Easy converter from OpenTK to BEPU
             Vector2 tmove;
-            if (Math.Abs(GamePadHandler.TotalMovementX) > 0.05) // TODO: Threshold CVar!
-            {
-                tmove.X = (float)GamePadHandler.TotalMovementX;
-            }
-            else
-            {
-                tmove.X = 0;
-            }
-            if (Math.Abs(GamePadHandler.TotalMovementY) > 0.05)
-            {
-                tmove.Y = (float)GamePadHandler.TotalMovementY;
-            }
-            else
-            {
-                tmove.Y = 0;
-            }
+            tmove.X = TheClient.Gamepad.MovementControl.X;
+            tmove.Y = TheClient.Gamepad.MovementControl.Y;
             if (tmove.LengthSquared() > 1)
             {
                 tmove.Normalize();
             }
+            SprintOrWalk = ((float)tmove.Length() * 2.0f) - 1.0f;
             if (tmove.X == 0 && tmove.Y == 0)
             {
                 if (Forward)
@@ -484,120 +462,6 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             XMove = (float)tmove.X;
             YMove = (float)tmove.Y;
-            if (GamePadHandler.JumpKey)
-            {
-                PGPJump = true;
-                Upward = true;
-            }
-            else if (PGPJump)
-            {
-                Upward = false;
-                PGPJump = false;
-            }
-            if (GamePadHandler.PrimaryKey)
-            {
-                PGPPrimary = true;
-                Click = true;
-            }
-            else if (PGPPrimary)
-            {
-                Click = false;
-                PGPPrimary = false;
-            }
-            if (GamePadHandler.SecondaryKey)
-            {
-                PGPSecondary = true;
-                AltClick = true;
-            }
-            else if (PGPSecondary)
-            {
-                AltClick = false;
-                PGPSecondary = false;
-            }
-            if (GamePadHandler.ChangeLeft)
-            {
-                if (!PGPDPadLeft) // TODO: Holdable?
-                {
-                    PGPDPadLeft = true;
-                    TheClient.Commands.ExecuteCommands("itemprev"); // TODO: Less lazy!
-                }
-            }
-            else
-            {
-                PGPDPadLeft = false;
-            }
-            if (GamePadHandler.ChangeRight)
-            {
-                if (!PGPDPadRight) // TODO: Holdable?
-                {
-                    PGPDPadRight = true;
-                    TheClient.Commands.ExecuteCommands("itemnext"); // TODO: Less lazy!
-                }
-            }
-            else
-            {
-                PGPDPadRight = false;
-            }
-            if (GamePadHandler.UseKey)
-            {
-                PGPUse = true;
-                Use = true;
-            }
-            else if (PGPUse)
-            {
-                PGPUse = false;
-                Use = false;
-            }
-            if (GamePadHandler.ReloadKey)
-            {
-                PGPReload = true;
-                TheClient.Commands.ExecuteCommands("weaponreload"); // TODO: Less lazy!
-            }
-            else if (PGPUse)
-            {
-                PGPReload = false;
-            }
-            if (GamePadHandler.ItemLeft)
-            {
-                PGPILeft = true;
-                ItemLeft = true;
-            }
-            else if (PGPILeft)
-            {
-                PGPILeft = false;
-                ItemLeft = false;
-            }
-            if (GamePadHandler.ItemRight)
-            {
-                PGPIRight = true;
-                ItemRight = true;
-            }
-            else if (PGPIRight)
-            {
-                PGPIRight = false;
-                ItemRight = false;
-            }
-            if (GamePadHandler.ItemUp)
-            {
-                PGPIUp = true;
-                ItemUp = true;
-            }
-            else if (PGPIUp)
-            {
-                PGPIUp = false;
-                ItemUp = false;
-            }
-            if (GamePadHandler.ItemDown)
-            {
-                PGPIDown = true;
-                ItemDown = true;
-            }
-            else if (PGPIDown)
-            {
-                PGPIDown = false;
-                ItemDown = false;
-            }
-            SprintOrWalk = GamePadHandler.SprintOrWalk;
             if (Sprint)
             {
                 SprintOrWalk = 1;

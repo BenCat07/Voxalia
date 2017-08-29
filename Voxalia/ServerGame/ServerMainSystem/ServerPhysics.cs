@@ -51,7 +51,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// <returns>A world object.</returns>
         public World LoadWorld(string name)
         {
-            string nl = name.ToLowerFast();
+            string nl = name.ToLowerFastFS();
             for (int i = 0; i < LoadedWorlds.Count; i++)
             {
                 if (LoadedWorlds[i].Name == nl)
@@ -155,7 +155,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// <returns>The world, or null.</returns>
         public World GetWorld(string name)
         {
-            name = name.ToLowerFast();
+            name = name.ToLowerFastFS();
             // TODO: LoadedWorlds -> Dictionary!
             for (int i = 0; i < LoadedWorlds.Count; i++)
             {

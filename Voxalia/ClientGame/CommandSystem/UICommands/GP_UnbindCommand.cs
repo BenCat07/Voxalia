@@ -16,30 +16,33 @@ using FreneticScript.TagHandlers;
 namespace Voxalia.ClientGame.CommandSystem.UICommands
 {
     /// <summary>
-    /// A quick command to unbind a key.
+    /// A quick command to unbind a gamepad button.
     /// </summary>
-    public class UnbindCommand : AbstractCommand
+    public class GP_UnbindCommand : AbstractCommand
     {
         public Client TheClient;
 
-        public UnbindCommand(Client tclient)
+        public GP_UnbindCommand(Client tclient)
         {
             TheClient = tclient;
-            Name = "unbind";
-            Description = "Removes any script bound to a key.";
-            Arguments = "<button>";
+            Name = "gp_unbind";
+            Description = "Removes any script bound to a gamepad button.";
+            Arguments = "<key>";
             MinimumArguments = 1;
             MaximumArguments = 1;
         }
 
         public static void Execute(CommandQueue queue, CommandEntry entry)
         {
-            Client TheClient = (entry.Command as UnbindCommand).TheClient;
+            Client TheClient = (entry.Command as GP_UnbindCommand).TheClient;
             string key = entry.GetArgument(queue, 0);
-            Key k = KeyHandler.GetKeyForName(key);
-            // TODO: Bad-key error.
-            KeyHandler.BindKey(k, (string)null);
-            entry.Good(queue, "Keybind removed for " + k + ".");
+            if (!Enum.TryParse(key, true, out GamePadButton btn))
+            {
+                queue.HandleError(entry, "Unknown button: " + key);
+                return;
+            }
+            TheClient.Gamepad.BindButton(btn, null);
+            entry.Good(queue, "Gamepad-button-bind removed for " + btn + ".");
         }
     }
 }

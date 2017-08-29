@@ -44,14 +44,14 @@ namespace Voxalia.ClientGame.UISystem
             BindKey(Key.S, "+backward");
             BindKey(Key.A, "+leftward");
             BindKey(Key.D, "+rightward");
-            BindKey(Key.X, "stance crouch");
-            BindKey(Key.C, "stance stand");
+            BindKey(Key.X, "stance crouch"); // TODO: Remove?
+            BindKey(Key.C, "stance stand"); // TODO: Toggle crouch/stand properly
             BindKey(Key.P, "toggle g_firstperson");
             BindKey(Key.Space, "+upward");
             BindKey(Key.CapsLock, "+walk");
             BindKey(Key.ShiftLeft, "+sprint");
             BindKey(Key.LControl, "+movedown");
-            // TODO: clean up F buttons
+            // TODO: clean up F* buttons
             BindKey(Key.F1, "toggle u_showhud");
             BindKey(Key.F2, "toggle u_highlight_targetblock;toggle u_highlight_placeblock");
             BindKey(Key.F3, "toggle u_debug");
@@ -497,7 +497,7 @@ namespace Voxalia.ClientGame.UISystem
 
         public static Key GetKeyForName(string name)
         {
-            if (namestokeys.TryGetValue(name.ToLowerFast(), out Key key))
+            if (namestokeys.TryGetValue(name.ToLowerFastFS(), out Key key))
             {
                 return key;
             }
@@ -522,7 +522,7 @@ namespace Voxalia.ClientGame.UISystem
                 {
                     CommandEntry fixedentry = script.Created.Entries[0].Duplicate();
                     fixedentry.Marker = 2;
-                    CommandScript nscript = new CommandScript("inverse_bind_" + key, new List<CommandEntry>() { fixedentry }) { Debug = DebugMode.MINIMAL };
+                    CommandScript nscript = new CommandScript("inverse_bind_" + key, new List<CommandEntry>() { fixedentry }, mode: DebugMode.MINIMAL);
                     InverseBinds[key] = nscript;
                 }
             }
@@ -550,7 +550,7 @@ namespace Voxalia.ClientGame.UISystem
                 {
                     CommandEntry fixedentry = script.Created.Entries[0].Duplicate();
                     fixedentry.Marker = 2;
-                    CommandScript nscript = new CommandScript("inverse_bind_" + key, new List<CommandEntry>() { fixedentry }) { Debug = DebugMode.MINIMAL };
+                    CommandScript nscript = new CommandScript("inverse_bind_" + key, new List<CommandEntry>() { fixedentry }, mode: DebugMode.MINIMAL);
                     InverseBinds[key] = nscript;
                 }
             }
