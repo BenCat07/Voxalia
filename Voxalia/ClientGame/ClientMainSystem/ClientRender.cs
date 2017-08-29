@@ -52,7 +52,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             List<Tuple<string, long>> toret = new List<Tuple<string, long>>();
             long modelc = 0;
-            foreach (Model model in Models.LoadedModels)
+            foreach (/* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Model model in Models.LoadedModels)
             {
                 modelc += model.GetVRAMUsage();
             }
@@ -337,12 +337,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// (TEMPORARY) A model for a rain cylinder.
         /// </summary>
-        public Model RainCyl;
+        public /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Model RainCyl;
 
         /// <summary>
         /// (TEMPORARY) A model for a snow cylinder.
         /// </summary>
-        public Model SnowCyl;
+        public /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Model SnowCyl;
 
         /// <summary>
         /// FBO for the in-game map.
@@ -1733,7 +1733,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SetEnts();
             Textures.White.Bind();
             Rendering.SetMinimumLight(1);
-            Model tmod = Models.GetModel("vr/controller/vive"); // TODO: Store the model in a var somewhere?
+            /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Model tmod = Models.GetModel("vr/controller/vive"); // TODO: Store the model in a var somewhere?
             VBO mmcircle = tmod.MeshFor("circle").vbo;
             tmod.LoadSkin(Textures);
             // TODO: Special dynamic controller models!

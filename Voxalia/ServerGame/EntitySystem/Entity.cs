@@ -154,7 +154,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// Implementations of this method will set the exact world position of this entity.
         /// </summary>
         /// <param name="pos">The world position.</param>
-        public abstract void SetPosition(Location pos);
+        public new abstract void SetPosition(Location pos);
 
         /// <summary>
         /// Implementations of this method will return the exact orientation of this entity.

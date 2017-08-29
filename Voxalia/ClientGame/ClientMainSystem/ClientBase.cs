@@ -248,12 +248,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// The system that manages misc. rendering tasks for the client.
         /// </summary>
-        public Renderer Rendering;
-        
+        public /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Renderer Rendering;
+
         /// <summary>
         /// The system that manages 3D models on the client.
         /// </summary>
-        public ModelEngine Models;
+        public /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.ModelEngine Models;
 
         /// <summary>
         /// The system that manages 3D model animation sets on the client.
@@ -383,7 +383,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Shaders.InitShaderSystem();
             View3D.CheckError("Load - Shaders");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading rendering helper...");
-            Rendering = new Renderer(Textures, Shaders);
+            Rendering = new /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Renderer(Textures, Shaders);
             Rendering.Init();
             SysConsole.Output(OutputType.CLIENTINIT, "Preparing load screen...");
             load_screen = Textures.GetTexture("ui/menus/loadscreen");
@@ -404,7 +404,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.CLIENTINIT, "Loading animation engine...");
             Animations = new AnimationEngine();
             SysConsole.Output(OutputType.CLIENTINIT, "Loading model engine...");
-            Models = new ModelEngine();
+            Models = new /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.ModelEngine();
             Models.Init(Animations, this);
             LODHelp = new ModelLODHelper(this);
             SysConsole.Output(OutputType.CLIENTINIT, "Loading general graphics settings...");

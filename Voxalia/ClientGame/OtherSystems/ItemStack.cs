@@ -110,7 +110,7 @@ namespace Voxalia.ClientGame.OtherSystems
             return Tex?.Name;
         }
 
-        public Model Mod;
+        public /* // TODO: Fix */ Voxalia.ClientGame.GraphicsSystems.Model Mod;
 
         public override string GetModelName()
         {
