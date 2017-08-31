@@ -19,6 +19,7 @@ using Voxalia.Shared;
 using Voxalia.ServerGame.OtherSystems;
 using System.Diagnostics;
 using FreneticGameCore;
+using FreneticGameCore.ServerSystem;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -118,7 +119,6 @@ namespace Voxalia.ServerGame.WorldSystem
             Config.Set("general.name", Name);
             Config.Default("general.seed", Utilities.UtilRandom.Next(SeedMax) - SeedMax / 2);
             Config.Default("general.spawnpoint", new Location(0, 0, 50).ToString());
-            Config.Default("general.flat", "false");
             Config.Default("general.time", 0);
             Config.Default("general.generator", "simple");
             Config.Default("general.generator_scale", 1.0);
@@ -128,7 +128,6 @@ namespace Voxalia.ServerGame.WorldSystem
             CFGEdited = true;
             Seed = Config.GetInt("general.seed", DefaultSeed).Value;
             SpawnPoint = Location.FromString(Config.GetString("general.spawnpoint", DefaultSpawnPoint));
-            Flat = Config.GetString("general.flat", "false").ToString().ToLowerFast() == "true";
             Generator = Config.GetString("general.generator", "simple").ToLowerFast();
             GeneratorScale = Config.GetDouble("general.generator_scale", 1.0).Value;
             MTRandom seedGen = new MTRandom(39, (ulong)Seed);
@@ -185,12 +184,23 @@ namespace Voxalia.ServerGame.WorldSystem
         /// The scheduling system for this world.
         /// </summary>
         public Scheduler Schedule = new Scheduler();
-
+        
         /// <summary>
-        /// Whether this world should be flat and empty. (IE, use flat generator).
-        /// TODO: Better generator controls.
+        /// Builds a fake engine for this world.
         /// </summary>
-        public bool Flat = false;
+        /// <returns>The built engine.</returns>
+        public ServerEngine FakeEngine()
+        {
+            return new ServerEngine()
+            {
+                PhysicsWorld = new PhysicsSpace()
+                {
+                    Internal = MainRegion.PhysicsWorld
+                },
+                Schedule = Schedule,
+                Source = this
+            };
+        }
 
         /// <summary>
         /// Starts up a world onto its own thread.
@@ -216,7 +226,13 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             MainRegion = new Region() { TheServer = TheServer, TheWorld = this };
             MainRegion.BuildRegion();
+            Engine = FakeEngine();
         }
+
+        /// <summary>
+        /// The faked engine for this world.
+        /// </summary>
+        public ServerEngine Engine;
 
         /// <summary>
         /// Used to calculate the <see cref="Delta"/> value.

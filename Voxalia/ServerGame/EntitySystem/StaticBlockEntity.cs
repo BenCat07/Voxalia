@@ -39,11 +39,11 @@ namespace Voxalia.ServerGame.EntitySystem
             DamageableEntityProperty dep = Damageable();
             dep.SetMaxHealth(5);
             dep.SetHealth(5);
-            dep.EffectiveDeathEvent.Add((e) =>
+            dep.EffectiveDeathEvent.AddEvent((e) =>
             {
                 // TODO: Break into a grabbable item?
                 RemoveMe();
-            }, 0);
+            }, this, 0);
         }
 
         private static Func<DamageableEntityProperty> GetDamageProperty = () => new DamageableEntityProperty();

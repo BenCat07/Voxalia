@@ -59,7 +59,7 @@ namespace Voxalia.ServerGame.OtherSystems
                 FDSSection serverSect = Section.GetSection("server") ?? new FDSSection();
                 Worlds = serverSect.GetStringList("worlds") ?? new List<string>() { "default" };
                 FPS = serverSect.GetInt("fps", 30).Value;
-                Debug = serverSect.GetString("debug", "true") == "true";
+                Debug = serverSect.GetBool("debug", true).Value;
                 WorldDefault.LoadFromSection(null, Section.GetSection("world_defaults") ?? new FDSSection());
                 FDSSection network = Section.GetSection("network") ?? new FDSSection();
                 Net_VerifyIP = network.GetString("verify_ip", "true") == "true";
@@ -95,6 +95,8 @@ namespace Voxalia.ServerGame.OtherSystems
 
         public bool TreesInDistance;
 
+        public bool GeneratorFlat;
+
         public FDSSection Section;
 
         public void LoadFromSection(Server tserver, FDSSection sect)
@@ -113,6 +115,8 @@ namespace Voxalia.ServerGame.OtherSystems
                 MaxLODRenderDistance = players.GetInt("max_lod_render_distance", tserver == null ? 20 : tserver.Settings.WorldDefault.MaxLODRenderDistance).Value;
                 FDSSection debug = sect.GetSection("debug") ?? new FDSSection();
                 TreesInDistance = debug.GetString("trees_in_distance", tserver == null ? "false" : (tserver.Settings.WorldDefault.TreesInDistance ? "true" : "false")) == "true";
+                FDSSection generator = sect.GetSection("generator") ?? new FDSSection();
+                GeneratorFlat = generator.GetBool("flat", false).Value;
             }
             catch (Exception ex)
             {

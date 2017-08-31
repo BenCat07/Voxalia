@@ -14,10 +14,11 @@ using System.Threading.Tasks;
 using FreneticGameCore;
 using FreneticScript;
 using FreneticScript.CommandSystem;
+using FreneticGameCore.EntitySystem;
 
 namespace Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem
 {
-    public class DamageableEntityProperty : Property
+    public class DamageableEntityProperty : BasicEntityProperty
     {
         [PropertyDebuggable]
         [PropertyAutoSavable]
@@ -32,16 +33,23 @@ namespace Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem
             public static DeathEventArgs EmptyDeath = new DeathEventArgs();
         }
 
-        public readonly FreneticScriptEventHandler<DeathEventArgs> EffectiveDeathEvent = new FreneticScriptEventHandler<DeathEventArgs>();
+        public readonly FreneticEvent<DeathEventArgs> EffectiveDeathEvent = new FreneticEvent<DeathEventArgs>();
         
-        public class HealthSetEventArgs : FreneticEventArgs
+        public class HealthSetEventArgs : FreneticEventArgs, ICancellableEvent
         {
+            public bool Cancelled { get; set; }
+
             public double AttemptedValue;
         }
 
-        public readonly FreneticScriptEventHandler<HealthSetEventArgs> HealthSetEvent = new FreneticScriptEventHandler<HealthSetEventArgs>();
+        public readonly FreneticEvent<HealthSetEventArgs> HealthSetEvent = new FreneticEvent<HealthSetEventArgs>();
 
-        public readonly FreneticScriptEventHandler<HealthSetEventArgs> HealthSetPostEvent = new FreneticScriptEventHandler<HealthSetEventArgs>();
+        public class HealthSetPostEventArgs : FreneticEventArgs
+        {
+            public double NewValue;
+        }
+
+        public readonly FreneticEvent<HealthSetPostEventArgs> HealthSetPostEvent = new FreneticEvent<HealthSetPostEventArgs>();
 
         public virtual double GetHealth()
         {
@@ -55,14 +63,14 @@ namespace Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem
 
         public virtual void SetHealth(double nhealth)
         {
-            HealthSetEvent.Fire(new HealthSetEventArgs() { AttemptedValue = nhealth });
+            HealthSetEvent.Fire(BEngine.Schedule, new HealthSetEventArgs() { AttemptedValue = nhealth, Cancelled = false });
             Health = Math.Min(nhealth, MaxHealth);
             if (MaxHealth != 0 && Health <= 0)
             {
                 Health = 0;
-                EffectiveDeathEvent.Fire(DeathEventArgs.EmptyDeath);
+                EffectiveDeathEvent.Fire(BEngine.Schedule, DeathEventArgs.EmptyDeath);
             }
-            HealthSetPostEvent.Fire(new HealthSetEventArgs() { AttemptedValue = nhealth });
+            HealthSetPostEvent.Fire(BEngine.Schedule, new HealthSetPostEventArgs() { NewValue = nhealth });
         }
 
         public virtual void Damage(double amount)

@@ -578,7 +578,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         private void PopulateInternal(int Seed, int seed2, int seed3, int seed4, int seed5, Chunk chunk)
         {
 #endif
-            if (chunk.OwningRegion.TheWorld.Flat)
+            if (chunk.OwningRegion.TheWorld.Settings.GeneratorFlat)
             {
                 if (chunk.WorldPosition.Z == 0)
                 {

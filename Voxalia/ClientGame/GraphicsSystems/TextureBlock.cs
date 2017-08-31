@@ -39,7 +39,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public int TWidth;
 
         /// <summary>
-        /// TODO: Direct links, not lookup strings!
+        /// TODO: Direct links, not lookup strings?
         /// </summary>
         public string[] IntTexs;
 

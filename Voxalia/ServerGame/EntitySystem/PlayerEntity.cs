@@ -461,15 +461,15 @@ namespace Voxalia.ServerGame.EntitySystem
             mod_scale = 1.5f;
             Damageable().SetMaxHealth(100);
             Damageable().SetHealth(100);
-            Damageable().HealthSetPostEvent.Add((e) =>
+            Damageable().HealthSetPostEvent.AddEvent((e) =>
             {
                 SendStatus();
-            }, 0);
-            Damageable().EffectiveDeathEvent.Add((e) =>
+            }, this, 0);
+            Damageable().EffectiveDeathEvent.AddEvent((e) =>
             {
                 Damageable().SetHealth(Damageable().GetMaxHealth());
                 Teleport(TheRegion.TheWorld.SpawnPoint);
-            }, 0);
+            }, this, 0);
             Network = conn;
             SetMass(tmass);
             CanRotate = false;

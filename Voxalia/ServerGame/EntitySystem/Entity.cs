@@ -63,9 +63,13 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             TheRegion = tregion;
             TheServer = tregion.TheServer;
+            Engine = tregion.TheWorld.Engine;
             OnTick += Tick;
         }
 
+        /// <summary>
+        /// Ticks the entity.
+        /// </summary>
         public abstract void Tick();
 
         /// <summary>

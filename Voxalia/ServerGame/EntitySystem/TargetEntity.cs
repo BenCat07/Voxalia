@@ -37,7 +37,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Items.cItem = 1;
             Items.Items[0].Info.PrepItem(this, Items.Items[0]);
             ShouldShine = true;
-            Damageable().EffectiveDeathEvent.Add((e) =>
+            Damageable().EffectiveDeathEvent.AddEvent((e) =>
             {
                 if (Removed)
                 {
@@ -45,7 +45,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 }
                 TheRegion.Explode(GetPosition(), 5);
                 RemoveMe();
-            }, 0);
+            }, this, 0);
         }
 
         public override NetworkEntityType GetNetType()
