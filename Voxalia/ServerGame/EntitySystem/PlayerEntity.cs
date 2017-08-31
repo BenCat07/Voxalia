@@ -34,7 +34,7 @@ namespace Voxalia.ServerGame.EntitySystem
     /// <summary>
     /// Represents a player-typed entity in the world.
     /// </summary>
-    public class PlayerEntity: HumanoidEntity
+    public class PlayerEntity: HumanoidEntity, IPermissible
     {
         public bool ShouldNetworkAnyway(Entity e)
         {
@@ -194,44 +194,30 @@ namespace Voxalia.ServerGame.EntitySystem
             // TODO: CBody settings? Mass? ...?
             // TODO: Inventory!
         }
-
-        /// <summary>
-        /// The internal code to check if the player has a highly specifically permission node.
-        /// </summary>
-        /// <param name="node">The node path.</param>
-        /// <returns>Whether the permission is marked.</returns>
-        public bool HasSpecificPermissionNodeInternal(string node)
-        {
-            return Permissions.GetString(node, "false").ToLowerFast() == "true";
-        }
-
+        
         /// <summary>
         /// The internal code to check if the player has a permission.
         /// </summary>
         /// <param name="path">The details of the node path.</param>
         /// <returns>Whether the permission is marked.</returns>
-        public bool HasPermissionInternal(params string[] path)
+        public bool HasPermission(params string[] path)
         {
-            string constructed = "";
-            for (int i = 0; i < path.Length; i++)
+            // TODO: Grab group value here in place of false on both spots, which will itself fall back to reasonable defaults.
+            FDSSection sect = Permissions;
+            int end = path.Length - 1;
+            for (int i = 0; i < end; i++)
             {
-                if (HasSpecificPermissionNodeInternal(constructed + "*"))
+                if (sect.GetBool("*", false).Value)
                 {
                     return true;
                 }
-                constructed += path[i] + ".";
+                sect = sect.GetSection(path[i]);
+                if (sect == null)
+                {
+                    return false;
+                }
             }
-            return HasSpecificPermissionNodeInternal(constructed.Substring(0, constructed.Length - 1));
-        }
-
-        /// <summary>
-        /// Returns whether the player has a permission.
-        /// </summary>
-        /// <param name="permission">The permission.</param>
-        /// <returns>Whether the permission is granted to the player.</returns>
-        public bool HasPermission(string permission)
-        {
-            return HasPermissionInternal(permission.ToLowerFast().SplitFast('.'));
+            return sect.GetBool(path[end], false).Value;
         }
 
         /// <summary>
@@ -1817,7 +1803,7 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             Network.SendPacket(new YourStatusPacketOut(Damageable().GetHealth(), Damageable().GetMaxHealth(), Flags));
         }
-        
+
         /// <summary>
         /// The Block Group Entity being used to represent a paste.
         /// </summary>

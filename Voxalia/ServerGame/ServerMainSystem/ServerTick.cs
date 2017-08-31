@@ -40,15 +40,15 @@ namespace Voxalia.ServerGame.ServerMainSystem
         public double opsat = 0;
         
         /// <summary>
-        /// The RegEx string to match a URL, see <see cref="urlregex"/>.
+        /// The RegEx string to match a URL, see <see cref="URLREGEX"/>.
         /// </summary>
-        public const string URL_REGEX = "(?<!([^\\s]))(https?:\\/\\/[^\\s]+)";
+        public const string URL_REGEX_EXPR = "(?<!([^\\s]))(https?:\\/\\/[^\\s]+)";
 
         /// <summary>
-        /// The Regex object to match a URL, see  <see cref="URL_REGEX"/>.
+        /// The Regex object to match a URL, see  <see cref="URL_REGEX_EXPR"/>.
         /// TODO: Replace usage of this with a non-regex method.
         /// </summary>
-        public Regex urlregex = new Regex(URL_REGEX, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        public static readonly Regex URLREGEX = new Regex(URL_REGEX_EXPR, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <summary>
         /// Translates all URLs in a chat message from raw URLs to valid textstyle URL identifiers.
@@ -57,7 +57,7 @@ namespace Voxalia.ServerGame.ServerMainSystem
         /// <returns></returns>
         public string TranslateURLs(string input)
         {
-            return urlregex.Replace(input, "^[url=$2|$2]");
+            return URLREGEX.Replace(input, "^[url=$2|$2]");
         }
 
         /// <summary>
