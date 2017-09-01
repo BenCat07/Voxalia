@@ -108,6 +108,11 @@ namespace Voxalia.ServerGame.ServerMainSystem
         public RecipeRegistry Recipes;
 
         /// <summary>
+        /// The system for permissions group tracking.
+        /// </summary>
+        public PermissionsGroupEngine PermGroups;
+
+        /// <summary>
         /// The system that tracks all 3D models, for collision tracing purposes.
         /// </summary>
         public ModelEngine Models;
@@ -373,6 +378,8 @@ namespace Voxalia.ServerGame.ServerMainSystem
             }
             SysConsole.Output(OutputType.INIT, "Loading player command engine...");
             PCEngine = new PlayerCommandEngine();
+            SysConsole.Output(OutputType.INIT, "Loading permissions engine...");
+            PermGroups = new PermissionsGroupEngine() { TheServer = this };
             SysConsole.Output(OutputType.INIT, "Loading item registry...");
             ItemInfos = new ItemInfoRegistry();
             Items = new ItemRegistry(this);

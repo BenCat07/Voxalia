@@ -162,6 +162,17 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 Permissions = new FDSSection();
             }
+            PermGroups.Clear();
+            List<string> pgs = config.GetStringList("perm_groups") ?? new List<string>();
+            for (int i = 0; i < pgs.Count; i++)
+            {
+                PermissionsGroup grp = TheServer.PermGroups.GetGroup(pgs[i]);
+                if (grp != null)
+                {
+                    PermGroups.Add(grp);
+                }
+                // else { "Deleted group: pgs[i]!" }
+            }
             EID = config.GetLong("eid").Value;
             IsFirstJoin = false;
             SpawnedTime = TheRegion.GlobalTickTime;
@@ -190,10 +201,26 @@ namespace Voxalia.ServerGame.EntitySystem
             config.Set(timePath, config.GetDouble(timePath, 0).Value + (TheRegion.GlobalTickTime - SpawnedTime));
             config.Set("permissions", Permissions);
             config.Set("eid", EID);
+            List<string> pgs = new List<string>();
+            foreach (PermissionsGroup pg in PermGroups)
+            {
+                pgs.Add(pg.Name);
+            }
+            config.Set("perm_groups", pgs);
             // TODO: Other stats!
             // TODO: CBody settings? Mass? ...?
             // TODO: Inventory!
         }
+
+        /// <summary>
+        /// Currently attached permissions groups.
+        /// </summary>
+        public List<PermissionsGroup> PermGroups = new List<PermissionsGroup>();
+
+        /// <summary>
+        /// Helper for permissions calculating.
+        /// </summary>
+        private FDSSection[] gsect = new FDSSection[0];
         
         /// <summary>
         /// The internal code to check if the player has a permission.
@@ -202,22 +229,53 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <returns>Whether the permission is marked.</returns>
         public bool HasPermission(params string[] path)
         {
-            // TODO: Grab group value here in place of false on both spots, which will itself fall back to reasonable defaults.
+            bool? b;
+            if (gsect.Length != PermGroups.Count)
+            {
+                gsect = new FDSSection[PermGroups.Count];
+            }
+            for (int i = 0; i < gsect.Length; i++)
+            {
+                gsect[i] = PermGroups[i].Root;
+            }
             FDSSection sect = Permissions;
             int end = path.Length - 1;
             for (int i = 0; i < end; i++)
             {
-                if (sect.GetBool("*", false).Value)
+                b = sect?.GetBool("*");
+                if (b.HasValue)
                 {
-                    return true;
+                    return b.Value;
                 }
-                sect = sect.GetSection(path[i]);
-                if (sect == null)
+                for (int g = 0; g < gsect.Length; g++)
                 {
-                    return false;
+                    b = gsect[g]?.GetBool("*");
+                    if (b.HasValue)
+                    {
+                        return b.Value;
+                    }
+                }
+                sect = sect?.GetSection(path[i]);
+                for (int g = 0; g < gsect.Length; g++)
+                {
+                    gsect[g] = gsect[g]?.GetSection(path[i]);
                 }
             }
-            return sect.GetBool(path[end], false).Value;
+            b = sect?.GetBool(path[end]);
+            if (b.HasValue)
+            {
+                return b.Value;
+            }
+            for (int g = 0; g < gsect.Length; g++)
+            {
+                b = gsect[g]?.GetBool(path[end]);
+                if (b.HasValue)
+                {
+                    return b.Value;
+                }
+            }
+            // TODO: Reasonable fallback perms of some form? If neither group nor player specifies...
+            return false;
         }
 
         /// <summary>
