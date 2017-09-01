@@ -15,10 +15,11 @@ using FreneticGameCore;
 using FreneticScript;
 using FreneticScript.CommandSystem;
 using FreneticGameCore.EntitySystem;
+using FreneticGameCore.ServerSystem.EntitySystem;
 
 namespace Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem
 {
-    public class DamageableEntityProperty : BasicEntityProperty
+    public class DamageableEntityProperty : ServerEntityProperty
     {
         [PropertyDebuggable]
         [PropertyAutoSavable]
@@ -63,14 +64,14 @@ namespace Voxalia.ServerGame.EntitySystem.EntityPropertiesSystem
 
         public virtual void SetHealth(double nhealth)
         {
-            HealthSetEvent.Fire(BEngine.Schedule, new HealthSetEventArgs() { AttemptedValue = nhealth, Cancelled = false });
+            HealthSetEvent.Fire(Engine.Schedule, new HealthSetEventArgs() { AttemptedValue = nhealth, Cancelled = false });
             Health = Math.Min(nhealth, MaxHealth);
             if (MaxHealth != 0 && Health <= 0)
             {
                 Health = 0;
-                EffectiveDeathEvent.Fire(BEngine.Schedule, DeathEventArgs.EmptyDeath);
+                EffectiveDeathEvent.Fire(Engine.Schedule, DeathEventArgs.EmptyDeath);
             }
-            HealthSetPostEvent.Fire(BEngine.Schedule, new HealthSetPostEventArgs() { NewValue = nhealth });
+            HealthSetPostEvent.Fire(Engine.Schedule, new HealthSetPostEventArgs() { NewValue = nhealth });
         }
 
         public virtual void Damage(double amount)

@@ -359,28 +359,31 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         public GameEngine3D Engine;
         
+        public GameClientWindow CWindow;
+        
         /// <summary>
         /// Configures the game engine placeholder.
         /// </summary>
         void FakeEngine()
         {
-            Engine = new GameEngine3D("SHOULD NEVER SHOW")
+            CWindow = new GameClientWindow("SHOULD NEVER SHOW", true)
             {
-                MainView = MainWorldView,
                 Textures = Textures,
                 Models = Models,
                 Animations = Animations,
                 Shaders = Shaders,
-                Rendering = Rendering,
-                ZFar = ZFar,
-                ZFarOut = ZFarOut,
-                FogMaxDist = FogMaxDist,
-                AllowLL = AllowLL,
-                Sounds = Sounds,
+                Rendering3D = Rendering,
                 Files = Files,
                 FontSets = FontSets,
-                GLFonts = Fonts,
+                GLFonts = Fonts
             };
+            CWindow.Engine3D.MainView = MainWorldView;
+            CWindow.Engine3D.ZFar = ZFar;
+            CWindow.Engine3D.ZFarOut = ZFarOut;
+            CWindow.Engine3D.AllowLL = AllowLL;
+            CWindow.Engine3D.Sounds = Sounds;
+            CWindow.Engine3D.FogMaxDist = FogMaxDist;
+            Engine = CWindow.Engine3D;
             CVars.r_dynamicshadows.OnChanged += (o, e) => Engine.EnableDynamicShadows = CVars.r_dynamicshadows.ValueB;
             CVars.r_dynamicshadows.OnChanged(null, null);
             CVars.r_znear.OnChanged += (o, e) => Engine.ZNear = CVars.r_znear.ValueF;
@@ -435,7 +438,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Textures = new TextureEngine();
             Textures.InitTextureSystem(Files);
             ItemFrame = Textures.GetTexture("ui/hud/item_frame");
-            Engine.Textures = Textures;
+            CWindow.Textures = Textures;
             SysConsole.Output(OutputType.CLIENTINIT, "Loading shaders...");
             Shaders = new ShaderEngine();
             GLVendor = GL.GetString(StringName.Vendor);
@@ -448,21 +451,21 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Shaders.MCM_GOOD_GRAPHICS = false;
             }
             Shaders.InitShaderSystem();
-            Engine.Shaders = Shaders;
+            CWindow.Shaders = Shaders;
             Engine.GetShaders();
             GraphicsUtil.CheckError("Load - Shaders");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading animation engine...");
             Animations = new AnimationEngine();
-            Engine.Animations = Animations;
+            CWindow.Animations = Animations;
             SysConsole.Output(OutputType.CLIENTINIT, "Loading model engine...");
             Models = new ModelEngine();
-            Models.Init(Animations, Engine);
+            Models.Init(Animations, CWindow);
             LODHelp = new ModelLODHelper(this);
-            Engine.Models = Models;
+            CWindow.Models = Models;
             SysConsole.Output(OutputType.CLIENTINIT, "Loading rendering helper...");
             Rendering = new Renderer(Textures, Shaders, Models);
             Rendering.Init();
-            Engine.Rendering = Rendering;
+            CWindow.Rendering3D = Rendering;
             SysConsole.Output(OutputType.CLIENTINIT, "Preparing load screen...");
             load_screen = Textures.GetTexture("ui/menus/loadscreen");
             Establish2D();
@@ -479,8 +482,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             FontSets.Init((subdat) => Languages.GetText(Files, subdat), () => Ortho, () => GlobalTickTimeLocal);
             GraphicsUtil.CheckError("Load - Fonts");
             PassLoadScreen();
-            Engine.FontSets = FontSets;
-            Engine.GLFonts = Fonts;
+            CWindow.FontSets = FontSets;
+            CWindow.GLFonts = Fonts;
             SysConsole.Output(OutputType.CLIENTINIT, "Loading general graphics settings...");
             CVars.r_vsync.OnChanged += OnVsyncChanged;
             OnVsyncChanged(CVars.r_vsync, EventArgs.Empty);

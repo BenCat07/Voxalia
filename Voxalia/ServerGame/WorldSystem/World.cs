@@ -20,6 +20,7 @@ using Voxalia.ServerGame.OtherSystems;
 using System.Diagnostics;
 using FreneticGameCore;
 using FreneticGameCore.ServerSystem;
+using FreneticGameCore.ServerSystem.EntitySystem;
 
 namespace Voxalia.ServerGame.WorldSystem
 {
@@ -193,7 +194,7 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             return new ServerEngine()
             {
-                PhysicsWorld = new PhysicsSpace()
+                PhysicsWorld = new PhysicsSpace<ServerEntity, ServerEngine>()
                 {
                     Internal = MainRegion.PhysicsWorld
                 },
@@ -307,12 +308,12 @@ namespace Voxalia.ServerGame.WorldSystem
                     while (TotalDelta > tdelt * 3)
                     {
                         // Lagging - cheat to catch up!
-                        tdelt *= 2;
+                        tdelt *= 2; // TODO: Handle even harder tick loss
                     }
                     // As long as there's more delta built up than delta wanted, tick
                     while (TotalDelta > tdelt)
                     {
-                        if (NeedShutdown)
+                        if (NeedShutdown.IsCancellationRequested)
                         {
                             UnloadFully(null);
                             return;
@@ -370,7 +371,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 UnloadCallback = wrapUp;
             }
-            NeedShutdown = true;
+            NeedShutdown.Cancel();
             if (Thread.CurrentThread != Execution)
             {
                 return;
@@ -384,7 +385,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// Whether the world is marked for shutdown as soon as possible.
         /// </summary>
-        bool NeedShutdown = false;
+        private CancellationTokenSource NeedShutdown = new CancellationTokenSource();
 
         /// <summary>
         /// Final step of the world shutdown sequence.
@@ -419,10 +420,13 @@ namespace Voxalia.ServerGame.WorldSystem
 
         int cfgsec = 0;
 
-        int tpsc = 0;
+        /// <summary>
+        /// TPS Counter.
+        /// </summary>
+        private int tpsc = 0;
 
         /// <summary>
-        /// The current tick rate of the server.
+        /// The current tick rate of the world.
         /// </summary>
         public int TPS = 0;
 
