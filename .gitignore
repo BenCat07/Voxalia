@@ -16,7 +16,6 @@ fonts/
 sounds/
 textures/
 animations/
-saves/
 structures/
 .vs/
 *.psess
@@ -38,7 +37,5 @@ logs/
 xulrunner/
 *.snk
 packages/
-VoxaliaTests/bin/Release/
 TestResult.xml
-bin/release/default/
 *.config

@@ -1,0 +1,10 @@
+# Default player permissions, edit per-server (not in data folder)
+my:
+	permission:
+		*: true
+	second_perm:
+		taco: true
+		alpha: false
+		beta: false
+	denied_section:
+		*: false
