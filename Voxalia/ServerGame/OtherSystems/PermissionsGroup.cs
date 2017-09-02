@@ -39,9 +39,9 @@ namespace Voxalia.ServerGame.OtherSystems
             }
             try
             {
-                if (TheServer.Files.Exists("saves/groups/" + name + ".fds"))
+                if (TheServer.Files.Exists("groups/" + name + ".fds"))
                 {
-                    string dat = TheServer.Files.ReadText("saves/groups/" + name + ".fds");
+                    string dat = TheServer.Files.ReadText("groups/" + name + ".fds");
                     FDSSection sect = new FDSSection(dat);
                     grp = new PermissionsGroup() { Name = name, Root = sect };
                     Groups[name] = grp;
