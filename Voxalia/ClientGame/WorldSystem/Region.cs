@@ -496,7 +496,7 @@ namespace Voxalia.ClientGame.WorldSystem
         public Material GetBlockMaterial(Dictionary<Vector3i, Chunk> chunkmap, Location pos)
         {
             Vector3i cpos = ChunkLocFor(pos);
-            if (!chunkmap.TryGetValue(cpos, out Chunk ch))
+            if (!chunkmap.TryGetValue(cpos, out Chunk ch) || ch.LOADING)
             {
                 return Material.AIR;
             }

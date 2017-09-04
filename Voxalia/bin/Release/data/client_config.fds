@@ -106,7 +106,7 @@ renderer:
 		# Whether to enable forward rendering mode (otherwise, deferred).
 		forward_mode: true
 		# How many chunks to process at a time.
-		chunks_at_once: 10
+		chunks_at_once: 5
 		# Whether to 'over-render' chunks when not guaranteed to be needed.
 		chunk_over_render: true
 		# Whether to use linked-list transparency tricks.
