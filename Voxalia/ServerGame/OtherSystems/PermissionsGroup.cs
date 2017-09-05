@@ -105,17 +105,22 @@ namespace Voxalia.ServerGame.OtherSystems
             int end = path.Length - 1;
             for (int i = 0; i < end; i++)
             {
-                b = sect?.GetBool("*");
-                if (b.HasValue)
-                {
-                    return b.Value;
-                }
                 sect = sect?.GetSection(path[i]);
             }
             b = sect?.GetBool(path[end]);
             if (b.HasValue)
             {
                 return b.Value;
+            }
+            sect = Root;
+            for (int i = 0; i < end; i++)
+            {
+                b = sect?.GetBool("*");
+                if (b.HasValue)
+                {
+                    return b.Value;
+                }
+                sect = sect?.GetSection(path[i]);
             }
             if (InheritsFrom != null)
             {
