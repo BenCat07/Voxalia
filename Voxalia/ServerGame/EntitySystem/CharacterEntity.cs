@@ -401,7 +401,7 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 pup = false;
             }
-            double speedmod = new Vector2(XMove, YMove).Length() * 2;
+            double speedmod = new Vector2(XMove, YMove).Length() * 1.25;
             speedmod *= (1f + SprintOrWalk * 0.5f);
             if (ItemDoSpeedMod)
             {

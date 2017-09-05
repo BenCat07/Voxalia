@@ -353,7 +353,7 @@ namespace Voxalia.ClientGame.EntitySystem
         
         public void SetMoveSpeed(CharacterController cc)
         {
-            float speedmod = (float)new Vector2(XMove, YMove).Length() * 2;
+            float speedmod = (float)new Vector2(XMove, YMove).Length() * 1.25f;
             speedmod *= (1f + SprintOrWalk * 0.5f);
             if (Click)
             {
