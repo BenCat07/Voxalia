@@ -414,7 +414,7 @@ namespace Voxalia.ClientGame.OtherSystems
             int[] res = GetHolder(Constants.TOPS_DATA_SIZE * 4);
             for (int i = 0; i < Constants.TOPS_DATA_SIZE; i++)
             {
-                res[i * 4 + 0] = Utilities.BytesToUshort(Utilities.BytesPartial(inp, i * 2, 2));
+                res[i * 4 + 0] = Utilities.BytesToUShort(Utilities.BytesPartial(inp, i * 2, 2));
                 res[i * 4 + 1] = Utilities.BytesToInt(Utilities.BytesPartial(inp, sectiontwo + i * 4, 4));
             }
             int buf = GL.GenBuffer();

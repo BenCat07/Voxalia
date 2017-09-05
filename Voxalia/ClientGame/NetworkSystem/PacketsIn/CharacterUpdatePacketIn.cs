@@ -26,7 +26,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             long eID = Utilities.BytesToLong(Utilities.BytesPartial(data, 0, 8));
             Location pos = Location.FromDoubleBytes(data, 8);
             Location vel = Location.FromDoubleBytes(data, 8 + 24);
-            ushort keys = Utilities.BytesToUshort(Utilities.BytesPartial(data, 8 + 24 + 24, 2));
+            ushort keys = Utilities.BytesToUShort(Utilities.BytesPartial(data, 8 + 24 + 24, 2));
             float dX = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 24 + 24 + 2, 4));
             float dY = Utilities.BytesToFloat(Utilities.BytesPartial(data, 8 + 24 + 24 + 2 + 4, 4));
             Location ang = new Location()

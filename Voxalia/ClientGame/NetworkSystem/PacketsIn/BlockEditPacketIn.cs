@@ -33,7 +33,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             for (int i = 0; i < len; i++)
             {
-                mats.Add(Utilities.BytesToUshort(dr.ReadBytes(2)));
+                mats.Add(Utilities.BytesToUShort(dr.ReadBytes(2)));
             }
             byte[] dats = dr.ReadBytes(len);
             byte[] paints = dr.ReadBytes(len);

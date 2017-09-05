@@ -87,7 +87,7 @@ namespace Voxalia.ServerGame.OtherSystems
             byte[] toret = new byte[(Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * (2 + 4)];
             for (int i = 0; i < Blocks.Length; i++)
             {
-                Utilities.UshortToBytes((ushort)Blocks[i].BasicMat).CopyTo(toret, i * 2);
+                Utilities.UShortToBytes((ushort)Blocks[i].BasicMat).CopyTo(toret, i * 2);
                 Utilities.IntToBytes(Blocks[i].Height).CopyTo(toret, (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * 2 + i * 4);
             }
             return toret;
@@ -97,7 +97,7 @@ namespace Voxalia.ServerGame.OtherSystems
         {
             for (int i = 0; i < Blocks.Length; i++)
             {
-                Blocks[i].BasicMat = (Material)Utilities.BytesToUshort(Utilities.BytesPartial(b, i * 2, 2));
+                Blocks[i].BasicMat = (Material)Utilities.BytesToUShort(Utilities.BytesPartial(b, i * 2, 2));
                 Blocks[i].Height = Utilities.BytesToInt(Utilities.BytesPartial(b, (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH) * 2 + i * 4, 4));
             }
         }
@@ -168,7 +168,7 @@ namespace Voxalia.ServerGame.OtherSystems
             byte[] toret = new byte[(Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 4) * (2 + 4)];
             for (int i = 0; i < BlocksTrans.Length; i++)
             {
-                Utilities.UshortToBytes((ushort)BlocksTrans[i].BasicMat).CopyTo(toret, i * 2);
+                Utilities.UShortToBytes((ushort)BlocksTrans[i].BasicMat).CopyTo(toret, i * 2);
                 Utilities.IntToBytes(BlocksTrans[i].Height).CopyTo(toret, (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 4) * 2 + i * 4);
             }
             return toret;
@@ -178,7 +178,7 @@ namespace Voxalia.ServerGame.OtherSystems
         {
             for (int i = 0; i < BlocksTrans.Length; i++)
             {
-                BlocksTrans[i].BasicMat = (Material)Utilities.BytesToUshort(Utilities.BytesPartial(b, i * 2, 2));
+                BlocksTrans[i].BasicMat = (Material)Utilities.BytesToUShort(Utilities.BytesPartial(b, i * 2, 2));
                 BlocksTrans[i].Height = Utilities.BytesToInt(Utilities.BytesPartial(b, (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 4) * 2 + i * 4, 4));
             }
         }

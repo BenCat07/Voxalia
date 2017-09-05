@@ -113,7 +113,7 @@ namespace Voxalia.ServerGame.OtherSystems
                 for (int y = 0; y < Constants.CHUNK_WIDTH; y++)
                 {
                     int ind = tregion.TopsHigherBlockIndex(x, y);
-                    ushort mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits, ind * 2, 2));
+                    ushort mat = Utilities.BytesToUShort(Utilities.BytesPartial(bits, ind * 2, 2));
                     MaterialImage imag = MaterialImages[mat];
                     if (fullzoom)
                     {
@@ -125,7 +125,7 @@ namespace Voxalia.ServerGame.OtherSystems
                                 fc.A = 255;
                                 for (int i = 3; i >= 0; i--)
                                 {
-                                    ushort smat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, (ind * 4 + i) * 2, 2));
+                                    ushort smat = Utilities.BytesToUShort(Utilities.BytesPartial(bits_trans, (ind * 4 + i) * 2, 2));
                                     if (smat != 0)
                                     {
                                         MaterialImage simag = MaterialImages[smat];
@@ -144,7 +144,7 @@ namespace Voxalia.ServerGame.OtherSystems
                         fc.A = 255;
                         for (int i = 3; i >= 0; i--)
                         {
-                            ushort smat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, ind * 2 * 4, 2));
+                            ushort smat = Utilities.BytesToUShort(Utilities.BytesPartial(bits_trans, ind * 2 * 4, 2));
                             if (smat != 0)
                             {
                                 MaterialImage simag = MaterialImages[smat];
@@ -230,7 +230,7 @@ namespace Voxalia.ServerGame.OtherSystems
                 for (int y = 0; y < Constants.CHUNK_WIDTH; y++)
                 {
                     int ind = tregion.TopsHigherBlockIndex(x, y);
-                    ushort mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits, ind * 2, 2));
+                    ushort mat = Utilities.BytesToUShort(Utilities.BytesPartial(bits, ind * 2, 2));
                     FastColor fc;
                     if (mat == 0)
                     {
@@ -243,7 +243,7 @@ namespace Voxalia.ServerGame.OtherSystems
                     }
                     for (int i = 3; i >= 0; i--)
                     {
-                        mat = Utilities.BytesToUshort(Utilities.BytesPartial(bits_trans, ind * 2 * 4, 2));
+                        mat = Utilities.BytesToUShort(Utilities.BytesPartial(bits_trans, ind * 2 * 4, 2));
                         if (mat != 0)
                         {
                             MaterialImage simag = MaterialImages[mat];

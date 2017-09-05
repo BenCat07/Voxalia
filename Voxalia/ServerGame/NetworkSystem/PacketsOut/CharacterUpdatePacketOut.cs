@@ -25,7 +25,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             player.GetPosition().ToDoubleBytes().CopyTo(Data, 8);
             player.GetVelocity().ToDoubleBytes().CopyTo(Data, 8 + 24);
             ushort dat = (ushort)((player.Upward ? 1 : 0) | (player.Downward ? 8 : 0));
-            Utilities.UshortToBytes(dat).CopyTo(Data, 8 + 24 + 24);
+            Utilities.UShortToBytes(dat).CopyTo(Data, 8 + 24 + 24);
             Utilities.FloatToBytes((float)player.Direction.Yaw).CopyTo(Data, 8 + 24 + 24 + 2);
             Utilities.FloatToBytes((float)player.Direction.Pitch).CopyTo(Data, 8 + 24 + 24 + 2 + 4);
             Data[8 + 24 + 24 + 2 + 4 + 4] = (byte)(player.IsCrouching ? 1 : 0);

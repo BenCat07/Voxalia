@@ -49,7 +49,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Utilities.IntToBytes(ZWidth).CopyTo(res, phys.Length + 4 + 4);
             for (int i = 0; i < Blocks.Length; i++)
             {
-                Utilities.UshortToBytes(Blocks[i].BlockMaterial).CopyTo(res, start + i * 2);
+                Utilities.UShortToBytes(Blocks[i].BlockMaterial).CopyTo(res, start + i * 2);
                 res[start + Blocks.Length * 2 + i] = Blocks[i].BlockData;
                 res[start + Blocks.Length * 3 + i] = Blocks[i].BlockPaint;
             }

@@ -28,7 +28,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             }
             for (int i = 0; i < mat.Length; i++)
             {
-                dw.WriteBytes(Utilities.UshortToBytes(mat[i]));
+                dw.WriteBytes(Utilities.UShortToBytes(mat[i]));
             }
             dw.WriteBytes(dat);
             dw.WriteBytes(paints);

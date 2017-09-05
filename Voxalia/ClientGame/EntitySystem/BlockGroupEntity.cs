@@ -283,7 +283,7 @@ namespace Voxalia.ClientGame.EntitySystem
             BlockInternal[] bi = new BlockInternal[xwidth * ywidth * zwidth];
             for (int i = 0; i < bi.Length; i++)
             {
-                bi[i]._BlockMaterialInternal = Utilities.BytesToUshort(Utilities.BytesPartial(data, PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + i * 2, 2));
+                bi[i]._BlockMaterialInternal = Utilities.BytesToUShort(Utilities.BytesPartial(data, PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + i * 2, 2));
                 bi[i].BlockData = data[PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 2 + i];
                 bi[i].BlockPaint = data[PhysicsEntity.PhysicsNetworkDataLength + (4 + 4 + 4) + bi.Length * 3 + i];
             }

@@ -58,7 +58,7 @@ namespace Voxalia.ServerGame.EntitySystem
             int start = phys.Length;
             byte[] Data = new byte[start + 2 + 1 + 1 + 1];
             phys.CopyTo(Data, 0);
-            Utilities.UshortToBytes(Original.BlockMaterial).CopyTo(Data, start);
+            Utilities.UShortToBytes(Original.BlockMaterial).CopyTo(Data, start);
             Data[start + 2] = Original.BlockData;
             Data[start + 3] = Original.BlockPaint;
             Data[start + 4] = Original.DamageData;

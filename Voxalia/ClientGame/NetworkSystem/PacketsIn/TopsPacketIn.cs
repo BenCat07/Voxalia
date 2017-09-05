@@ -39,7 +39,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             subdata = FileHandler.Uncompress(Utilities.BytesPartial(data, 4 + 4 + 4 + len, data.Length - (4 + 4 + 4 + len)));
             for (int i = 0; i < (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 4); i++)
             {
-                ushort mat = Utilities.BytesToUshort(Utilities.BytesPartial(subdata, i * 2, 2));
+                ushort mat = Utilities.BytesToUShort(Utilities.BytesPartial(subdata, i * 2, 2));
                 int height = Utilities.BytesToInt(Utilities.BytesPartial(subdata, (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 4 * 2) + i * 4, 4));
                 bua.BlocksTrans[i] = new BlockUpperArea.TopBlock() { BasicMat = (Material)mat, Height = height };
             }

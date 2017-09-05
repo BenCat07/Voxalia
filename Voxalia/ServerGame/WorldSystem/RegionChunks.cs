@@ -107,7 +107,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    ushort t = Utilities.BytesToUshort(Utilities.BytesPartial(slod, i * 2, 2));
+                    ushort t = Utilities.BytesToUShort(Utilities.BytesPartial(slod, i * 2, 2));
                     if (((Material)t).IsOpaque())
                     {
                         b |= posser;
@@ -156,49 +156,49 @@ namespace Voxalia.ServerGame.WorldSystem
                 if (!ba && (cap & 2) == 2)
                 {
                     maxA = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
-                    matA = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 1, 2));
+                    matA = Utilities.BytesToUShort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 1, 2));
                     ba = true;
                 }
                 else if (!ba && (cap & 1) == 1)
                 {
                     maxA = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
-                    matA = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 0, 2));
+                    matA = Utilities.BytesToUShort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 0, 2));
                     ba = true;
                 }
                 if (!bb && (cap & 8) == 8)
                 {
                     maxB = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
-                    matB = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 3, 2));
+                    matB = Utilities.BytesToUShort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 3, 2));
                     bb = true;
                 }
                 else if (!bb && (cap & 4) == 4)
                 {
                     maxB = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
-                    matB = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 2, 2));
+                    matB = Utilities.BytesToUShort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 2, 2));
                     bb = true;
                 }
                 if (!bc && (cap & 32) == 32)
                 {
                     maxC = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
-                    matC = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 5, 2));
+                    matC = Utilities.BytesToUShort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 5, 2));
                     bc = true;
                 }
                 else if (!bc && (cap & 16) == 16)
                 {
                     maxC = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
-                    matC = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 4, 2));
+                    matC = Utilities.BytesToUShort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 4, 2));
                     bc = true;
                 }
                 if (!bd && (cap & 128) == 128)
                 {
                     maxD = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH;
-                    matD = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 7, 2));
+                    matD = Utilities.BytesToUShort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 7, 2));
                     bd = true;
                 }
                 else if (!bd && (cap & 64) == 64)
                 {
                     maxD = x * Constants.CHUNK_WIDTH + Constants.CHUNK_WIDTH / 2;
-                    matD = Utilities.BytesToUshort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 6, 2));
+                    matD = Utilities.BytesToUShort(Utilities.BytesPartial(bytes, 128 + 128 + x * (8 * 2) + 2 * 6, 2));
                     bd = true;
                 }
             }
@@ -308,7 +308,7 @@ namespace Voxalia.ServerGame.WorldSystem
                                         SysConsole.Output(OutputType.DEBUG, "Used " + height + ", " + mat);
                                     }*/
                                     int idder = ((y * Constants.CHUNK_WIDTH + by) * 2 + ry) * (Constants.CHUNK_WIDTH * countter * 2) + ((x * Constants.CHUNK_WIDTH + bx) * 2 + rx);
-                                    Utilities.UshortToBytes(mat).CopyTo(result, idder * 2);
+                                    Utilities.UShortToBytes(mat).CopyTo(result, idder * 2);
                                     Utilities.IntToBytes(height).CopyTo(result, sectiontwo + idder * 4);
                                 }
                             }
@@ -410,13 +410,13 @@ namespace Voxalia.ServerGame.WorldSystem
                     int inder = bua.BlockIndex(x * 5, y * 5);
                     Material mat = bua.Blocks[inder].BasicMat;
                     int ind = TopsHigherBlockIndex(x + relPos.X * HIGHER_SIZE, y + relPos.Y * HIGHER_SIZE);
-                    Utilities.UshortToBytes((ushort)mat).CopyTo(b, ind * 2);
+                    Utilities.UShortToBytes((ushort)mat).CopyTo(b, ind * 2);
                     ind *= 4;
                     inder *= 4;
                     for (int bz = 0; bz < 4; bz++)
                     {
                         mat = bua.BlocksTrans[inder + bz].BasicMat;
-                        Utilities.UshortToBytes((ushort)mat).CopyTo(bt, (ind + bz) * 2);
+                        Utilities.UShortToBytes((ushort)mat).CopyTo(bt, (ind + bz) * 2);
                     }
                 }
             }

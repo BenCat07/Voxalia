@@ -662,7 +662,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 for (int i = 0; i < BlocksInternal.Length; i++)
                 {
-                    BlocksInternal[i]._BlockMaterialInternal = Utilities.BytesToUshort(Utilities.BytesPartial(det.Blocks, i * 2, 2));
+                    BlocksInternal[i]._BlockMaterialInternal = Utilities.BytesToUShort(Utilities.BytesPartial(det.Blocks, i * 2, 2));
                     BlocksInternal[i].BlockData = det.Blocks[BlocksInternal.Length * 2 + i];
                     BlocksInternal[i].BlockLocalData = det.Blocks[BlocksInternal.Length * 3 + i];
                     BlocksInternal[i]._BlockPaintInternal = det.Blocks[BlocksInternal.Length * 4 + i];

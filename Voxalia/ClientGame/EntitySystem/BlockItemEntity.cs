@@ -181,7 +181,7 @@ namespace Voxalia.ClientGame.EntitySystem
     {
         public override Entity Create(Region tregion, byte[] data)
         {
-            Material mat = (Material)Utilities.BytesToUshort(Utilities.BytesPartial(data, PhysicsEntity.PhysicsNetworkDataLength, 2));
+            Material mat = (Material)Utilities.BytesToUShort(Utilities.BytesPartial(data, PhysicsEntity.PhysicsNetworkDataLength, 2));
             byte dat = data[PhysicsEntity.PhysicsNetworkDataLength + 2];
             byte tpa = data[PhysicsEntity.PhysicsNetworkDataLength + 3];
             byte damage = data[PhysicsEntity.PhysicsNetworkDataLength + 4];
