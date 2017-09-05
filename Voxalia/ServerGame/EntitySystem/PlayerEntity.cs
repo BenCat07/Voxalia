@@ -558,6 +558,7 @@ namespace Voxalia.ServerGame.EntitySystem
             if (PlayerConfig == null)
             {
                 PlayerConfig = new FDSSection();
+                Permissions = new PermissionsGroup() { Name = "Unset", Root = new FDSSection() };
                 SaveToConfig(PlayerConfig);
                 LoadFromSaves(PlayerConfig);
             }
