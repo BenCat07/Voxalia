@@ -559,6 +559,7 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 PlayerConfig = new FDSSection();
                 SaveToConfig(PlayerConfig);
+                LoadFromSaves(PlayerConfig);
             }
             SaveToFile();
         }
