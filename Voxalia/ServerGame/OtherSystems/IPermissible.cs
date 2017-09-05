@@ -25,7 +25,7 @@ namespace Voxalia.ServerGame.OtherSystems
         /// </summary>
         /// <param name="keyPath">The key path.</param>
         /// <returns>Whether it's permitted.</returns>
-        bool HasPermission(params string[] keyPath);
+        bool? HasPermission(params string[] keyPath);
     }
 
     /// <summary>
@@ -39,7 +39,7 @@ namespace Voxalia.ServerGame.OtherSystems
         /// <param name="perm">The object.</param>
         /// <param name="pstr">The path string.</param>
         /// <returns>Whether it's permitted.</returns>
-        public static bool HasPermissionByPathString(this IPermissible perm, string pstr)
+        public static bool? HasPermissionByPathString(this IPermissible perm, string pstr)
         {
             return perm.HasPermission(pstr.SplitFast('.'));
         }

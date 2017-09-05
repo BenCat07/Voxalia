@@ -44,6 +44,16 @@ namespace Voxalia.ServerGame.OtherSystems
                     string dat = TheServer.Files.ReadText("groups/" + name + ".fds");
                     FDSSection sect = new FDSSection(dat);
                     grp = new PermissionsGroup() { Name = name, Root = sect };
+                    FDSSection grpint = sect.GetSection("__group_internal__");
+                    if (grpint != null)
+                    {
+                        string inherit = grpint.GetString("inherits");
+                        if (inherit != null)
+                        {
+                            grp.InheritsFrom = GetGroup(inherit);
+                        }
+                        grp.Priority = grpint.GetDouble("priority", 0).Value;
+                    }
                     Groups[name] = grp;
                     return grp;
                 }
@@ -61,7 +71,7 @@ namespace Voxalia.ServerGame.OtherSystems
     /// Represents a group permission data.
     /// Not meant to be used directly, but rather as an object granted to players.
     /// </summary>
-    public class PermissionsGroup
+    public class PermissionsGroup : IPermissible
     {
         /// <summary>
         /// Name of the group.
@@ -72,5 +82,47 @@ namespace Voxalia.ServerGame.OtherSystems
         /// Permissions root section.
         /// </summary>
         public FDSSection Root;
+
+        /// <summary>
+        /// The group this group inherits from, if any.
+        /// </summary>
+        public PermissionsGroup InheritsFrom = null;
+
+        /// <summary>
+        /// The priority value of this group.
+        /// </summary>
+        public double Priority = 0;
+
+        /// <summary>
+        /// The internal code to check if the player has a permission.
+        /// </summary>
+        /// <param name="path">The details of the node path.</param>
+        /// <returns>Whether the permission is marked.</returns>
+        public bool? HasPermission(params string[] path)
+        {
+            bool? b;
+            FDSSection sect = Root;
+            int end = path.Length - 1;
+            for (int i = 0; i < end; i++)
+            {
+                b = sect?.GetBool("*");
+                if (b.HasValue)
+                {
+                    return b.Value;
+                }
+                sect = sect?.GetSection(path[i]);
+            }
+            b = sect?.GetBool(path[end]);
+            if (b.HasValue)
+            {
+                return b.Value;
+            }
+            if (InheritsFrom != null)
+            {
+                return InheritsFrom.HasPermission(path);
+            }
+            return null;
+        }
+
     }
 }

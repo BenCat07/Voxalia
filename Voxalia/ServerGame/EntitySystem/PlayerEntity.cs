@@ -99,12 +99,7 @@ namespace Voxalia.ServerGame.EntitySystem
         /// Whether this player is enabled for movement security tracking.
         /// </summary>
         public bool SecureMovement = true;
-
-        /// <summary>
-        /// The permissions data on this player.
-        /// </summary>
-        public FDSSection Permissions = new FDSSection();
-
+        
         /// <summary>
         /// Sends a language-file based message to the player.
         /// </summary>
@@ -154,13 +149,17 @@ namespace Voxalia.ServerGame.EntitySystem
                 }, 0.1);
             }
             SecureMovement = config.GetBool("secure_movement", true).Value;
+            Permissions = new PermissionsGroup()
+            {
+                Name = "player:" + Name
+            };
             if (config.HasKey("permissions"))
             {
-                Permissions = config.GetSection("permissions");
+                Permissions.Root = config.GetSection("permissions") ?? new FDSSection();
             }
-            if (Permissions == null)
+            else
             {
-                Permissions = new FDSSection();
+                Permissions.Root = new FDSSection();
             }
             PermGroups.Clear();
             List<string> pgs = config.GetStringList("perm_groups") ?? new List<string>();
@@ -173,6 +172,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 }
                 // else { "Deleted group: pgs[i]!" }
             }
+            SortPermGroups();
             EID = config.GetLong("eid").Value;
             IsFirstJoin = false;
             SpawnedTime = TheRegion.GlobalTickTime;
@@ -199,7 +199,7 @@ namespace Voxalia.ServerGame.EntitySystem
             }
             const string timePath = "stats.general.time_seconds";
             config.Set(timePath, config.GetDouble(timePath, 0).Value + (TheRegion.GlobalTickTime - SpawnedTime));
-            config.Set("permissions", Permissions);
+            config.Set("permissions", Permissions.Root);
             config.Set("eid", EID);
             List<string> pgs = new List<string>();
             foreach (PermissionsGroup pg in PermGroups)
@@ -214,68 +214,45 @@ namespace Voxalia.ServerGame.EntitySystem
 
         /// <summary>
         /// Currently attached permissions groups.
+        /// User must keep sorted if modified.
+        /// Use <see cref="SortPermGroups"/>.
         /// </summary>
         public List<PermissionsGroup> PermGroups = new List<PermissionsGroup>();
 
         /// <summary>
-        /// Helper for permissions calculating.
+        /// Sorts the <see cref="PermGroups"/>.
         /// </summary>
-        private FDSSection[] gsect = new FDSSection[0];
-        
+        public void SortPermGroups()
+        {
+            PermGroups.Sort((a, b) => a.Priority.CompareTo(b));
+        }
+
+        /// <summary>
+        /// The permissions group that is unique this player.
+        /// </summary>
+        public PermissionsGroup Permissions;
+
         /// <summary>
         /// The internal code to check if the player has a permission.
         /// </summary>
         /// <param name="path">The details of the node path.</param>
         /// <returns>Whether the permission is marked.</returns>
-        public bool HasPermission(params string[] path)
+        public bool? HasPermission(params string[] path)
         {
-            bool? b;
-            if (gsect.Length != PermGroups.Count)
-            {
-                gsect = new FDSSection[PermGroups.Count];
-            }
-            for (int i = 0; i < gsect.Length; i++)
-            {
-                gsect[i] = PermGroups[i].Root;
-            }
-            FDSSection sect = Permissions;
-            int end = path.Length - 1;
-            for (int i = 0; i < end; i++)
-            {
-                b = sect?.GetBool("*");
-                if (b.HasValue)
-                {
-                    return b.Value;
-                }
-                for (int g = 0; g < gsect.Length; g++)
-                {
-                    b = gsect[g]?.GetBool("*");
-                    if (b.HasValue)
-                    {
-                        return b.Value;
-                    }
-                }
-                sect = sect?.GetSection(path[i]);
-                for (int g = 0; g < gsect.Length; g++)
-                {
-                    gsect[g] = gsect[g]?.GetSection(path[i]);
-                }
-            }
-            b = sect?.GetBool(path[end]);
+            bool? b = Permissions.HasPermission(path);
             if (b.HasValue)
             {
-                return b.Value;
+                return b;
             }
-            for (int g = 0; g < gsect.Length; g++)
+            foreach (PermissionsGroup pg in PermGroups)
             {
-                b = gsect[g]?.GetBool(path[end]);
+                b = pg.HasPermission(path);
                 if (b.HasValue)
                 {
-                    return b.Value;
+                    return b;
                 }
             }
-            // TODO: Reasonable fallback perms of some form? If neither group nor player specifies...
-            return false;
+            return null;
         }
 
         /// <summary>
