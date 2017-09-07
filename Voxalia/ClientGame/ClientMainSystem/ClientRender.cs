@@ -44,7 +44,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// TODO: Is tracking this actually helpful?
         /// </summary>
         public ConcurrentQueue<ChunkVBO> vbos = new ConcurrentQueue<ChunkVBO>();
-        
+
         /// <summary>
         /// Gets an estimated Video RAM (graphics memory) usage, broken into component usages.
         /// </summary>
@@ -121,7 +121,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         }
 
         const float FOGMAXDIST_3 = 55000;
-        
+
         const float FOGMAXDIST_2 = 11000;
 
         const float FOGMAXDIST_1 = 30 * 90;
@@ -152,7 +152,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The rendering subsystem for the item bar.
         /// </summary>
         public View3D ItemBarView = new View3D();
-        
+
         /// <summary>
         /// Early startup call to preparing some rendering systems.
         /// </summary>
@@ -226,7 +226,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             FixView(MainItemView);
             FixView(ItemBarView);
         }
-        
+
         public void RenderItemBar(View3D renderer)
         {
             Render2D(true);
@@ -304,12 +304,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// FBO for the in-game map.
         /// </summary>
         int map_fbo_main = -1;
-        
+
         /// <summary>
         /// Texture for the in-game map.
         /// </summary>
         int map_fbo_texture = -1;
-        
+
         /// <summary>
         /// Depth texture for the in-game map.
         /// </summary>
@@ -431,12 +431,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The sky box VBO's.
         /// </summary>
         VBO[] skybox;
-        
+
         /// <summary>
         /// The Shadow Pass shader, for voxels.
         /// </summary>
         public Shader s_shadowvox;
-        
+
         /// <summary>
         /// The G-Buffer FBO shader, for voxels.
         /// </summary>
@@ -446,27 +446,27 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The G-Buffer FBO shader, for SLOD voxels.
         /// </summary>
         public Shader s_fbovslod;
-        
+
         /// <summary>
         /// The G-Buffer FBO shader, for the refraction pass, for voxels.
         /// </summary>
         public Shader s_fbov_refract;
-        
+
         /// <summary>
         /// The shader used only for transparent voxels.
         /// </summary>
         public Shader s_transponlyvox;
-        
+
         /// <summary>
         /// The shader used only for transparent voxels with lighting.
         /// </summary>
         public Shader s_transponlyvoxlit;
-        
+
         /// <summary>
         /// The shader used only for transparent voxels with shadowed lighting.
         /// </summary>
         public Shader s_transponlyvoxlitsh;
-        
+
         /// <summary>
         /// The shader used to calculate the in-game map data.
         /// </summary>
@@ -482,7 +482,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// TODO: Optimize this away.
         /// </summary>
         public Shader s_transpadder;
-        
+
         /// <summary>
         /// The shader used for forward ('fast') rendering of voxels.
         /// </summary>
@@ -492,7 +492,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// The shader used for forward ('fast') rendering of SLOD voxels.
         /// </summary>
         public Shader s_forw_vox_slod;
-        
+
         /// <summary>
         /// The shader used for forward ('fast') rendering of transparent voxels.
         /// </summary>
@@ -715,7 +715,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// How long a tick took this frame.
         /// </summary>
         public double TickTime;
-        
+
         /// <summary>
         /// How long GL.Finish took this frame.
         /// </summary>
@@ -957,7 +957,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Textures.NormalDef.Bind();
             GL.ActiveTexture(TextureUnit.Texture0);
             GraphicsUtil.CheckError("Rendering - Sky - Prep - Textures");
-            Rendering.SetMinimumLight(1.0f, MainWorldView);
+            //Rendering.SetMinimumLight(1.0f, MainWorldView);
+            GraphicsUtil.CheckError("Rendering - Sky - Prep - MinLight");
             //Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * 1.6f), 1)); // TODO: 1.6 -> Externally defined constant. SunLightMod? Also, verify this value is used properly!
             GL.Disable(EnableCap.CullFace);
             Rendering.SetColor(Color4.White, MainWorldView);
@@ -998,8 +999,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             skybox[5].Render(false);
             Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * SunLightModDirect), 1), MainWorldView);
             GraphicsUtil.CheckError("Rendering - Sky - Light");
-            Rendering.SetMinimumLight(0, MainWorldView);
+            //Rendering.SetMinimumLight(0, MainWorldView);
+            GraphicsUtil.CheckError("Rendering - Sky - Sun - Pre 1");
             Rendering.SetColor(Color4.White, MainWorldView);
+            GraphicsUtil.CheckError("Rendering - Sky - Sun - Pre 1.5");
             if (CVars.r_fast.ValueB)
             {
                 Engine.Shaders3D.s_forwt_nofog.Bind();
@@ -1010,6 +1013,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
                 // TODO: Deferred option?
             }
+            GraphicsUtil.CheckError("Rendering - Sky - Sun - Pre 2");
             float zf = ZFar();
             float spf = ZFarOut() * 0.3333f;
             Textures.GetTexture("skies/sun").Bind(); // TODO: Store var!
@@ -1035,8 +1039,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
             GL.Enable(EnableCap.CullFace);
             Matrix4 ident = Matrix4.Identity;
             GL.UniformMatrix4(2, false, ref ident);
-            Rendering.SetMinimumLight(0, MainWorldView);
+            GraphicsUtil.CheckError("Rendering - Sky - N3 - Pre");
+            //Rendering.SetMinimumLight(0, MainWorldView);
+            GraphicsUtil.CheckError("Rendering - Sky - N3 - Light");
             Rendering.SetColor(Color4.White, MainWorldView);
+            GraphicsUtil.CheckError("Rendering - Sky - N3 - Color");
             if (CVars.r_fast.ValueB)
             {
                 Engine.Shaders3D.s_forwt_obj.Bind();
@@ -1057,6 +1064,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 //Models.GetModel("plants/trees/treevox01").DrawLOD(Player.GetPosition() + Player.ForwardVector() * ZFar() * 0.75);
             }
+            GraphicsUtil.CheckError("Rendering - Sky - Render Offset Ents");
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             if (MainWorldView.FBOid.IsForward())
             {
@@ -1133,7 +1141,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SetEnts();
             if (MainWorldView.FBOid.IsForward())
             {
-               // GL.Uniform2(14, new Vector2(CVars.r_znear.ValueF, ZFar()));
+                // GL.Uniform2(14, new Vector2(CVars.r_znear.ValueF, ZFar()));
             }
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             SetVox();
@@ -1658,7 +1666,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 : base(tregion, false, false)
             {
             }
-            
+
             public override void Render()
             {
                 TheClient.SetEnts();
@@ -2381,7 +2389,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 IsOrtho = true;
                 pos.X += 512f - (Window.Width * 0.5f);
                 pos.Y += 256f - (Window.Height);// - bottomup;
-                item.Render3D(pos+ new Location(size * 0.5f, size * 0.5f, 0f), (float)GlobalTickTimeLocal * 0.5f, new Location(size * 0.75f));
+                item.Render3D(pos + new Location(size * 0.5f, size * 0.5f, 0f), (float)GlobalTickTimeLocal * 0.5f, new Location(size * 0.75f));
                 IsOrtho = false;
                 return;
             }
@@ -2416,13 +2424,20 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix);
                 GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
                 GL.Uniform1(6, (float)Engine.GlobalTickTime);
+                GraphicsUtil.CheckError("Render/Fast - Uniforms 5.1");
                 // TODO: GL.Uniform1(7, AudioLevel);
                 GL.Uniform4(12, new Vector4(view.FogCol.ToOpenTK(), view.FogAlpha));
+                GraphicsUtil.CheckError("Render/Fast - Uniforms 5.15");
                 GL.Uniform1(13, fogDist);
                 //GL.Uniform2(14, zfar_rel); // ?
                 Engine.Rendering.SetColor(Color4.White, view);
-                GL.Uniform3(10, -TheSun.Direction.ToOpenTK());
-                GL.Uniform3(11, maxLit);
+                GraphicsUtil.CheckError("Render/Fast - Uniforms 5.2");
+                if (!Engine.Forward_Lights)
+                {
+                    GL.Uniform3(10, -TheSun.Direction.ToOpenTK());
+                    GraphicsUtil.CheckError("Render/Fast - Uniforms 5.21");
+                    GL.Uniform3(11, maxLit);
+                }
                 s_forw_vox_slod.Bind();
                 GraphicsUtil.CheckError("Render/Fast - Uniforms 5.25");
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix);
