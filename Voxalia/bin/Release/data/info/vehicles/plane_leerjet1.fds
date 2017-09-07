@@ -1,0 +1,41 @@
+vehicle:
+	name: Plane - Airman - Leer Jet - Mark 1
+	type: plane
+	mass: 1000.0
+	model: vehicles/planes/leerjet/plane_leerjet_body
+	forces:
+		# 10 * mass
+		strong: 10000
+		# 3 * mass
+		weak: 3000
+		pitch: 0.5
+		roll: 0.5
+		yaw: 0.1
+		wheels: 100
+		turn: 0.2
+	forwardness_helper: 0.05
+	lift_helper: 2.0
+	wheels:
+		front:
+			model: vehicles/planes/leerjet/plane_leerjet_wheel
+			suspension: 0.02
+		back:
+			model: vehicles/planes/leerjet/plane_leerjet_wheel
+			suspension: 0.02
+	flaps:
+		f01l:
+			model: vehicles/planes/leerjet/plane_leerjet_flap_f01l
+			mode: roll/l
+			max_angle: 30
+		f02r:
+			model: vehicles/planes/leerjet/plane_leerjet_flap_f02r
+			mode: roll/r
+			max_angle: 30
+		b01u:
+			model: vehicles/planes/leerjet/plane_leerjet_flap_b01u
+			mode: yaw
+			max_angle: 20
+		b02c:
+			model: vehicles/planes/leerjet/plane_leerjet_flap_b02c
+			mode: pitch
+			max_angle: 30

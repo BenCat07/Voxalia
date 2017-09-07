@@ -1089,7 +1089,15 @@ namespace Voxalia.ClientGame.WorldSystem
                         {
                             TheClient.Schedule.StartAsyncTask(() =>
                             {
-                                LightForChunks(ch, above);
+                                try
+                                {
+                                    LightForChunks(ch, above);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Utilities.CheckException(ex);
+                                    SysConsole.Output("Handling chunk lights", ex);
+                                }
                                 TheClient.Schedule.ScheduleSyncTask(() =>
                                 {
                                     LightingNow.Remove(ch.WorldPosition);

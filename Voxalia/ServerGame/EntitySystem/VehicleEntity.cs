@@ -452,7 +452,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Vector3 left = Quaternion.Transform(new Vector3(-1, 0, 0), wheel.GetOrientation());
             Vector3 up = Quaternion.Transform(new Vector3(0, 0, 1), wheel.GetOrientation());
             JointSlider pointOnLineJoint = new JointSlider(this, wheel, -new Location(up));
-            JointLAxisLimit suspensionLimit = new JointLAxisLimit(this, wheel, 0f, susp, wheel.GetPosition(), wheel.GetPosition(), -new Location(up)); // TODO: 0.1 -> arbitrary constant
+            JointLAxisLimit suspensionLimit = new JointLAxisLimit(this, wheel, 0f, susp, wheel.GetPosition(), wheel.GetPosition(), -new Location(up));
             JointPullPush spring = new JointPullPush(this, wheel, -new Location(up), true);
             if (driving)
             {
