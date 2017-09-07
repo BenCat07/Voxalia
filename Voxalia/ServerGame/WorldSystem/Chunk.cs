@@ -175,6 +175,20 @@ namespace Voxalia.ServerGame.WorldSystem
 
         /// <summary>
         /// Sets the block at given coordinates to a specified block data set.
+        /// No late-check-valid call.
+        /// </summary>
+        /// <param name="x">The X coordinate.</param>
+        /// <param name="y">The Y coordinate.</param>
+        /// <param name="z">The Z coordinate.</param>
+        /// <param name="det">The block details.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetBlockAt_NoCheck(int x, int y, int z, BlockInternal det)
+        {
+            BlocksInternal[BlockIndex(x, y, z)] = det;
+        }
+
+        /// <summary>
+        /// Sets the block at given coordinates to a specified block data set.
         /// </summary>
         /// <param name="x">The X coordinate.</param>
         /// <param name="y">The Y coordinate.</param>

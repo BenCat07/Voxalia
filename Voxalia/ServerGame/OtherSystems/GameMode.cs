@@ -80,6 +80,8 @@ namespace Voxalia.ServerGame.OtherSystems
         {
             return Details[(int)mode];
         }
+
+        // TODO: Get by name, etc.
     }
 
     /// <summary>

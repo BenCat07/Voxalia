@@ -271,6 +271,58 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                     });
                 });
             }
+            else if (arg0 == "massiveSet" && entry.InputArguments.Count > 1)
+            {
+                BlockInternal bi = new BlockInternal((ushort)(Utilities.UtilRandom.Next(10) > 5 ? Material.DIRT : Material.STONE), 0, 0, (byte)BlockFlags.EDITED);
+                int pre_count = entry.Player.TheRegion.LoadedChunks.Count;
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                Location radius = Location.FromString(entry.InputArguments[1]);
+                Location minimum = entry.Player.GetPosition() - radius;
+                Location maximum = entry.Player.GetPosition() + new Location(radius.X, radius.Y, 0);
+                Vector3i min_i = minimum.ToVec3i();
+                Vector3i max_i = maximum.ToVec3i();
+                Vector3i c_min = entry.Player.TheRegion.ChunkLocFor(min_i);
+                Vector3i c_max = entry.Player.TheRegion.ChunkLocFor(max_i);
+                Vector3i chunk_scale = c_max - c_min + new Vector3i(1, 1, 1);
+                Chunk[] chunks = new Chunk[chunk_scale.X * chunk_scale.Y * chunk_scale.Z];
+                for (int x = c_min.X; x <= c_max.X; x++)
+                {
+                    for (int y = c_min.Y; y <= c_max.Y; y++)
+                    {
+                        for (int z = c_min.Z; z <= c_max.Z; z++)
+                        {
+                            Vector3i cloc = new Vector3i(x, y, z);
+                            Chunk ch = entry.Player.TheRegion.LoadChunk(cloc);
+                            ch.LateCheckValid();
+                            Vector3i cur = cloc - c_min;
+                            chunks[cur.Z * chunk_scale.Y * chunk_scale.X + cur.Y * chunk_scale.X + cur.X] = ch;
+                        }
+                    }
+                }
+                for (int x = min_i.X; x < max_i.X; x++)
+                {
+                    for (int y = min_i.Y; y < max_i.Y; y++)
+                    {
+                        for (int z = min_i.Z; z < max_i.Z; z++)
+                        {
+                            Vector3i cloc = entry.Player.TheRegion.ChunkLocFor(new Vector3i(x, y, z));
+                            Vector3i cur = cloc - c_min;
+                            chunks[cur.Z * chunk_scale.Y * chunk_scale.X + cur.Y * chunk_scale.X + cur.X].SetBlockAt_NoCheck
+                                (x - cloc.X * Chunk.CHUNK_SIZE, y - cloc.Y * Chunk.CHUNK_SIZE, z - cloc.Z * Chunk.CHUNK_SIZE, bi);
+                        }
+                    }
+                }
+                sw.Stop();
+                int post_count = entry.Player.TheRegion.LoadedChunks.Count;
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Took: " + (sw.ElapsedTicks / (double)Stopwatch.Frequency) + " seconds... chunk load count: " + (post_count - pre_count));
+                for (int i = 0; i < chunks.Length; i++)
+                {
+                    chunks[i].ChunkDetect();
+                    entry.Player.TheRegion.PushNewChunkDetailsToUpperArea(chunks[i]);
+                    entry.Player.TheRegion.ChunkUpdateForAll(chunks[i]);
+                }
+            }
             else if (arg0 == "gameMode" && entry.InputArguments.Count > 1)
             {
                 if (Enum.TryParse(entry.InputArguments[1].ToUpperInvariant(), out GameMode mode))
