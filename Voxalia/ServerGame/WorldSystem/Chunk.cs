@@ -486,7 +486,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 return LOD;
             }
             bool isAir = canReturnNull || canZero;
-            int csize = Chunk.CHUNK_SIZE / lod;
+            int csize = CHUNK_SIZE / lod;
             byte[] data_orig = new byte[csize * csize * csize * 2];
             for (int x = 0; x < csize; x++)
             {

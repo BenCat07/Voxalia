@@ -110,7 +110,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
                 Data[16] = 1;
                 return;
             }
-            byte[] gdata = lod == 15 ? data_orig : FileHandler.Compress(data_orig);
+            byte[] gdata = lod >= 6 ? data_orig : FileHandler.Compress(data_orig);
             DataStream ds = new DataStream(gdata.Length + 16);
             DataWriter dw = new DataWriter(ds);
             dw.WriteInt(chunk.WorldPosition.X);
@@ -118,12 +118,15 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             dw.WriteInt(chunk.WorldPosition.Z);
             dw.WriteInt(lod);
             dw.WriteByte(0);
-            byte[] reach = new byte[chunk.Reachability.Length];
-            for (int i = 0; i < reach.Length; i++)
+            if (lod == 1)
             {
-                reach[i] = (byte)(chunk.Reachability[i] ? 1 : 0);
+                byte[] reach = new byte[chunk.Reachability.Length];
+                for (int i = 0; i < reach.Length; i++)
+                {
+                    reach[i] = (byte)(chunk.Reachability[i] ? 1 : 0);
+                }
+                dw.WriteBytes(reach);
             }
-            dw.WriteBytes(reach);
             dw.WriteBytes(gdata);
             Data = ds.ToArray();
         }

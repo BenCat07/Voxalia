@@ -37,10 +37,17 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         callback?.Invoke(LSAir);
                     }
-                    callback?.Invoke(b);
+                    TheWorld.Schedule.ScheduleSyncTask(() =>
+                    {
+                        callback?.Invoke(b);
+                    });
                 }
-                // TODO: Maybe save this value to the ChunkManager?
-                callback?.Invoke(Generator.GetSuperLOD(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos));
+                // TODO: Maybe save this value to the ChunkManager? ... or maybe not? Needs planning...
+                b = Generator.GetSuperLOD(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
+                TheWorld.Schedule.ScheduleSyncTask(() =>
+                {
+                    callback?.Invoke(b);
+                });
             });
         }
 
@@ -55,9 +62,17 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         callback?.Invoke(L6Air);
                     }
-                    callback?.Invoke(b);
+                    TheWorld.Schedule.ScheduleSyncTask(() =>
+                    {
+                        callback?.Invoke(b);
+                    });
                 }
-                callback?.Invoke(Generator.GetLODSix(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos));
+                // TODO: Maybe save this value to the ChunkManager? ... or maybe not? Needs planning...
+                b = Generator.GetLODSix(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
+                TheWorld.Schedule.ScheduleSyncTask(() =>
+                {
+                    callback?.Invoke(b);
+                });
             });
         }
 
@@ -72,7 +87,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
                 return b;
             }
-            // TODO: Maybe save this value to the ChunkManager?
+            // TODO: Maybe save this value to the ChunkManager? ... or maybe not? Needs planning...
             return Generator.GetSuperLOD(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
         }
 
@@ -87,7 +102,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
                 return b;
             }
-            // TODO: Maybe save this value to the ChunkManager?
+            // TODO: Maybe save this value to the ChunkManager? ... or maybe not? Needs planning...
             return Generator.GetLODSix(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, cpos);
         }
 
@@ -645,6 +660,26 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <param name="chunkmap">A map of chunks to search first.</param>
         /// <param name="pos">The location.</param>
         /// <returns>The material.</returns>
+        public Material GetBlockMaterial(Dictionary<Vector3i, Chunk> chunkmap, Vector3i pos)
+        {
+            Vector3i cpos = ChunkLocFor(pos);
+            if (!chunkmap.TryGetValue(cpos, out Chunk ch))
+            {
+                ch = LoadChunk(cpos);
+                chunkmap[cpos] = ch;
+            }
+            int x = pos.X - (int)cpos.X * Chunk.CHUNK_SIZE;
+            int y = pos.Y - (int)cpos.Y * Chunk.CHUNK_SIZE;
+            int z = pos.Z - (int)cpos.Z * Chunk.CHUNK_SIZE;
+            return ch.GetBlockAt(x, y, z).Material;
+        }
+
+        /// <summary>
+        /// Gets the material at a location, searching a specific map of chunks first (prior to searching globally).
+        /// </summary>
+        /// <param name="chunkmap">A map of chunks to search first.</param>
+        /// <param name="pos">The location.</param>
+        /// <returns>The material.</returns>
         public Material GetBlockMaterial(Dictionary<Vector3i, Chunk> chunkmap, Location pos)
         {
             Vector3i cpos = ChunkLocFor(pos);
@@ -656,7 +691,7 @@ namespace Voxalia.ServerGame.WorldSystem
             int x = (int)Math.Floor(pos.X) - (int)cpos.X * Chunk.CHUNK_SIZE;
             int y = (int)Math.Floor(pos.Y) - (int)cpos.Y * Chunk.CHUNK_SIZE;
             int z = (int)Math.Floor(pos.Z) - (int)cpos.Z * Chunk.CHUNK_SIZE;
-            return (Material)ch.GetBlockAt(x, y, z).BlockMaterial;
+            return ch.GetBlockAt(x, y, z).Material;
         }
 
         /// <summary>
@@ -670,7 +705,7 @@ namespace Voxalia.ServerGame.WorldSystem
             int x = (int)Math.Floor(pos.X) - (int)ch.WorldPosition.X * Chunk.CHUNK_SIZE;
             int y = (int)Math.Floor(pos.Y) - (int)ch.WorldPosition.Y * Chunk.CHUNK_SIZE;
             int z = (int)Math.Floor(pos.Z) - (int)ch.WorldPosition.Z * Chunk.CHUNK_SIZE;
-            return (Material)ch.GetBlockAt(x, y, z).BlockMaterial;
+            return ch.GetBlockAt(x, y, z).Material;
         }
 
         /// <summary>
@@ -732,6 +767,58 @@ namespace Voxalia.ServerGame.WorldSystem
                 ChunkSendToAll(new BlockEditPacketOut(new Location[] { pos }, new ushort[] { bi._BlockMaterialInternal }, new byte[] { dat }, new byte[] { paint }), ch.WorldPosition);
             }
         }
+        
+        // Special case.
+        public void MassBlockEdit(HashSet<Vector3i> locs, BlockInternal bi, bool override_protection = false, double resDelay = 0)
+        {
+            try
+            {
+                Dictionary<Vector3i, Chunk> chunksEdited = new Dictionary<Vector3i, Chunk>();
+                foreach (Vector3i pos in locs)
+                {
+                    Vector3i cl = ChunkLocFor(pos);
+                    if (!chunksEdited.TryGetValue(cl, out Chunk ch))
+                    {
+                        ch = LoadChunk(cl);
+                        ch.LateCheckValid();
+                        chunksEdited[cl] = ch;
+                    }
+                    int x = pos.X - cl.X * Chunk.CHUNK_SIZE;
+                    int y = pos.Y - cl.Y * Chunk.CHUNK_SIZE;
+                    int z = pos.Z - cl.Z * Chunk.CHUNK_SIZE;
+                    int ind = ch.BlockIndex(x, y, z);
+                    if (!override_protection && ((BlockFlags)ch.BlocksInternal[ind].BlockLocalData).HasFlag(BlockFlags.PROTECTED))
+                    {
+                        return;
+                    }
+                    ch.BlocksInternal[ind] = bi;
+                }
+                foreach (KeyValuePair<Vector3i, Chunk> pair in chunksEdited)
+                {
+                    pair.Value.LastEdited = GlobalTickTime;
+                    pair.Value.Flags |= ChunkFlags.NEEDS_DETECT;
+                    Action a = () =>
+                    {
+                        pair.Value.ChunkDetect();
+                        PushNewChunkDetailsToUpperArea(pair.Value);
+                        ChunkUpdateForAll(pair.Value);
+                    };
+                    if (resDelay <= 0)
+                    {
+                        a();
+                    }
+                    else
+                    {
+                        TheWorld.Schedule.ScheduleSyncTask(a, resDelay);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Utilities.CheckException(ex);
+                SysConsole.Output("Running a mass block edit", ex);
+            }
+        }
 
         public void MassBlockEdit(Location[] locs, BlockInternal[] bis, bool override_protection = false)
         {
@@ -747,9 +834,9 @@ namespace Voxalia.ServerGame.WorldSystem
                         ch = LoadChunk(cl);
                         chunksEdited[cl] = ch;
                     }
-                    int x = (int)Math.Floor(pos.X) - (int)cl.X * Chunk.CHUNK_SIZE;
-                    int y = (int)Math.Floor(pos.Y) - (int)cl.Y * Chunk.CHUNK_SIZE;
-                    int z = (int)Math.Floor(pos.Z) - (int)cl.Z * Chunk.CHUNK_SIZE;
+                    int x = (int)Math.Floor(pos.X) - cl.X * Chunk.CHUNK_SIZE;
+                    int y = (int)Math.Floor(pos.Y) - cl.Y * Chunk.CHUNK_SIZE;
+                    int z = (int)Math.Floor(pos.Z) - cl.Z * Chunk.CHUNK_SIZE;
                     if (!override_protection && ((BlockFlags)ch.GetBlockAt(x, y, z).BlockLocalData).HasFlag(BlockFlags.PROTECTED))
                     {
                         return;
@@ -827,6 +914,20 @@ namespace Voxalia.ServerGame.WorldSystem
         /// The value of 1.0 / CHUNK_WIDTH. A constant.
         /// </summary>
         const double tCW = 1.0 / (double)Constants.CHUNK_WIDTH;
+
+        /// <summary>
+        /// Returns the chunk location for a world position.
+        /// </summary>
+        /// <param name="worldPos">The world position.</param>
+        /// <returns>The chunk location.</returns>
+        public Vector3i ChunkLocFor(Vector3i worldPos)
+        {
+            Vector3i temp;
+            temp.X = (int)Math.Floor(worldPos.X * tCW);
+            temp.Y = (int)Math.Floor(worldPos.Y * tCW);
+            temp.Z = (int)Math.Floor(worldPos.Z * tCW);
+            return temp;
+        }
 
         /// <summary>
         /// Returns the chunk location for a world position.

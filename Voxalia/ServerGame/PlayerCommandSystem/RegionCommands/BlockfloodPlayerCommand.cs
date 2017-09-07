@@ -33,7 +33,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
             }
             Material chosenMat = MaterialHelpers.FromNameOrNumber(entry.InputArguments[0]);
             double maxRad = Utilities.StringToFloat(entry.InputArguments[1]);
-            if (maxRad > 100) // TODO: Config!
+            if (maxRad > 100) // TODO: Configurable.
             {
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Maximum radius is 100!");
                 return;
@@ -41,15 +41,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
             Location start = entry.Player.GetPosition().GetBlockLocation() + new Location(0, 0, 1);
             HashSet<Vector3i> locs = new HashSet<Vector3i>();
             FloodFrom(entry.Player.TheRegion, start.ToVec3i(), maxRad, locs);
-            Vector3i[] tlocs = locs.ToArray();
-            BlockInternal[] bis = new BlockInternal[tlocs.Length];
-            Location[] plocs = new Location[tlocs.Length];
-            for (int i = 0; i < bis.Length; i++)
-            {
-                plocs[i] = tlocs[i].ToLocation();
-                bis[i] = new BlockInternal((ushort)chosenMat, 0, 0, (byte)BlockFlags.EDITED);
-            }
-            entry.Player.TheRegion.MassBlockEdit(plocs, bis);
+            entry.Player.TheRegion.MassBlockEdit(locs, new BlockInternal((ushort)chosenMat, 0, 0, (byte)BlockFlags.EDITED), resDelay: 0.1);
         }
 
         Vector3i[] FloodDirs = new Vector3i[] { new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0), new Vector3i(0, 1, 0), new Vector3i(0, -1, 0), new Vector3i(0, 0, -1) };
@@ -57,7 +49,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.RegionCommands
         void FloodFrom(Region tregion, Vector3i start, double maxRad, HashSet<Vector3i> locs)
         {
             Queue<Vector3i> toCheck = new Queue<Vector3i>(128);
-            Dictionary<Vector3i, Chunk> chks = new Dictionary<Vector3i, Chunk>(64);
+            Dictionary<Vector3i, Chunk> chks = new Dictionary<Vector3i, Chunk>(128); // TODO: Arbitrary constant.
             toCheck.Enqueue(start);
             while (toCheck.Count > 0)
             {
