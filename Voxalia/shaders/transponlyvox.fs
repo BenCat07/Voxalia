@@ -94,7 +94,23 @@ void main()
 		}
 		else if (f.tcol.x > 0.51)
 		{
-			if (f.tcol.x > (146.0 / 255.0))
+			if (f.tcol.x > (150.0 / 255.0))
+			{
+					float genNoise = snoise2(vec3(ivec3(f.position.xyz) + ivec3(time)));
+					float sparkleX = mod(genNoise * 10.0, 0.8) + 0.1;
+					float sparkleY = mod(genNoise * 27.3, 0.8) + 0.1;
+					float intensity = mod(genNoise * 123.4, 0.5) + 0.5;
+					float intensity_rel = (time - float(int(time)));
+					if (intensity_rel > 0.5)
+					{
+						intensity_rel = (1.0 - intensity_rel);
+					}
+					intensity_rel *= 2.0;
+					vec2 dist_xy = f.texcoord.xy - vec2(sparkleX, sparkleY);
+					float intensity_dist = 20.0 * max(0.0, 0.05 - abs(dist_xy.x)) * (1.0 - 5.0 * min(0.2, abs(dist_xy.y))) + 20.0 * max(0.0, 0.05 - abs(dist_xy.y)) * (1.0 - 5.0 * min(0.2, abs(dist_xy.x)));
+					tcolor = vec4(min(vec3(1.0), tcolor.xyz + vec3(intensity * intensity_rel * intensity_dist)), 0.8);
+			}
+			else if (f.tcol.x > (146.0 / 255.0))
 			{
 				if (f.tcol.x > (148.0 / 255.0))
 				{

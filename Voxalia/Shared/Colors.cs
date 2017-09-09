@@ -104,6 +104,7 @@ namespace Voxalia.Shared
         public static Color TAN = Color.FromArgb(210, 180, 140);
         public static Color TILED_TWO = Color.FromArgb(0, 147, 127, 127);
         public static Color TILED_THREE = Color.FromArgb(0, 149, 127, 127);
+        public static Color SPARKLING = Color.FromArgb(0, 151, 127, 127);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
@@ -280,7 +281,8 @@ namespace Voxalia.Shared
             Register("CONVEYOR4", CONVEYOR4);
             Register("TAN", TAN);
             Register("TILED_TWO", TILED_TWO);
-            Register("TILED_THREE", TILED_THREE); // 82
+            Register("TILED_THREE", TILED_THREE);
+            Register("SPARKLING", SPARKLING); // 83
             // TODO: Rest to 127
         }
     }

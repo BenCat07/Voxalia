@@ -88,8 +88,9 @@ const vec4 tcolors_val[] = vec4[](
 	vec4(0.5, (175.0 / 255.0), 0.5, 0.0), // CONVEYOR4 = 79
 	vec4(0.8, 0.7, 0.55, 1.0), // TAN = 80
 	vec4((147.0 / 255.0), 0.5, 0.5, 0.0), // TILED_TWO = 81
-	vec4((149.0 / 255.0), 0.5, 0.5, 0.0) // TILED_THREE = 82
-	// TODO: Next will be X 151.0+
+	vec4((149.0 / 255.0), 0.5, 0.5, 0.0), // TILED_THREE = 82
+	vec4((151.0 / 255.0), 0.5, 0.5, 0.0) // SPARKLING = 83
+	// TODO: Next will be X 153.0+
 	// TODO: After X=175.0, there's still room for Z 147.0+
 	// TODO: up to 127
 );
