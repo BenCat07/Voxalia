@@ -43,7 +43,9 @@ namespace Voxalia.Shared
     /// </summary>
     public enum VehicleType : byte
     {
-        PLANE = 1
+        CAR = 0,
+        PLANE = 1,
+        HELICOPTER = 2
     }
 
     /// <summary>

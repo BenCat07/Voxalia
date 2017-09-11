@@ -22,22 +22,21 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
         {
             UsageType = NetUsageType.ENTITIES;
             ID = ServerToClientPacket.GAIN_CONTROL_OF_VEHICLE;
-            if (vehicle is CarEntity)
+            if (vehicle is CarEntity ce)
             {
-                Setup(character, (CarEntity)vehicle);
+                Setup(character, ce);
             }
-            else if (vehicle is HelicopterEntity)
+            else if (vehicle is HelicopterEntity he)
             {
-                Setup(character, (HelicopterEntity)vehicle);
+                Setup(character, he);
             }
-            else if (vehicle is PlaneEntity)
+            else if (vehicle is PlaneEntity pe)
             {
-                Setup(character, (PlaneEntity)vehicle);
+                Setup(character, pe);
             }
-            // TODO: Boats!
             else
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException("Vehicle type given is not currently implemented.");
             }
         }
 
@@ -46,7 +45,8 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             DataStream ds = new DataStream();
             DataWriter dw = new DataWriter(ds);
             dw.WriteLong(character.EID);
-            dw.WriteByte(0); // TODO: Enum?
+            dw.WriteByte((byte)VehicleType.CAR);
+            dw.WriteFloat(vehicle.ViewBackMultiplier);
             dw.WriteInt(vehicle.DrivingMotors.Count);
             dw.WriteInt(vehicle.SteeringMotors.Count);
             for (int i = 0; i < vehicle.DrivingMotors.Count; i++)
@@ -65,7 +65,8 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             DataStream ds = new DataStream();
             DataWriter dw = new DataWriter(ds);
             dw.WriteLong(character.EID);
-            dw.WriteByte(1); // TODO: Enum?
+            dw.WriteByte((byte)VehicleType.HELICOPTER);
+            dw.WriteFloat(vehicle.ViewBackMultiplier);
             dw.WriteLong(vehicle.EID);
             Data = ds.ToArray();
         }
@@ -75,7 +76,8 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             DataStream ds = new DataStream();
             DataWriter dw = new DataWriter(ds);
             dw.WriteLong(character.EID);
-            dw.WriteByte(2); // TODO: Enum?
+            dw.WriteByte((byte)VehicleType.PLANE);
+            dw.WriteFloat(vehicle.ViewBackMultiplier);
             dw.WriteLong(vehicle.EID);
             Data = ds.ToArray();
         }

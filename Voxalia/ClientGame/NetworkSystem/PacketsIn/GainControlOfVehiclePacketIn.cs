@@ -24,16 +24,17 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             DataStream ds = new DataStream(data);
             DataReader dr = new DataReader(ds);
             long PEID = dr.ReadLong();
-            byte type = dr.ReadByte();
+            VehicleType type = (VehicleType)dr.ReadByte();
+            float vbm = dr.ReadFloat();
             Entity e = TheClient.TheRegion.GetEntity(PEID);
-            if (type == 0)
+            if (type == VehicleType.CAR)
             {
-                if (e is PlayerEntity)
+                if (e is PlayerEntity player)
                 {
-                    ((PlayerEntity)e).InVehicle = true;
+                    player.InVehicle = true;
+                    player.VehicleViewBackMultiplier = vbm;
                     int drivecount = dr.ReadInt();
                     int steercount = dr.ReadInt();
-                    PlayerEntity player = (PlayerEntity)e;
                     player.DrivingMotors.Clear();
                     player.SteeringMotors.Clear();
                     for (int i = 0; i < drivecount; i++)
@@ -63,21 +64,21 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 }
                 // TODO: other CharacterEntity's
             }
-            else if (type == 1)
+            else if (type == VehicleType.HELICOPTER)
             {
-                if (e is PlayerEntity)
+                if (e is PlayerEntity player)
                 {
                     long heloid = dr.ReadLong();
                     Entity helo = TheClient.TheRegion.GetEntity(heloid);
-                    if (!(helo is ModelEntity))
+                    if (!(helo is ModelEntity helomod))
                     {
                         dr.Close();
                         return false;
                     }
-                    ((PlayerEntity)e).InVehicle = true;
-                    ((PlayerEntity)e).Vehicle = helo;
-                    ModelEntity helomod = (ModelEntity)helo;
-                    helomod.TurnIntoHelicopter((PlayerEntity)e);
+                    player.VehicleViewBackMultiplier = vbm;
+                    player.InVehicle = true;
+                    player.Vehicle = helo;
+                    helomod.TurnIntoHelicopter(player);
                     dr.Close();
                     return true;
                 }
@@ -85,7 +86,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 dr.Close();
                 return true;
             }
-            else if (type == 2)
+            else if (type == VehicleType.PLANE)
             {
                 // TODO: Wheels!
                 if (e is PlayerEntity player)
@@ -97,6 +98,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                         dr.Close();
                         return false;
                     }
+                    player.VehicleViewBackMultiplier = vbm;
                     player.InVehicle = true;
                     player.Vehicle = plane;
                     planemod.TurnIntoPlane(player);

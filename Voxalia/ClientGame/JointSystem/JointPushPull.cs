@@ -37,8 +37,8 @@ namespace Voxalia.ClientGame.JointSystem
             LinearAxisMotor lam = new LinearAxisMotor(Ent1.Body, Ent2.Body, Ent2.GetPosition().ToBVector(), Ent2.GetPosition().ToBVector(), Axis.ToBVector());
             lam.Settings.Mode = Mode ? MotorMode.Servomechanism : MotorMode.VelocityMotor;
             lam.Settings.Servo.Goal = 1;
-            lam.Settings.Servo.SpringSettings.Stiffness = 300;
-            lam.Settings.Servo.SpringSettings.Damping = 70;
+            lam.Settings.Servo.SpringSettings.Stiffness = 3000;
+            lam.Settings.Servo.SpringSettings.Damping = 700;
             return lam;
         }
     }

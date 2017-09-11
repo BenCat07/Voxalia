@@ -3,6 +3,7 @@ vehicle:
 	type: plane
 	mass: 1000.0
 	model: vehicles/planes/plane_airman_bodysystem
+	view_distance: 7
 	forces:
 		# 10 * mass
 		strong: 10000

@@ -57,7 +57,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Utilities.DoubleToBytes(StrYaw).CopyTo(resDat, modDat.Length + 6 * 8);
             Utilities.DoubleToBytes(WheelStrength).CopyTo(resDat, modDat.Length + 7 * 8);
             Utilities.DoubleToBytes(TurnStrength).CopyTo(resDat, modDat.Length + 8 * 8);
-            resDat[modDat.Length + 9 * 8] = (int)VehicleType.PLANE;
+            resDat[modDat.Length + 9 * 8] = (byte)VehicleType.PLANE;
             return resDat;
         }
 

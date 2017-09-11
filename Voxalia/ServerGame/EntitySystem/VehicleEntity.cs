@@ -63,6 +63,8 @@ namespace Voxalia.ServerGame.EntitySystem
                 pe.TurnStrength = forceSect.GetDouble("turn").Value;
                 pe.ForwardHelper = vehicleSect.GetDouble("forwardness_helper").Value;
                 pe.LiftHelper = vehicleSect.GetDouble("lift_helper").Value;
+                pe.ViewBackMultiplier = vehicleSect.GetFloat("view_distance", 7).Value;
+                pe.CenterOfMassOffset = Location.FromString(vehicleSect.GetString("center_of_mass", "0,0,0"));
                 return pe;
             }
             else
@@ -72,12 +74,17 @@ namespace Voxalia.ServerGame.EntitySystem
             }
         }
 
+        /// <summary>
+        /// Offset to the center of mass.
+        /// </summary>
+        public Location CenterOfMassOffset = Location.Zero;
+
         public override NetworkEntityType GetNetType()
         {
             return NetworkEntityType.VEHICLE;
         }
 
-        // TODO: Save with just the entity source file name?
+        // TODO: Save with just the vehicle source file name?
 
         public string SourceName;
 
@@ -90,6 +97,8 @@ namespace Voxalia.ServerGame.EntitySystem
         public Seat DriverSeat;
 
         public string vehName;
+
+        public float ViewBackMultiplier = 7;
 
         public void HandleFlapsInput(double yawmove, double pitchmove, double rollmove)
         {
@@ -297,7 +306,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     centerOfMass /= mass;
                 }
-                Body.CollisionInformation.LocalPosition = -centerOfMass.ToBVector();
+                Body.CollisionInformation.LocalPosition = -centerOfMass.ToBVector() - CenterOfMassOffset.ToBVector();
                 ForceNetwork();
                 for (int i = 0; i < nodes.Count; i++)
                 {

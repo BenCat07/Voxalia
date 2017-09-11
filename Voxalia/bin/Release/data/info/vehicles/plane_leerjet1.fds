@@ -3,6 +3,8 @@ vehicle:
 	type: plane
 	mass: 1000.0
 	model: vehicles/planes/leerjet/plane_leerjet_body
+	view_distance: 17
+	center_of_mass: 0,7,0
 	forces:
 		# 10 * mass
 		strong: 10000

@@ -887,9 +887,14 @@ namespace Voxalia.ClientGame.EntitySystem
             GraphicsUtil.CheckError("Render - Player - Post");
         }
 
+        /// <summary>
+        /// How far back to set the view when in a vehicle.
+        /// </summary>
+        public float VehicleViewBackMultiplier = 7;
+
         public float ViewBackMod()
         {
-            return (InVehicle && Vehicle != null) ? 7 : 2;
+            return (InVehicle && Vehicle != null) ? VehicleViewBackMultiplier : 2;
         }
 
         public Location GetCameraPosition()
