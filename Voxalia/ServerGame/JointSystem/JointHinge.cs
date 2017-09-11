@@ -18,7 +18,7 @@ using FreneticGameCore;
 
 namespace Voxalia.ServerGame.JointSystem
 {
-    public class JointHinge : BaseJoint // TODO: Network me!
+    public class JointHinge : BaseJoint
     {
         public JointHinge(PhysicsEntity e1, PhysicsEntity e2, Location hinge)
         {

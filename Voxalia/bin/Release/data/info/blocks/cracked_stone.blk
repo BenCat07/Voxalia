@@ -1,0 +1,7 @@
+Name=Cracked_Stone
+SpeedMod=1.25
+Sound=STONE
+Hardness=20
+BreakTime=2
+Breaker=PICKAXE
+TextureBasic=blocks/solid/natural/cracked_stone$blocks/solid/natural/cracked_stone_normal
