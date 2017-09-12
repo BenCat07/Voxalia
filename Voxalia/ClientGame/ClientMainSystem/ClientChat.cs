@@ -48,7 +48,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             };
             ChatMenu.AddChild(ChatBox);
             ChatMenu.AddChild(ChatScroller);
-            Channels = new bool[(int)TextChannel.COUNT];
+            Channels = new bool[(int)TextChannelHelpers.COUNT];
             Func<int> xer = () => 30;
             Channels[0] = true;
             for (int i = 1; i < Channels.Length; i++)

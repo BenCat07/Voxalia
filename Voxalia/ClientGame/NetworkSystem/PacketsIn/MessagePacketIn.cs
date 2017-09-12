@@ -23,7 +23,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 return false;
             }
             TextChannel tc = (TextChannel)data[0];
-            if (tc <= TextChannel.ALWAYS || tc >= TextChannel.COUNT)
+            if (tc <= 0 || (int)tc >= TextChannelHelpers.COUNT)
             {
                 SysConsole.Output(OutputType.WARNING, "Invalid TEXTCHANEL specified: " + tc);
                 return false;

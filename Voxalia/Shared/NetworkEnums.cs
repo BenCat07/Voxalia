@@ -290,7 +290,11 @@ namespace Voxalia.Shared
         DEBUG_INFO = 4,
         IMPORTANT = 5,
         UNSPECIFIED = 6,
-        COUNT = 7
+    }
+
+    public static class TextChannelHelpers
+    {
+        public static int COUNT = 7;
     }
 
     /// <summary>
