@@ -68,15 +68,7 @@ namespace Voxalia.Shared
         STONE = 40,
         GRASS_SWAMP = 41,
         GRASS_SWAMP_TALL = 42,
-        CRACKED_STONE = 43,
-        /// <summary>
-        /// How many materials there are by default. Only for use with direct handling of this enumeration (shouldn't happen often.)
-        /// </summary>
-        NUM_DEFAULT = 44,
-        /// <summary>
-        /// How many materials there theoretically can be.
-        /// </summary>
-        MAX = 16384
+        CRACKED_STONE = 43
     }
 
     /// <summary>
@@ -84,12 +76,16 @@ namespace Voxalia.Shared
     /// </summary>
     public static class MaterialHelpers
     {
+        public static int DEFAULT_MATERIALS = 44;
+
+        public static int MAX_MATERIALS = 16384;
+
         public static bool Populated = false;
         
         public static void Populate(FileHandler files)
         {
             List<string> fileList = files.ListFiles("info/blocks/");
-            List<MaterialInfo> allmats = new List<MaterialInfo>((int)Material.NUM_DEFAULT);
+            List<MaterialInfo> allmats = new List<MaterialInfo>(DEFAULT_MATERIALS);
             foreach (string file in fileList)
             {
                 string f = file.ToLowerFast().After("/blocks/").Before(".blk");
@@ -309,7 +305,7 @@ namespace Voxalia.Shared
         /// <summary>
         /// All material data known to this engine.
         /// </summary>
-        public static List<MaterialInfo> ALL_MATS = new List<MaterialInfo>((int)Material.NUM_DEFAULT);
+        public static List<MaterialInfo> ALL_MATS = new List<MaterialInfo>(DEFAULT_MATERIALS);
 
         public static bool IsValid(Material mat)
         {
