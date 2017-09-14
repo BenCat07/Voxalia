@@ -231,9 +231,8 @@ namespace Voxalia.ServerGame.WorldSystem
             });
         }
 
-        public byte[] GetTopsArray(Vector2i chunkPos, int offs, int size_mode)
+        public byte[] GetTopsArray(Vector2i chunkPos, int offs, int size_mode, bool trees)
         {
-            // TODO: Find more logical basis for this system than tops data...? Maybe keep as 'default gen' only... or somehow calculate reasonable but-below-the-top max data from block/chunk average weights...
             byte[] result = new byte[Constants.TOPS_DATA_SIZE * 6];
             const int sectiontwo = Constants.TOPS_DATA_SIZE * 2;
             const int countter = 3;
@@ -331,7 +330,34 @@ namespace Voxalia.ServerGame.WorldSystem
                     }
                 }
             }
-            return result;
+            if (!trees)
+            {
+                return result;
+            }
+            // TODO: Accurate after-edits tree list?
+            List<KeyValuePair<Vector2i, string>> treelist = new List<KeyValuePair<Vector2i, string>>();
+            for (int x = -offs; x <= offs; x++)
+            {
+                for (int y = -offs; y <= offs; y++)
+                {
+                    treelist.AddRange(Generator.GenerateTrees(new Vector3i(x + chunkPos.X, y + chunkPos.Y, 0), TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5));
+                }
+            }
+            byte[] res = new byte[(treelist.Count / 4) * (3 * 4 + 4)];
+            for (int iA = 3; iA < treelist.Count; iA += 4)
+            {
+                int i = iA / 4;
+                Utilities.IntToBytes(treelist[iA].Key.X).CopyTo(res, (i * (3 * 4 + 4)));
+                Utilities.IntToBytes(treelist[iA].Key.Y).CopyTo(res, (i * (3 * 4 + 4)) + 4);
+                int z = (int)Generator.GetHeight(TheWorld.Seed, TheWorld.Seed2, TheWorld.Seed3, TheWorld.Seed4, TheWorld.Seed5, treelist[iA].Key.X, treelist[iA].Key.Y, false);
+                Utilities.IntToBytes(z).CopyTo(res, (i * (3 * 4 + 4)) + 4 * 2);
+                int strid = TheServer.Networking.Strings.IndexForString(treelist[iA].Value);
+                Utilities.IntToBytes(strid).CopyTo(res, (i * (3 * 4 + 4)) + 4 * 3);
+            }
+            byte[] final = new byte[result.Length + res.Length];
+            result.CopyTo(final, 0);
+            res.CopyTo(final, result.Length);
+            return final;
         }
 
         /// <summary>

@@ -1064,6 +1064,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 }
                 //Models.GetModel("plants/trees/treevox01").DrawLOD(Player.GetPosition() + Player.ForwardVector() * ZFar() * 0.75);
             }
+            for (int i = 0; i < VoxelComputer.TopsTrees.Count; i++)
+            {
+                // TODO: MORE EFFICIENT RENDERING!!!
+                VoxelComputer.TopsTrees[i].Value.DrawLOD(VoxelComputer.TopsTrees[i].Key.ToLocation(), MainWorldView);
+            }
             GraphicsUtil.CheckError("Rendering - Sky - Render Offset Ents");
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             if (MainWorldView.FBOid.IsForward())

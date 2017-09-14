@@ -399,6 +399,8 @@ namespace Voxalia.ClientGame.OtherSystems
 
         byte[] TopsData, Tops2Data, Tops3Data;
 
+        public List<KeyValuePair<Vector3i, Model>> TopsTrees = new List<KeyValuePair<Vector3i, Model>>();
+
         public void TopsCrunch(byte[] inp, byte mode)
         {
             (mode == 1 ? TopsChunk : (mode == 2 ? Tops2Chunk : Tops3Chunk))?.Destroy();
@@ -501,6 +503,21 @@ namespace Voxalia.ClientGame.OtherSystems
                 Tops3Data = inp;
             }
             GL.BindVertexArray(0);
+            if (mode == 1)
+            {
+                TopsTrees.Clear();
+                int count = (inp.Length - Constants.TOPS_DATA_SIZE * 6) / (3 * 4 + 4);
+                for (int i = 0; i < count; i++)
+                {
+                    int x = Utilities.BytesToInt(Utilities.BytesPartial(inp, Constants.TOPS_DATA_SIZE * 6 + i * (3 * 4 + 4), 4));
+                    int y = Utilities.BytesToInt(Utilities.BytesPartial(inp, Constants.TOPS_DATA_SIZE * 6 + i * (3 * 4 + 4) + 4, 4));
+                    int z = Utilities.BytesToInt(Utilities.BytesPartial(inp, Constants.TOPS_DATA_SIZE * 6 + i * (3 * 4 + 4) + 4 * 2, 4));
+                    int strid = Utilities.BytesToInt(Utilities.BytesPartial(inp, Constants.TOPS_DATA_SIZE * 6 + i * (3 * 4 + 4) + 4 * 3, 4));
+                    string modelName = TheClient.Network.Strings.StringForIndex(strid);
+                    Model mod = TheClient.Models.GetModel(modelName);
+                    TopsTrees.Add(new KeyValuePair<Vector3i, Model>(new Vector3i(x, y, z), mod));
+                }
+            }
         }
 
         public void Calc(params Chunk[] chs)

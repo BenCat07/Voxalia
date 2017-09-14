@@ -30,5 +30,7 @@ namespace Voxalia.ServerGame.WorldSystem
         public abstract BiomeGenerator GetBiomeGen();
 
         public abstract void Tick();
+
+        public abstract List<KeyValuePair<Vector2i, string>> GenerateTrees(Vector3i chunkPos, int seed, int seed2, int seed3, int seed4, int seed5);
     }
 }

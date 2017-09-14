@@ -493,6 +493,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                 }
                 HeightMap res = new HeightMap();
                 res.Generate(this, pos, Seed, seed2, seed3, seed4, seed5);
+                res.GenerateTrees(this, pos, Seed, seed2, seed3, seed4, seed5);
                 HMaps[posser] = res;
                 return res;
             }
@@ -534,7 +535,41 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
 
             public Vector3i ChunkPosition;
 
+            public List<KeyValuePair<Vector2i, int>> Trees;
+
             public Location CPos;
+
+            public void GenerateTrees(SimpleGeneratorCore sgc, Vector3i chunkPos, int Seed, int seed, int seed3, int seed4, int seed5)
+            {
+                Trees = new List<KeyValuePair<Vector2i, int>>();
+                ChunkPosition = chunkPos;
+                CPos = chunkPos.ToLocation() * Chunk.CHUNK_SIZE;
+                MTRandom random = new MTRandom((ulong)chunkPos.GetHashCode());
+                // TODO: Biome basis!
+                int c = 0;
+                if (random.Next(1, 5) == 1)
+                {
+                    if (random.Next(1, 5) == 1)
+                    {
+                        if (random.Next(1, 5) == 1)
+                        {
+                            c = random.Next(1, 3);
+                        }
+                        else
+                        {
+                            c = random.Next(1, 2);
+                        }
+                    }
+                    else
+                    {
+                        c = 1;
+                    }
+                }
+                for (int i = 0; i < c; i++)
+                {
+                    Trees.Add(new KeyValuePair<Vector2i, int>(new Vector2i(random.Next(Chunk.CHUNK_SIZE), random.Next(Chunk.CHUNK_SIZE)), random.Next()));
+                }
+            }
 
             public void Generate(SimpleGeneratorCore sgc, Vector3i chunkPos, int Seed, int seed2, int seed3, int seed4, int seed5)
             {
@@ -554,6 +589,18 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                     }
                 }
             }
+        }
+
+        public override List<KeyValuePair<Vector2i, string>> GenerateTrees(Vector3i chunkPos, int seed, int seed2, int seed3, int seed4, int seed5)
+        {
+            HeightMap hm = new HeightMap();
+            hm.GenerateTrees(this, chunkPos, seed, seed2, seed3, seed4, seed5);
+            List<KeyValuePair<Vector2i, string>> trees = new List<KeyValuePair<Vector2i, string>>();
+            for (int i = 0; i < hm.Trees.Count; i++)
+            {
+                trees.Add(new KeyValuePair<Vector2i, string>(hm.Trees[i].Key + new Vector2i(chunkPos.X * Constants.CHUNK_WIDTH, chunkPos.Y * Constants.CHUNK_WIDTH), "plants/trees/treevox0" + ((hm.Trees[i].Value % 2) + 1)));
+            }
+            return trees;
         }
 
         public byte[] OreShapes = new byte[] { 0, 64, 65, 66, 67, 68 };
@@ -623,6 +670,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             // About to be populated: ensure chunk has a valid block set.
             chunk.SetBlockAt(0, 0, 0, BlockInternal.AIR);
             HeightMap hm = GetHeightMap(chunk.WorldPosition, Seed, seed2, seed3, seed4, seed5);
+            int[] toppers = new int[Chunk.CHUNK_SIZE * Chunk.CHUNK_SIZE]; // TODO: Reusable pool? This will generate trash!
             for (int x = 0; x < Chunk.CHUNK_SIZE; x++)
             {
                 for (int y = 0; y < Chunk.CHUNK_SIZE; y++)
@@ -770,25 +818,18 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
                             }
                         }
                     }
-                    // Special case: trees.
-                    if (hheight > 0 && top >= 0 && top < Chunk.CHUNK_SIZE)
-                    {
-#if TIMINGS
-                        Stopwatch sw = new Stopwatch();
-                        sw.Start();
-#endif
-                        // TODO: Scrap this or change the logic?
-                        MTRandom spotr = new MTRandom(39, (ulong)(SimplexNoise.Generate(seed2 + cx, Seed + cy) * 1000 * 1000)); // TODO: Improve!
-                        if (spotr.Next(300) == 1) // TODO: Efficiency! // TODO: Biome based chance!
-                        {
-                            // TODO: Different trees per biome!
-                            chunk.OwningRegion.SpawnTree("treevox0" + (spotr.Next(2) + 1), new Location(cx + 0.5f, cy + 0.5f, hheight), chunk);
-                        }
-#if TIMINGS
-                        sw.Stop();
-                        Timings_Entities += sw.ElapsedTicks / (double)Stopwatch.Frequency;
-#endif
-                    }
+                    toppers[y * Chunk.CHUNK_SIZE + x] = top;
+                }
+            }
+            for (int i = 0; i < hm.Trees.Count; i++)
+            {
+                Vector2i pos = hm.Trees[i].Key;
+                int top = toppers[pos.Y * Chunk.CHUNK_SIZE + pos.X];
+                if (top >= 0 && top < Chunk.CHUNK_SIZE)
+                {
+                    double hheight = hm.Heights[pos.Y * Chunk.CHUNK_SIZE + pos.X];
+                    // TODO: Different trees per biome!
+                    chunk.OwningRegion.SpawnTree("treevox0" + ((hm.Trees[i].Value % 2) + 1), new Location(hm.CPos.X + pos.X + 0.5f, hm.CPos.Y + pos.Y + 0.5f, hheight), chunk);
                 }
             }
         }

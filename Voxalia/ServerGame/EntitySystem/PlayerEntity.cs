@@ -975,7 +975,7 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 TheRegion.TheWorld.Schedule.StartAsyncTask(() =>
                 {
-                    byte[] toper3 = TheRegion.GetTopsArray(flat, 750, 4);
+                    byte[] toper3 = TheRegion.GetTopsArray(flat, 750, 4, false);
                     TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
                     {
                         if (!pkick)
@@ -997,7 +997,7 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 TheRegion.TheWorld.Schedule.StartAsyncTask(() =>
                 {
-                    byte[] toper = TheRegion.GetTopsArray(flat, 30, 2);
+                    byte[] toper = TheRegion.GetTopsArray(flat, 30, 2, true);
                     TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
                     {
                         if (!pkick)
@@ -1010,7 +1010,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     Schedule.StartAsyncTask(() =>
                     {
-                        byte[] toper2 = TheRegion.GetTopsArray(flat, 150, 3);
+                        byte[] toper2 = TheRegion.GetTopsArray(flat, 150, 3, false);
                         TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
                         {
                             if (!pkick)

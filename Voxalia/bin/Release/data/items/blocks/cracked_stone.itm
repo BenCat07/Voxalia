@@ -1,0 +1,10 @@
+type: block
+icon: render_block:self
+display: Cracked Stone
+description: Cracked!
+color: 1,1,1
+model: block
+bound: false
+datum: 43
+weight: 3
+volume: 1

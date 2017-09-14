@@ -32,6 +32,11 @@ namespace Voxalia.ServerGame.WorldSystem.SphereGenerator
             return new byte[5 * 5 * 5 * 2];
         }
 
+        public override List<KeyValuePair<Vector2i, string>> GenerateTrees(Vector3i chunkPos, int seed, int seed2, int seed3, int seed4, int seed5)
+        {
+            return new List<KeyValuePair<Vector2i, string>>(); // No trees.
+        }
+
         public override void ClearTimings()
         {
             // Nothing needed.
