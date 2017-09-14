@@ -22,18 +22,18 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// No flags apply.
         /// </summary>
-        NONE = 0,
+        NONE =         0b00000000,
         /// <summary>
         /// The chunk has custom data and needs population.
         /// </summary>
-        ISCUSTOM = 1,
+        ISCUSTOM =     0b00000001,
         /// <summary>
         /// The chunk is still populating.
         /// </summary>
-        POPULATING = 2,
+        POPULATING =   0b00000010,
         /// <summary>
         /// The chunk needs a detection pass called on it.
         /// </summary>
-        NEEDS_DETECT = 4
+        NEEDS_DETECT = 0b00000100
     }
 }

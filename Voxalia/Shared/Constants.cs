@@ -85,5 +85,20 @@ namespace Voxalia.Shared
         /// All points are valid exact the positive most row and column.
         /// </summary>
         public const int TOPS_VERT_COUNT = ((TOPS_DATA_WIDTH - 1) * (TOPS_DATA_WIDTH - 1)) * 6;
+
+        /// <summary>
+        /// This constant is the ABSOLUTE MAXIMUM width-radius of a world, in blocks.
+        /// <para>It is calculated to be 2 billion blocks.</para>
+        /// <para>This is to ensure a 32-bit signed integer can fully represent the width-diameter of any world at all times.</para>
+        /// <para>(A 32-bit signed integer can go a to a bit past 2.1 billion.</para>
+        /// <para>Worlds are generally smaller than this constant, but can go up to exactly the value of this constant as a limit.</para>
+        /// </summary>
+        public const int MAX_WORLD_RADIUS_BLOCKS = 1000000000;
+
+        /// <summary>
+        /// This constant is the ABSOLUTE MAXIMUM width-radius of a world, in chunks.
+        /// It is calculated to be <see cref="MAX_WORLD_RADIUS_BLOCKS"/> divided by <see cref="CHUNK_WIDTH"/>.
+        /// </summary>
+        public const int MAX_WORLD_RADIUS_CHUNKS = MAX_WORLD_RADIUS_BLOCKS / CHUNK_WIDTH;
     }
 }
