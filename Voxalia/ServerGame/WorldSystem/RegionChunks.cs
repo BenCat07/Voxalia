@@ -646,7 +646,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// All currently loaded chunks.
         /// </summary>
-        public Dictionary<Vector3i, Chunk> LoadedChunks = new Dictionary<Vector3i, Chunk>(16384);
+        public Dictionary<int, Dictionary<Vector3i, Chunk>> LoadedChunks = new Dictionary<int, Dictionary<Vector3i, Chunk>>(1024);
 
         /// <summary>
         /// Determines whether a character is allowed to break a material at a location.
@@ -977,7 +977,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <returns>The chunk object.</returns>
         public Chunk LoadChunkNoPopulate(Vector3i cpos)
         {
-            if (LoadedChunks.TryGetValue(cpos, out Chunk chunk))
+            if (TryFindChunk(cpos, out Chunk chunk))
             {
                 // Be warned, it may still be loading here!
                 return chunk;
@@ -991,11 +991,43 @@ namespace Voxalia.ServerGame.WorldSystem
             };
             if (PopulateChunk(chunk, true, true))
             {
-                LoadedChunks.Add(cpos, chunk);
+                QuickAddChunk(cpos, chunk);
                 chunk.Flags &= ~ChunkFlags.ISCUSTOM;
                 chunk.AddToWorld();
             }
             return chunk;
+        }
+
+        public void QuickAddChunk(Vector3i cpos, Chunk chk)
+        {
+            int code = cpos.GetHashCode() % 512;
+            if (!LoadedChunks.TryGetValue(code, out Dictionary<Vector3i, Chunk> chks))
+            {
+                chks = new Dictionary<Vector3i, Chunk>(512);
+                LoadedChunks[code] = chks;
+            }
+            chks.Add(cpos, chk);
+        }
+
+        public void QuickRemoveChunk(Vector3i cpos)
+        {
+            if (LoadedChunks.TryGetValue(cpos.GetHashCode() % 512, out Dictionary<Vector3i, Chunk> chks))
+            {
+                chks.Remove(cpos);
+            }
+        }
+
+        public bool TryFindChunk(Vector3i cpos, out Chunk chunk)
+        {
+            if (LoadedChunks.TryGetValue(cpos.GetHashCode() % 512, out Dictionary<Vector3i, Chunk> chks))
+            {
+                if (chks.TryGetValue(cpos, out chunk))
+                {
+                    return true;
+                }
+            }
+            chunk = null;
+            return false;
         }
 
         /// <summary>
@@ -1006,7 +1038,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <returns>The valid chunk object.</returns>
         public Chunk LoadChunk(Vector3i cpos)
         {
-            if (LoadedChunks.TryGetValue(cpos, out Chunk chunk))
+            if (TryFindChunk(cpos, out Chunk chunk))
             {
                 bool pass = false;
                 while (!pass)
@@ -1028,7 +1060,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 }
                 if (chunk.Flags.HasFlag(ChunkFlags.POPULATING))
                 {
-                    LoadedChunks.Remove(cpos);
+                    QuickRemoveChunk(cpos);
                     ChunkManager.ClearChunkDetails(cpos);
                     SysConsole.Output(OutputType.ERROR, "non-custom chunk was still loading when grabbed: " + chunk.WorldPosition);
                 }
@@ -1044,7 +1076,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 OwningRegion = this,
                 WorldPosition = cpos
             };
-            LoadedChunks.Add(cpos, chunk);
+            QuickAddChunk(cpos, chunk);
             PopulateChunk(chunk, true);
             chunk.AddToWorld();
             return chunk;
@@ -1080,7 +1112,7 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             if (chunk.Flags.HasFlag(ChunkFlags.POPULATING))
             {
-                LoadedChunks.Remove(chunk.WorldPosition);
+                QuickRemoveChunk(chunk.WorldPosition);
                 ChunkManager.ClearChunkDetails(chunk.WorldPosition);
                 SysConsole.Output(OutputType.ERROR, "Non-custom chunk was still loading when grabbed: " + chunk.WorldPosition);
             }
@@ -1096,7 +1128,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <param name="callback">What to run when its populated.</param>
         public void LoadChunk_Background(Vector3i cpos, Action<Chunk> callback = null)
         {
-            if (LoadedChunks.TryGetValue(cpos, out Chunk chunk))
+            if (TryFindChunk(cpos, out Chunk chunk))
             {
                 if (chunk.LoadSchedule != null)
                 {
@@ -1131,7 +1163,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 WorldPosition = cpos,
                 UnloadTimer = 0
             };
-            LoadedChunks.Add(cpos, chunk);
+            QuickAddChunk(cpos, chunk);
             chunk.LoadSchedule = TheWorld.Schedule.StartAsyncTask(() =>
             {
                 chunk.UnloadTimer = 0;
@@ -1156,7 +1188,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <returns>The chunk, or null.</returns>
         public Chunk GetChunk(Vector3i cpos)
         {
-            if (LoadedChunks.TryGetValue(cpos, out Chunk chunk))
+            if (TryFindChunk(cpos, out Chunk chunk))
             {
                 if (chunk.Flags.HasFlag(ChunkFlags.ISCUSTOM))
                 {
@@ -1183,6 +1215,16 @@ namespace Voxalia.ServerGame.WorldSystem
             int y = (int)Math.Floor(pos.Y) - (int)ch.WorldPosition.Y * Chunk.CHUNK_SIZE;
             int z = (int)Math.Floor(pos.Z) - (int)ch.WorldPosition.Z * Chunk.CHUNK_SIZE;
             return ch.GetBlockAt(x, y, z);
+        }
+
+        public List<Chunk> GetAllChunksLoaded()
+        {
+            List<Chunk> chks = new List<Chunk>();
+            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
+            {
+                chks.AddRange(chkmap.Values);
+            }
+            return chks;
         }
 
         /// <summary>

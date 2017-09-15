@@ -32,21 +32,25 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public void TickClouds()
         {
-            foreach (Chunk chunk in LoadedChunks.Values)
+            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
             {
-                // TODO: Only if pure air?
-                if (chunk.WorldPosition.Z >= 2 && chunk.WorldPosition.Z <= 5) // TODO: Better estimating. Also, config?
+                foreach (Chunk chunk in chkmap.Values)
                 {
-                    if (Utilities.UtilRandom.Next(400) > 399) // TODO: Config?
+                    // TODO: Only if pure air?
+                    if (chunk.WorldPosition.Z >= 2 && chunk.WorldPosition.Z <= 5) // TODO: Better estimating. Also, config?
                     {
-                        double d1 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
-                        double d2 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
-                        double d3 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
-                        Cloud cloud = new Cloud(this, chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(d1, d2, d3));
-                        SpawnCloud(cloud);
+                        if (Utilities.UtilRandom.Next(400) > 399) // TODO: Config?
+                        {
+                            double d1 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
+                            double d2 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
+                            double d3 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
+                            Cloud cloud = new Cloud(this, chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(d1, d2, d3));
+                            SpawnCloud(cloud);
+                        }
                     }
                 }
             }
+            { }
             for (int i = Clouds.Count - 1; i >= 0; i--)
             {
                 // TODO: if in non-air chunk, dissipate rapidly?
@@ -91,7 +95,7 @@ namespace Voxalia.ServerGame.WorldSystem
                     }
                 }
                 Vector3i cpos = ChunkLocFor(Clouds[i].Position);
-                if (!LoadedChunks.ContainsKey(cpos))
+                if (!TryFindChunk(cpos, out Chunk _))
                 {
                     DeleteCloud(Clouds[i]);
                     continue;

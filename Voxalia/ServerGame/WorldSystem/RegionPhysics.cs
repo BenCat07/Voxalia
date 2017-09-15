@@ -73,24 +73,30 @@ namespace Voxalia.ServerGame.WorldSystem
                 Max = start
             };
             box.Include(start + dir * len);
-            foreach (KeyValuePair<Vector3i, Chunk> chunk in LoadedChunks)
+            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
             {
-                if (chunk.Value == null || chunk.Value.FCO == null)
+                foreach (Chunk chunk in chkmap.Values)
                 {
-                    continue;
-                }
-                if (!box.Intersects(new AABB() { Min = chunk.Value.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE,
-                    Max = chunk.Value.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE) }))
-                {
-                    continue;
-                }
-                if (chunk.Value.FCO.RayCast(ray, len, null, considerSolid, out RayHit temp))
-                {
-                    hA = true;
-                    if (temp.T < best.HitData.T)
+                    if (chunk == null || chunk.FCO == null)
                     {
-                        best.HitData = temp;
-                        best.HitObject = chunk.Value.FCO;
+                        continue;
+                    }
+                    if (!box.Intersects(new AABB()
+                    {
+                        Min = chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE,
+                        Max = chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE)
+                    }))
+                    {
+                        continue;
+                    }
+                    if (chunk.FCO.RayCast(ray, len, null, considerSolid, out RayHit temp))
+                    {
+                        hA = true;
+                        if (temp.T < best.HitData.T)
+                        {
+                            best.HitData = temp;
+                            best.HitObject = chunk.FCO;
+                        }
                     }
                 }
             }
@@ -135,24 +141,30 @@ namespace Voxalia.ServerGame.WorldSystem
                 Max = start
             };
             box.Include(start + dir * len);
-            foreach (KeyValuePair<Vector3i, Chunk> chunk in LoadedChunks)
+            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
             {
-                if (chunk.Value == null || chunk.Value.FCO == null)
+                foreach (Chunk chunk in chkmap.Values)
                 {
-                    continue;
-                }
-                if (!box.Intersects(new AABB() { Min = chunk.Value.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE,
-                    Max = chunk.Value.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE) }))
-                {
-                    continue;
-                }
-                if (chunk.Value.FCO.ConvexCast(shape, ref rt, ref sweep, len, considerSolid, out RayHit temp))
-                {
-                    hA = true;
-                    if (temp.T < best.HitData.T)
+                    if (chunk == null || chunk.FCO == null)
                     {
-                        best.HitData = temp;
-                        best.HitObject = chunk.Value.FCO;
+                        continue;
+                    }
+                    if (!box.Intersects(new AABB()
+                    {
+                        Min = chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE,
+                        Max = chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE, Chunk.CHUNK_SIZE)
+                    }))
+                    {
+                        continue;
+                    }
+                    if (chunk.FCO.ConvexCast(shape, ref rt, ref sweep, len, considerSolid, out RayHit temp))
+                    {
+                        hA = true;
+                        if (temp.T < best.HitData.T)
+                        {
+                            best.HitData = temp;
+                            best.HitObject = chunk.FCO;
+                        }
                     }
                 }
             }

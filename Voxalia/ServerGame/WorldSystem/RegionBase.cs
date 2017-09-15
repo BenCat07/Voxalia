@@ -156,35 +156,38 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             TickClouds();
             List<Vector3i> DelMe = new List<Vector3i>();
-            foreach (Chunk chk in LoadedChunks.Values)
+            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
             {
-                if (chk.LastEdited >= 0 && Utilities.UtilRandom.NextDouble() <= UnloadChance)
+                foreach (Chunk chk in chkmap.Values)
                 {
-                    chk.SaveToFile(null);
-                }
-                bool seen = false;
-                foreach (PlayerEntity player in Players)
-                {
-                    if (player.ShouldLoadChunk(chk.WorldPosition))
+                    if (chk.LastEdited >= 0 && Utilities.UtilRandom.NextDouble() <= UnloadChance)
                     {
-                        seen = true;
-                        chk.UnloadTimer = 0;
-                        break;
+                        chk.SaveToFile(null);
                     }
-                }
-                if (!seen)
-                {
-                    chk.UnloadTimer += Delta;
-                    if (chk.UnloadTimer > UnloadLimit && Utilities.UtilRandom.NextDouble() <= UnloadChance) // TODO: Or under memory load?
+                    bool seen = false;
+                    foreach (PlayerEntity player in Players)
                     {
-                        chk.UnloadSafely();
-                        DelMe.Add(chk.WorldPosition);
+                        if (player.ShouldLoadChunk(chk.WorldPosition))
+                        {
+                            seen = true;
+                            chk.UnloadTimer = 0;
+                            break;
+                        }
+                    }
+                    if (!seen)
+                    {
+                        chk.UnloadTimer += Delta;
+                        if (chk.UnloadTimer > UnloadLimit && Utilities.UtilRandom.NextDouble() <= UnloadChance) // TODO: Or under memory load?
+                        {
+                            chk.UnloadSafely();
+                            DelMe.Add(chk.WorldPosition);
+                        }
                     }
                 }
             }
             foreach (Vector3i loc in DelMe)
             {
-                LoadedChunks.Remove(loc);
+                QuickRemoveChunk(loc);
             }
             foreach (KeyValuePair<Vector2i, BlockUpperArea> bua in UpperAreas)
             {
@@ -308,7 +311,7 @@ namespace Voxalia.ServerGame.WorldSystem
             // TODO: Transfer all players to another world. Or kick if no worlds available?
             IntHolder counter = new IntHolder(); // TODO: is IntHolder needed here?
             IntHolder total = new IntHolder(); // TODO: is IntHolder needed here?
-            List<Chunk> chunks = new List<Chunk>(LoadedChunks.Values);
+            List<Chunk> chunks = GetAllChunksLoaded();
             foreach (Chunk chunk in chunks)
             {
                 total.Value++;

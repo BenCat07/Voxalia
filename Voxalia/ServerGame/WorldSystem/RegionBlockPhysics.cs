@@ -26,7 +26,7 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             start = start.GetBlockLocation();
             Vector3i vec = ChunkLocFor(start);
-            if (!LoadedChunks.ContainsKey(vec))
+            if (!TryFindChunk(vec, out Chunk _))
             {
                 // Don't physics on an unloaded block. The chunk load sequence will remind us to tick it.
                 return;

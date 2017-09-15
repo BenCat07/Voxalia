@@ -211,7 +211,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 Body.ActivityInformation.Activate();
             }
             Vector3i cpos = TheRegion.ChunkLocFor(GetPosition());
-            if (CanSave && !TheRegion.LoadedChunks.ContainsKey(cpos)) // TODO: is this really needed every tick?
+            if (CanSave && !TheRegion.TryFindChunk(cpos, out Chunk _)) // TODO: is this really needed every tick?
             {
                 TheRegion.LoadChunk(cpos);
             }
