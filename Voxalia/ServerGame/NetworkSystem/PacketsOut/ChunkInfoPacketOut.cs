@@ -49,7 +49,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             dw.WriteInt(cpos.Z);
             dw.WriteInt(posMult);
             dw.WriteByte(0);
-            dw.WriteBytes(slod);
+            dw.WriteBytes(posMult >= 6 ? slod : FileHandler.Compress(slod));
             Data = ds.ToArray();
         }
 
