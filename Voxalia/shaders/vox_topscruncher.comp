@@ -48,6 +48,8 @@ int height_for(uvec2 coord)
 	return f_topsdat[(coord.y * 180) + (coord.x)].y;
 }
 
+#define TOPS_LAZY_PI 3.14159
+
 void main()
 {
 	if (gl_GlobalInvocationID.y != 180)
@@ -84,12 +86,78 @@ void main()
 		}
 		// 0,0  :  1,0  :  1,1 - xp ym
 		// 0,0  :  1,1  :  0,1 - xm yp
-		f_position[c_ind + 2] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, float(c_hei), -texter_xp);
-		f_position[c_ind + 1] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M, float(xp_hei), texter_xp);
-		f_position[c_ind + 0] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, float(pp_hei), texter_xp);
-		f_position[c_ind + 5] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M, float(c_hei), -texter_xp);
-		f_position[c_ind + 4] = vec4(gl_GlobalInvocationID.x * S_M + S_M, gl_GlobalInvocationID.y * S_M + S_M, float(pp_hei), texter_xp);
-		f_position[c_ind + 3] = vec4(gl_GlobalInvocationID.x * S_M, gl_GlobalInvocationID.y * S_M + S_M, float(yp_hei), -texter_xp);
+#if PATCH_EXTRA
+		float multofactoro = 1.0;
+		float posadd_x = 0.0;
+		float posadd_y = 0.0;
+		// NOTE: This section could maybe be made to expand middle instead of shrink edges?
+		if (gl_GlobalInvocationID.x < 2)
+		{
+			float sinified = sin(float(gl_GlobalInvocationID.y) * (TOPS_LAZY_PI / 180.0)) * float(S_M);
+			if (gl_GlobalInvocationID.x < 1)
+			{
+				multofactoro = 0.01;
+				posadd_x = sinified * 2.0;
+			}
+			else
+			{
+				multofactoro = 0.4;
+				posadd_x = sinified;
+			}
+		}
+		if (gl_GlobalInvocationID.y < 2)
+		{
+			float sinified = sin(float(gl_GlobalInvocationID.x) * (TOPS_LAZY_PI / 180.0)) * float(S_M);
+			if (gl_GlobalInvocationID.y < 1)
+			{
+				multofactoro = 0.01;
+				posadd_y = sinified * 2.0;
+			}
+			else
+			{
+				multofactoro = 0.4;
+				posadd_y = sinified;
+			}
+		}
+		if (gl_GlobalInvocationID.x > 177)
+		{
+			float sinified = sin(float(gl_GlobalInvocationID.y) * (TOPS_LAZY_PI / 180.0)) * float(S_M);
+			if (gl_GlobalInvocationID.x > 178)
+			{
+				multofactoro = 0.01;
+				posadd_x = -sinified * 2.0;
+			}
+			else
+			{
+				multofactoro = 0.4;
+				posadd_x = -sinified;
+			}
+		}
+		if (gl_GlobalInvocationID.y > 177)
+		{
+			float sinified = sin(float(gl_GlobalInvocationID.x) * (TOPS_LAZY_PI / 180.0)) * float(S_M);
+			if (gl_GlobalInvocationID.y > 178)
+			{
+				multofactoro = 0.01;
+				posadd_y = -sinified * 2.0;
+			}
+			else
+			{
+				multofactoro = 0.4;
+				posadd_y = -sinified;
+			}
+		}
+		c_hei = int(float(c_hei) * multofactoro);
+#else
+		const float posadd_x = 0.0;
+		const float posadd_y = 0.0;
+#endif
+		f_position[c_ind + 2] = vec4(gl_GlobalInvocationID.x * S_M + posadd_x, gl_GlobalInvocationID.y * S_M + posadd_y, float(c_hei), -texter_xp);
+		f_position[c_ind + 1] = vec4(gl_GlobalInvocationID.x * S_M + S_M + posadd_x, gl_GlobalInvocationID.y * S_M + posadd_y, float(xp_hei), texter_xp);
+		f_position[c_ind + 0] = vec4(gl_GlobalInvocationID.x * S_M + S_M + posadd_x, gl_GlobalInvocationID.y * S_M + S_M + posadd_y, float(pp_hei), texter_xp);
+		f_position[c_ind + 5] = vec4(gl_GlobalInvocationID.x * S_M + posadd_x, gl_GlobalInvocationID.y * S_M + posadd_y, float(c_hei), -texter_xp);
+		f_position[c_ind + 4] = vec4(gl_GlobalInvocationID.x * S_M + S_M + posadd_x, gl_GlobalInvocationID.y * S_M + S_M + posadd_y, float(pp_hei), texter_xp);
+		f_position[c_ind + 3] = vec4(gl_GlobalInvocationID.x * S_M + posadd_x, gl_GlobalInvocationID.y * S_M + S_M + posadd_y, float(yp_hei), -texter_xp);
 		vec3 norm_a = normalize(cross(vec3(1.0, 0.0, float(xp_hei - c_hei)), vec3(1.0, 1.0, float(pp_hei - c_hei))));
 		f_normal[c_ind + 2] = vec4(norm_a, -texter_yp);
 		f_normal[c_ind + 1] = vec4(norm_a, -texter_yp);

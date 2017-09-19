@@ -22,6 +22,8 @@
 #define MCM_SKY_FOG 0
 #define MCM_ANTI_TRANSP 0
 #define MCM_SIMPLE_LIGHT 0
+#define MCM_SLOD_LIGHT 0
+#define MCM_SPECIAL_FOG 0
 
 layout (binding = 0) uniform sampler2DArray s;
 #if MCM_LIGHTS
@@ -102,7 +104,9 @@ void applyFog()
 		float dist = pow(dot(fi.pos, fi.pos) * fogDist, 0.6);
 		float fogMod = dist * exp(fogCol.w) * fogCol.w;
 		float fmz = min(fogMod, 1.0);
+#if MCM_SPECIAL_FOG
 		fmz *= fmz * fmz * fmz;
+#endif
 		color.xyz = min(color.xyz * (1.0 - fmz) + fogCol.xyz * fmz, vec3(1.0));
 	}
 }
@@ -456,7 +460,10 @@ void main()
 	color.xyz = min(res_color * (1.0 - max(0.2, minimum_light)) + color.xyz * max(0.2, minimum_light), vec3(1.0));
 #else // MCM_LIGHTS
 	float dotted = dot(-tf_normal, sunlightDir);
-	dotted = dotted <= 0.0 ? 0.0 : sqrt(dotted);
+	dotted = dotted <= 0.0 ? 0.0 : dotted;
+#if MCM_SLOD_LIGHT
+	dotted = dotted * 0.5 + 0.5;
+#endif // MCM_SLOD_LIGHT
 	color.xyz *= min(max(dotted * maximum_light, max(0.2, minimum_light)), 1.0) * 0.75;
 #endif // else - MCM_LIGHTS
 	applyFog();

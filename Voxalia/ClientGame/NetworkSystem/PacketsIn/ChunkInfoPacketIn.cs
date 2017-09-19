@@ -100,6 +100,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             catch (Exception ex)
             {
+                Utilities.CheckException(ex);
                 SysConsole.Output("handling CHUNK PARSE DATA: " + data_unzipped.Length + ", " + posMult, ex);
                 return;
             }

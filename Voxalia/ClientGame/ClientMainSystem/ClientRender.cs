@@ -137,7 +137,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             if (CVars.r_compute.ValueB)
             {
-                return CurFogMax;
+                return CurFogMax * 2.0f;
             }
             return ZFar();
         }
@@ -279,7 +279,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             string forw_extra = (CVars.r_forward_normals.ValueB ? ",MCM_NORMALS" : "")
                 + (CVars.r_forward_lights.ValueB ? ",MCM_LIGHTS" : "")
                 + (CVars.r_forward_shadows.ValueB ? ",MCM_SHADOWS" : "");
-            s_forw_vox_slod = Shaders.GetShader("forward_vox" + def + ",MCM_SIMPLE_LIGHT,MCM_NO_ALPHA_CAP,MCM_ANTI_TRANSP");
+            s_forw_vox_slod = Shaders.GetShader("forward_vox" + def + ",MCM_SIMPLE_LIGHT,MCM_NO_ALPHA_CAP,MCM_ANTI_TRANSP,MCM_SLOD_LIGHT");
             s_forw_vox = Shaders.GetShader("forward_vox" + def + ",MCM_TH" + forw_extra);
             s_forw_vox_trans = Shaders.GetShader("forward_vox" + def + ",MCM_TRANSP,MCM_TH" + forw_extra);
             if (AllowLL)
@@ -2452,7 +2452,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.Uniform1(13, fogDist);
                 //GL.Uniform2(14, zfar_rel); // ?
                 Engine.Rendering.SetColor(Color4.White, view);
-                GL.Uniform3(10, -TheSun.Direction.ToOpenTK());
+                GL.Uniform3(10, TheSun.Direction.ToOpenTK());
                 GL.Uniform3(11, maxLit);
             };
             view.ViewPatchTwo = () =>
