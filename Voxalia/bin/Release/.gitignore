@@ -1,4 +1,5 @@
 shaders/
 data/info/text/
+data/info/characters.dat
 server_*/
 client_*/
