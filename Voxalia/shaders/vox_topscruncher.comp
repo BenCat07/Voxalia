@@ -75,15 +75,31 @@ void main()
 			f_color[c_ind + i] = vec4(1.0);
 		}
 		const int OFFSETTER = 16;
+		const int OFFSETTER2 = 15;
 		const int S_M = TOPS_WIDTH;
+		/*
+		// TODO S_M==75 -> #define + #if ?
 		if (S_M == 75 && gl_GlobalInvocationID.x > (90 - OFFSETTER) && gl_GlobalInvocationID.x < (90 + OFFSETTER)
 					   && gl_GlobalInvocationID.y > (90 - OFFSETTER) && gl_GlobalInvocationID.y < (90 + OFFSETTER))
 		{
-			c_hei -= 100;
-			xp_hei -= 100;
-			yp_hei -= 100;
-			pp_hei -= 100;
+			if (gl_GlobalInvocationID.x > (90 - OFFSETTER2) || gl_GlobalInvocationID.y > (90 - OFFSETTER2))
+			{
+				c_hei -= 100;
+			}
+			if (gl_GlobalInvocationID.x < (90 + OFFSETTER2))
+			{
+				xp_hei -= 100;
+			}
+			if (gl_GlobalInvocationID.y < (90 + OFFSETTER2))
+			{
+				yp_hei -= 100;
+			}
+			if (gl_GlobalInvocationID.y < (90 + OFFSETTER2) && gl_GlobalInvocationID.x < (90 + OFFSETTER2))
+			{
+				pp_hei -= 100;
+			}
 		}
+		*/
 		// 0,0  :  1,0  :  1,1 - xp ym
 		// 0,0  :  1,1  :  0,1 - xm yp
 #if PATCH_EXTRA
@@ -159,13 +175,13 @@ void main()
 		f_position[c_ind + 4] = vec4(gl_GlobalInvocationID.x * S_M + S_M + posadd_x, gl_GlobalInvocationID.y * S_M + S_M + posadd_y, float(pp_hei), texter_xp);
 		f_position[c_ind + 3] = vec4(gl_GlobalInvocationID.x * S_M + posadd_x, gl_GlobalInvocationID.y * S_M + S_M + posadd_y, float(yp_hei), -texter_xp);
 		vec3 norm_a = normalize(cross(vec3(1.0, 0.0, float(xp_hei - c_hei)), vec3(1.0, 1.0, float(pp_hei - c_hei))));
-		f_normal[c_ind + 2] = vec4(norm_a, -texter_yp);
-		f_normal[c_ind + 1] = vec4(norm_a, -texter_yp);
-		f_normal[c_ind + 0] = vec4(norm_a, texter_yp);
+		f_normal[c_ind + 2] = vec4(-norm_a, -texter_yp);
+		f_normal[c_ind + 1] = vec4(-norm_a, -texter_yp);
+		f_normal[c_ind + 0] = vec4(-norm_a, texter_yp);
 		vec3 norm_b = normalize(cross(vec3(1.0, 1.0, float(pp_hei - c_hei)), vec3(0.0, 1.0, float(yp_hei - c_hei))));
-		f_normal[c_ind + 5] = vec4(norm_b, -texter_yp);
-		f_normal[c_ind + 4] = vec4(norm_b, texter_yp);
-		f_normal[c_ind + 3] = vec4(norm_b, texter_yp);
+		f_normal[c_ind + 5] = vec4(-norm_b, -texter_yp);
+		f_normal[c_ind + 4] = vec4(-norm_b, texter_yp);
+		f_normal[c_ind + 3] = vec4(-norm_b, texter_yp);
 		vec3 dv1_a = vec3(1.0, 0.0, float(xp_hei - c_hei));
 		vec3 dv2_a = vec3(1.0, 1.0, float(pp_hei - c_hei));
 		vec3 dt1_a = vec3(1.0, 0.0, 0.0);

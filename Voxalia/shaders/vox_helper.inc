@@ -410,26 +410,35 @@ void crunch_verts(in uvec3 pos, in uint start)
 #endif
 #if MODE_TWO
 		uvec3 pos_fix = uvec3(round(v1));
-		uvec4 p_c = n1.z < 0.0 ? curBLK : (n1.x > 0.6 ? getAtRel(uvec3(pos_fix.x + 1, pos_fix.y, pos_fix.z + 1)) :
-				(n1.x < -0.6 ? getAtRel(uvec3(pos_fix.x - 1, pos_fix.y, pos_fix.z + 1)) :
-				(n1.y > 0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y + 1, pos_fix.z + 1)) :
-				(n1.y < -0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y - 1, pos_fix.z + 1)) :
-				getAtRel(uvec3(pos_fix.x, pos_fix.y, pos_fix.z + 1))))));
-		f_color[start + it3 + 0] = vec4(vec3(float(max(p_c.y, getLightsRel(uvec3(round(v1)), curBLK))) / 255.0) + lightsFromBlocksFor(v1, n1), 1.0);
-		pos_fix = uvec3(round(v2));
-		p_c = n2.z < 0.0 ? curBLK : (n2.x > 0.6 ? getAtRel(uvec3(pos_fix.x + 1, pos_fix.y, pos_fix.z + 1)) :
-				(n2.x < -0.6 ? getAtRel(uvec3(pos_fix.x - 1, pos_fix.y, pos_fix.z + 1)) :
-				(n2.y > 0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y + 1, pos_fix.z + 1)) :
-				(n2.y < -0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y - 1, pos_fix.z + 1)) :
-				getAtRel(uvec3(pos_fix.x, pos_fix.y, pos_fix.z + 1))))));
-		f_color[start + it3 + 1] = vec4(vec3(float(max(p_c.y, getLightsRel(uvec3(round(v2)), curBLK))) / 255.0) + lightsFromBlocksFor(v2, n2), 1.0);
-		pos_fix = uvec3(round(v3));
-		p_c = n3.z < 0.0 ? curBLK : (n3.x > 0.6 ? getAtRel(uvec3(pos_fix.x + 1, pos_fix.y, pos_fix.z + 1)) :
-				(n3.x < -0.6 ? getAtRel(uvec3(pos_fix.x - 1, pos_fix.y, pos_fix.z + 1)) :
-				(n3.y > 0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y + 1, pos_fix.z + 1)) :
-				(n3.y < -0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y - 1, pos_fix.z + 1)) :
-				getAtRel(uvec3(pos_fix.x, pos_fix.y, pos_fix.z + 1))))));
-		f_color[start + it3 + 2] = vec4(vec3(float(max(p_c.y, getLightsRel(uvec3(round(v3)), curBLK))) / 255.0) + lightsFromBlocksFor(v3, n3), 1.0);
+		if (MCM_VOX_COUNT <= 6)
+		{
+			f_color[start + it3 + 0] = vec4(1.0);
+			f_color[start + it3 + 1] = vec4(1.0);
+			f_color[start + it3 + 2] = vec4(1.0);
+		}
+		else
+		{
+			uvec4 p_c = n1.z < 0.0 ? curBLK : (n1.x > 0.6 ? getAtRel(uvec3(pos_fix.x + 1, pos_fix.y, pos_fix.z + 1)) :
+					(n1.x < -0.6 ? getAtRel(uvec3(pos_fix.x - 1, pos_fix.y, pos_fix.z + 1)) :
+					(n1.y > 0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y + 1, pos_fix.z + 1)) :
+					(n1.y < -0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y - 1, pos_fix.z + 1)) :
+					getAtRel(uvec3(pos_fix.x, pos_fix.y, pos_fix.z + 1))))));
+			f_color[start + it3 + 0] = vec4(vec3(float(max(p_c.y, getLightsRel(uvec3(round(v1)), curBLK))) / 255.0) + lightsFromBlocksFor(v1, n1), 1.0);
+			pos_fix = uvec3(round(v2));
+			p_c = n2.z < 0.0 ? curBLK : (n2.x > 0.6 ? getAtRel(uvec3(pos_fix.x + 1, pos_fix.y, pos_fix.z + 1)) :
+					(n2.x < -0.6 ? getAtRel(uvec3(pos_fix.x - 1, pos_fix.y, pos_fix.z + 1)) :
+					(n2.y > 0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y + 1, pos_fix.z + 1)) :
+					(n2.y < -0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y - 1, pos_fix.z + 1)) :
+					getAtRel(uvec3(pos_fix.x, pos_fix.y, pos_fix.z + 1))))));
+			f_color[start + it3 + 1] = vec4(vec3(float(max(p_c.y, getLightsRel(uvec3(round(v2)), curBLK))) / 255.0) + lightsFromBlocksFor(v2, n2), 1.0);
+			pos_fix = uvec3(round(v3));
+			p_c = n3.z < 0.0 ? curBLK : (n3.x > 0.6 ? getAtRel(uvec3(pos_fix.x + 1, pos_fix.y, pos_fix.z + 1)) :
+					(n3.x < -0.6 ? getAtRel(uvec3(pos_fix.x - 1, pos_fix.y, pos_fix.z + 1)) :
+					(n3.y > 0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y + 1, pos_fix.z + 1)) :
+					(n3.y < -0.6 ? getAtRel(uvec3(pos_fix.x, pos_fix.y - 1, pos_fix.z + 1)) :
+					getAtRel(uvec3(pos_fix.x, pos_fix.y, pos_fix.z + 1))))));
+			f_color[start + it3 + 2] = vec4(vec3(float(max(p_c.y, getLightsRel(uvec3(round(v3)), curBLK))) / 255.0) + lightsFromBlocksFor(v3, n3), 1.0);
+		}
 		vec4 r_tcol = tcolors_val[blockPaint(curBLK.w)];
 		f_indices[start + it3] = start + it3;
 		f_tcol[start + it3] = r_tcol;

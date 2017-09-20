@@ -2452,7 +2452,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.Uniform1(13, fogDist);
                 //GL.Uniform2(14, zfar_rel); // ?
                 Engine.Rendering.SetColor(Color4.White, view);
-                GL.Uniform3(10, TheSun.Direction.ToOpenTK());
+                GL.Uniform3(10, -TheSun.Direction.ToOpenTK());
                 GL.Uniform3(11, maxLit);
             };
             view.ViewPatchTwo = () =>

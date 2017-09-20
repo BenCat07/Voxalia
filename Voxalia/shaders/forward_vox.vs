@@ -84,7 +84,7 @@ void main()
 #else
 	fi.thv = vec4(abs(position.w), abs(texcoords.w), abs(normal.w), abs(tangent.w));
 	fi.thw = vec4(position.w < 0 ? 0.0 : 1.0, texcoords.w < 0 ? 0.0 : 1.0, normal.w < 0 ? 0.0 : 1.0, tangent.w < 0 ? 0.0 : 1.0);
-	fi.tcol = vec4(1.0);
+	fi.tcol = vec4(1.0); // TODO: Actual tcol?
 #endif
     fi.color = color_for(vpos_mv, color * v_color);
 	fi.pos = vpos_mv.xyz;
