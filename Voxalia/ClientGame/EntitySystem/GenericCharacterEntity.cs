@@ -29,7 +29,7 @@ namespace Voxalia.ClientGame.EntitySystem
     {
         public Model model;
 
-        public System.Drawing.Color color;
+        public Color4F color;
 
         public GenericCharacterEntity(Region tregion)
             : base(tregion)
@@ -114,7 +114,11 @@ namespace Voxalia.ClientGame.EntitySystem
             ent.PreRot *= Matrix4d.CreateRotationZ(dr.ReadFloat() * Utilities.PI180);
             ent.mod_scale = dr.ReadFloat();
             ent.PreRot = Matrix4d.Scale(ent.mod_scale) * ent.PreRot;
-            ent.color = System.Drawing.Color.FromArgb(dr.ReadInt());
+            float cR = dr.ReadFloat();
+            float cG = dr.ReadFloat();
+            float cB = dr.ReadFloat();
+            float cA = dr.ReadFloat();
+            ent.color = new Color4F(cR, cG, cB, cA);
             byte dtx = dr.ReadByte();
             ent.Visible = (dtx & 1) == 1;
             ent.ShouldShine = (dtx & 32) == 32;

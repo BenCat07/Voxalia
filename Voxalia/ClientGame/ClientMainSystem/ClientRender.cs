@@ -2129,7 +2129,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// <summary>
         /// Draws a curved line in 3D space.
         /// </summary>
-        void DrawCurve(Location one, Location two, Location cPoint, System.Drawing.Color color)
+        void DrawCurve(Location one, Location two, Location cPoint, Color4F color)
         {
             const int curvePoints = 10;
             const double step = 1.0 / curvePoints;

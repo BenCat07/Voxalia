@@ -28,7 +28,7 @@ namespace Voxalia.ServerGame.ItemSystem
         public Server TheServer;
 
         public ItemStack(string name, string secondary_name, Server tserver, int count, string tex, string display, string descrip,
-            System.Drawing.Color color, string model, bool bound, int datum, params KeyValuePair<string, TemplateObject>[] attrs)
+            Color4F color, string model, bool bound, int datum, params KeyValuePair<string, TemplateObject>[] attrs)
         {
             TheServer = tserver;
             Load(name, secondary_name, count, tex, display, descrip, color, model, datum);
@@ -42,7 +42,7 @@ namespace Voxalia.ServerGame.ItemSystem
             }
         }
 
-        public ItemStack(string name, Server tserver, int count, string tex, string display, string descrip, System.Drawing.Color color,
+        public ItemStack(string name, Server tserver, int count, string tex, string display, string descrip, Color4F color,
             string model, bool bound, int datum, params KeyValuePair<string, TemplateObject>[] attrs)
             : this(name, null, tserver, count, tex, display, descrip, color, model, bound, datum, attrs)
         {
@@ -293,7 +293,7 @@ namespace Voxalia.ServerGame.ItemSystem
             double volume = 1;
             int datum = 0;
             double temperature = 0;
-            System.Drawing.Color color = System.Drawing.Color.White;
+            Color4F color = Color4F.White;
             bool renderComp = true;
             Location renderCompOffs = Location.Zero;
             foreach (KeyValuePair<string, string> pair in pairs)

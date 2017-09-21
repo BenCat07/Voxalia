@@ -31,11 +31,11 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public float Brightness = 2.0f; // TODO: Controllable!
 
-        public GlowstickEntity(Region tregion, int color)
+        public GlowstickEntity(Region tregion, int color) // TODO: Int -> Actual Color4F?
             : base(tregion, false)
         {
             System.Drawing.Color col = System.Drawing.Color.FromArgb(color);
-            GColor = new Color4(col.R, col.G, col.B, col.A);
+            GColor = Color4F.FromArgb(col.R, col.G, col.B, col.A);
         }
 
         public override void Render()
@@ -61,7 +61,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         public override void SpawnBody()
         {
-            light = new PointLight(GetPosition(), 15, new Location(GColor.R, GColor.G, GColor.B) * Brightness);
+            light = new PointLight(GetPosition(), 15, GColor.RGB * Brightness);
             //light.SetCastShadows(false);
             TheClient.MainWorldView.Lights.Add(light);
             base.SpawnBody();

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FreneticGameCore;
 using System.Threading.Tasks;
 using Voxalia.Shared;
 
@@ -17,7 +18,7 @@ namespace Voxalia.ClientGame.JointSystem
 {
     public class ConnectorBeam : BaseFJoint
     {
-        public System.Drawing.Color color = System.Drawing.Color.Cyan;
+        public Color4F color = new Color4F(0f, 0.5f, 0.5f);
 
         public override void Solve()
         {

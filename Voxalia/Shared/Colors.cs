@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Drawing;
 using FreneticGameCore;
 
 namespace Voxalia.Shared
@@ -20,95 +19,94 @@ namespace Voxalia.Shared
     /// </summary>
     public static class Colors
     {
-        // TODO: Replace System.Drawing.Color with more efficient or powerful system?
-        public static Color WHITE = Color.FromArgb(255, 255, 255);
-        public static Color BLACK = Color.FromArgb(7, 7, 7);
-        public static Color GREEN = Color.FromArgb(0, 255, 0);
-        public static Color BLUE = Color.FromArgb(0, 0, 255);
-        public static Color RED = Color.FromArgb(255, 0, 0);
-        public static Color MAGENTA = Color.FromArgb(255, 0, 255);
-        public static Color YELLOW = Color.FromArgb(255, 255, 0);
-        public static Color CYAN = Color.FromArgb(0, 255, 255);
-        public static Color DARK_GREEN = Color.FromArgb(0, 128, 0);
-        public static Color DARK_BLUE = Color.FromArgb(0, 0, 128);
-        public static Color DARK_RED = Color.FromArgb(128, 0, 0);
-        public static Color LIGHT_GREEN = Color.FromArgb(128, 255, 128);
-        public static Color LIGHT_BLUE = Color.FromArgb(128, 128, 255);
-        public static Color LIGHT_RED = Color.FromArgb(255, 128, 128);
-        public static Color GRAY = Color.FromArgb(128, 128, 128);
-        public static Color LIGHT_GRAY = Color.FromArgb(192, 192, 192);
-        public static Color DARK_GRAY = Color.FromArgb(64, 64, 64);
-        public static Color DARK_MAGENTA = Color.FromArgb(128, 0, 128);
-        public static Color DARK_YELLOW = Color.FromArgb(128, 128, 0);
-        public static Color DARK_CYAN = Color.FromArgb(0, 128, 128);
-        public static Color LIGHT_MAGENTA = Color.FromArgb(255, 128, 255);
-        public static Color LIGHT_YELLOW = Color.FromArgb(255, 255, 128);
-        public static Color LIGHT_CYAN = Color.FromArgb(128, 255, 255);
-        public static Color ORANGE = Color.FromArgb(255, 128, 0);
-        public static Color BROWN = Color.FromArgb(128, 64, 0);
-        public static Color PURPLE = Color.FromArgb(128, 0, 255);
-        public static Color PINK = Color.FromArgb(255, 128, 255);
-        public static Color LIME = Color.FromArgb(128, 255, 0);
-        public static Color SKY_BLUE = Color.FromArgb(0, 128, 255);
-        public static Color VERY_DARK_GRAY = Color.FromArgb(32, 32, 32);
-        // SLIGHTLY_BRIGHT
-        // BRIGHT
-        // VERY_BRIGHT
-        public static Color TRANSPARENT_GREEN = Color.FromArgb(127, 0, 255, 0);
-        public static Color TRANSPARENT_BLUE = Color.FromArgb(127, 0, 0, 255);
-        public static Color TRANSPARENT_RED = Color.FromArgb(127, 255, 0, 0);
-        public static Color TRANSPARENT_MAGENTA = Color.FromArgb(127, 255, 0, 255);
-        public static Color TRANSPARENT_YELLOW = Color.FromArgb(127, 255, 255, 0);
-        public static Color TRANSPARENT_CYAN = Color.FromArgb(127, 0, 255, 255);
-        public static Color SLIGHTLY_TRANSPARENT = Color.FromArgb(191, 255, 255, 255);
-        public static Color TRANSPARENT = Color.FromArgb(127, 255, 255, 255);
-        public static Color VERY_TRANSPARENT = Color.FromArgb(63, 255, 255, 255);
-        public static Color LIGHT_STROBE_GREEN = Color.FromArgb(2, 255, 0, 255);
-        public static Color LIGHT_STROBE_BLUE = Color.FromArgb(2, 255, 255, 0);
-        public static Color LIGHT_STROBE_RED = Color.FromArgb(2, 0, 255, 255);
-        public static Color LIGHT_STROBE_MAGENTA = Color.FromArgb(2, 0, 255, 0);
-        public static Color LIGHT_STROBE_YELLOW = Color.FromArgb(2, 0, 0, 255);
-        public static Color LIGHT_STROBE_CYAN = Color.FromArgb(2, 255, 0, 0);
-        public static Color STROBE_WHITE = Color.FromArgb(0, 255, 255, 255);
-        public static Color STROBE_GREEN = Color.FromArgb(0, 0, 255, 0);
-        public static Color STROBE_BLUE = Color.FromArgb(0, 0, 0, 255);
-        public static Color STROBE_RED = Color.FromArgb(0, 255, 0, 0);
-        public static Color STROBE_MAGENTA = Color.FromArgb(0, 255, 0, 255);
-        public static Color STROBE_YELLOW = Color.FromArgb(0, 255, 255, 0);
-        public static Color STROBE_CYAN = Color.FromArgb(0, 0, 255, 255);
-        public static Color MAGIC = Color.FromArgb(0, 0, 0, 0);
-        public static Color OLD_MAGIC = Color.FromArgb(0, 127, 0, 0);
-        public static Color RAINBOW = Color.FromArgb(0, 127, 0, 127);
-        public static Color BLUR = Color.FromArgb(0, 0, 127, 0);
-        public static Color CRACKS = Color.FromArgb(0, (byte)(0.4 * 255), 127, 127);
-        public static Color CRACKS_LIGHT = Color.FromArgb(0, (byte)(0.31 * 255), 127, 127);
-        public static Color CRACKS_DARK = Color.FromArgb(0, 127, 127, 127);
-        public static Color INVERT = Color.FromArgb(0, 127, 127, 145);
-        public static Color SHINE = Color.FromArgb(0, 145, 127, 127);
-        public static Color SLIGHTLY_DIRTY = Color.FromArgb(0, 127, 145, 127);
-        public static Color DIRTY = Color.FromArgb(0, 127, 147, 127);
-        public static Color VERY_DIRTY = Color.FromArgb(0, 127, 149, 127);
-        public static Color CHECKERED = Color.FromArgb(0, 127, 151, 127);
-        public static Color LOW_RES = Color.FromArgb(0, 127, 153, 127);
-        public static Color VERY_LOW_RES = Color.FromArgb(0, 127, 155, 127);
-        public static Color SLOW_MOVEMENT = Color.FromArgb(0, 127, 157, 127);
-        public static Color CONVEYOR = Color.FromArgb(0, 127, 159, 127);
-        public static Color CONVEYOR2 = Color.FromArgb(0, 127, 161, 127);
-        public static Color ROTATED = Color.FromArgb(0, 127, 163, 127);
-        public static Color ROTATING = Color.FromArgb(0, 127, 165, 127);
-        public static Color SWIRLING = Color.FromArgb(0, 127, 167, 127);
-        public static Color MUSICAL = Color.FromArgb(0, 127, 169, 127);
-        public static Color NOISEY = Color.FromArgb(0, 127, 171, 127);
-        public static Color CONVEYOR3 = Color.FromArgb(0, 127, 173, 127);
-        public static Color CONVEYOR4 = Color.FromArgb(0, 127, 175, 127);
-        public static Color TAN = Color.FromArgb(210, 180, 140);
-        public static Color TILED_TWO = Color.FromArgb(0, 147, 127, 127);
-        public static Color TILED_THREE = Color.FromArgb(0, 149, 127, 127);
-        public static Color SPARKLING = Color.FromArgb(0, 151, 127, 127);
+        public static Color4F WHITE = Color4F.FromArgb(255, 255, 255);
+        public static Color4F BLACK = Color4F.FromArgb(7, 7, 7);
+        public static Color4F GREEN = Color4F.FromArgb(0, 255, 0);
+        public static Color4F BLUE = Color4F.FromArgb(0, 0, 255);
+        public static Color4F RED = Color4F.FromArgb(255, 0, 0);
+        public static Color4F MAGENTA = Color4F.FromArgb(255, 0, 255);
+        public static Color4F YELLOW = Color4F.FromArgb(255, 255, 0);
+        public static Color4F CYAN = Color4F.FromArgb(0, 255, 255);
+        public static Color4F DARK_GREEN = Color4F.FromArgb(0, 128, 0);
+        public static Color4F DARK_BLUE = Color4F.FromArgb(0, 0, 128);
+        public static Color4F DARK_RED = Color4F.FromArgb(128, 0, 0);
+        public static Color4F LIGHT_GREEN = Color4F.FromArgb(128, 255, 128);
+        public static Color4F LIGHT_BLUE = Color4F.FromArgb(128, 128, 255);
+        public static Color4F LIGHT_RED = Color4F.FromArgb(255, 128, 128);
+        public static Color4F GRAY = Color4F.FromArgb(128, 128, 128);
+        public static Color4F LIGHT_GRAY = Color4F.FromArgb(192, 192, 192);
+        public static Color4F DARK_GRAY = Color4F.FromArgb(64, 64, 64);
+        public static Color4F DARK_MAGENTA = Color4F.FromArgb(128, 0, 128);
+        public static Color4F DARK_YELLOW = Color4F.FromArgb(128, 128, 0);
+        public static Color4F DARK_CYAN = Color4F.FromArgb(0, 128, 128);
+        public static Color4F LIGHT_MAGENTA = Color4F.FromArgb(255, 128, 255);
+        public static Color4F LIGHT_YELLOW = Color4F.FromArgb(255, 255, 128);
+        public static Color4F LIGHT_CYAN = Color4F.FromArgb(128, 255, 255);
+        public static Color4F ORANGE = Color4F.FromArgb(255, 128, 0);
+        public static Color4F BROWN = Color4F.FromArgb(128, 64, 0);
+        public static Color4F PURPLE = Color4F.FromArgb(128, 0, 255);
+        public static Color4F PINK = Color4F.FromArgb(255, 128, 255);
+        public static Color4F LIME = Color4F.FromArgb(128, 255, 0);
+        public static Color4F SKY_BLUE = Color4F.FromArgb(0, 128, 255);
+        public static Color4F VERY_DARK_GRAY = Color4F.FromArgb(32, 32, 32);
+        public static Color4F SLIGHTLY_BRIGHT = new Color4F(1.25f, 1.25f, 1.25f, 1f);
+        public static Color4F BRIGHT = new Color4F(1.5f, 1.5f, 1.5f, 1f);
+        public static Color4F VERY_BRIGHT = new Color4F(2f, 2f, 2f, 1f);
+        public static Color4F TRANSPARENT_GREEN = Color4F.FromArgb(127, 0, 255, 0);
+        public static Color4F TRANSPARENT_BLUE = Color4F.FromArgb(127, 0, 0, 255);
+        public static Color4F TRANSPARENT_RED = Color4F.FromArgb(127, 255, 0, 0);
+        public static Color4F TRANSPARENT_MAGENTA = Color4F.FromArgb(127, 255, 0, 255);
+        public static Color4F TRANSPARENT_YELLOW = Color4F.FromArgb(127, 255, 255, 0);
+        public static Color4F TRANSPARENT_CYAN = Color4F.FromArgb(127, 0, 255, 255);
+        public static Color4F SLIGHTLY_TRANSPARENT = Color4F.FromArgb(191, 255, 255, 255);
+        public static Color4F TRANSPARENT = Color4F.FromArgb(127, 255, 255, 255);
+        public static Color4F VERY_TRANSPARENT = Color4F.FromArgb(63, 255, 255, 255);
+        public static Color4F LIGHT_STROBE_GREEN = Color4F.FromArgb(2, 255, 0, 255);
+        public static Color4F LIGHT_STROBE_BLUE = Color4F.FromArgb(2, 255, 255, 0);
+        public static Color4F LIGHT_STROBE_RED = Color4F.FromArgb(2, 0, 255, 255);
+        public static Color4F LIGHT_STROBE_MAGENTA = Color4F.FromArgb(2, 0, 255, 0);
+        public static Color4F LIGHT_STROBE_YELLOW = Color4F.FromArgb(2, 0, 0, 255);
+        public static Color4F LIGHT_STROBE_CYAN = Color4F.FromArgb(2, 255, 0, 0);
+        public static Color4F STROBE_WHITE = Color4F.FromArgb(0, 255, 255, 255);
+        public static Color4F STROBE_GREEN = Color4F.FromArgb(0, 0, 255, 0);
+        public static Color4F STROBE_BLUE = Color4F.FromArgb(0, 0, 0, 255);
+        public static Color4F STROBE_RED = Color4F.FromArgb(0, 255, 0, 0);
+        public static Color4F STROBE_MAGENTA = Color4F.FromArgb(0, 255, 0, 255);
+        public static Color4F STROBE_YELLOW = Color4F.FromArgb(0, 255, 255, 0);
+        public static Color4F STROBE_CYAN = Color4F.FromArgb(0, 0, 255, 255);
+        public static Color4F MAGIC = Color4F.FromArgb(0, 0, 0, 0);
+        public static Color4F OLD_MAGIC = Color4F.FromArgb(0, 127, 0, 0);
+        public static Color4F RAINBOW = Color4F.FromArgb(0, 127, 0, 127);
+        public static Color4F BLUR = Color4F.FromArgb(0, 0, 127, 0);
+        public static Color4F CRACKS = Color4F.FromArgb(0, (byte)(0.4 * 255), 127, 127);
+        public static Color4F CRACKS_LIGHT = Color4F.FromArgb(0, (byte)(0.31 * 255), 127, 127);
+        public static Color4F CRACKS_DARK = Color4F.FromArgb(0, 127, 127, 127);
+        public static Color4F INVERT = Color4F.FromArgb(0, 127, 127, 145);
+        public static Color4F SHINE = Color4F.FromArgb(0, 145, 127, 127);
+        public static Color4F SLIGHTLY_DIRTY = Color4F.FromArgb(0, 127, 145, 127);
+        public static Color4F DIRTY = Color4F.FromArgb(0, 127, 147, 127);
+        public static Color4F VERY_DIRTY = Color4F.FromArgb(0, 127, 149, 127);
+        public static Color4F CHECKERED = Color4F.FromArgb(0, 127, 151, 127);
+        public static Color4F LOW_RES = Color4F.FromArgb(0, 127, 153, 127);
+        public static Color4F VERY_LOW_RES = Color4F.FromArgb(0, 127, 155, 127);
+        public static Color4F SLOW_MOVEMENT = Color4F.FromArgb(0, 127, 157, 127);
+        public static Color4F CONVEYOR = Color4F.FromArgb(0, 127, 159, 127);
+        public static Color4F CONVEYOR2 = Color4F.FromArgb(0, 127, 161, 127);
+        public static Color4F ROTATED = Color4F.FromArgb(0, 127, 163, 127);
+        public static Color4F ROTATING = Color4F.FromArgb(0, 127, 165, 127);
+        public static Color4F SWIRLING = Color4F.FromArgb(0, 127, 167, 127);
+        public static Color4F MUSICAL = Color4F.FromArgb(0, 127, 169, 127);
+        public static Color4F NOISEY = Color4F.FromArgb(0, 127, 171, 127);
+        public static Color4F CONVEYOR3 = Color4F.FromArgb(0, 127, 173, 127);
+        public static Color4F CONVEYOR4 = Color4F.FromArgb(0, 127, 175, 127);
+        public static Color4F TAN = Color4F.FromArgb(210, 180, 140);
+        public static Color4F TILED_TWO = Color4F.FromArgb(0, 147, 127, 127);
+        public static Color4F TILED_THREE = Color4F.FromArgb(0, 149, 127, 127);
+        public static Color4F SPARKLING = Color4F.FromArgb(0, 151, 127, 127);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
-        public static Color[] KnownColorsArray = new Color[128];
+        public static Color4F[] KnownColorsArray = new Color4F[128];
 
         public static string[] KnownColorNamesArray = new string[128];
 
@@ -129,7 +127,7 @@ namespace Voxalia.Shared
             return 1.0;
         }
 
-        public static Color ColorForText(string txt)
+        public static Color4F ColorForText(string txt)
         {
             byte b = ForName(txt, 255);
             if (b != 255)
@@ -139,26 +137,21 @@ namespace Voxalia.Shared
             string[] spl = txt.Split(',');
             if (spl.Length == 3)
             {
-                return Color.FromArgb(Utilities.StringToInt(spl[0]),
-                    Utilities.StringToInt(spl[1]),
-                    Utilities.StringToInt(spl[2]));
+                return new Color4F(Utilities.StringToFloat(spl[0]), Utilities.StringToFloat(spl[1]), Utilities.StringToFloat(spl[2]));
             }
             if (spl.Length == 4)
             {
-                return Color.FromArgb(Utilities.StringToInt(spl[3]),
-                    Utilities.StringToInt(spl[0]),
-                    Utilities.StringToInt(spl[1]),
-                    Utilities.StringToInt(spl[2]));
+                return new Color4F(Utilities.StringToFloat(spl[0]), Utilities.StringToFloat(spl[1]), Utilities.StringToFloat(spl[2]), Utilities.StringToFloat(spl[3]));
             }
             return ForByte(0);
         }
 
-        public static string ToColorString(this Color c)
+        public static string ToColorString(this Color4F c)
         {
-            return (c.R / 255f) + "," + (c.G / 255f) + "," + (c.B / 255f) + "," + (c.A / 255f);
+            return (c.R) + "," + (c.G) + "," + (c.B) + "," + (c.A);
         }
 
-        public static Color ForByte(byte input)
+        public static Color4F ForByte(byte input)
         {
             return KnownColorsArray[input];
         }
@@ -189,7 +182,7 @@ namespace Voxalia.Shared
         public static int TRANS_BASE;
         public static int M_BLUR;
 
-        static int Register(string name, Color col)
+        static int Register(string name, Color4F col)
         {
             KnownColorNames.Add(name, (byte)inc);
             KnownColorNamesArray[inc] = name;
@@ -229,9 +222,9 @@ namespace Voxalia.Shared
             Register("LIME", LIME);
             Register("SKY_BLUE", SKY_BLUE);
             Register("VERY_DARK_GRAY", VERY_DARK_GRAY);
-            Register("SLIGHTLY_BRIGHT", WHITE); // TODO: SLIGHTLY_BRIGHT ? (1.25)
-            Register("BRIGHT", WHITE); // BRIGHT ? (1.5)
-            Register("VERY_BRIGHT", WHITE); // VERY_BRIGHT ? (2.0)
+            Register("SLIGHTLY_BRIGHT", SLIGHTLY_BRIGHT);
+            Register("BRIGHT", BRIGHT);
+            Register("VERY_BRIGHT", VERY_BRIGHT);
             TRANS1 = Register("TRANSPARENT_GREEN", TRANSPARENT_GREEN);
             Register("TRANSPARENT_BLUE", TRANSPARENT_BLUE);
             Register("TRANSPARENT_RED", TRANSPARENT_RED);

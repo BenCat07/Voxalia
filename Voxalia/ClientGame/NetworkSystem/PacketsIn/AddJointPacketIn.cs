@@ -219,7 +219,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             else if (type == 12)
             {
-                if (data.Length != len + 4 + 1)
+                if (data.Length != len + 4 * 4 + 1)
                 {
                     SysConsole.Output(OutputType.WARNING, "Joint packet: Bad length!");
                     return false;
@@ -228,7 +228,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 {
                     One = pe1,
                     Two = pe2,
-                    color = System.Drawing.Color.FromArgb(Utilities.BytesToInt(Utilities.BytesPartial(data, len, 4))),
+                    color = new Color4F(Utilities.BytesToFloat(Utilities.BytesPartial(data, len, 4)), Utilities.BytesToFloat(Utilities.BytesPartial(data, len + 4, 4)), Utilities.BytesToFloat(Utilities.BytesPartial(data, len + 4 * 2, 4)), Utilities.BytesToFloat(Utilities.BytesPartial(data, len + 4 * 3, 4))),
                     JID = JID,
                     type = (BeamType)data[len + 4]
                 };

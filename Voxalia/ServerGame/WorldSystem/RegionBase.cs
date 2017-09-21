@@ -398,8 +398,8 @@ namespace Voxalia.ServerGame.WorldSystem
                 BlockInternal bi = GetBlockInternal(loc);
                 SetBlockMaterial(loc, (Material)bi.BlockMaterial, bi.BlockData, bcol, (byte)(bi.BlockLocalData | (byte)BlockFlags.EDITED), bi.Damage);
             }
-            System.Drawing.Color ccol = Colors.ForByte(bcol);
-            ParticleEffectPacketOut pepo = new ParticleEffectPacketOut(ParticleEffectNetType.PAINT_BOMB, rad + 15, pos, new Location(ccol.R / 255f, ccol.G / 255f, ccol.B / 255f));
+            Color4F ccol = Colors.ForByte(bcol);
+            ParticleEffectPacketOut pepo = new ParticleEffectPacketOut(ParticleEffectNetType.PAINT_BOMB, rad + 15, pos, new Location(ccol.R, ccol.G, ccol.B));
             foreach (PlayerEntity pe in GetPlayersInRadius(pos, rad + 30)) // TODO: Better particle view dist
             {
                 pe.Network.SendPacket(pepo);

@@ -53,9 +53,9 @@ namespace Voxalia.ClientGame.EntitySystem
             List<BEPUutilities.Vector3> vecs = BlockShapeRegistry.BSD[Dat].GetVertices(new BEPUutilities.Vector3(0, 0, 0), false, false, false, false, false, false);
             List<BEPUutilities.Vector3> norms = BlockShapeRegistry.BSD[Dat].GetNormals(new BEPUutilities.Vector3(0, 0, 0), false, false, false, false, false, false);
             List<BEPUutilities.Vector3> tcoord = BlockShapeRegistry.BSD[Dat].GetTCoords(new BEPUutilities.Vector3(0, 0, 0), Mat, false, false, false, false, false, false);
-            vbo.Vertices = new List<OpenTK.Vector3>();
-            vbo.Normals = new List<OpenTK.Vector3>();
-            vbo.TexCoords = new List<OpenTK.Vector3>();
+            vbo.Vertices = new List<Vector3>();
+            vbo.Normals = new List<Vector3>();
+            vbo.TexCoords = new List<Vector3>();
             vbo.Indices = new List<uint>();
             vbo.Colors = new List<Vector4>();
             vbo.TCOLs = new List<Vector4>();
@@ -64,12 +64,12 @@ namespace Voxalia.ClientGame.EntitySystem
             vbo.THWs = new List<Vector4>();
             vbo.THVs2 = new List<Vector4>();
             vbo.THWs2 = new List<Vector4>();
-            System.Drawing.Color tcol = Voxalia.Shared.Colors.ForByte(Paint);
+            Color4F tcol = Colors.ForByte(Paint);
             for (int i = 0; i < vecs.Count; i++)
             {
-                vbo.Vertices.Add(new OpenTK.Vector3((float)vecs[i].X, (float)vecs[i].Y, (float)vecs[i].Z));
-                vbo.Normals.Add(new OpenTK.Vector3((float)norms[i].X, (float)norms[i].Y, (float)norms[i].Z));
-                vbo.TexCoords.Add(new OpenTK.Vector3((float)tcoord[i].X, (float)tcoord[i].Y, (float)tcoord[i].Z));
+                vbo.Vertices.Add(new Vector3((float)vecs[i].X, (float)vecs[i].Y, (float)vecs[i].Z));
+                vbo.Normals.Add(new Vector3((float)norms[i].X, (float)norms[i].Y, (float)norms[i].Z));
+                vbo.TexCoords.Add(new Vector3((float)tcoord[i].X, (float)tcoord[i].Y, (float)tcoord[i].Z));
                 vbo.Indices.Add((uint)i);
                 vbo.Colors.Add(new Vector4(1, 1, 1, 1));
                 vbo.TCOLs.Add(TheClient.Rendering.AdaptColor(vbo.Vertices[i], tcol));
@@ -77,15 +77,15 @@ namespace Voxalia.ClientGame.EntitySystem
             for (int i = 0; i < vecs.Count; i += 3)
             {
                 int basis = i;
-                OpenTK.Vector3 v1 = vbo.Vertices[basis];
-                OpenTK.Vector3 dv1 = vbo.Vertices[basis + 1] - v1;
-                OpenTK.Vector3 dv2 = vbo.Vertices[basis + 2] - v1;
-                OpenTK.Vector3 t1 = vbo.TexCoords[basis];
-                OpenTK.Vector3 dt1 = vbo.TexCoords[basis + 1] - t1;
-                OpenTK.Vector3 dt2 = vbo.TexCoords[basis + 2] - t1;
-                OpenTK.Vector3 tangent = (dv1 * dt2.Y - dv2 * dt1.Y) * 1f / (dt1.X * dt2.Y - dt1.Y * dt2.X);
-                OpenTK.Vector3 normal = vbo.Normals[basis];
-                tangent = (tangent - normal * OpenTK.Vector3.Dot(normal, tangent)).Normalized();
+                Vector3 v1 = vbo.Vertices[basis];
+                Vector3 dv1 = vbo.Vertices[basis + 1] - v1;
+                Vector3 dv2 = vbo.Vertices[basis + 2] - v1;
+                Vector3 t1 = vbo.TexCoords[basis];
+                Vector3 dt1 = vbo.TexCoords[basis + 1] - t1;
+                Vector3 dt2 = vbo.TexCoords[basis + 2] - t1;
+                Vector3 tangent = (dv1 * dt2.Y - dv2 * dt1.Y) * 1f / (dt1.X * dt2.Y - dt1.Y * dt2.X);
+                Vector3 normal = vbo.Normals[basis];
+                tangent = (tangent - normal * Vector3.Dot(normal, tangent)).Normalized();
                 for (int x = 0; x < 3; x++)
                 {
                     vbo.Tangents.Add(tangent);

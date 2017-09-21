@@ -24,10 +24,10 @@ namespace Voxalia.ServerGame.EntitySystem
     public class SmokeGrenadeEntity : GrenadeEntity, EntityUseable
     {
         // TODO: Possibly construct off of and save an itemstack rather than reconstructing it.
-        System.Drawing.Color col;
+        Color4F col;
         ParticleEffectNetType SmokeType;
 
-        public SmokeGrenadeEntity(System.Drawing.Color _col, Region tregion, ParticleEffectNetType smokeType) :
+        public SmokeGrenadeEntity(Color4F _col, Region tregion, ParticleEffectNetType smokeType) :
             base(tregion)
         {
             col = _col;
@@ -43,7 +43,10 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             BsonDocument doc = new BsonDocument();
             AddPhysicsData(doc);
-            doc["sg_color"] = col.ToArgb();
+            doc["sg_cr"] = col.R;
+            doc["sg_cg"] = col.G;
+            doc["sg_cb"] = col.B;
+            doc["sg_ca"] = col.A;
             doc["sg_smokeleft"] = SmokeLeft;
             doc["sg_type"] = SmokeType.ToString();
             return doc;
@@ -108,8 +111,10 @@ namespace Voxalia.ServerGame.EntitySystem
         public override Entity Create(Region tregion, BsonDocument doc)
         {
             ParticleEffectNetType efftype = (ParticleEffectNetType)Enum.Parse(typeof(ParticleEffectNetType), doc["sg_type"].AsString);
-            SmokeGrenadeEntity grenade = new SmokeGrenadeEntity(System.Drawing.Color.FromArgb(doc["sg_color"].AsInt32), tregion, efftype);
-            grenade.SmokeLeft = doc["sg_smokeleft"].AsInt32;
+            SmokeGrenadeEntity grenade = new SmokeGrenadeEntity(new Color4F((float)doc["sg_cr"].AsDouble, (float)doc["sg_cg"].AsDouble, (float)doc["sg_cb"].AsDouble, (float)doc["sg_ca"].AsDouble), tregion, efftype)
+            {
+                SmokeLeft = doc["sg_smokeleft"].AsInt32
+            };
             grenade.ApplyPhysicsData(doc);
             return grenade;
         }

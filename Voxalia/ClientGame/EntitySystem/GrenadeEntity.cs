@@ -19,6 +19,7 @@ using OpenTK.Graphics.OpenGL4;
 using Voxalia.ClientGame.OtherSystems;
 using BEPUphysics.CollisionShapes.ConvexShapes;
 using Voxalia.Shared;
+using FreneticGameCore;
 using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.EntitySystem
@@ -27,13 +28,13 @@ namespace Voxalia.ClientGame.EntitySystem
     {
         public Model model;
 
-        public Color4 GColor;
+        public Color4F GColor;
 
         public GrenadeEntity(Region tregion, bool shadows)
             : base(tregion, true, shadows)
         {
             model = TheClient.Models.Sphere;
-            GColor = new Color4(0f, 0f, 0f, 1f);
+            GColor = new Color4F(0f, 0f, 0f, 1f);
             Shape = new CylinderShape(0.2f, 0.05f);
             Bounciness = 0.95f;
             SetMass(1);

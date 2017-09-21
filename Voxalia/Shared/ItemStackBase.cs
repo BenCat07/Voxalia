@@ -115,7 +115,7 @@ namespace Voxalia.Shared
         /// <summary>
         /// What color to draw this item as.
         /// </summary>
-        public Color DrawColor = Color.White;
+        public Color4F DrawColor = Color4F.White;
 
         /// <summary>
         /// How much volume this item takes up.
@@ -182,7 +182,10 @@ namespace Voxalia.Shared
             dw.WriteFloat((float)Weight);
             dw.WriteFloat((float)Volume);
             dw.WriteFloat((float)Temperature);
-            dw.WriteInt(DrawColor.ToArgb());
+            dw.WriteFloat(DrawColor.R);
+            dw.WriteFloat(DrawColor.G);
+            dw.WriteFloat(DrawColor.B);
+            dw.WriteFloat(DrawColor.A);
             dw.WriteFullString(Name);
             dw.WriteFullString(SecondaryName ?? "");
             dw.WriteFullString(DisplayName);
@@ -265,7 +268,7 @@ namespace Voxalia.Shared
         /// <param name="color">The color.</param>
         /// <param name="model">The model.</param>
         /// <param name="datum">The 'datum' value.</param>
-        public void Load(string name, string secondary_name, int count, string tex, string display, string descrip, Color color, string model, int datum)
+        public void Load(string name, string secondary_name, int count, string tex, string display, string descrip, Color4F color, string model, int datum)
         {
             SetName(name);
             SecondaryName = secondary_name;
@@ -290,7 +293,11 @@ namespace Voxalia.Shared
             Weight = dr.ReadFloat();
             Volume = dr.ReadFloat();
             Temperature = dr.ReadFloat();
-            DrawColor = Color.FromArgb(dr.ReadInt());
+            float dcR = dr.ReadFloat();
+            float dcG = dr.ReadFloat();
+            float dcB = dr.ReadFloat();
+            float dcA = dr.ReadFloat();
+            DrawColor = new Color4F(dcR, dcG, dcB, dcA);
             SetName(dr.ReadFullString());
             string secondary_name = dr.ReadFullString();
             SecondaryName = secondary_name.Length == 0 ? null : secondary_name;

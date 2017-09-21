@@ -504,15 +504,15 @@ namespace Voxalia.ServerGame.EntitySystem
         public void InitPlayer()
         {
             // TODO: Convert all these to item files!
-            Items.GiveItem(new ItemStack("open_hand", TheServer, 1, "items/common/open_hand_ico", "Open Hand", "Grab things!", Color.White, "items/common/hand", true, 0));
-            Items.GiveItem(new ItemStack("fist", TheServer, 1, "items/common/fist_ico", "Fist", "Hit things!", Color.White, "items/common/fist", true, 0));
-            Items.GiveItem(new ItemStack("hook", TheServer, 1, "items/common/hook_ico", "Grappling Hook", "Grab distant things!", Color.White, "items/common/hook", true, 0));
+            Items.GiveItem(new ItemStack("open_hand", TheServer, 1, "items/common/open_hand_ico", "Open Hand", "Grab things!", Color4F.White, "items/common/hand", true, 0));
+            Items.GiveItem(new ItemStack("fist", TheServer, 1, "items/common/fist_ico", "Fist", "Hit things!", Color4F.White, "items/common/fist", true, 0));
+            Items.GiveItem(new ItemStack("hook", TheServer, 1, "items/common/hook_ico", "Grappling Hook", "Grab distant things!", Color4F.White, "items/common/hook", true, 0));
             Items.GiveItem(TheServer.Items.GetItem("admintools/manipulator", 1));
-            Items.GiveItem(new ItemStack("pickaxe", TheServer, 1, "render_model:self", "Generic Pickaxe", "Rapid stone mining!", Color.White, "items/tools/generic_pickaxe", false, 0));
-            Items.GiveItem(new ItemStack("flashlight", TheServer, 1, "items/common/flashlight_ico", "Flashlight", "Lights things up!", Color.White, "items/common/flashlight", false, 0));
-            Items.GiveItem(new ItemStack("flashantilight", TheServer, 1, "items/common/flashlight_ico", "Flashantilight", "Lights things down!", Color.White, "items/common/flashlight", false, 0));
-            Items.GiveItem(new ItemStack("sun_angler", TheServer, 1, "items/tools/sun_angler", "Sun Angler", "Moves the sun itself!", Color.White, "items/tools/sun_angler", false, 0));
-            Items.GiveItem(new ItemStack("breadcrumb", TheServer, 1, "items/common/breadcrumbs", "Bread Crumbs", "Finds the way back, even over the river and through the woods!", Color.White, "items/common/breadcrumbs", false, 0));
+            Items.GiveItem(new ItemStack("pickaxe", TheServer, 1, "render_model:self", "Generic Pickaxe", "Rapid stone mining!", Color4F.White, "items/tools/generic_pickaxe", false, 0));
+            Items.GiveItem(new ItemStack("flashlight", TheServer, 1, "items/common/flashlight_ico", "Flashlight", "Lights things up!", Color4F.White, "items/common/flashlight", false, 0));
+            Items.GiveItem(new ItemStack("flashantilight", TheServer, 1, "items/common/flashlight_ico", "Flashantilight", "Lights things down!", Color4F.White, "items/common/flashlight", false, 0));
+            Items.GiveItem(new ItemStack("sun_angler", TheServer, 1, "items/tools/sun_angler", "Sun Angler", "Moves the sun itself!", Color4F.White, "items/tools/sun_angler", false, 0));
+            Items.GiveItem(new ItemStack("breadcrumb", TheServer, 1, "items/common/breadcrumbs", "Bread Crumbs", "Finds the way back, even over the river and through the woods!", Color4F.White, "items/common/breadcrumbs", false, 0));
             for (int i = 2; i < MaterialHelpers.ALL_MATS.Count; i++)
             {
                 if (MaterialHelpers.IsValid((Material)i))
@@ -520,23 +520,23 @@ namespace Voxalia.ServerGame.EntitySystem
                     Items.GiveItem(TheServer.Items.GetItem("blocks/" + ((Material)i).GetName().ToLowerFast(), 100));
                 }
             }
-            Items.GiveItem(new ItemStack("pistol_gun", TheServer, 1, "render_model:self", "9mm Pistol", "It shoots bullets!", Color.White, "items/weapons/silenced_pistol", false, 0));
-            Items.GiveItem(new ItemStack("shotgun_gun", TheServer, 1, "items/weapons/shotgun_ico", "Shotgun", "It shoots many bullets!", Color.White, "items/weapons/shotgun", false, 0));
-            Items.GiveItem(new ItemStack("bow", TheServer, 1, "items/weapons/bow_ico", "Bow", "It shoots arrows!", Color.White, "items/weapons/bow", false, 0));
-            Items.GiveItem(new ItemStack("explodobow", TheServer, 1, "items/weapons/explodobow_ico", "ExplodoBow", "It shoots arrows that go boom!", Color.White, "items/weapons/explodo_bow", false, 0));
-            Items.GiveItem(new ItemStack("hatcannon", TheServer, 1, "items/weapons/hatcannon_ico", "Hat Cannon", "It shoots hats!", Color.White, "items/weapons/hat_cannon", false, 0));
+            Items.GiveItem(new ItemStack("pistol_gun", TheServer, 1, "render_model:self", "9mm Pistol", "It shoots bullets!", Color4F.White, "items/weapons/silenced_pistol", false, 0));
+            Items.GiveItem(new ItemStack("shotgun_gun", TheServer, 1, "items/weapons/shotgun_ico", "Shotgun", "It shoots many bullets!", Color4F.White, "items/weapons/shotgun", false, 0));
+            Items.GiveItem(new ItemStack("bow", TheServer, 1, "items/weapons/bow_ico", "Bow", "It shoots arrows!", Color4F.White, "items/weapons/bow", false, 0));
+            Items.GiveItem(new ItemStack("explodobow", TheServer, 1, "items/weapons/explodobow_ico", "ExplodoBow", "It shoots arrows that go boom!", Color4F.White, "items/weapons/explodo_bow", false, 0));
+            Items.GiveItem(new ItemStack("hatcannon", TheServer, 1, "items/weapons/hatcannon_ico", "Hat Cannon", "It shoots hats!", Color4F.White, "items/weapons/hat_cannon", false, 0));
             Items.GiveItem(TheServer.Items.GetItem("weapons/rifles/m4"));
             Items.GiveItem(TheServer.Items.GetItem("weapons/rifles/minigun"));
-            Items.GiveItem(new ItemStack("suctionray", TheServer, 1, "items/tools/suctionray_ico", "Suction Ray", "Sucks things towards you!", Color.White, "items/tools/suctionray", false, 0));
-            Items.GiveItem(new ItemStack("pushray", TheServer, 1, "items/tools/pushray_ico", "Push Ray", "Pushes things away from you!", Color.White, "items/tools/pushray", false, 0));
-            Items.GiveItem(new ItemStack("bullet", "9mm_ammo", TheServer, 100, "items/weapons/ammo/9mm_round_ico", "9mm Ammo", "Nine whole millimeters!", Color.White, "items/weapons/ammo/9mm_round", false, 0));
-            Items.GiveItem(new ItemStack("bullet", "shotgun_ammo", TheServer, 100, "items/weapons/ammo/shotgun_shell_ico", "Shotgun Ammo", "Always travels in packs!", Color.White, "items/weapons/ammo/shotgun_shell", false, 0));
-            Items.GiveItem(new ItemStack("bullet", "rifle_ammo", TheServer, 1000, "items/weapons/ammo/rifle_round_ico", "Assault Rifle Ammo", "Very rapid!", Color.White, "items/weapons/ammo/rifle_round", false, 0));
-            Items.GiveItem(new ItemStack("glowstick", TheServer, 10, "items/common/glowstick_ico", "Glowstick", "Pretty colors!", Color.Cyan, "items/common/glowstick", false, 0));
+            Items.GiveItem(new ItemStack("suctionray", TheServer, 1, "items/tools/suctionray_ico", "Suction Ray", "Sucks things towards you!", Color4F.White, "items/tools/suctionray", false, 0));
+            Items.GiveItem(new ItemStack("pushray", TheServer, 1, "items/tools/pushray_ico", "Push Ray", "Pushes things away from you!", Color4F.White, "items/tools/pushray", false, 0));
+            Items.GiveItem(new ItemStack("bullet", "9mm_ammo", TheServer, 100, "items/weapons/ammo/9mm_round_ico", "9mm Ammo", "Nine whole millimeters!", Color4F.White, "items/weapons/ammo/9mm_round", false, 0));
+            Items.GiveItem(new ItemStack("bullet", "shotgun_ammo", TheServer, 100, "items/weapons/ammo/shotgun_shell_ico", "Shotgun Ammo", "Always travels in packs!", Color4F.White, "items/weapons/ammo/shotgun_shell", false, 0));
+            Items.GiveItem(new ItemStack("bullet", "rifle_ammo", TheServer, 1000, "items/weapons/ammo/rifle_round_ico", "Assault Rifle Ammo", "Very rapid!", Color4F.White, "items/weapons/ammo/rifle_round", false, 0));
+            Items.GiveItem(new ItemStack("glowstick", TheServer, 10, "items/common/glowstick_ico", "Glowstick", "Pretty colors!", new Color4F(0f, 0.5f, 0.5f), "items/common/glowstick", false, 0));
             Items.GiveItem(TheServer.Items.GetItem("weapons/grenades/smoke", 10));
             Items.GiveItem(TheServer.Items.GetItem("weapons/grenades/smokesignal", 10));
             Items.GiveItem(TheServer.Items.GetItem("weapons/grenades/explosivegrenade", 10));
-            Items.GiveItem(new ItemStack("smokemachine", TheServer, 10, "items/common/smokemachine_ico", "Smoke Machine", "Do not inhale!", Color.White, "items/common/smokemachine", false, 0));
+            Items.GiveItem(new ItemStack("smokemachine", TheServer, 10, "items/common/smokemachine_ico", "Smoke Machine", "Do not inhale!", Color4F.White, "items/common/smokemachine", false, 0));
             Items.GiveItem(TheServer.Items.GetItem("special/parachute", 1));
             Items.GiveItem(TheServer.Items.GetItem("special/jetpack", 1));
             Items.GiveItem(TheServer.Items.GetItem("useful/fuel", 100));

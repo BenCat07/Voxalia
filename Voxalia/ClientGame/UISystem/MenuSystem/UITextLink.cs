@@ -36,7 +36,7 @@ namespace Voxalia.ClientGame.UISystem.MenuSystem
 
         public Texture Icon;
 
-        public System.Drawing.Color IconColor = System.Drawing.Color.White;
+        public Color4F IconColor = Color4F.White;
 
         public UITextLink(Texture ico, string btext, string btexthover, string btextclick, FontSet font, Action clicked, UIAnchor anchor, Func<int> xOff, Func<int> yOff)
             : base(anchor, () => 0, () => 0, xOff, yOff)

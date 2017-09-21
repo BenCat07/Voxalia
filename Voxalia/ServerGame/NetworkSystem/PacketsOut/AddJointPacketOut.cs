@@ -105,10 +105,13 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             }
             else if (joint is ConnectorBeam)
             {
-                Data = new byte[len + 4 + 1];
+                Data = new byte[len + 4 * 4 + 1];
                 Data[0] = 12;
-                Utilities.IntToBytes(((ConnectorBeam)joint).color.ToArgb()).CopyTo(Data, len);
-                Data[len + 4] = (byte)((ConnectorBeam)joint).type;
+                Utilities.FloatToBytes(((ConnectorBeam)joint).color.R).CopyTo(Data, len);
+                Utilities.FloatToBytes(((ConnectorBeam)joint).color.G).CopyTo(Data, len + 4);
+                Utilities.FloatToBytes(((ConnectorBeam)joint).color.B).CopyTo(Data, len + 4 * 2);
+                Utilities.FloatToBytes(((ConnectorBeam)joint).color.A).CopyTo(Data, len + 4 * 3);
+                Data[len + 4 * 4] = (byte)((ConnectorBeam)joint).type;
             }
             else if (joint is JointFlyingDisc)
             {

@@ -11,6 +11,7 @@ using Voxalia.ServerGame.WorldSystem;
 using System.Drawing;
 using FreneticScript.TagHandlers;
 using Voxalia.Shared;
+using FreneticGameCore;
 
 namespace Voxalia.ServerGame.ItemSystem
 {
@@ -40,7 +41,7 @@ namespace Voxalia.ServerGame.ItemSystem
             }
             if (slot == 0)
             {
-                return new ItemStack("Air", TheWorld.TheServer, 1, "clear", "Air", "An empty slot.", Color.White, "blank.dae", true, 0);
+                return new ItemStack("Air", TheWorld.TheServer, 1, "clear", "Air", "An empty slot.", Color4F.White, "blank.dae", true, 0);
             }
             else
             {
@@ -66,7 +67,10 @@ namespace Voxalia.ServerGame.ItemSystem
                     item2.Name == item.Name &&
                     item2.DisplayName == item.DisplayName &&
                     item2.Description == item.Description &&
-                    item2.DrawColor == item.DrawColor &&
+                    item2.DrawColor.R == item.DrawColor.R &&
+                    item2.DrawColor.G == item.DrawColor.G &&
+                    item2.DrawColor.B == item.DrawColor.B &&
+                    item2.DrawColor.A == item.DrawColor.A &&
                     item2.Image == item.Image &&
                     item2.Volume == item.Volume &&
                     item2.Weight == item.Weight &&

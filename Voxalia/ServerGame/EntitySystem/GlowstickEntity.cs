@@ -21,9 +21,9 @@ namespace Voxalia.ServerGame.EntitySystem
 {
     public class GlowstickEntity: GrenadeEntity
     {
-        public System.Drawing.Color Color;
+        public Color4F Color;
 
-        public GlowstickEntity(System.Drawing.Color col, Region tregion) :
+        public GlowstickEntity(Color4F col, Region tregion) :
             base(tregion)
         {
             Color = col;
@@ -38,7 +38,10 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             BsonDocument doc = new BsonDocument();
             AddPhysicsData(doc);
-            doc["gs_color"] = Color.ToArgb();
+            doc["gs_cr"] = Color.R;
+            doc["gs_cg"] = Color.G;
+            doc["gs_cb"] = Color.B;
+            doc["gs_ca"] = Color.A;
             return doc;
         }
 
@@ -50,9 +53,12 @@ namespace Voxalia.ServerGame.EntitySystem
         public override byte[] GetNetData()
         {
             byte[] phys = GetPhysicsNetData();
-            byte[] dat = new byte[phys.Length + 4];
+            byte[] dat = new byte[phys.Length + 4 * 4];
             phys.CopyTo(dat, 0);
-            Utilities.IntToBytes(Color.ToArgb()).CopyTo(dat, phys.Length);
+            Utilities.FloatToBytes(Color.R).CopyTo(dat, phys.Length);
+            Utilities.FloatToBytes(Color.G).CopyTo(dat, phys.Length + 4);
+            Utilities.FloatToBytes(Color.B).CopyTo(dat, phys.Length + 4 * 2);
+            Utilities.FloatToBytes(Color.A).CopyTo(dat, phys.Length + 4 * 3);
             return dat;
         }
     }
@@ -61,7 +67,7 @@ namespace Voxalia.ServerGame.EntitySystem
     {
         public override Entity Create(Region tregion, BsonDocument doc)
         {
-            GlowstickEntity glowstick = new GlowstickEntity(System.Drawing.Color.FromArgb(doc["gs_color"].AsInt32), tregion);
+            GlowstickEntity glowstick = new GlowstickEntity(new Color4F((float)doc["gs_cr"].AsDouble, (float)doc["gs_cg"].AsDouble, (float)doc["gs_cb"].AsDouble, (float)doc["gs_ca"].AsDouble), tregion);
             glowstick.ApplyPhysicsData(doc);
             return glowstick;
         }
