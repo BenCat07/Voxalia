@@ -418,6 +418,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     TickWorld(Delta);
                     TickChatSystem();
                     TickInvMenu();
+                    CWindow.ClientEngineTick();
+                    CWindow.MouseX = MouseHandler.MouseX();
+                    CWindow.MouseY = MouseHandler.MouseY();
                     CScreen.FullTick(Delta);
                     Sounds.Update(MainWorldView.CameraPos, MainWorldView.CameraTarget - MainWorldView.CameraPos, MainWorldView.CameraUp(), Player.GetVelocity(), Window.Focused);
                     Schedule.RunAllSyncTasks(0);

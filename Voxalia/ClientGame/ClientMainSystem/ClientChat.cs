@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Voxalia.ClientGame.UISystem;
-using Voxalia.ClientGame.UISystem.MenuSystem;
+using FreneticGameGraphics.UISystem;
 using Voxalia.Shared;
 using Voxalia.ClientGame.OtherSystems;
 using Voxalia.ClientGame.GraphicsSystems;
@@ -40,9 +40,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
         {
             FontSet font = FontSets.Standard;
             int minY = 10 + (int)font.font_default.Height;
-            ChatMenu = new UIGroup(UIAnchor.TOP_CENTER, () => Window.Width, () => Window.Height - minY - UIBottomHeight, () => 0, () => 0);
-            ChatScroller = new UIScrollBox(UIAnchor.TOP_CENTER, () => ChatMenu.GetWidth() - (30 * 2), () => ChatMenu.GetHeight() - minY, () => 0, () => minY) { Color = new Vector4(0f, 0.5f, 0.5f, 0.6f) };
-            ChatBox = new UIInputBox("", "Enter a /command or a chat message...", font, UIAnchor.TOP_CENTER, ChatScroller.GetWidth, () => 0, () => (int)ChatScroller.GetHeight() + minY)
+            ChatMenu = new UIGroup(new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_CENTER).GetterWidthHeight(() => Window.Width, () => Window.Height - minY - UIBottomHeight).ConstantXY(0, 0));
+            ChatScroller = new UIScrollBox(new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_CENTER).GetterWidthHeight(() => ChatMenu.GetWidth() - (30 * 2), () => ChatMenu.GetHeight() - minY).ConstantXY(0, minY)) { Color = new Color4F(0f, 0.5f, 0.5f, 0.6f) };
+            ChatBox = new UIInputBox("", "Enter a /command or a chat message...", font, new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_CENTER).GetterWidth(ChatScroller.GetWidth).ConstantX(0).GetterY(() => (int)ChatScroller.GetHeight() + minY))
             {
                 EnterPressed = EnterChatMessage
             };
@@ -59,7 +59,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 UITextLink link = null;
                 Func<int> fxer = xer;
                 int chan = i;
-                link = new UITextLink(null, "^r^t^0^h^o^2" + n, "^!^e^t^0^h^o^2" + n, "^2^e^t^0^h^o^0" + n, FontSets.Standard, () => ToggleLink(link, n, chan), UIAnchor.TOP_LEFT, fxer, () => 10);
+                link = new UITextLink(null, "^r^t^0^h^o^2" + n, "^!^e^t^0^h^o^2" + n, "^2^e^t^0^h^o^0" + n, FontSets.Standard, () => ToggleLink(link, n, chan), new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_LEFT).GetterX(fxer).ConstantY(10));
                 xer = () => fxer() + len + 10;
                 ChatMenu.AddChild(link);
             }
@@ -224,7 +224,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     by += FontSets.Standard.font_default.Height;
                     int y = (int)by;
                     string ch = (ChatMessages[i].Channel == TextChannel.ALWAYS) ? "" : (ChatMessages[i].Channel.ToString() + ": ");
-                    ChatScroller.AddChild(new UILabel(ch + ChatMessages[i].Text, FontSets.Standard, UIAnchor.TOP_LEFT, () => 0, () => y, () => (int)ChatScroller.GetWidth()));
+                    ChatScroller.AddChild(new UILabel(ch + ChatMessages[i].Text, FontSets.Standard, new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_LEFT).ConstantXY(0, y).GetterWidth(() => (int)ChatScroller.GetWidth())));
                 }
             }
             by += FontSets.Standard.font_default.Height;

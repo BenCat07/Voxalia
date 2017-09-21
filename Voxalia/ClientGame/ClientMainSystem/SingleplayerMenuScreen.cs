@@ -12,23 +12,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Voxalia.ClientGame.UISystem;
-using Voxalia.ClientGame.UISystem.MenuSystem;
+using FreneticGameGraphics.UISystem;
 using Voxalia.ServerGame.ServerMainSystem;
 using FreneticGameCore;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
-    class SingleplayerMenuScreen : UIScreen
+    class SingleplayerMenuScreen : VoxUIScreen
     {
         public SingleplayerMenuScreen(Client tclient) : base(tclient)
         {
             ResetOnRender = false;
-            AddChild(new UIButton("ui/menus/buttons/basic", "Back", TheClient.FontSets.SlightlyBigger, () => TheClient.ShowMainMenu(), UIAnchor.BOTTOM_LEFT, () => 350, () => 70, () => 10, () => -100));
+            AddChild(new UIButton("ui/menus/buttons/basic", "Back", TheClient.FontSets.SlightlyBigger, () => TheClient.ShowMainMenu(), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_LEFT).ConstantXY(10, -100).ConstantWidthHeight(350, 70)));
             AddChild(new UIButton("ui/menus/buttons/basic", "New Game", TheClient.FontSets.SlightlyBigger, () =>
             {
                 AddGame("g" + Utilities.UtilRandom.Next(10000));
-
-            }, UIAnchor.BOTTOM_LEFT, () => 350, () => 70, () => 10, () => -200));
+            }, new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_LEFT).ConstantXY(10, -200).ConstantWidthHeight(350, 70)));
             CurrentY = 150;
             IEnumerable<string> found = Directory.EnumerateDirectories(Environment.CurrentDirectory);
             HashSet<string> fullList = new HashSet<string>();
@@ -48,7 +47,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     AddGame(str);
                 }
             }
-            AddChild(new UILabel("^!^e^0  Voxalia\nSingleplayer", TheClient.FontSets.SlightlyBigger, UIAnchor.TOP_CENTER, () => 0, () => 0));
+            AddChild(new UILabel("^!^e^0  Voxalia\nSingleplayer", TheClient.FontSets.SlightlyBigger, new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.TOP_CENTER).ConstantXY(0, 0)));
         }
 
         public int CurrentY;
@@ -88,7 +87,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                         SysConsole.Output("Running singleplayer game server", ex);
                     }
                 });
-            }, UIAnchor.TOP_LEFT, () => 600, () => 70, () => 10, () => ypos));
+            }, new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.TOP_LEFT).ConstantXY(10, ypos).ConstantWidthHeight(600, 70)));
         }
 
         public override void SwitchTo()

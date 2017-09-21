@@ -12,7 +12,7 @@ using OpenTK.Graphics.OpenGL4;
 using System.Linq;
 using Voxalia.ClientGame.GraphicsSystems;
 using Voxalia.ClientGame.UISystem;
-using Voxalia.ClientGame.UISystem.MenuSystem;
+using FreneticGameGraphics.UISystem;
 using Voxalia.Shared;
 using Voxalia.ClientGame.OtherSystems;
 using FreneticGameCore;
@@ -21,7 +21,7 @@ using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
-    public class MainMenuScreen: UIScreen
+    public class MainMenuScreen: VoxUIScreen
     {
         //public UIImage Background;
         
@@ -36,14 +36,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             //Background = new UIImage(TheClient.Textures.GetTexture("ui/menus/menuback"), UIAnchor.TOP_LEFT, GetWidth, GetHeight, Zero, Zero);
             //AddChild(Background);
             FontSet font = TheClient.FontSets.SlightlyBigger;
-            UITextLink quit = new UITextLink(null, "^%Q^7uit", "^%Q^e^7uit", "^7^e^%Q^0uit", font, () => TheClient.Window.Close(), UIAnchor.BOTTOM_RIGHT, () => -100, () => -100);
+            UITextLink quit = new UITextLink(null, "^%Q^7uit", "^%Q^e^7uit", "^7^e^%Q^0uit", font, () => TheClient.Window.Close(), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_RIGHT).ConstantXY(-100, -100));
             AddChild(quit);
-            UITextLink sp = new UITextLink(null, "^%S^7ingleplayer", "^%S^e^7ingleplayer", "^7^e^%S^0ingleplayer", font, () => TheClient.ShowSingleplayer(), UIAnchor.BOTTOM_RIGHT, () => -100, () => -100 - (int)quit.GetHeight());
+            UITextLink sp = new UITextLink(null, "^%S^7ingleplayer", "^%S^e^7ingleplayer", "^7^e^%S^0ingleplayer", font, () => TheClient.ShowSingleplayer(), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_RIGHT).ConstantX(-100).GetterY(() => -100 - quit.GetHeight()));
             AddChild(sp);
-            UITextLink mp = new UITextLink(null, "^%M^7ultiplayer", "^%M^e^7ultiplayer", "^7^e^%M^0ultiplayer", font, () => UIConsole.WriteLine("Multiplayer menu coming soon!"), UIAnchor.BOTTOM_RIGHT, () => -100, () => -100 - (int)(sp.GetHeight() + quit.GetHeight()));
+            UITextLink mp = new UITextLink(null, "^%M^7ultiplayer", "^%M^e^7ultiplayer", "^7^e^%M^0ultiplayer", font, () => UIConsole.WriteLine("Multiplayer menu coming soon!"), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_RIGHT).ConstantX(-100).GetterY(() => -100 - (int)(sp.GetHeight() + quit.GetHeight())));
             AddChild(mp);
             List<string> hints = TheClient.Languages.GetTextList(TheClient.Files, "voxalia", "hints.common");
-            UILabel label = new UILabel("^0^e^7" + hints[Utilities.UtilRandom.Next(hints.Count)], TheClient.FontSets.Standard, UIAnchor.BOTTOM_LEFT, () => 0, () => -(int)TheClient.Fonts.Standard.Height * 3, () => TheClient.Window.Width);
+            UILabel label = new UILabel("^0^e^7" + hints[Utilities.UtilRandom.Next(hints.Count)], TheClient.FontSets.Standard, new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_LEFT).ConstantX(0).GetterY(() => -(int)TheClient.Fonts.Standard.Height * 3).GetterWidth(() => TheClient.Window.Width));
             AddChild(label);
         }
 

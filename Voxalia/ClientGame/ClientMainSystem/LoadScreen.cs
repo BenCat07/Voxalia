@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Voxalia.ClientGame.UISystem;
-using Voxalia.ClientGame.UISystem.MenuSystem;
+using FreneticGameGraphics.UISystem;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
@@ -19,21 +19,17 @@ using Voxalia.Shared;
 using System.Threading;
 using System.Threading.Tasks;
 using FreneticGameCore;
+using FreneticGameGraphics.ClientSystem;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
-    class LoadScreen: UIScreen
+    class LoadScreen: VoxUIScreen
     {
         UIImage BackDrop;
-
-        int Zero()
-        {
-            return 0;
-        }
-
+        
         public LoadScreen(Client tclient) : base(tclient)
         {
-            BackDrop = new UIImage(TheClient.Textures.GetTexture("ui/menus/loadscreen"), UIAnchor.TOP_LEFT, () => TheClient.Window.Width, () => TheClient.Window.Height, Zero, Zero);
+            BackDrop = new UIImage(TheClient.Textures.GetTexture("ui/menus/loadscreen"), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.TOP_LEFT).ConstantXY(0, 0).GetterWidthHeight(() => TheClient.Window.Width, () => TheClient.Window.Height));
             AddChild(BackDrop);
             AddHint();
         }
@@ -43,7 +39,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         public void AddHint()
         {
             List<string> hints = TheClient.Languages.GetTextList(TheClient.Files, "voxalia", "hints.common");
-            Hint = new UILabel("^0^e^7" + hints[Utilities.UtilRandom.Next(hints.Count)], TheClient.FontSets.Standard, UIAnchor.BOTTOM_LEFT, () => 0, () => -(int)TheClient.Fonts.Standard.Height * 3, () => TheClient.Window.Width);
+            Hint = new UILabel("^0^e^7" + hints[Utilities.UtilRandom.Next(hints.Count)], TheClient.FontSets.Standard, new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_LEFT).ConstantX(0).GetterY(() => -(int)TheClient.Fonts.Standard.Height * 3).GetterWidth(() => TheClient.Window.Width));
             AddChild(Hint);
         }
 
@@ -54,9 +50,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             AddHint();
         }
 
-        public override void FullRender(double delta, int xoff, int yoff)
+        public override void FullRender(ViewUI2D view, double delta, int xoff, int yoff)
         {
-            base.FullRender(delta, xoff, yoff);
+            base.FullRender(view, delta, xoff, yoff);
             TheClient.RenderLoader(TheClient.Window.Width - 100f, 100f, 100f, delta);
         }
     }

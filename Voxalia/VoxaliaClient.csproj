@@ -105,6 +105,7 @@
     <Compile Include="ClientGame\NetworkSystem\PacketsOut\MyVehiclePacketOut.cs" />
     <Compile Include="ClientGame\NetworkSystem\PingInfo.cs" />
     <Compile Include="ClientGame\OtherSystems\VoxelComputeEngine.cs" />
+    <Compile Include="ClientGame\UISystem\VoxUIScreen.cs" />
     <Compile Include="ClientGame\WorldSystem\RegionPlants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ClientGame\ClientMainSystem\Client2DEffects.cs" />
@@ -256,17 +257,6 @@
     <Compile Include="ClientGame\OtherSystems\ItemStack.cs" />
     <Compile Include="ClientGame\UISystem\GamePadHandler.cs" />
     <Compile Include="ClientGame\UISystem\KeyHandler.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UIButton.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UIColoredBox.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UIImage.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UIInputBox.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UIAnchor.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UIElement.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UIGroup.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UIScreen.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UILabel.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UIScrollBox.cs" />
-    <Compile Include="ClientGame\UISystem\MenuSystem\UITextLink.cs" />
     <Compile Include="ClientGame\UISystem\MouseHandler.cs" />
     <Compile Include="ClientGame\UISystem\RawGamePad.cs" />
     <Compile Include="ClientGame\UISystem\UIConsole.cs" />

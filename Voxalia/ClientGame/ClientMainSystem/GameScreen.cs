@@ -8,18 +8,19 @@
 
 using System;
 using Voxalia.ClientGame.UISystem;
-using Voxalia.ClientGame.UISystem.MenuSystem;
+using FreneticGameGraphics.UISystem;
+using FreneticGameGraphics.ClientSystem;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
-    public class GameScreen : UIScreen
+    public class GameScreen : VoxUIScreen
     {
         UIColoredBox Hud3DHelper()
         {
-            return new UIColoredBox(new Vector4(1f, 1f, 1f, 0f), UIAnchor.BOTTOM_CENTER, () => 1024, () => 256, () => 0, () => 0) { GetTexture = () => TheClient.ItemBarView.CurrentFBOTexture, Flip = true };
+            return new UIColoredBox(new Vector4(1f, 1f, 1f, 0f), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_CENTER).ConstantXY(0, 0).ConstantWidthHeight(1024, 256)) { GetTexture = () => TheClient.ItemBarView.CurrentFBOTexture, Flip = true };
         }
 
         public GameScreen(Client tclient) : base(tclient)
@@ -33,7 +34,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             MouseHandler.CaptureMouse();
         }
 
-        protected override void Render(double delta, int xoff, int yoff)
+        protected override void Render(ViewUI2D view, double delta, int xoff, int yoff)
         {
             TheClient.Render2DGame();
         }

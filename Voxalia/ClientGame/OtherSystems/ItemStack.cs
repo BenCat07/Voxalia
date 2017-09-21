@@ -180,8 +180,8 @@ namespace Voxalia.ClientGame.OtherSystems
                 }
             }
             Tex.Bind();
-            TheClient.Rendering.SetColor(TheClient.Rendering.AdaptColor(ClientUtilities.Convert(TheClient.Player.GetPosition()), GetColor()), TheClient.MainWorldView);
-            TheClient.Rendering.RenderRectangle((int)pos.X, (int)pos.Y, (int)(pos.X + size.X), (int)(pos.Y + size.Y));
+            TheClient.CWindow.Rendering2D.SetColor(TheClient.Rendering.AdaptColor(ClientUtilities.Convert(TheClient.Player.GetPosition()), GetColor()));
+            TheClient.CWindow.Rendering2D.RenderRectangle(TheClient.CWindow.MainUI.UIContext, (int)pos.X, (int)pos.Y, (int)(pos.X + size.X), (int)(pos.Y + size.Y));
         }
     }
 }

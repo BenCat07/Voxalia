@@ -564,7 +564,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void Draw2DEnv()
         {
-            CScreen.FullRender(gDelta, 0, 0);
+            CWindow.MainUI.CurrentScreen = CScreen;
+            CWindow.MainUI.Draw();
+            //CScreen.FullRender(CWindow.MainUI, gDelta, 0, 0);
         }
 
         /// <summary>
@@ -2279,23 +2281,23 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     }
                     int healthbaroffset = 300;
                     Textures.White.Bind();
-                    Rendering.SetColor(Color4.Black, MainWorldView);
-                    Rendering.RenderRectangle(center - healthbaroffset, Window.Height - 30, center + healthbaroffset, Window.Height - 2);
-                    Rendering.SetColor(Color4.Red, MainWorldView);
-                    Rendering.RenderRectangle(center - healthbaroffset + 2, Window.Height - 28, center - (healthbaroffset - 2) * ((100 - percent) / 100), Window.Height - 4);
-                    Rendering.SetColor(Color4.Cyan, MainWorldView);
-                    Rendering.RenderRectangle(center + 2, Window.Height - 28, center + healthbaroffset - 2, Window.Height - 4); // TODO: Armor percent
+                    CWindow.Rendering2D.SetColor(Color4.Black);
+                    CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, center - healthbaroffset, Window.Height - 30, center + healthbaroffset, Window.Height - 2);
+                    CWindow.Rendering2D.SetColor(Color4.Red);
+                    CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, center - healthbaroffset + 2, Window.Height - 28, center - (healthbaroffset - 2) * ((100 - percent) / 100), Window.Height - 4);
+                    CWindow.Rendering2D.SetColor(Color4.Cyan);
+                    CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, center + 2, Window.Height - 28, center + healthbaroffset - 2, Window.Height - 4); // TODO: Armor percent
                     FontSets.SlightlyBigger.DrawColoredText("^S^!^e^0Health: " + Player.Health.ToString(healthformat) + "/" + Player.MaxHealth.ToString(healthformat) + " = " + percent.ToString(healthformat) + "%",
                         new Location(center - healthbaroffset + 4, Window.Height - 26, 0));
                     FontSets.SlightlyBigger.DrawColoredText("^S^%^e^0Armor: " + "100.0" + "/" + "100.0" + " = " + "100.0" + "%", // TODO: Armor values!
                         new Location(center + 4, Window.Height - 26, 0));
                     if (CVars.u_showmap.ValueB)
                     {
-                        Rendering.SetColor(Color4.White, MainWorldView);
+                        CWindow.Rendering2D.SetColor(Color4.White);
                         Textures.Black.Bind();
-                        Rendering.RenderRectangle(Window.Width - 16 - 200, 16, Window.Width - 16, 16 + 200); // TODO: Dynamic size?
+                        CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, Window.Width - 16 - 200, 16, Window.Width - 16, 16 + 200); // TODO: Dynamic size?
                         GL.BindTexture(TextureTarget.Texture2D, map_fbo_texture);
-                        Rendering.RenderRectangle(Window.Width - 16 - (200 - 2), 16 + 2, Window.Width - 16 - 2, 16 + (200 - 2));
+                        CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, Window.Width - 16 - (200 - 2), 16 + 2, Window.Width - 16 - 2, 16 + (200 - 2));
                     }
                     int cX = Window.Width / 2;
                     int cY = Window.Height / 2;
@@ -2304,15 +2306,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     {
                         move = 20;
                     }
-                    Rendering.SetColor(Color4.White, MainWorldView);
+                    CWindow.Rendering2D.SetColor(Color4.White);
                     Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_tl").Bind(); // TODO: Save! Don't re-grab every tick!
-                    Rendering.RenderRectangle(cX - CVars.u_reticlescale.ValueI - move, cY - CVars.u_reticlescale.ValueI - move, cX - move, cY - move);
+                    CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, cX - CVars.u_reticlescale.ValueI - move, cY - CVars.u_reticlescale.ValueI - move, cX - move, cY - move);
                     Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_tr").Bind();
-                    Rendering.RenderRectangle(cX + move, cY - CVars.u_reticlescale.ValueI - move, cX + CVars.u_reticlescale.ValueI + move, cY - move);
+                    CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, cX + move, cY - CVars.u_reticlescale.ValueI - move, cX + CVars.u_reticlescale.ValueI + move, cY - move);
                     Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_bl").Bind();
-                    Rendering.RenderRectangle(cX - CVars.u_reticlescale.ValueI - move, cY + move, cX - move, cY + CVars.u_reticlescale.ValueI + move);
+                    CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, cX - CVars.u_reticlescale.ValueI - move, cY + move, cX - move, cY + CVars.u_reticlescale.ValueI + move);
                     Textures.GetTexture("ui/hud/reticles/" + CVars.u_reticle.Value + "_br").Bind();
-                    Rendering.RenderRectangle(cX + move, cY + move, cX + CVars.u_reticlescale.ValueI + move, cY + CVars.u_reticlescale.ValueI + move);
+                    CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, cX + move, cY + move, cX + CVars.u_reticlescale.ValueI + move, cY + CVars.u_reticlescale.ValueI + move);
                     if (CVars.u_showrangefinder.ValueB)
                     {
                         FontSets.Standard.DrawColoredText(CameraDistance.ToString("0.0"), new Location(cX + move + CVars.u_reticlescale.ValueI, cY + move + CVars.u_reticlescale.ValueI, 0));
@@ -2320,11 +2322,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     if (CVars.u_showcompass.ValueB)
                     {
                         Textures.White.Bind();
-                        Rendering.SetColor(Color4.Black, MainWorldView);
-                        Rendering.RenderRectangle(64, Window.Height - (32 + 32), Window.Width - 64, Window.Height - 32);
-                        Rendering.SetColor(Color4.Gray, MainWorldView);
-                        Rendering.RenderRectangle(66, Window.Height - (32 + 30), Window.Width - 66, Window.Height - 34);
-                        Rendering.SetColor(Color4.White, MainWorldView);
+                        CWindow.Rendering2D.SetColor(Color4.Black);
+                        CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, 64, Window.Height - (32 + 32), Window.Width - 64, Window.Height - 32);
+                        CWindow.Rendering2D.SetColor(Color4.Gray);
+                        CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, 66, Window.Height - (32 + 30), Window.Width - 66, Window.Height - 34);
+                        CWindow.Rendering2D.SetColor(Color4.White);
                         RenderCompassCoord(Vector4d.UnitY, "N");
                         RenderCompassCoord(-Vector4d.UnitY, "S");
                         RenderCompassCoord(Vector4d.UnitX, "E");
@@ -2398,10 +2400,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 IsOrtho = false;
                 return;
             }
+            GraphicsUtil.CheckError("Render Item - Pre Rendered Item");
             ItemFrame.Bind();
-            Rendering.SetColor(Color4.White, MainWorldView);
-            Rendering.RenderRectangle((int)pos.X - 1, (int)pos.Y - 1, (int)(pos.X + size) + 1, (int)(pos.Y + size) + 1);
+            CWindow.Rendering2D.SetColor(Color4.White);
+            CWindow.Rendering2D.RenderRectangle(CWindow.MainUI.UIContext, (int)pos.X - 1, (int)pos.Y - 1, (int)(pos.X + size) + 1, (int)(pos.Y + size) + 1);
             item.Render(pos, new Location(size, size, 0));
+            GraphicsUtil.CheckError("Render Item - Post Rendered Item");
             if (item.Count > 0)
             {
                 FontSets.SlightlyBigger.DrawColoredText("^!^e^7^S" + item.Count, new Location(pos.X + 5, pos.Y + size - FontSets.SlightlyBigger.font_default.Height / 2f - 5, 0));

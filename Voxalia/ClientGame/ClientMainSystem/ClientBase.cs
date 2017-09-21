@@ -25,7 +25,7 @@ using Voxalia.ServerGame.ServerMainSystem;
 using System.Threading;
 using System.Drawing;
 using FreneticGameCore.Files;
-using Voxalia.ClientGame.UISystem.MenuSystem;
+using FreneticGameGraphics.UISystem;
 using FreneticGameCore;
 using FreneticGameGraphics;
 using FreneticGameGraphics.GraphicsHelpers;
@@ -375,8 +375,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Rendering3D = Rendering,
                 Files = Files,
                 FontSets = FontSets,
-                GLFonts = Fonts
+                GLFonts = Fonts,
+                Window = Window
             };
+            CWindow.MainUI = new ViewUI2D(CWindow);
             CWindow.Engine3D.MainView = MainWorldView;
             CWindow.Engine3D.ZFar = ZFar;
             CWindow.Engine3D.ZFarOut = ZFarOut;
@@ -466,6 +468,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             Rendering = new Renderer(Textures, Shaders, Models);
             Rendering.Init();
             CWindow.Rendering3D = Rendering;
+            CWindow.Rendering2D = new Renderer2D(Textures, Shaders);
+            CWindow.Rendering2D.Init();
             SysConsole.Output(OutputType.CLIENTINIT, "Preparing load screen...");
             load_screen = Textures.GetTexture("ui/menus/loadscreen");
             Establish2D();

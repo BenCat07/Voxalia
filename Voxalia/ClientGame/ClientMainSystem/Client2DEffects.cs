@@ -22,7 +22,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
     {
         public void RenderLoader(float x, float y, float size, double delta)
         {
+            // TODO: 2D Logic version!
+            Shaders.ColorMultShader.Bind();
             RenderLoadIconV2(x, y, size, delta);
+            Shaders.ColorMult2DShader.Bind();
             GraphicsUtil.CheckError("RenderLoader");
         }
 
