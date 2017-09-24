@@ -75,7 +75,7 @@ void main()
 	vec3 tf_normal = (mv_mat_simple * vec4(normal.xyz, 0.0)).xyz;
 	vec3 tf_tangent = (mv_mat_simple * vec4(tangent.xyz, 0.0)).xyz;
 	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent.xyz, normal.xyz), 0.0)).xyz;
-	fi.tbn = transpose(mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
+	fi.tbn = (mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
 	vec4 vpos_mv = mv_matrix * vpos;
 #if MCM_TH
 	fi.thv = thv;

@@ -69,7 +69,7 @@ void main()
 	vec3 tf_normal = (mv_mat_simple * vec4(normal, 0.0)).xyz;
 	vec3 tf_tangent = (mv_mat_simple * vec4(tangent, 0.0)).xyz;
 	vec3 tf_bitangent = (mv_mat_simple * vec4(cross(tangent, normal), 0.0)).xyz;
-	f.tbn = transpose(mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
+	f.tbn = (mat3(tf_tangent, tf_bitangent, tf_normal)); // TODO: Neccessity of transpose()?
 }
 
 const float min_cstrobe = 3.0 / 255.0;

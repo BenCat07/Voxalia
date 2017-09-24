@@ -50,7 +50,6 @@ namespace Voxalia.ServerGame.WorldSystem
                     }
                 }
             }
-            { }
             for (int i = Clouds.Count - 1; i >= 0; i--)
             {
                 // TODO: if in non-air chunk, dissipate rapidly?

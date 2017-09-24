@@ -1,6 +1,7 @@
 # Blocks Info
 
 - TODO: Information here!
+- TODO: This needs to be replacedby something more sane, seriously.
 - Generally do not edit the debug block all - its exact texture values are expected to some degree by the code.
 
 ### Textures

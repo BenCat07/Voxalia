@@ -323,8 +323,13 @@ void main()
 	renderhint2 = vec4(0.0, reflecto, 0.0, 1.0);
 #endif // else - MCM_TRANSP
 #endif // MCM_LIGHTS
+	float rhb_fx = 1.0;
+	if (rhBlur > 0.0 && col.w < 0.99)
+	{
+		rhb_fx = sqrt(length(fi.pos.xyz) * 0.05);
+	}
 #if MCM_NO_ALPHA_CAP
-	if (col.w * fi.color.w <= 0.01)
+	if (col.w * fi.color.w * rhb_fx <= 0.01)
 	{
 		discard;
 	}
@@ -333,12 +338,12 @@ void main()
 #endif
 #else // MCM_NO_ALPHA_CAP
 #if MCM_TRANSP
-	if (col.w * fi.color.w >= 0.99)
+	if (col.w * fi.color.w * rhb_fx >= 0.99)
 	{
 		discard;
 	}
 #else // MCM_TRANSP
-	if (col.w * fi.color.w < 0.99)
+	if (col.w * fi.color.w * rhb_fx < 0.99)
 	{
 		discard;
 	}
@@ -453,6 +458,7 @@ void main()
 		vec3 diffuse = max(dot(tf_normal, L), 0.0) * vec3(diffuse_albedo); // Find out how much diffuse light to apply
 		vec3 reller = normalize(fi.pos - eye_pos);
 		float spec_res = pow(max(dot(reflect(L, -tf_normal), reller), 0.0), 200.0) * specular_albedo * specularStrength;
+		spec_res = max(0.0, spec_res);
 		opac_min += spec_res;
 		vec3 specular = vec3(spec_res); // Find out how much specular light to apply.
 		res_color += (vec3(depth, depth, depth) * atten * (diffuse * light_color) * color.xyz) + (min(specular, 1.0) * light_color * atten * depth); // Put it all together now.
@@ -467,14 +473,9 @@ void main()
 	color.xyz *= min(max(dotted * maximum_light, max(0.2, minimum_light)), 1.0) * 0.75;
 #endif // else - MCM_LIGHTS
 	applyFog();
-#if MCM_TRANSP
-	if (rhBlur > 0.0)
-	{
-		float opacity_mod = length(fi.pos.xyz) * 0.05;
-		color.w *= min(opacity_mod + opac_min, 0.9);
-	}
-#endif // MCM_TRANSP
 #endif // else - MCM_BRIGHT
+	color.w *= rhb_fx + opac_min;
+	color.w = min(color.w, 1.0);
 	applyFog();
 #if MCM_INVERSE_FADE
 	float dist = linearizeDepth(gl_FragCoord.z);

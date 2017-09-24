@@ -33,7 +33,7 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
         
         public virtual Material WaterMaterial()
         {
-            return Material.DIRTY_WATER;
+            return Material.WATER;
         }
 
         public virtual Material SandMaterial()

@@ -2464,7 +2464,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 s_forw_vox = s_forw_vox.Bind();
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix_OffsetFor3D);
             };
-            view.ViewPatchThree = (fogDist) =>
+            view.ViewPatchThree = (fogDist, shadowmat_dat, light_dat, c) =>
             {
                 s_forw_vox_trans.Bind();
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix);
@@ -2475,6 +2475,12 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.Uniform1(13, fogDist);
                 // GL.Uniform2(14, zfar_rel); // ?
                 Engine.Rendering.SetColor(Color4.White, view);
+                if (Engine.Forward_Lights)
+                {
+                    GL.Uniform1(15, (float)c);
+                    GL.UniformMatrix4(20, View3D.LIGHTS_MAX, false, shadowmat_dat);
+                    GL.UniformMatrix4(20 + View3D.LIGHTS_MAX, View3D.LIGHTS_MAX, false, light_dat);
+                }
             };
             view.ViewPatchFour = () =>
             {
