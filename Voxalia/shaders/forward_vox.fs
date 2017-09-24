@@ -319,7 +319,7 @@ void main()
 	float specularStrength = max(hintter.x, extra_specular);
 #if MCM_TRANSP
 #else // MCM_TRANSP
-	reflecto = max(reflecto, hintter.z);
+	reflecto = max(reflecto, hintter.y);
 	renderhint2 = vec4(0.0, reflecto, 0.0, 1.0);
 #endif // else - MCM_TRANSP
 #endif // MCM_LIGHTS

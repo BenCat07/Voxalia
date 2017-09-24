@@ -1148,6 +1148,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SetEnts();
             if (MainWorldView.FBOid.IsForward())
             {
+                if (CVars.r_forwardreflections.ValueB && MainWorldView.FBOid == FBOID.FORWARD_SOLID && MainWorldView.RS4P.IsBound)
+                {
+                    GL.BindFramebuffer(FramebufferTarget.Framebuffer, MainWorldView.OV_FBO);
+                    GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, MainWorldView.RS4P.fbo);
+                    GL.BlitFramebuffer(0, 0, MainWorldView.Width, MainWorldView.Height, 0, 0, MainWorldView.Width, MainWorldView.Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                    GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
+                    GL.BindFramebuffer(FramebufferTarget.Framebuffer, MainWorldView.RS4P.fbo);
+                }
                 // GL.Uniform2(14, new Vector2(CVars.r_znear.ValueF, ZFar()));
             }
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
