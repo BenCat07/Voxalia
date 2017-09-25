@@ -564,7 +564,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void Draw2DEnv()
         {
-            CWindow.MainUI.CurrentScreen = CScreen;
+            CWindow.MainUI.InternalCurrentScreen = CScreen;
             CWindow.MainUI.Draw();
             //CScreen.FullRender(CWindow.MainUI, gDelta, 0, 0);
         }
