@@ -41,8 +41,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             FontSet font = FontSets.Standard;
             int minY = 10 + (int)font.font_default.Height;
             ChatMenu = new UIGroup(new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_CENTER).GetterWidthHeight(() => Window.Width, () => Window.Height - minY - UIBottomHeight).ConstantXY(0, 0));
-            ChatScroller = new UIScrollBox(new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_CENTER).GetterWidthHeight(() => ChatMenu.GetWidth() - (30 * 2), () => ChatMenu.GetHeight() - minY).ConstantXY(0, minY)) { Color = new Color4F(0f, 0.5f, 0.5f, 0.6f) };
-            ChatBox = new UIInputBox("", "Enter a /command or a chat message...", font, new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_CENTER).GetterWidth(ChatScroller.GetWidth).ConstantX(0).GetterY(() => (int)ChatScroller.GetHeight() + minY))
+            ChatScroller = new UIScrollBox(new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_CENTER).GetterWidthHeight(() => ChatMenu.Position.Width - (30 * 2), () => ChatMenu.Position.Height - minY).ConstantXY(0, minY)) { Color = new Color4F(0f, 0.5f, 0.5f, 0.6f) };
+            ChatBox = new UIInputBox("", "Enter a /command or a chat message...", font, new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_CENTER).GetterWidth(() => ChatScroller.Position.Width).ConstantX(0).GetterY(() => (int)ChatScroller.Position.Height + minY))
             {
                 EnterPressed = EnterChatMessage
             };
@@ -224,11 +224,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     by += FontSets.Standard.font_default.Height;
                     int y = (int)by;
                     string ch = (ChatMessages[i].Channel == TextChannel.ALWAYS) ? "" : (ChatMessages[i].Channel.ToString() + ": ");
-                    ChatScroller.AddChild(new UILabel(ch + ChatMessages[i].Text, FontSets.Standard, new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_LEFT).ConstantXY(0, y).GetterWidth(() => (int)ChatScroller.GetWidth())));
+                    ChatScroller.AddChild(new UILabel(ch + ChatMessages[i].Text, FontSets.Standard, new UIPositionHelper(CWindow.MainUI).Anchor(UIAnchor.TOP_LEFT).ConstantXY(0, y).GetterWidth(() => (int)ChatScroller.Position.Width)));
                 }
             }
             by += FontSets.Standard.font_default.Height;
-            ChatBottom = (int)(by - ChatScroller.GetHeight());
+            ChatBottom = (int)(by - ChatScroller.Position.Height);
             ChatScroller.MaxScroll = ChatBottom;
         }
 

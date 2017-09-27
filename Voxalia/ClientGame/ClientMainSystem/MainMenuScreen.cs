@@ -38,9 +38,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             FontSet font = TheClient.FontSets.SlightlyBigger;
             UITextLink quit = new UITextLink(null, "^%Q^7uit", "^%Q^e^7uit", "^7^e^%Q^0uit", font, () => TheClient.Window.Close(), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_RIGHT).ConstantXY(-100, -100));
             AddChild(quit);
-            UITextLink sp = new UITextLink(null, "^%S^7ingleplayer", "^%S^e^7ingleplayer", "^7^e^%S^0ingleplayer", font, () => TheClient.ShowSingleplayer(), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_RIGHT).ConstantX(-100).GetterY(() => -100 - quit.GetHeight()));
+            UITextLink sp = new UITextLink(null, "^%S^7ingleplayer", "^%S^e^7ingleplayer", "^7^e^%S^0ingleplayer", font, () => TheClient.ShowSingleplayer(), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_RIGHT).ConstantX(-100).GetterY(() => -100 - quit.Position.Height));
             AddChild(sp);
-            UITextLink mp = new UITextLink(null, "^%M^7ultiplayer", "^%M^e^7ultiplayer", "^7^e^%M^0ultiplayer", font, () => UIConsole.WriteLine("Multiplayer menu coming soon!"), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_RIGHT).ConstantX(-100).GetterY(() => -100 - (int)(sp.GetHeight() + quit.GetHeight())));
+            UITextLink mp = new UITextLink(null, "^%M^7ultiplayer", "^%M^e^7ultiplayer", "^7^e^%M^0ultiplayer", font, () => UIConsole.WriteLine("Multiplayer menu coming soon!"), new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_RIGHT).ConstantX(-100).GetterY(() => -100 - (int)(sp.Position.Height + quit.Position.Height)));
             AddChild(mp);
             List<string> hints = TheClient.Languages.GetTextList(TheClient.Files, "voxalia", "hints.common");
             UILabel label = new UILabel("^0^e^7" + hints[Utilities.UtilRandom.Next(hints.Count)], TheClient.FontSets.Standard, new UIPositionHelper(Client.MainUI).Anchor(UIAnchor.BOTTOM_LEFT).ConstantX(0).GetterY(() => -(int)TheClient.Fonts.Standard.Height * 3).GetterWidth(() => TheClient.Window.Width));

@@ -34,7 +34,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             MouseHandler.CaptureMouse();
         }
 
-        protected override void Render(ViewUI2D view, double delta, int xoff, int yoff, float rotation)
+        public override void Render(ViewUI2D view, double delta)
         {
             TheClient.Render2DGame();
         }

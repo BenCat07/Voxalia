@@ -50,9 +50,9 @@ namespace Voxalia.ClientGame.ClientMainSystem
             AddHint();
         }
 
-        public override void FullRender(ViewUI2D view, double delta, int xoff, int yoff, Vector3 lastRot)
+        public override void Render(ViewUI2D view, double delta)
         {
-            base.FullRender(view, delta, xoff, yoff, lastRot);
+            base.Render(view, delta);
             TheClient.RenderLoader(TheClient.Window.Width - 100f, 100f, 100f, delta);
         }
     }
