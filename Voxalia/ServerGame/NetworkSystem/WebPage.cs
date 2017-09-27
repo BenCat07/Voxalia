@@ -102,7 +102,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                 http_response_id = 500;
                 http_response_itname = "Internal Server Error";
                 http_response_contenttype = "text/plain; charset=UTF-8";
-                http_response_content = FileHandler.encoding.GetBytes("500 Internal Server Error\n");
+                http_response_content = FileHandler.DefaultEncoding.GetBytes("500 Internal Server Error\n");
             }
             if (GZip)
             {
@@ -180,7 +180,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                                 }
                             }
                             content.Append("\n</body>\n</html>\n");
-                            http_response_content = FileHandler.encoding.GetBytes(content.ToString());
+                            http_response_content = FileHandler.DefaultEncoding.GetBytes(content.ToString());
                             return;
                         }
                         break;
@@ -226,7 +226,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                     content.Append("Not a valid login!");
                 }
                 content.Append("\n</body>\n</html>\n");
-                http_response_content = FileHandler.encoding.GetBytes(content.ToString());
+                http_response_content = FileHandler.DefaultEncoding.GetBytes(content.ToString());
                 return;
             }
             Do404();
@@ -242,7 +242,7 @@ namespace Voxalia.ServerGame.NetworkSystem
             respcont += "</html>\n";
             http_response_id = 404;
             http_response_itname = "File Not Found";
-            http_response_content = FileHandler.encoding.GetBytes(respcont);
+            http_response_content = FileHandler.DefaultEncoding.GetBytes(respcont);
         }
 
         public bool GZip = false;
@@ -275,7 +275,7 @@ namespace Voxalia.ServerGame.NetworkSystem
 
         public byte[] GetFullData()
         {
-            byte[] header = FileHandler.encoding.GetBytes(GetHeaders());
+            byte[] header = FileHandler.DefaultEncoding.GetBytes(GetHeaders());
             byte[] result = new byte[http_response_content.Length + header.Length];
             header.CopyTo(result, 0);
             http_response_content.CopyTo(result, header.Length);

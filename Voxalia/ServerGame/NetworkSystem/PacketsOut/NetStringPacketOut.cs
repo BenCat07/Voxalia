@@ -18,7 +18,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
         {
             UsageType = NetUsageType.GENERAL;
             ID = ServerToClientPacket.NET_STRING;
-            Data = FileHandler.encoding.GetBytes(str);
+            Data = FileHandler.DefaultEncoding.GetBytes(str);
         }
     }
 }

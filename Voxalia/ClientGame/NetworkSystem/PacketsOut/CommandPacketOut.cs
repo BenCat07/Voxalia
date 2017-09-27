@@ -17,7 +17,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsOut
         public CommandPacketOut(string cmd)
         {
             ID = ClientToServerPacket.COMMAND;
-            Data = FileHandler.encoding.GetBytes(cmd);
+            Data = FileHandler.DefaultEncoding.GetBytes(cmd);
         }
     }
 }

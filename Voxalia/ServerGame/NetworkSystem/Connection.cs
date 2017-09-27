@@ -157,7 +157,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                     { "session", key }
                 };
                 byte[] response = wb.UploadValues(VoxProgram.GlobalServerAddress + "account/microconfirm", "POST", data);
-                string resp = FileHandler.encoding.GetString(response).Trim(' ', '\n', '\r', '\t');
+                string resp = FileHandler.DefaultEncoding.GetString(response).Trim(' ', '\n', '\r', '\t');
                 if (resp.StartsWith("ACCEPT=") && resp.EndsWith(";"))
                 {
                     string ip = resp.Substring("ACCEPT=".Length, resp.Length - 1 - "ACCEPT=".Length);
@@ -260,7 +260,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                         if (recd[recdsofar - 1] == '\n' && (recd[recdsofar - 2] == '\n' || recd[recdsofar - 3] == '\n'))
                         {
                             WebPage wp = new WebPage(TheServer, this);
-                            wp.Init(FileHandler.encoding.GetString(recd, 0, recdsofar));
+                            wp.Init(FileHandler.DefaultEncoding.GetString(recd, 0, recdsofar));
                             PrimarySocket.Send(wp.GetFullData());
                             PrimarySocket.Close(5);
                             Alive = false;
@@ -277,8 +277,8 @@ namespace Voxalia.ServerGame.NetworkSystem
                         if (recd[recdsofar - 1] == '\n' && (recd[recdsofar - 2] == '\n' || recd[recdsofar - 3] == '\n'))
                         {
                             WebPage wp = new WebPage(TheServer, this);
-                            wp.Init(FileHandler.encoding.GetString(recd, 0, recdsofar));
-                            PrimarySocket.Send(FileHandler.encoding.GetBytes(wp.GetHeaders()));
+                            wp.Init(FileHandler.DefaultEncoding.GetString(recd, 0, recdsofar));
+                            PrimarySocket.Send(FileHandler.DefaultEncoding.GetBytes(wp.GetHeaders()));
                             PrimarySocket.Close(5);
                             Alive = false;
                         }
@@ -288,7 +288,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                         // VOXALIA ping
                         if (recd[recdsofar - 1] == '\n')
                         {
-                            PrimarySocket.Send(FileHandler.encoding.GetBytes("SUCCESS\rVoxalia Server Online\n"));
+                            PrimarySocket.Send(FileHandler.DefaultEncoding.GetBytes("SUCCESS\rVoxalia Server Online\n"));
                             PrimarySocket.Close(5);
                             Alive = false;
                         }
@@ -298,7 +298,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                         // VOXALIA connect
                         if (recd[recdsofar - 1] == '\n')
                         {
-                            string data = FileHandler.encoding.GetString(recd, 6, recdsofar - 7);
+                            string data = FileHandler.DefaultEncoding.GetString(recd, 6, recdsofar - 7);
                             string[] datums = data.SplitFast('\r');
                             if (datums.Length != 5)
                             {
@@ -349,7 +349,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                                         TheServer.Schedule.ScheduleSyncTask(() =>
                                         {
                                             TheServer.PlayersWaiting.Add(player);
-                                            PrimarySocket.Send(FileHandler.encoding.GetBytes("ACCEPT\n"));
+                                            PrimarySocket.Send(FileHandler.DefaultEncoding.GetBytes("ACCEPT\n"));
                                         });
                                         GotBase = true;
                                         recdsofar = 0;
@@ -382,7 +382,7 @@ namespace Voxalia.ServerGame.NetworkSystem
                         // VOXALIA chunk connect
                         if (recd[recdsofar - 1] == '\n')
                         {
-                            string data = FileHandler.encoding.GetString(recd, 6, recdsofar - 7);
+                            string data = FileHandler.DefaultEncoding.GetString(recd, 6, recdsofar - 7);
                             string[] datums = data.SplitFast('\r');
                             if (datums.Length != 4)
                             {
@@ -412,7 +412,7 @@ namespace Voxalia.ServerGame.NetworkSystem
 
                                 PE = player ?? throw new Exception("Can't find player for VOXc_:" + name + ", " + host + ", " + port + ", " + key.Length);
                                 player.ChunkNetwork = this;
-                                PrimarySocket.Send(FileHandler.encoding.GetBytes("ACCEPT\n"));
+                                PrimarySocket.Send(FileHandler.DefaultEncoding.GetBytes("ACCEPT\n"));
                                 // TODO: What if the world disappears during connect sequence?
                                 player.LastPingByte = 0;
                                 player.LastCPingByte = 0;

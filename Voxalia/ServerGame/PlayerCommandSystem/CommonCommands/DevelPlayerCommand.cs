@@ -23,6 +23,7 @@ using Voxalia.Shared.Collision;
 using Voxalia.ServerGame.JointSystem;
 using FreneticGameCore;
 using FreneticGameCore.Collision;
+using FreneticGameCore.Files;
 
 namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
 {
@@ -84,6 +85,17 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             else if (arg0 == "countEnts")
             {
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Ents: " + entry.Player.TheRegion.Entities.Count);
+            }
+            else if (arg0 == "varInt" && entry.InputArguments.Count > 1)
+            {
+                long l = Utilities.StringToLong(entry.InputArguments[1]);
+                DataStream ds = new DataStream();
+                DataWriter dw = new DataWriter(ds);
+                dw.WriteVarInt(l);
+                byte[] b = ds.ToArray();
+                DataStream dOut = new DataStream(b);
+                DataReader dr = new DataReader(dOut);
+                entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Read back " + dr.ReadVarInt() + " from " + string.Join(":::", b));
             }
             else if (arg0 == "autoThrow")
             {

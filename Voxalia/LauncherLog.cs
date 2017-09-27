@@ -221,6 +221,12 @@ namespace VoxaliaLauncher
 
         void WriteInternal(string text)
         {
+            byte[] b = new byte[text.Length];
+            for (int i = 0; i < b.Length; i++)
+            {
+                b[i] = (byte)text[i];
+            }
+            text = Encoding.UTF8.GetString(b);
             edited = true;
             if (RTFBs.Count > 600)
             {
@@ -311,7 +317,7 @@ namespace VoxaliaLauncher
             while (true)
             {
                 string read = await OutputReader.ReadLineAsync();
-                if (!Visible || IsDisposed || read == null)
+                if (IsDisposed || read == null || !Visible)
                 {
                     if (checkBox1.Checked)
                     {
@@ -328,7 +334,7 @@ namespace VoxaliaLauncher
                 }
                 Invoke(new Action(() =>
                 {
-                    if (!Visible || IsDisposed || IsClosed)
+                    if (IsDisposed || IsClosed || !Visible)
                     {
                         return;
                     }
@@ -342,7 +348,7 @@ namespace VoxaliaLauncher
             while (true)
             {
                 string read = await OutputReader2.ReadLineAsync();
-                if (!Visible || IsDisposed || read == null)
+                if (IsDisposed || read == null || !Visible)
                 {
                     if (checkBox1.Checked)
                     {
@@ -359,7 +365,7 @@ namespace VoxaliaLauncher
                 }
                 Invoke(new Action(() =>
                 {
-                    if (!Visible || IsDisposed || IsClosed)
+                    if (IsDisposed || IsClosed || !Visible)
                     {
                         return;
                     }

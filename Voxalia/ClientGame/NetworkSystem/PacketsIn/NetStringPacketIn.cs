@@ -14,7 +14,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
     {
         public override bool ParseBytesAndExecute(byte[] data)
         {
-            TheClient.Network.Strings.Strings.Add(FileHandler.encoding.GetString(data));
+            TheClient.Network.Strings.Strings.Add(FileHandler.DefaultEncoding.GetString(data));
             return true;
         }
     }

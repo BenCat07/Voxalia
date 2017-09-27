@@ -83,7 +83,7 @@ namespace Voxalia.ClientGame.NetworkSystem
                 data["username"] = Username;
                 data["session"] = Key;
                 byte[] response = wb.UploadValues(VoxProgram.GlobalServerAddress + "account/microgetsess", "POST", data);
-                string resp = FileHandler.encoding.GetString(response).Trim(' ', '\n', '\r', '\t');
+                string resp = FileHandler.DefaultEncoding.GetString(response).Trim(' ', '\n', '\r', '\t');
                 if (resp.StartsWith("ACCEPT=") && resp.EndsWith(";"))
                 {
                     return resp.Substring("ACCEPT=".Length, resp.Length - 1 - "ACCEPT=".Length);
@@ -177,11 +177,11 @@ namespace Voxalia.ClientGame.NetworkSystem
                     ConnectionSocket.Connect(new IPEndPoint(address, tport));
                     Stopwatch stopwatch = new Stopwatch();
                     stopwatch.Start();
-                    ConnectionSocket.Send(FileHandler.encoding.GetBytes("VOXp_\n"));
+                    ConnectionSocket.Send(FileHandler.DefaultEncoding.GetBytes("VOXp_\n"));
                     byte[] resp = ReceiveUntil(ConnectionSocket, 150, (byte)'\n');
                     stopwatch.Stop();
                     long ping = stopwatch.ElapsedMilliseconds;
-                    string respString = FileHandler.encoding.GetString(resp);
+                    string respString = FileHandler.DefaultEncoding.GetString(resp);
                     bool success = false;
                     string message = "No server ping response.";
                     if (respString != null)
@@ -644,10 +644,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                     + TheClient.CVars.r_renderdist_2h.ValueI + "," + TheClient.CVars.r_renderdist_5.ValueI + ","
                     + TheClient.CVars.r_renderdist_5h.ValueI + "," + TheClient.CVars.r_renderdist_6.ValueI + ","
                     + TheClient.CVars.r_renderdist_15.ValueI;
-                ConnectionSocket.Send(FileHandler.encoding.GetBytes("VOX__\r" + Username
+                ConnectionSocket.Send(FileHandler.DefaultEncoding.GetBytes("VOX__\r" + Username
                      + "\r" + key + "\r" + LastIP + "\r" + LastPort + "\r" + renderd + "\n"));
                 byte[] resp = ReceiveUntil(ConnectionSocket, 150, (byte)'\n');
-                if (FileHandler.encoding.GetString(resp) != "ACCEPT")
+                if (FileHandler.DefaultEncoding.GetString(resp) != "ACCEPT")
                 {
                     ConnectionSocket.Close();
                     throw new Exception("Server did not accept connection");
@@ -661,10 +661,10 @@ namespace Voxalia.ClientGame.NetworkSystem
                 ChunkSocket.ReceiveBufferSize = 5 * 1024 * 1024;
                 ChunkSocket.SendBufferSize = 5 * 1024 * 1024;
                 ChunkSocket.Connect(new IPEndPoint(address, tport));
-                ChunkSocket.Send(FileHandler.encoding.GetBytes("VOXc_\r" + Username
+                ChunkSocket.Send(FileHandler.DefaultEncoding.GetBytes("VOXc_\r" + Username
                     + "\r" + key + "\r" + LastIP + "\r" + LastPort + "\n"));
                 resp = ReceiveUntil(ChunkSocket, 150, (byte)'\n');
-                if (FileHandler.encoding.GetString(resp) != "ACCEPT")
+                if (FileHandler.DefaultEncoding.GetString(resp) != "ACCEPT")
                 {
                     ConnectionSocket.Close();
                     ChunkSocket.Close();

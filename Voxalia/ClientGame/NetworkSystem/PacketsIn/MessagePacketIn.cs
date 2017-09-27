@@ -28,7 +28,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                 SysConsole.Output(OutputType.WARNING, "Invalid TEXTCHANEL specified: " + tc);
                 return false;
             }
-            TheClient.WriteMessage(tc, FileHandler.encoding.GetString(data, 1, data.Length - 1));
+            TheClient.WriteMessage(tc, FileHandler.DefaultEncoding.GetString(data, 1, data.Length - 1));
             return true;
         }
     }

@@ -18,7 +18,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
         {
             UsageType = NetUsageType.GENERAL;
             ID = ServerToClientPacket.MESSAGE;
-            byte[] text = FileHandler.encoding.GetBytes(msg);
+            byte[] text = FileHandler.DefaultEncoding.GetBytes(msg);
             Data = new byte[1 + text.Length];
             Data[0] = (byte)chan;
             text.CopyTo(Data, 1);
