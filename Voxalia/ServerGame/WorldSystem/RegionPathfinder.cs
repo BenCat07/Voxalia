@@ -39,7 +39,7 @@ namespace Voxalia.ServerGame.WorldSystem
             nodes.Nodes[id] = pf;
             return id;
         }
-
+        
         public Object PFNodeSetLock = new Object();
 
         public Stack<PathFindNodeSet> PFNodeSet = new Stack<PathFindNodeSet>();
@@ -96,14 +96,13 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             int nloc = 0;
             int start = GetNode(nodes, ref nloc, startloc, 0.0, 0.0, -1);
-            HashSet<Location> closed = new HashSet<Location>();
-            HashSet<Location> openset = new HashSet<Location>();
+            Dictionary<Location, PathFindNode> closed = new Dictionary<Location, PathFindNode>();
+            Dictionary<Location, PathFindNode> openset = new Dictionary<Location, PathFindNode>();
             PFEntry pfet;
             pfet.Nodes = nodes;
             pfet.ID = start;
             open.Enqueue(ref pfet, 0.0);
             openset.Add(startloc);
-            // TODO: relevant chunk map, to shorten the block solidity lookup time!
             while (open.Count > 0)
             {
                 int nextid = open.Dequeue().ID;
@@ -121,7 +120,7 @@ namespace Voxalia.ServerGame.WorldSystem
                     }
                     return Reconstruct(nodes.Nodes, nextid);
                 }
-                closed.Add(next.Internal);
+                closed[next.Internal] = next;
                 foreach (Location neighbor in PathFindNode.Neighbors)
                 {
                     Location neighb = next.Internal + neighbor;
@@ -129,15 +128,15 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         continue;
                     }
-                    if (closed.Contains(neighb))
+                    if (closed.TryGetValue(neighb, out PathFindNode fbv) && fbv.F < next.F)
                     {
                         continue;
                     }
-                    if (openset.Contains(neighb))
+                    if (openset.TryGetValue(neighb, out PathFindNode pfv) && pfv.F < next.F)
                     {
                         continue;
                     }
-                    // TODO: Check solidity from entities too!
+                    // TODO: Check solidity from very solid entities too!
                     if (GetBlockMaterial(map, neighb).GetSolidity() != MaterialSolidity.NONSOLID) // TODO: Better solidity check
                     {
                         continue;
@@ -149,7 +148,7 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         continue;
                     }
-                    int node = GetNode(nodes, ref nloc, neighb, next.G + 1.0 + neighb.Distance(endloc), next.G + 1.0, nextid);
+                    int node = GetNode(nodes, ref nloc, neighb, next.G + 1.0, next.F + 1.0 + neighb.Distance(endloc), nextid);
                     PFEntry tpfet;
                     tpfet.Nodes = nodes;
                     tpfet.ID = node;
