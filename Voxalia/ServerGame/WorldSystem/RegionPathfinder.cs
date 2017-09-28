@@ -22,7 +22,7 @@ namespace Voxalia.ServerGame.WorldSystem
     public partial class Region
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetNode(PathFindNodeSet nodes, ref int nloc, Location loc, double f, double g, int parent)
+        public int GetNode(PathFindNodeSet nodes, ref int nloc, Vector3i loc, double f, double g, int parent)
         {
             int id = nloc++;
             if (nloc == nodes.Nodes.Length)
@@ -95,20 +95,25 @@ namespace Voxalia.ServerGame.WorldSystem
                 map = new Dictionary<Vector3i, Chunk>(1024);
             }
             int nloc = 0;
-            int start = GetNode(nodes, ref nloc, startloc, 0.0, 0.0, -1);
-            Dictionary<Location, PathFindNode> closed = new Dictionary<Location, PathFindNode>();
-            Dictionary<Location, PathFindNode> openset = new Dictionary<Location, PathFindNode>();
+            int start = GetNode(nodes, ref nloc, startloc.ToVec3i(), 0.0, 0.0, -1);
+            // TODO: Grab these from a stack too?
+            Dictionary<Vector3i, PathFindNode> closed = new Dictionary<Vector3i, PathFindNode>();
+            Dictionary<Vector3i, PathFindNode> openset = new Dictionary<Vector3i, PathFindNode>();
             PFEntry pfet;
             pfet.Nodes = nodes;
             pfet.ID = start;
             open.Enqueue(ref pfet, 0.0);
-            openset[startloc] = nodes.Nodes[start];
+            openset[startloc.ToVec3i()] = nodes.Nodes[start];
             while (open.Count > 0)
             {
                 int nextid = open.Dequeue().ID;
                 PathFindNode next = nodes.Nodes[nextid];
+                if (openset.TryGetValue(next.Internal, out PathFindNode pano) && pano.F < next.F)
+                {
+                    continue;
+                }
                 openset.Remove(next.Internal);
-                if (next.Internal.DistanceSquared(endloc) < gosq)
+                if (next.Internal.ToLocation().DistanceSquared(endloc) < gosq)
                 {
                     open.Clear();
                     map.Clear();
@@ -120,19 +125,25 @@ namespace Voxalia.ServerGame.WorldSystem
                     }
                     return Reconstruct(nodes.Nodes, nextid);
                 }
-                closed[next.Internal] = next;
-                foreach (Location neighbor in PathFindNode.Neighbors)
+                if (closed.TryGetValue(next.Internal, out PathFindNode pfn) && pfn.F < next.F)
                 {
-                    Location neighb = next.Internal + neighbor;
-                    if (startloc.DistanceSquared(neighb) > mrsq)
+                    continue;
+                }
+                closed[next.Internal] = next;
+                foreach (Vector3i neighbor in PathFindNode.Neighbors)
+                {
+                    Vector3i neighb = next.Internal + neighbor;
+                    if (startloc.DistanceSquared(neighb.ToLocation()) > mrsq)
                     {
                         continue;
                     }
-                    if (closed.TryGetValue(neighb, out PathFindNode fbv) && fbv.F < next.F)
+                    // Note: Add `&& fbv.F <= next.F)` to enhance precision of results... but it makes invalid searches take forever.
+                    if (closed.TryGetValue(neighb, out PathFindNode fbv))
                     {
                         continue;
                     }
-                    if (openset.TryGetValue(neighb, out PathFindNode pfv) && pfv.F < next.F)
+                    // Note: Add `&& pfv.F <= next.F)` to enhance precision of results... but it makes invalid searches take forever.
+                    if (openset.TryGetValue(neighb, out PathFindNode pfv))
                     {
                         continue;
                     }
@@ -141,19 +152,19 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         continue;
                     }
-                    if (GetBlockMaterial(map, neighb + new Location(0, 0, -1)).GetSolidity() == MaterialSolidity.NONSOLID
-                        && GetBlockMaterial(map, neighb + new Location(0, 0, -2)).GetSolidity() == MaterialSolidity.NONSOLID
-                        && GetBlockMaterial(map, next.Internal + new Location(0, 0, -1)).GetSolidity() == MaterialSolidity.NONSOLID
-                        && GetBlockMaterial(map, next.Internal + new Location(0, 0, -2)).GetSolidity() == MaterialSolidity.NONSOLID)
+                    if (GetBlockMaterial(map, neighb + new Vector3i(0, 0, -1)).GetSolidity() == MaterialSolidity.NONSOLID
+                        && GetBlockMaterial(map, neighb + new Vector3i(0, 0, -2)).GetSolidity() == MaterialSolidity.NONSOLID
+                        && GetBlockMaterial(map, next.Internal + new Vector3i(0, 0, -1)).GetSolidity() == MaterialSolidity.NONSOLID
+                        && GetBlockMaterial(map, next.Internal + new Vector3i(0, 0, -2)).GetSolidity() == MaterialSolidity.NONSOLID)
                     {
                         continue;
                     }
-                    int node = GetNode(nodes, ref nloc, neighb, next.G + 1.0, next.F + 1.0 + neighb.Distance(endloc), nextid);
+                    int node = GetNode(nodes, ref nloc, neighb, next.G + 1.0, next.F + 1.0 + neighb.ToLocation().Distance(endloc), nextid);
                     PFEntry tpfet;
                     tpfet.Nodes = nodes;
                     tpfet.ID = node;
                     open.Enqueue(ref tpfet, nodes.Nodes[node].F);
-                    openset[nodes.Nodes[node].Internal] = nodes.Nodes[node];
+                    openset[neighb] = nodes.Nodes[node];
                 }
             }
             open.Clear();
@@ -178,7 +189,7 @@ namespace Voxalia.ServerGame.WorldSystem
             List<Location> locs = new List<Location>();
             while (node != -1)
             {
-                locs.Add(nodes[node].Internal);
+                locs.Add(nodes[node].Internal.ToLocation() + new Location(0.5, 0.5, 0));
                 node = nodes[node].Parent;
             }
             locs.Reverse();
@@ -208,7 +219,7 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return 1;
             }
-            else if (Nodes.Nodes[ID].F > Nodes.Nodes[other.ID].F)
+            if (Nodes.Nodes[other.ID].F < Nodes.Nodes[ID].F)
             {
                 return -1;
             }
@@ -323,7 +334,7 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// The actual block location this node represents.
         /// </summary>
-        public Location Internal;
+        public Vector3i Internal;
         
         /// <summary>
         /// The F value for this node. (See: Any A* explanation!)
@@ -343,14 +354,19 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// The default set of valid neighbors for a block.
         /// </summary>
-        public static Location[] Neighbors = new Location[] { Location.UnitX, Location.UnitY, Location.UnitZ, -Location.UnitX, -Location.UnitY, -Location.UnitZ };
+        public static Vector3i[] Neighbors = new Vector3i[] {
+            new Vector3i(1, 0, 0), new Vector3i(-1, 0, 0), new Vector3i(0, 1, 0), new Vector3i(0, -1, 0), new Vector3i(0, 0, 1), new Vector3i(0, 0, -1)
+        };
 
         /// <summary>
         /// Calculates the distance to a second node.
         /// </summary>
         public double Distance(PathFindNode other)
         {
-            return Internal.Distance(other.Internal);
+            int x = Internal.X - other.Internal.X;
+            int y = Internal.Y - other.Internal.Y;
+            int z = Internal.Z - other.Internal.Z;
+            return Math.Sqrt(x * x + y * y + z * z);
         }
     }
 }
