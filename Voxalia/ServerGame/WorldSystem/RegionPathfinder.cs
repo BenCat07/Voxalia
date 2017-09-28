@@ -102,7 +102,7 @@ namespace Voxalia.ServerGame.WorldSystem
             pfet.Nodes = nodes;
             pfet.ID = start;
             open.Enqueue(ref pfet, 0.0);
-            openset.Add(startloc);
+            openset[startloc] = nodes.Nodes[start];
             while (open.Count > 0)
             {
                 int nextid = open.Dequeue().ID;
@@ -153,7 +153,7 @@ namespace Voxalia.ServerGame.WorldSystem
                     tpfet.Nodes = nodes;
                     tpfet.ID = node;
                     open.Enqueue(ref tpfet, nodes.Nodes[node].F);
-                    openset.Add(nodes.Nodes[node].Internal);
+                    openset[nodes.Nodes[node].Internal] = nodes.Nodes[node];
                 }
             }
             open.Clear();
