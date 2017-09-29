@@ -35,7 +35,7 @@ namespace Voxalia.ServerGame.EntitySystem
             Original = orig;
             Shape = BlockShapeRegistry.BSD[0].GetShape(BlockDamage.NONE, out Location offset, false);
             SetPosition(pos.GetBlockLocation() + offset);
-            SetOrientation(Quaternion.Identity);
+            SetOrientation(BEPUutilities.Quaternion.Identity);
             DamageableEntityProperty dep = Damageable();
             dep.SetMaxHealth(5);
             dep.SetHealth(5);

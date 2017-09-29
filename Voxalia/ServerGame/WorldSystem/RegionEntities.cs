@@ -406,8 +406,8 @@ namespace Voxalia.ServerGame.WorldSystem
             me.SetPosition(h ? new Location(rcr.HitData.Location) : pos);*/
             Vector3 treealign = new Vector3(0, 0, 1);
             Vector3 norm = /*h ? rcr.HitData.Normal : */new Vector3(0, 0, 1);
-            Quaternion.GetQuaternionBetweenNormalizedVectors(ref treealign, ref norm, out Quaternion orient);
-            orient *= Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)(Utilities.UtilRandom.NextDouble() * Math.PI * 2));
+            BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref treealign, ref norm, out BEPUutilities.Quaternion orient);
+            orient *= BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)(Utilities.UtilRandom.NextDouble() * Math.PI * 2));
             me.SetOrientation(orient);
             me.SetPosition(pos);
             me.CanLOD = true;
@@ -415,7 +415,7 @@ namespace Voxalia.ServerGame.WorldSystem
             Action res = () =>
             {
                 SpawnEntity(me);
-                me.SetPosition(pos - new Location(norm) - new Location(Quaternion.Transform(me.offset.ToBVector(), orient)));
+                me.SetPosition(pos - new Location(norm) - new Location(BEPUutilities.Quaternion.Transform(me.offset.ToBVector(), orient)));
                 me.ForceNetwork();
             };
             if (chunk == null)

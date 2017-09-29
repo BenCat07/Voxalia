@@ -103,8 +103,8 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     Matrix lookatlh = Utilities.LookAtLH(Location.Zero, vel, Location.UnitZ);
                     lookatlh.Transpose();
-                    Angles = Quaternion.CreateFromRotationMatrix(lookatlh);
-                    Angles *= Quaternion.CreateFromAxisAngle(Vector3.UnitX, 90f * (double)Utilities.PI180);
+                    Angles = BEPUutilities.Quaternion.CreateFromRotationMatrix(lookatlh);
+                    Angles *= BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, 90f * (double)Utilities.PI180);
                 }
             }
         }

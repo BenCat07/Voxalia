@@ -99,7 +99,7 @@ namespace Voxalia.ServerGame.EntitySystem
                     return; // Don't fly when there's nobody driving this!
                 }
                 // Collect the helicopter's relative "up" vector
-                Vector3 up = Quaternion.Transform(Vector3.UnitZ, Entity.Orientation);
+                Vector3 up = BEPUutilities.Quaternion.Transform(Vector3.UnitZ, Entity.Orientation);
                 // Apply the amount of force necessary to counteract downward force, within a limit.
                 // POTENTIAL: Adjust according to orientation?
                 double uspeed = Math.Min(Helicopter.LiftStrength, -(Entity.LinearVelocity.Z + Entity.Space.ForceUpdater.Gravity.Z) * Entity.Mass);
@@ -118,8 +118,8 @@ namespace Voxalia.ServerGame.EntitySystem
                 Vector3 VecUp = new Vector3(Helicopter.RightLeft * 0.2f * Helicopter.TiltMod, Helicopter.ForwBack * -0.2f * Helicopter.TiltMod, 1);
                 // TODO: Simplify yawrel calculation.
                 double tyaw = (double)(Utilities.MatrixToAngles(Matrix.CreateFromQuaternion(Entity.Orientation)).Z * Utilities.PI180);
-                Quaternion yawrel = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, tyaw);
-                VecUp = Quaternion.Transform(VecUp, yawrel);
+                BEPUutilities.Quaternion yawrel = BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, tyaw);
+                VecUp = BEPUutilities.Quaternion.Transform(VecUp, yawrel);
                 VecUp.Y = -VecUp.Y;
                 VecUp.Normalize();
                 Vector3 axis = Vector3.Cross(VecUp, up);

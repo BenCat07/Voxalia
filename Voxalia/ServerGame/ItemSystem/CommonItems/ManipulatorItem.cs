@@ -117,8 +117,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             if (player.Flags.HasFlag(YourStatusFlags.NO_ROTATE))
             {
                 // TODO: Better method for easy rotation
-                Quaternion quat = Quaternion.CreateFromAxisAngle(Vector3.UnitX, (double)player.AttemptedDirectionChange.Pitch * 0.1f)
-                    * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)player.AttemptedDirectionChange.Yaw * 0.1f);
+                BEPUutilities.Quaternion quat = BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, (double)player.AttemptedDirectionChange.Pitch * 0.1f)
+                    * BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)player.AttemptedDirectionChange.Yaw * 0.1f);
                 player.Manipulator_Grabbed.SetOrientation(player.Manipulator_Grabbed.GetOrientation() * quat);
                 player.Manipulator_Grabbed.SetAngularVelocity(Location.Zero);
                 player.AttemptedDirectionChange = Location.Zero;

@@ -33,7 +33,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             Location pos = Location.FromDoubleBytes(data, 4);
             Location vel = Location.FromDoubleBytes(data, 4 + 24);
             Location avel = Location.FromDoubleBytes(data, 4 + 24 + 24);
-            Quaternion quat = Utilities.BytesToQuaternion(data, 4 + 24 + 24 + 24);
+            BEPUutilities.Quaternion quat = Utilities.BytesToQuaternion(data, 4 + 24 + 24 + 24);
             double gtt = Utilities.BytesToDouble(Utilities.BytesPartial(data, 4 + 24 + 24 + 24 + 16, 8));
             Location prel = Location.FromDoubleBytes(data, 4 + 24 + 24 + 24 + 16 + 8);
             TheClient.Player.VehiclePacketFromServer(tid, pos, vel, avel, quat, gtt, prel);

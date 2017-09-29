@@ -26,7 +26,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             }
             Location pos = Location.FromDoubleBytes(data, 0);
             Location vel = Location.FromDoubleBytes(data, 24);
-            Quaternion ang = Utilities.BytesToQuaternion(data, 24 + 24);
+            BEPUutilities.Quaternion ang = Utilities.BytesToQuaternion(data, 24 + 24);
             Location angvel = Location.FromDoubleBytes(data, 24 + 24 + 16);
             bool active = (data[24 + 24 + 16 + 24] & 1) == 1;
             long eID = Utilities.BytesToLong(Utilities.BytesPartial(data, 24 + 24 + 16 + 24 + 1, 8));
@@ -45,7 +45,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
                     double rel = TheClient.CVars.n_ourvehiclelerp.ValueD;
                     e.SetPosition(e.GetPosition() + (pos - e.GetPosition()) * rel * TheClient.Delta);
                     e.SetVelocity(e.GetVelocity() + (vel - e.GetVelocity()) * rel * TheClient.Delta);
-                    e.SetOrientation(Quaternion.Slerp(e.GetOrientation(), ang, rel * TheClient.Delta));
+                    e.SetOrientation(BEPUutilities.Quaternion.Slerp(e.GetOrientation(), ang, rel * TheClient.Delta));
                     e.SetAngularVelocity(e.GetAngularVelocity() + (angvel - e.GetAngularVelocity()) * rel * TheClient.Delta);
                 }
                 if (e.Body != null && e.Body.ActivityInformation != null && e.Body.ActivityInformation.IsActive && !active) // TODO: Why are the first two checks needed?

@@ -173,8 +173,8 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
             Vector3 tvec = vel.ToBVector();
             for (int i = 0; i < c; i++)
             {
-                Quaternion quat = Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)(Utilities.UtilRandom.NextDouble() * (Math.PI / 2.0)));
-                Location nvel = new Location(Quaternion.Transform(tvec, quat));
+                BEPUutilities.Quaternion quat = BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)(Utilities.UtilRandom.NextDouble() * (Math.PI / 2.0)));
+                Location nvel = new Location(BEPUutilities.Quaternion.Transform(tvec, quat));
                 nvel.Z += 3;
                 double xoff = Utilities.UtilRandom.NextDouble() * spread - spread * 0.5;
                 double yoff = Utilities.UtilRandom.NextDouble() * spread - spread * 0.5;

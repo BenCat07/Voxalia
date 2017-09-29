@@ -111,8 +111,8 @@ namespace Voxalia.ServerGame.EntitySystem
             base.Tick();
             Body.ActivityInformation.Activate();
             CursorMarker.SetPosition(ItemSource() + ItemDir * 0.9f);
-            CursorMarker.SetOrientation(Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), (double)(Direction.Pitch * Utilities.PI180)) *
-                Quaternion.CreateFromAxisAngle(new Vector3(0, 0, 1), (double)(Direction.Yaw * Utilities.PI180)));
+            CursorMarker.SetOrientation(BEPUutilities.Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), (double)(Direction.Pitch * Utilities.PI180)) *
+                BEPUutilities.Quaternion.CreateFromAxisAngle(new Vector3(0, 0, 1), (double)(Direction.Yaw * Utilities.PI180)));
         }
 
         public double LastClick = 0;
@@ -145,9 +145,9 @@ namespace Voxalia.ServerGame.EntitySystem
             {
                 SingleAnimationNode head = tAnim.GetNode("special06.r");
                 Dictionary<string, Matrix> adjs = new Dictionary<string, Matrix>();
-                Matrix rotforw = Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitX, -(double)(Direction.Pitch / 1.75f * Utilities.PI180)));
+                Matrix rotforw = Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, -(double)(Direction.Pitch / 1.75f * Utilities.PI180)));
                 adjs["spine05"] = rotforw;
-                Matrix m4 = Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)((-Direction.Yaw + 270) * Utilities.PI180) % 360f))
+                Matrix m4 = Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)((-Direction.Yaw + 270) * Utilities.PI180) % 360f))
                     * head.GetBoneTotalMatrix(0, adjs) * (rotforw * Matrix.CreateTranslation(new Vector3(0, 0, 0.2f)));
                 m4.Transpose();
                 return GetPosition() + new Location(m4.Translation) * 1.5f;

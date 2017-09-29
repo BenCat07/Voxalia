@@ -34,7 +34,7 @@ namespace Voxalia.ClientGame.JointSystem
             Matrix worldTrans = Matrix.CreateFromQuaternion(One.GetOrientation()) * Matrix.CreateTranslation(One.GetPosition().ToBVector());
             Matrix tmat = Relative * worldTrans;
             Location pos = new Location(tmat.Translation);
-            Quaternion quat = Quaternion.CreateFromRotationMatrix(tmat);
+            BEPUutilities.Quaternion quat = BEPUutilities.Quaternion.CreateFromRotationMatrix(tmat);
             Two.SetPosition(pos);
             Two.SetOrientation(quat);
         }

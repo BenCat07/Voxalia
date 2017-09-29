@@ -85,8 +85,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 return;
             }
             double drawRate = DrawRate;
-            TemplateObject dw2;
-            if (item.SharedAttributes.TryGetValue("drawrate", out dw2))
+            if (item.SharedAttributes.TryGetValue("drawrate", out TemplateObject dw2))
             {
                 NumberTag nt = NumberTag.TryFor(dw2);
                 if (nt != null)
@@ -95,8 +94,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 }
             }
             double drawMin = DrawMinimum;
-            TemplateObject dm2;
-            if (item.SharedAttributes.TryGetValue("drawmin", out dm2))
+            if (item.SharedAttributes.TryGetValue("drawmin", out TemplateObject dm2))
             {
                 NumberTag nt = NumberTag.TryFor(dm2);
                 if (nt != null)
@@ -122,8 +120,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             ae.SetVelocity(forward * timeStretched * 20 * FireStrength);
             Matrix lookatlh = Utilities.LookAtLH(Location.Zero, forward, Location.UnitZ);
             lookatlh.Transpose();
-            ae.Angles = Quaternion.CreateFromRotationMatrix(lookatlh);
-            ae.Angles *= Quaternion.CreateFromAxisAngle(Vector3.UnitX, 90f * (double)Utilities.PI180);
+            ae.Angles = BEPUutilities.Quaternion.CreateFromRotationMatrix(lookatlh);
+            ae.Angles *= BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, 90f * (double)Utilities.PI180);
             player.TheRegion.SpawnEntity(ae);
             return ae;
         }

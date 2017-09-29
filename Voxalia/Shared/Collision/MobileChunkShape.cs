@@ -100,7 +100,7 @@ namespace Voxalia.Shared.Collision
                                 Vector3 adj = new Vector3(x + (double)offs.X, y + (double)offs.Y, z + (double)offs.Z);
                                 EntityCollidable coll = es.GetCollidableInstance();
                                 //coll.LocalPosition = adj;
-                                RigidTransform rt = new RigidTransform(Vector3.Zero, Quaternion.Identity);
+                                RigidTransform rt = new RigidTransform(Vector3.Zero, BEPUutilities.Quaternion.Identity);
                                 coll.LocalPosition = Vector3.Zero;
                                 coll.WorldTransform = rt;
                                 coll.UpdateBoundingBoxForTransform(ref rt);
@@ -133,7 +133,7 @@ namespace Voxalia.Shared.Collision
         public bool RayCast(ref Ray ray, double maximumLength, MaterialSolidity solidness, out RayHit hit)
         {
             // TODO: Original special ray code!
-            RigidTransform rt = new RigidTransform(ray.Position, Quaternion.Identity);
+            RigidTransform rt = new RigidTransform(ray.Position, BEPUutilities.Quaternion.Identity);
             Vector3 sweep = ray.Direction;
             return ConvexCast(RayCastShape, ref rt, ref sweep, maximumLength, solidness, out hit);
         }

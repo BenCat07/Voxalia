@@ -220,8 +220,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ThePlanet.Reposition(corPos - ThePlanet.Direction * 30 * 6);
                     Vector3 tsd = TheSun.Direction.ToBVector();
                     Vector3 tpd = PlanetDir.ToBVector();
-                    Quaternion.GetQuaternionBetweenNormalizedVectors(ref tsd, ref tpd, out Quaternion diff);
-                    PlanetSunDist = (float)Quaternion.GetAngleFromQuaternion(ref diff) / (float)Utilities.PI180;
+                    BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref tsd, ref tpd, out BEPUutilities.Quaternion diff);
+                    PlanetSunDist = (float)BEPUutilities.Quaternion.GetAngleFromQuaternion(ref diff) / (float)Utilities.PI180;
                     if (PlanetSunDist < 75)
                     {
                         TheSun.InternalLights[0].color = new OpenTK.Vector3((float)Math.Min(SunLightDef.X * (PlanetSunDist / 15), 1),

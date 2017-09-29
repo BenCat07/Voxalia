@@ -32,7 +32,7 @@ namespace Voxalia.ClientGame.EntitySystem
     {
         public YourStatusFlags ServerFlags = YourStatusFlags.NONE;
 
-        public static readonly Quaternion PreFlyOrient = Quaternion.CreateFromAxisAngle(Vector3.UnitX, Math.PI * 0.5);
+        public static readonly BEPUutilities.Quaternion PreFlyOrient = BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, Math.PI * 0.5);
 
         public void Fly()
         {
@@ -128,7 +128,7 @@ namespace Voxalia.ClientGame.EntitySystem
         {
             public Location Pos, Vel, AVel;
 
-            public Quaternion Quat;
+            public BEPUutilities.Quaternion Quat;
 
             public double Time;
         }
@@ -139,7 +139,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         const double VEH_MINIMUM = 5.0;
 
-        public void VehiclePacketFromServer(int ID, Location pos, Location vel, Location avel, Quaternion quat, double gtt, Location prel)
+        public void VehiclePacketFromServer(int ID, Location pos, Location vel, Location avel, BEPUutilities.Quaternion quat, double gtt, Location prel)
         {
             if (VehicleMarks[ID].Time > 0)
             {
@@ -160,7 +160,7 @@ namespace Voxalia.ClientGame.EntitySystem
                 //ve.SetPosition(ve.GetPosition() + off_pos * off_gtt);
                 //ve.SetVelocity(ve.GetVelocity() + off_vel * off_gtt);
                 ve.ServerKnownLocation = pos;
-                ve.MoveToOffsetWithJoints(off_pos * off_gtt, off_vel * off_gtt, Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));
+                ve.MoveToOffsetWithJoints(off_pos * off_gtt, off_vel * off_gtt, BEPUutilities.Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));
                 ve.SetAngularVelocity(ve.GetAngularVelocity() + off_avel * off_gtt);
                 //ve.SetOrientation(Quaternion.Slerp(ve.GetOrientation(), quat, off_gtt));
                 //SetPosition(ve.GetPosition() + prel);
@@ -491,8 +491,8 @@ namespace Voxalia.ClientGame.EntitySystem
             if (TheClient.VR != null)
             {
                 OpenTK.Quaternion oquat = TheClient.VR.HeadMatRot.ExtractRotation(true);
-                Quaternion quat = new Quaternion(oquat.X, oquat.Y, oquat.Z, oquat.W);
-                Vector3 face = -Quaternion.Transform(Vector3.UnitZ, quat);
+                BEPUutilities.Quaternion quat = new BEPUutilities.Quaternion(oquat.X, oquat.Y, oquat.Z, oquat.W);
+                Vector3 face = -BEPUutilities.Quaternion.Transform(Vector3.UnitZ, quat);
                 Direction = Utilities.VectorToAngles(new Location(face));
                 Direction.Yaw += 180;
                 //OpenTK.Vector3 headSpot = TheClient.VR.BasicHeadMat.ExtractTranslation();
@@ -724,7 +724,7 @@ namespace Voxalia.ClientGame.EntitySystem
             return InVehicle && Vehicle != null && Vehicle is ModelEntity && (Vehicle as ModelEntity).Plane != null;
         }
 
-        public Quaternion GetRelativeQuaternion()
+        public BEPUutilities.Quaternion GetRelativeQuaternion()
         {
             if (InPlane() && TheClient.CVars.g_firstperson.ValueB)
             {
@@ -735,10 +735,10 @@ namespace Voxalia.ClientGame.EntitySystem
                 Vector3 up = Vector3.UnitZ;
                 Vector3 antigrav = -Body.Gravity.Value;
                 antigrav.Normalize();
-                Quaternion.GetQuaternionBetweenNormalizedVectors(ref antigrav, ref up, out Quaternion q);
+                BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref antigrav, ref up, out BEPUutilities.Quaternion q);
                 return q;
             }
-            return Quaternion.Identity;
+            return BEPUutilities.Quaternion.Identity;
         }
 
         public float Health;
@@ -838,13 +838,13 @@ namespace Voxalia.ClientGame.EntitySystem
                 TheClient.MainWorldView.SetMatrix(2, mat);
                 Dictionary<string, Matrix> adjs = new Dictionary<string, Matrix>(SavedAdjustments);
                 // TODO: Logic of this rotation math?
-                Matrix rotforw = Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitX, ((float)(Direction.Pitch / 2f * Utilities.PI180) % 360f)));
+                Matrix rotforw = Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, ((float)(Direction.Pitch / 2f * Utilities.PI180) % 360f)));
                 adjs["spine04"] = GetAdjustment("spine04") * rotforw;
                 SingleAnimationNode hand = tAnim.GetNode("metacarpal2.r");
                 Matrix m4 = Matrix.CreateScale(1.5f, 1.5f, 1.5f)
-                    * (Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)((-Direction.Yaw + 90) * Utilities.PI180) % 360f))
+                    * (Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)((-Direction.Yaw + 90) * Utilities.PI180) % 360f))
                     * hand.GetBoneTotalMatrix(aTTime, adjs))
-                    * Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)((-90) * Utilities.PI180) % 360f));
+                    * Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)((-90) * Utilities.PI180) % 360f));
                 OpenTK.Matrix4 bonemat = new OpenTK.Matrix4((float)m4.M11, (float)m4.M12, (float)m4.M13, (float)m4.M14,
                     (float)m4.M21, (float)m4.M22, (float)m4.M23, (float)m4.M24,
                     (float)m4.M31, (float)m4.M32, (float)m4.M33, (float)m4.M34,
@@ -863,13 +863,13 @@ namespace Voxalia.ClientGame.EntitySystem
                 mat = OpenTK.Matrix4d.CreateTranslation(ClientUtilities.ConvertD(renderrelpos));
                 TheClient.MainWorldView.SetMatrix(2, mat);
                 Dictionary<string, Matrix> adjs = new Dictionary<string, Matrix>();
-                Matrix rotforw = Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitX, ((float)(Direction.Pitch / 2f * Utilities.PI180) % 360f)));
+                Matrix rotforw = Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, ((float)(Direction.Pitch / 2f * Utilities.PI180) % 360f)));
                 adjs["spine04"] = GetAdjustment("spine04") * rotforw;
                 SingleAnimationNode spine = tAnim.GetNode("spine04");
                 Matrix m4 = Matrix.CreateScale(1.5f, 1.5f, 1.5f)
-                    * (Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)((-Direction.Yaw + 90) * Utilities.PI180) % 360f))
+                    * (Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)((-Direction.Yaw + 90) * Utilities.PI180) % 360f))
                     * spine.GetBoneTotalMatrix(aTTime, adjs))
-                     * Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitX, (float)((90) * Utilities.PI180) % 360f));
+                     * Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, (float)((90) * Utilities.PI180) % 360f));
                 OpenTK.Matrix4 bonemat = new OpenTK.Matrix4((float)m4.M11, (float)m4.M12, (float)m4.M13, (float)m4.M14, (float)m4.M21, (float)m4.M22, (float)m4.M23, (float)m4.M24,
                     (float)m4.M31, (float)m4.M32, (float)m4.M33, (float)m4.M34, (float)m4.M41, (float)m4.M42, (float)m4.M43, (float)m4.M44);
                 GL.UniformMatrix4(100, false, ref bonemat);

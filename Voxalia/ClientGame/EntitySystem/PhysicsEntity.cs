@@ -98,7 +98,7 @@ namespace Voxalia.ClientGame.EntitySystem
 
         private HashSet<long> relative_fixed = new HashSet<long>();
 
-        public void MoveToOffsetWithJoints(Location pos, Location vel, Quaternion new_orient)
+        public void MoveToOffsetWithJoints(Location pos, Location vel, BEPUutilities.Quaternion new_orient)
         {
             relative_fixed.Add(EID);
             SetPosition(GetPosition() + pos);
@@ -458,20 +458,20 @@ namespace Voxalia.ClientGame.EntitySystem
         /// <summary>
         /// Returns the orientation of an entity.
         /// </summary>
-        public override Quaternion GetOrientation()
+        public override BEPUutilities.Quaternion GetOrientation()
         {
             if (Body != null)
             {
                 return Body.Orientation;
             }
-            return Quaternion.CreateFromRotationMatrix(WorldTransform);
+            return BEPUutilities.Quaternion.CreateFromRotationMatrix(WorldTransform);
         }
 
         /// <summary>
         /// Sets the direction of the entity.
         /// </summary>
         /// <param name="rot">The new angles.</param>
-        public override void SetOrientation(Quaternion rot)
+        public override void SetOrientation(BEPUutilities.Quaternion rot)
         {
             if (Body != null)
             {

@@ -120,9 +120,9 @@ namespace Voxalia.ServerGame.EntitySystem
                 }
                 // TODO: Special case for motion on land: only push forward if FORWARD key is pressed? Or maybe apply that rule in general?
                 // Collect the plane's relative vectors
-                Vector3 forward = Quaternion.Transform(Vector3.UnitY, Entity.Orientation);
-                Vector3 side = Quaternion.Transform(Vector3.UnitX, Entity.Orientation);
-                Vector3 up = Quaternion.Transform(Vector3.UnitZ, Entity.Orientation);
+                Vector3 forward = BEPUutilities.Quaternion.Transform(Vector3.UnitY, Entity.Orientation);
+                Vector3 side = BEPUutilities.Quaternion.Transform(Vector3.UnitX, Entity.Orientation);
+                Vector3 up = BEPUutilities.Quaternion.Transform(Vector3.UnitZ, Entity.Orientation);
                 // Engines!
                 if (Plane.FastOrSlow >= 0.0)
                 {
@@ -136,7 +136,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 double rot_x = -Plane.ForwBack * Plane.StrPitch * Delta * dotforw * mval;
                 double rot_y = Plane.RightLeft * dotforw * Plane.StrRoll * Delta * mval;
                 double rot_z = -((Plane.IRight ? 1 : 0) + (Plane.ILeft ? -1 : 0)) * dotforw * Plane.StrYaw * Delta * mval;
-                entity.AngularVelocity +=  Quaternion.Transform(new Vector3(rot_x, rot_y, rot_z), entity.Orientation);
+                entity.AngularVelocity += BEPUutilities.Quaternion.Transform(new Vector3(rot_x, rot_y, rot_z), entity.Orientation);
                 double vellen = entity.LinearVelocity.Length();
                 Vector3 newVel = forward * vellen;
                 double forwVel = Vector3.Dot(entity.LinearVelocity, forward);

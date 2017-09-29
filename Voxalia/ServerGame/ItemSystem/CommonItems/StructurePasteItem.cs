@@ -95,7 +95,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 bge.Angle = 0;
                 bge.rotOffs = Location.Zero;
             }
-            bge.SetOrientation(Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)bge.Angle * (double)Utilities.PI180));
+            bge.SetOrientation(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)bge.Angle * (double)Utilities.PI180));
         }
 
         public override void Tick(Entity entity, ItemStack item)
@@ -129,8 +129,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
                 Location eye = player.ItemSource();
                 Location forw = player.ItemDir;
                 player.Pasting.SetPosition((eye + forw * player.PastingDist).GetBlockLocation() - player.Pasting.Origin - player.Pasting.shapeOffs);
-                RayCastResult rcr;
-                bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, player.PastingDist, MaterialSolidity.ANY, player.IgnoreThis, out rcr);
+                bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, player.PastingDist, MaterialSolidity.ANY, player.IgnoreThis, out RayCastResult rcr);
                 if (h)
                 {
                     if (rcr.HitObject != null && rcr.HitObject is EntityCollidable && ((EntityCollidable)rcr.HitObject).Entity != null)
@@ -165,8 +164,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
            // TODO: Generic 'player.gettargetblock'?
             Location eye = player.ItemSource();
             Location forw = player.ItemDir;
-            RayCastResult rcr;
-            bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, player.PastingDist, MaterialSolidity.ANY, player.IgnoreThis, out rcr);
+            bool h = player.TheRegion.SpecialCaseRayTrace(eye, forw, player.PastingDist, MaterialSolidity.ANY, player.IgnoreThis, out RayCastResult rcr);
             Location pasteloc = (eye + forw * player.PastingDist + player.Pasting.rotOffs).GetBlockLocation();
             if (h)
             {

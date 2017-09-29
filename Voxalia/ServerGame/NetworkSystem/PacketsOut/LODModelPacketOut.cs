@@ -28,7 +28,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
             me.GetPosition().ToDoubleBytes().CopyTo(Data, 0);
             int ind = me.TheServer.Networking.Strings.IndexForString(me.model);
             Utilities.IntToBytes(ind).CopyTo(Data, 24);
-            Quaternion quat = me.GetOrientation();
+            BEPUutilities.Quaternion quat = me.GetOrientation();
             Utilities.FloatToBytes((float)quat.X).CopyTo(Data, 24 + 4);
             Utilities.FloatToBytes((float)quat.Y).CopyTo(Data, 24 + 4 + 4);
             Utilities.FloatToBytes((float)quat.Z).CopyTo(Data, 24 + 4 + 4 + 4);

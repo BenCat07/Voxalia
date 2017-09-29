@@ -616,20 +616,20 @@ namespace Voxalia.ServerGame.EntitySystem
         /// <summary>
         /// Returns the orientation of an entity.
         /// </summary>
-        public override Quaternion GetOrientation()
+        public override BEPUutilities.Quaternion GetOrientation()
         {
             if (Body != null)
             {
                 return Body.Orientation;
             }
-            return Quaternion.CreateFromRotationMatrix(WorldTransform);
+            return BEPUutilities.Quaternion.CreateFromRotationMatrix(WorldTransform);
         }
 
         /// <summary>
         /// Sets the direction of the entity.
         /// </summary>
         /// <param name="rot">The new angles.</param>
-        public override void SetOrientation(Quaternion rot)
+        public override void SetOrientation(BEPUutilities.Quaternion rot)
         {
             if (Body != null)
             {
@@ -720,7 +720,7 @@ namespace Voxalia.ServerGame.EntitySystem
             doc["ph_vel"] = GetVelocity().ToDoubleBytes();
             doc["ph_avel"] = GetAngularVelocity().ToDoubleBytes();
             // TODO: Quat-to-bytes system!
-            Quaternion quat = GetOrientation();
+            BEPUutilities.Quaternion quat = GetOrientation();
             doc["ph_ang_x"] = (double)quat.X;
             doc["ph_ang_y"] = (double)quat.Y;
             doc["ph_ang_z"] = (double)quat.Z;
@@ -777,7 +777,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 double ay = (double)doc["ph_ang_y"].AsDouble;
                 double az = (double)doc["ph_ang_z"].AsDouble;
                 double aw = (double)doc["ph_ang_w"].AsDouble;
-                SetOrientation(new Quaternion(ax, ay, az, aw));
+                SetOrientation(new BEPUutilities.Quaternion(ax, ay, az, aw));
             }
             if (doc.ContainsKey("ph_grav"))
             {

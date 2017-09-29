@@ -343,9 +343,9 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 SingleAnimationNode head = tAnim.GetNode("special06.r");
                 Dictionary<string, Matrix> adjs = new Dictionary<string, Matrix>(SavedAdjustments);
-                Matrix rotforw = Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitX, -(float)(Direction.Pitch / 1.75f * Utilities.PI180)));
+                Matrix rotforw = Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, -(float)(Direction.Pitch / 1.75f * Utilities.PI180)));
                 adjs["spine04"] = GetAdjustment("spine04") * rotforw;
-                Matrix m4 = Matrix.CreateFromQuaternion(Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)((-Direction.Yaw + 270) * Utilities.PI180) % 360f))
+                Matrix m4 = Matrix.CreateFromQuaternion(BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (float)((-Direction.Yaw + 270) * Utilities.PI180) % 360f))
                     * head.GetBoneTotalMatrix(0, adjs) * (rotforw * Matrix.CreateTranslation(new Vector3(0, 0, 0.2f)));
                 m4.Transpose();
                 return renderrelpos + new Location(m4.Translation) * 1.5f;

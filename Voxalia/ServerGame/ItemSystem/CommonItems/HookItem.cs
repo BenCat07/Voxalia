@@ -55,8 +55,8 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             Location step = (player.GetCenter() - Position) / len;
             Location forw = Utilities.VectorToAngles(step);
             forw.Yaw += 180;
-            BEPUutilities.Quaternion quat = Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), (double)(forw.Pitch * Utilities.PI180)) *
-                Quaternion.CreateFromAxisAngle(new Vector3(0, 0, 1), (double)(forw.Yaw * Utilities.PI180));
+            BEPUutilities.Quaternion quat = BEPUutilities.Quaternion.CreateFromAxisAngle(new Vector3(1, 0, 0), (double)(forw.Pitch * Utilities.PI180)) *
+                BEPUutilities.Quaternion.CreateFromAxisAngle(new Vector3(0, 0, 1), (double)(forw.Yaw * Utilities.PI180));
             if (HitEnt == null)
             {
                 ModelEntity mod = new ModelEntity("cube", player.TheRegion)

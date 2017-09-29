@@ -118,7 +118,7 @@ namespace Voxalia.ServerGame.EntitySystem
             DataStream ds = new DataStream();
             DataWriter dr = new DataWriter(ds);
             dr.WriteBytes(GetPosition().ToDoubleBytes());
-            Quaternion quat = GetOrientation();
+            BEPUutilities.Quaternion quat = GetOrientation();
             dr.WriteFloat((float)quat.X);
             dr.WriteFloat((float)quat.Y);
             dr.WriteFloat((float)quat.Z);
@@ -541,7 +541,7 @@ namespace Voxalia.ServerGame.EntitySystem
         public bool IsFlying = false;
         public double PreFlyMass = 0;
 
-        public static readonly Quaternion PreFlyOrient = Quaternion.CreateFromAxisAngle(Vector3.UnitX, Math.PI * 0.5);
+        public static readonly BEPUutilities.Quaternion PreFlyOrient = BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitX, Math.PI * 0.5);
 
         public virtual void Fly()
         {
@@ -606,13 +606,13 @@ namespace Voxalia.ServerGame.EntitySystem
             return base.GetPosition();
         }
 
-        public override Quaternion GetOrientation()
+        public override BEPUutilities.Quaternion GetOrientation()
         {
-            return Quaternion.CreateFromAxisAngle(Vector3.UnitY, (double)Direction.Pitch)
-                * Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)Direction.Yaw);
+            return BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitY, (double)Direction.Pitch)
+                * BEPUutilities.Quaternion.CreateFromAxisAngle(Vector3.UnitZ, (double)Direction.Yaw);
         }
 
-        public override void SetOrientation(Quaternion rot)
+        public override void SetOrientation(BEPUutilities.Quaternion rot)
         {
             Matrix trot = Matrix.CreateFromQuaternion(rot);
             Location ang = Utilities.MatrixToAngles(trot);

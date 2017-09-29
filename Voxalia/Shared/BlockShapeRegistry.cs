@@ -300,7 +300,7 @@ namespace Voxalia.Shared
             Coll = es.GetCollidableInstance();
             Coll.LocalPosition = offset.ToBVector();
             Vector3 zero = Vector3.Zero;
-            Quaternion ident = Quaternion.Identity;
+            BEPUutilities.Quaternion ident = BEPUutilities.Quaternion.Identity;
             Coll.UpdateWorldTransform(ref zero, ref ident);
             RigidTransform rt = new RigidTransform(zero, ident);
             Coll.UpdateBoundingBoxForTransform(ref rt);

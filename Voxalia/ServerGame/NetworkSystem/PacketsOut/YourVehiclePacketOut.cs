@@ -16,7 +16,7 @@ namespace Voxalia.ServerGame.NetworkSystem.PacketsOut
 {
     public class YourVehiclePacketOut: AbstractPacketOut
     {
-        public YourVehiclePacketOut(double delta, int tID, Location pos, Location vel, Location avel, Quaternion quat, Location prel)
+        public YourVehiclePacketOut(double delta, int tID, Location pos, Location vel, Location avel, BEPUutilities.Quaternion quat, Location prel)
         {
             UsageType = NetUsageType.ENTITIES;
             ID = ServerToClientPacket.YOUR_VEHICLE;

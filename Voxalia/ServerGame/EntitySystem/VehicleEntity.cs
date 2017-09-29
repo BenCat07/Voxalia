@@ -263,7 +263,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 {
                     return;
                 }
-                SetOrientation(Quaternion.Identity); // TODO: Track and reset orientation maybe?
+                SetOrientation(BEPUutilities.Quaternion.Identity); // TODO: Track and reset orientation maybe?
                 List<Model3DNode> nodes = GetNodes(scene.RootNode);
                 List<VehiclePartEntity> frontwheels = new List<VehiclePartEntity>();
                 Location centerOfMass = Location.Zero;
@@ -326,7 +326,7 @@ namespace Voxalia.ServerGame.EntitySystem
                         Location pos = GetPosition() + new Location(Body.CollisionInformation.LocalPosition) + new Location(mat.M41, -mat.M43, mat.M42) + offset; // TODO: matrix gone funky?
                         VehiclePartEntity wheel = new VehiclePartEntity(TheRegion, (name.After("wheel").Contains("f") ? wheelsModFront : wheelsModBack), true);
                         wheel.SetPosition(pos);
-                        wheel.SetOrientation(Quaternion.Identity);
+                        wheel.SetOrientation(BEPUutilities.Quaternion.Identity);
                         wheel.Gravity = Gravity;
                         wheel.CGroup = CGroup;
                         wheel.SetMass(30); // TODO: Arbitrary constant
@@ -334,7 +334,7 @@ namespace Voxalia.ServerGame.EntitySystem
                         TheRegion.SpawnEntity(wheel);
                         wheel.ForceNetwork();
                         wheel.SetPosition(pos);
-                        wheel.SetOrientation(Quaternion.Identity);
+                        wheel.SetOrientation(BEPUutilities.Quaternion.Identity);
                         if (name.After("wheel").Contains("f"))
                         {
                             SteeringMotors.Add(ConnectWheel(wheel, false, true, wheelsSuspFront));
@@ -366,7 +366,7 @@ namespace Voxalia.ServerGame.EntitySystem
                         FDSSection flapDat = SourceFile.GetSection("vehicle.flaps").GetSection(name.After("flap").Replace("_", ""));
                         VehiclePartEntity flap = new VehiclePartEntity(TheRegion, flapDat.GetString("model"), true);
                         flap.SetPosition(pos);
-                        flap.SetOrientation(Quaternion.Identity);
+                        flap.SetOrientation(BEPUutilities.Quaternion.Identity);
                         flap.Gravity = Gravity;
                         flap.CGroup = CGroup;
                         flap.SetMass(20);
@@ -374,7 +374,7 @@ namespace Voxalia.ServerGame.EntitySystem
                         TheRegion.SpawnEntity(flap);
                         flap.ForceNetwork();
                         flap.SetPosition(pos);
-                        flap.SetOrientation(Quaternion.Identity);
+                        flap.SetOrientation(BEPUutilities.Quaternion.Identity);
                         ConnectFlap(flap, flapDat);
                     }
                 }
@@ -458,8 +458,8 @@ namespace Voxalia.ServerGame.EntitySystem
         {
             TheRegion.AddJoint(new ConstWheelStepUp(wheel, wheel.StepHeight));
             wheel.SetFriction(2.5f);
-            Vector3 left = Quaternion.Transform(new Vector3(-1, 0, 0), wheel.GetOrientation());
-            Vector3 up = Quaternion.Transform(new Vector3(0, 0, 1), wheel.GetOrientation());
+            Vector3 left = BEPUutilities.Quaternion.Transform(new Vector3(-1, 0, 0), wheel.GetOrientation());
+            Vector3 up = BEPUutilities.Quaternion.Transform(new Vector3(0, 0, 1), wheel.GetOrientation());
             JointSlider pointOnLineJoint = new JointSlider(this, wheel, -new Location(up));
             JointLAxisLimit suspensionLimit = new JointLAxisLimit(this, wheel, 0f, susp, wheel.GetPosition(), wheel.GetPosition(), -new Location(up));
             JointPullPush spring = new JointPullPush(this, wheel, -new Location(up), true);
