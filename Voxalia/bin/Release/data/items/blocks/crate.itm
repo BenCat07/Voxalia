@@ -1,0 +1,10 @@
+type: block
+icon: render_block:self
+display: Crate
+description: Contains things, possibly!
+color: 1,1,1
+model: block
+bound: false
+datum: 45
+weight: 2
+volume: 1

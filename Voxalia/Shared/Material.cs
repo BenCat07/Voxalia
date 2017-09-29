@@ -69,7 +69,8 @@ namespace Voxalia.Shared
         GRASS_SWAMP = 41,
         GRASS_SWAMP_TALL = 42,
         CRACKED_STONE = 43,
-        BIG_BRICKS = 44
+        BIG_BRICKS = 44,
+        CRATE = 45
     }
 
     /// <summary>
