@@ -11,6 +11,8 @@ using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using Voxalia.Shared;
 using FreneticScript;
 using Voxalia.Shared.Collision;
@@ -52,14 +54,65 @@ namespace Voxalia.ServerGame.WorldSystem
         /// Finds a path from the start to the end, if one exists.
         /// Current implementation is A-Star (A*).
         /// Thanks to fullwall for the reference sources this was originally built from.
-        /// Questionably safe for Async usage.
+        /// Possibly safe for Async usage.
+        /// Runs two searches asynchronously from either end, and returns the shorter path (either one failing = both fail immediately!).
         /// </summary>
         /// <param name="startloc">The starting location.</param>
         /// <param name="endloc">The ending location.</param>
         /// <param name="maxRadius">The maximum radius to search through.</param>
         /// <param name="goaldist">The maximum distance from the goal allowed.</param>
         /// <returns>The shortest path, as a list of blocks to travel through.</returns>
-        public List<Location> FindPath(Location startloc, Location endloc, double maxRadius, double goaldist)
+        public List<Location> FindPathAsyncDouble(Location startloc, Location endloc, double maxRadius, double goaldist)
+        {
+            CancellationTokenSource cts = new CancellationTokenSource();
+            List<Location> a = new List<Location>();
+            List<Location> b = new List<Location>();
+            Task one = TheWorld.Schedule.StartAsyncTask(() =>
+            {
+                List<Location> f = FindPath(startloc, endloc, maxRadius, goaldist, cts);
+                if (f != null)
+                {
+                    a.AddRange(f);
+                }
+            }).Created;
+            Task two = TheWorld.Schedule.StartAsyncTask(() =>
+            {
+                List<Location> f = FindPath(endloc, startloc, maxRadius, goaldist, cts);
+                if (f != null)
+                {
+                    b.AddRange(f);
+                }
+            }).Created;
+            one.Wait();
+            two.Wait();
+            if (a.Count > 0 && b.Count > 0)
+            {
+                if (a.Count < b.Count)
+                {
+                    return a;
+                }
+                else
+                {
+                    b.Reverse();
+                    return b;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Finds a path from the start to the end, if one exists.
+        /// Current implementation is A-Star (A*).
+        /// Thanks to fullwall for the reference sources this was originally built from.
+        /// Possibly safe for Async usage.
+        /// </summary>
+        /// <param name="startloc">The starting location.</param>
+        /// <param name="endloc">The ending location.</param>
+        /// <param name="maxRadius">The maximum radius to search through.</param>
+        /// <param name="goaldist">The maximum distance from the goal allowed.</param>
+        /// <param name="cts">A cancellation token, if any.</param>
+        /// <returns>The shortest path, as a list of blocks to travel through.</returns>
+        public List<Location> FindPath(Location startloc, Location endloc, double maxRadius, double goaldist, CancellationTokenSource cts = null)
         {
             // TODO: Improve async safety!
             startloc = startloc.GetBlockLocation() + new Location(0.5, 0.5, 1.0);
@@ -68,6 +121,7 @@ namespace Voxalia.ServerGame.WorldSystem
             double gosq = goaldist * goaldist;
             if (startloc.DistanceSquared(endloc) > mrsq)
             {
+                cts.Cancel();
                 return null;
             }
             PathFindNodeSet nodes;
@@ -106,6 +160,10 @@ namespace Voxalia.ServerGame.WorldSystem
             openset[startloc.ToVec3i()] = nodes.Nodes[start];
             while (open.Count > 0)
             {
+                if (cts.IsCancellationRequested)
+                {
+                    return null;
+                }
                 int nextid = open.Dequeue().ID;
                 PathFindNode next = nodes.Nodes[nextid];
                 if (openset.TryGetValue(next.Internal, out PathFindNode pano) && pano.F < next.F)
@@ -175,6 +233,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 PFQueueSet.Push(open);
                 PFMapSet.Push(map);
             }
+            cts.Cancel();
             return null;
         }
 

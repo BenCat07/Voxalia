@@ -232,7 +232,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                 {
                     Stopwatch sw = new Stopwatch();
                     sw.Start();
-                    List<Location> locs = entry.Player.TheRegion.FindPath(entry.Player.GetPosition(), entry.Player.GetPosition() + new Location(dist, 0, 0), dist * 2, 1.5f);
+                    List<Location> locs = entry.Player.TheRegion.FindPathAsyncDouble(entry.Player.GetPosition(), entry.Player.GetPosition() + new Location(dist, 0, 0), dist * 2, 1.5f);
                     sw.Stop();
                     entry.Player.TheRegion.TheWorld.Schedule.ScheduleSyncTask(() =>
                     {
