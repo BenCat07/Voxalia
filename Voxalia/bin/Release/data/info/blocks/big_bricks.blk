@@ -1,7 +1,7 @@
-Name=Bricks
+Name=Big_Bricks
 SpeedMod=1.2
 Sound=STONE
 Hardness=25
 BreakTime=3
 Breaker=PICKAXE
-TextureBasic=blocks/solid/made/bricks
+TextureBasic=blocks/solid/made/big_bricks

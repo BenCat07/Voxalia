@@ -68,7 +68,8 @@ namespace Voxalia.Shared
         STONE = 40,
         GRASS_SWAMP = 41,
         GRASS_SWAMP_TALL = 42,
-        CRACKED_STONE = 43
+        CRACKED_STONE = 43,
+        BIG_BRICKS = 44
     }
 
     /// <summary>
@@ -76,7 +77,7 @@ namespace Voxalia.Shared
     /// </summary>
     public static class MaterialHelpers
     {
-        public static int DEFAULT_MATERIALS = 44;
+        public static int DEFAULT_MATERIALS = 45;
 
         public static int MAX_MATERIALS = 16384;
 

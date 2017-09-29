@@ -1,0 +1,10 @@
+type: block
+icon: render_block:self
+display: Big Bricks
+description: Big and solid when dry!
+color: 1,1,1
+model: block
+bound: false
+datum: 44
+weight: 3.5
+volume: 1
