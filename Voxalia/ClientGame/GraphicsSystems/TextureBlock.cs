@@ -27,9 +27,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public Client TheClient;
 
         public TextureEngine TEngine;
-
-        public List<AnimatedTexture> Anims;
-
+        
         public int TextureID = -1;
         
         public int NormalTextureID = -1;
@@ -43,29 +41,37 @@ namespace Voxalia.ClientGame.GraphicsSystems
         /// </summary>
         public string[] IntTexs;
 
+        public const int TEX_REQUIRED_BITS = (256 * 256 * 5);
+
+        public int HelpTWMin;
+
+        public List<MaterialTextureInfo> TexList;
+
         public void Generate(Client tclient, ClientCVar cvars, TextureEngine eng, bool delayable)
         {
             TheClient = tclient;
-            if (Anims != null)
-            {
-                for (int i = 0; i < Anims.Count; i++)
-                {
-                    Anims[i].Destroy();
-                }
-            }
             if (TextureID > -1)
             {
                 GL.DeleteTexture(TextureID);
                 GL.DeleteTexture(NormalTextureID);
                 GL.DeleteTexture(HelpTextureID);
             }
-            Anims = new List<AnimatedTexture>();
+            List<MaterialTextureInfo> texs = new List<MaterialTextureInfo>(MaterialHelpers.Textures.Length);
+            TexList = texs;
+            int extras = 0;
+            for (int i = 0; i < MaterialHelpers.Textures.Length; i++)
+            {
+                string[] basic = MaterialHelpers.Textures[i].SplitFast('@')[0].SplitFast('$')[0].SplitFast('%')[0].SplitFast(',');
+                texs.Add(new MaterialTextureInfo() { Mat = i, ResultantID = extras });
+                extras += basic.Length;
+            }
             TEngine = eng;
             TextureID = GL.GenTexture();
             TWidth = cvars.r_blocktexturewidth.ValueI;
+            HelpTWMin = TEX_REQUIRED_BITS / (TWidth * TWidth);
             GL.BindTexture(TextureTarget.Texture2DArray, TextureID);
-            int levels = TheClient.CVars.r_block_mipmaps.ValueB ? 8 : 1; // TODO: 8 -> Setting
-            GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, MaterialHelpers.Textures.Length);
+            int levels = TheClient.CVars.r_block_mipmaps.ValueB ? (TWidth == 256 ? 6 : 4) : 1; // TODO: 6/4 -> Setting
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, extras);
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)(cvars.r_blocktexturelinear.ValueB ? TextureMinFilter.LinearMipmapLinear : TextureMinFilter.Nearest));
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)(cvars.r_blocktexturelinear.ValueB ? TextureMagFilter.Linear : TextureMagFilter.Nearest));
@@ -73,7 +79,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
             HelpTextureID = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, HelpTextureID);
-            GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, MaterialHelpers.Textures.Length);
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, extras + HelpTWMin);
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
@@ -81,24 +87,21 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
             NormalTextureID = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2DArray, NormalTextureID);
-            GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, MaterialHelpers.Textures.Length);
+            GL.TexStorage3D(TextureTarget3d.Texture2DArray, levels, SizedInternalFormat.Rgba8, TWidth, TWidth, extras);
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2DArray);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
             GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
             // TODO: Use normal.a!
-            List<MaterialTextureInfo> texs = new List<MaterialTextureInfo>(MaterialHelpers.Textures.Length);
             IntTexs = new string[MaterialHelpers.Textures.Length];
             for (int ia = 0; ia < MaterialHelpers.Textures.Length; ia++)
             {
                 int i = ia;
                 Action a = () =>
                 {
-                    MaterialTextureInfo tex = new MaterialTextureInfo()
-                    {
-                        Mat = i
-                    };
+                    MaterialTextureInfo tex = texs[i];
+                    int resID = tex.ResultantID;
                     string[] refrornot = MaterialHelpers.Textures[i].SplitFast('@');
                     if (refrornot.Length > 1)
                     {
@@ -134,15 +137,14 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             tex.NormRate = Utilities.StringToFloat(rorn[1]);
                         }
                         tex.NormalTextures = rorn[0].SplitFast(',');
-                        SetTexture((int)tex.Mat, tex.NormalTextures[0]);
                         if (tex.NormalTextures.Length > 1)
                         {
-                            SetAnimated((int)tex.Mat, tex.NormRate, tex.NormalTextures, NormalTextureID);
+                            SetAnimated((int)resID, tex.NormRate, tex.NormalTextures, NormalTextureID, -1);
                         }
                     }
                     else
                     {
-                        SetTexture((int)tex.Mat, "normal_def");
+                        SetTexture((int)resID, "normal_def", -1);
                     }
                     string[] rateornot = normalornot[0].SplitFast('%');
                     if (rateornot.Length > 1)
@@ -151,12 +153,50 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     }
                     tex.Textures = rateornot[0].SplitFast(',');
                     GL.BindTexture(TextureTarget.Texture2DArray, TextureID);
-                    SetTexture((int)tex.Mat, tex.Textures[0]);
                     if (tex.Textures.Length > 1)
                     {
-                        SetAnimated((int)tex.Mat, tex.Rate, tex.Textures, TextureID);
+                        SetAnimated((int)resID, tex.Rate, tex.Textures, TextureID, resID);
+                        if (tex.NormalTextures == null)
+                        {
+                            GL.BindTexture(TextureTarget.Texture2DArray, NormalTextureID);
+                            tex.NormalTextures = new string[tex.Textures.Length];
+                            tex.NormRate = tex.Rate;
+                            for (int fz = 0; fz < tex.NormalTextures.Length; fz++)
+                            {
+                                tex.NormalTextures[fz] = "normal_def";
+                            }
+                            SetAnimated((int)resID, tex.Rate, tex.NormalTextures, NormalTextureID, -1);
+                        }
                     }
-                    texs.Add(tex);
+                    else
+                    {
+                        SetTexture((int)resID, tex.Textures[0], resID);
+                        if (tex.NormalTextures == null)
+                        {
+                            tex.NormalTextures = new string[] { "normal_def" };
+                        }
+                    }
+                    if (tex.ReflectTextures == null)
+                    {
+                        tex.ReflectTextures = new string[tex.Textures.Length];
+                        for (int fz = 0; fz < tex.ReflectTextures.Length; fz++)
+                        {
+                            tex.ReflectTextures[fz] = "black";
+                        }
+                        tex.RefractTextures = tex.ReflectTextures;
+                        tex.GlowingTextures = tex.ReflectTextures;
+                        tex.SpecularTextures = tex.ReflectTextures;
+                    }
+                    if (tex.NormRate != tex.Rate || tex.RefrRate != tex.Rate)
+                    {
+                        SysConsole.Output(OutputType.WARNING, "Rates wrong for " + MaterialHelpers.Textures[i]);
+                        tex.NormRate = tex.Rate;
+                        tex.RefrRate = tex.Rate;
+                    }
+                    if (tex.Textures.Length != tex.NormalTextures.Length || tex.ReflectTextures.Length != tex.Textures.Length)
+                    {
+                        SysConsole.Output(OutputType.WARNING, "Texture counts wrong for " + MaterialHelpers.Textures[i]);
+                    }
                     IntTexs[(int)tex.Mat] = tex.Textures[0];
                     if (!delayable)
                     {
@@ -180,7 +220,6 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     GL.BindTexture(TextureTarget.Texture2DArray, HelpTextureID);
                     Bitmap combo = GetCombo(texs[i], 0);
-                    TEngine.LockBitmapToTexture(combo, (int)texs[i].Mat);
                     if ((texs[i].SpecularTextures != null) && (texs[i].ReflectTextures != null) && (texs[i].RefractTextures != null) && (texs[i].GlowingTextures != null) && texs[i].SpecularTextures.Length > 1)
                     {
                         Bitmap[] bmps = new Bitmap[texs[i].SpecularTextures.Length];
@@ -189,11 +228,15 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         {
                             bmps[x] = GetCombo(texs[i], x);
                         }
-                        SetAnimated((int)texs[i].Mat, texs[i].RefrRate, bmps, HelpTextureID);
+                        SetAnimated((int)texs[i].ResultantID + HelpTWMin, texs[i].RefrRate, bmps, HelpTextureID);
                         for (int x = 1; x < bmps.Length; x++)
                         {
                             bmps[x].Dispose();
                         }
+                    }
+                    else
+                    {
+                        TEngine.LockBitmapToTexture(combo, (int)texs[i].ResultantID + HelpTWMin);
                     }
                     combo.Dispose();
                     if (!delayable)
@@ -298,84 +341,72 @@ namespace Voxalia.ClientGame.GraphicsSystems
             return combined;
         }
         
-        public void SetTexture(int ID, string texture)
+        public void SetTexture(int ID, string texture, int oSpot)
         {
             TEngine.LoadTextureIntoArray(texture, ID, TWidth);
+            GraphicsUtil.CheckError("TextureBlock - SetTexture - TENG");
+            if (oSpot > 0)
+            {
+                GL.BindTexture(TextureTarget.Texture2DArray, HelpTextureID);
+                int id_z = oSpot / (TWidth * TWidth);
+                int id_xy = oSpot % (TWidth * TWidth);
+                int ix = id_xy % TWidth;
+                int iy = id_xy / TWidth;
+                float[] t = new float[4]
+                {
+                    (1.0f / 8.0f),
+                    0.0f,
+                    0.0f,
+                    1.0f
+                };
+                GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, ix, iy, id_z, 1, 1, 1, OpenTK.Graphics.OpenGL4.PixelFormat.Rgba, PixelType.Float, t);
+                GraphicsUtil.CheckError("TextureBlock - SetTexture - OSp");
+            }
         }
 
         public void SetAnimated(int ID, double rate, Bitmap[] textures, int tid)
         {
-            AnimatedTexture anim = new AnimatedTexture()
-            {
-                Block = this,
-                Level = ID,
-                Time = 0,
-                Rate = rate,
-                Textures = new int[textures.Length],
-                FBOs = new int[textures.Length],
-                OwnsTheTextures = true
-            };
             for (int i = 0; i < textures.Length; i++)
             {
-                anim.Textures[i] = GL.GenTexture();
-                GL.BindTexture(TextureTarget.Texture2D, anim.Textures[i]);
-                TEngine.LockBitmapToTexture(textures[i], false);
-                GL.BindTexture(TextureTarget.Texture2D, 0);
-                anim.FBOs[i] = GL.GenFramebuffer();
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, anim.FBOs[i]);
-                GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, anim.Textures[i], 0);
+                TEngine.LockBitmapToTexture(textures[i], ID + i);
             }
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            anim.Current = 0;
-            anim.FBO = GL.GenFramebuffer();
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, anim.FBO);
-            GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, tid, 0, ID);
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            Anims.Add(anim);
+            GraphicsUtil.CheckError("TextureBlock - SetAnimated - TENG");
         }
 
-        public void SetAnimated(int ID, double rate, string[] textures, int tid)
+        public void SetAnimated(int ID, double rate, string[] textures, int tid, int oSpot)
         {
-            AnimatedTexture anim = new AnimatedTexture()
-            {
-                Block = this,
-                Level = ID,
-                Time = 0,
-                Rate = rate,
-                Textures = new int[textures.Length],
-                FBOs = new int[textures.Length],
-                OwnsTheTextures = false
-            };
             for (int i = 0; i < textures.Length; i++)
             {
-                anim.Textures[i] = TEngine.GetTexture(textures[i], TWidth).Original_InternalID;
-                anim.FBOs[i] = GL.GenFramebuffer();
-                GL.BindFramebuffer(FramebufferTarget.Framebuffer, anim.FBOs[i]);
-                GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, anim.Textures[i], 0);
+                TEngine.LoadTextureIntoArray(textures[i], ID + i, TWidth);
             }
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            anim.Current = 0;
-            anim.FBO = GL.GenFramebuffer();
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, anim.FBO);
-            GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, tid, 0, ID);
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-            Anims.Add(anim);
-        }
-
-        public void Tick(double ttime)
-        {
-            for (int i = 0; i < Anims.Count; i++)
+            GraphicsUtil.CheckError("TextureBlock - SetAnimated - TENG");
+            if (oSpot > 0)
             {
-                Anims[i].Tick(ttime);
+                 GL.BindTexture(TextureTarget.Texture2DArray, HelpTextureID);
+                double time = rate * 32;
+                int id_z = oSpot / (TWidth * TWidth);
+                int id_xy = oSpot % (TWidth * TWidth);
+                int ix = id_xy % TWidth;
+                int iy = id_xy / TWidth;
+                // ARGB
+                float[] t = new float[4]
+                {
+                    (float)time / 256f,
+                    textures.Length / 256f,
+                    0.0f,
+                    1.0f
+                };
+                GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, ix, iy, id_z, 1, 1, 1, OpenTK.Graphics.OpenGL4.PixelFormat.Rgba, PixelType.Float, t);
+                GraphicsUtil.CheckError("TextureBlock - SetAnimated - OSp");
             }
-            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
         }
     }
 
     public class MaterialTextureInfo
     {
         public int Mat;
+
+        public int ResultantID = 0;
 
         public string[] Textures;
 
@@ -394,69 +425,5 @@ namespace Voxalia.ClientGame.GraphicsSystems
         public double NormRate = 1;
 
         public double RefrRate = 1;
-    }
-
-    public class AnimatedTexture
-    {
-        public TextureBlock Block;
-        
-        public int Level;
-
-        public double Rate;
-
-        public double Time;
-
-        public int FBO;
-
-        public int[] FBOs;
-
-        public bool OwnsTheTextures;
-        
-        public void Tick(double ttime)
-        {
-            Time += ttime;
-            bool changed = false;
-            while (Time > Rate)
-            {
-                Current++;
-                if (Current >= Textures.Length)
-                {
-                    Current = 0;
-                }
-                Time -= Rate;
-                changed = true;
-            }
-            if (changed)
-            {
-                AnimateNext();
-            }
-        }
-
-        public int[] Textures;
-
-        public int Current = 0;
-
-        private void AnimateNext()
-        {
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, FBO);
-            GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, FBOs[Current]);
-            GL.BlitFramebuffer(0, 0, Block.TWidth, Block.TWidth, 0, 0, Block.TWidth, Block.TWidth, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
-        }
-
-        public void Destroy()
-        {
-            GL.DeleteFramebuffer(FBO);
-            for (int i = 0; i < FBOs.Length; i++)
-            {
-                GL.DeleteFramebuffer(FBOs[i]);
-            }
-            if (OwnsTheTextures)
-            {
-                for (int i = 0; i < Textures.Length; i++)
-                {
-                    GL.DeleteTexture(Textures[i]);
-                }
-            }
-        }
     }
 }

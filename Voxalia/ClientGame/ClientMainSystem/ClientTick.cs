@@ -397,7 +397,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     }
                     Schedule.RunAllSyncTasks(Delta);
                     Textures.Update(GlobalTickTimeLocal);
-                    TBlock.Tick(Delta);
                     Shaders.Update(GlobalTickTimeLocal);
                     Models.Update(GlobalTickTimeLocal);
                     KeyHandler.Tick();

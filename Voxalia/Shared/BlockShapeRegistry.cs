@@ -408,7 +408,7 @@ namespace Voxalia.Shared
 
         public Vector3[] GetTCoordsQuick(int index, Material mat, Vector3i coord)
         {
-            // NOTE: This method is called very often by the client. Any optimization here will be very useful!
+            // NOTE: This method is called very often by the client (when r_compute is off). Any optimization here will be very useful (For old clients)!
             Vector3[] set = BSSD.TCrds[index];
             int len = set.Length;
             Vector3[] vecs = new Vector3[len];

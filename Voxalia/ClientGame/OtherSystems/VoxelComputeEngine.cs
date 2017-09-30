@@ -72,6 +72,12 @@ namespace Voxalia.ClientGame.OtherSystems
         public void Init(Client tclient)
         {
             TheClient = tclient;
+            LoadShaders();
+            PrepBuf();
+        }
+
+        public void LoadShaders()
+        {
             for (int i = 0; i < Reppers.Length; i++)
             {
                 Program_Counter[i] = TheClient.Shaders.CompileCompute("vox_count", "#define MCM_VOX_COUNT " + Reppers[i] + "\n#define MCM_SOLIDONLY 1\n");
@@ -90,6 +96,10 @@ namespace Voxalia.ClientGame.OtherSystems
             Program_Tops2Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 75\n#define PATCH_EXTRA 1\n");
             Program_Tops3Cruncher = TheClient.Shaders.CompileCompute("vox_topscruncher", "#define TOPS_WIDTH 375\n#define PATCH_EXTRA 1\n");
             GraphicsUtil.CheckError("Compute - Startup - Shaders");
+        }
+
+        public void PrepBuf()
+        {
             float[] df = new float[MaterialHelpers.ALL_MATS.Count * (6 * 7 + 7)];
             for (int i = 0; i < MaterialHelpers.ALL_MATS.Count; i++)
             {
@@ -98,7 +108,7 @@ namespace Voxalia.ClientGame.OtherSystems
                     int cnt = Math.Min(6, MaterialHelpers.ALL_MATS[i].TID[x].Length);
                     for (int y = 0; y < cnt; y++)
                     {
-                        df[(1 + y + x * 7) * MaterialHelpers.ALL_MATS.Count + i] = MaterialHelpers.ALL_MATS[i].TID[x][y];
+                        df[(1 + y + x * 7) * MaterialHelpers.ALL_MATS.Count + i] = TheClient.TBlock.TexList[MaterialHelpers.ALL_MATS[i].TID[x][y]].ResultantID;
                     }
                     df[(x * 7) * MaterialHelpers.ALL_MATS.Count + i] = cnt;
                 }
@@ -215,9 +225,9 @@ namespace Voxalia.ClientGame.OtherSystems
                             resX[coord + 1 + cnt * 3 + subvert * 3 + 0] = (float)bssd.Norms[subDat][subvert].X;
                             resX[coord + 1 + cnt * 3 + subvert * 3 + 1] = (float)bssd.Norms[subDat][subvert].Y;
                             resX[coord + 1 + cnt * 3 + subvert * 3 + 2] = (float)bssd.Norms[subDat][subvert].Z;
-                            resX[coord + 1 + cnt * 6 + subvert * 3 + 0] = (float)bssd.TCrds[subDat][subvert].X;
-                            resX[coord + 1 + cnt * 6 + subvert * 3 + 1] = (float)bssd.TCrds[subDat][subvert].Y;
-                            resX[coord + 1 + cnt * 6 + subvert * 3 + 2] = (float)bssd.TCrds[subDat][subvert].Z;
+                            resX[coord + 1 + cnt * 6 + subvert * 3 + 0] = (float)TheClient.TBlock.TexList[(int)bssd.TCrds[subDat][subvert].X].ResultantID;
+                            resX[coord + 1 + cnt * 6 + subvert * 3 + 1] = (float)TheClient.TBlock.TexList[(int)bssd.TCrds[subDat][subvert].Y].ResultantID;
+                            resX[coord + 1 + cnt * 6 + subvert * 3 + 2] = (float)TheClient.TBlock.TexList[(int)bssd.TCrds[subDat][subvert].Z].ResultantID;
                         }
                         coord += cnt * 9 + 1;
                     }

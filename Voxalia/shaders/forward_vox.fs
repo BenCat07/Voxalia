@@ -26,9 +26,7 @@
 #define MCM_SPECIAL_FOG 0
 
 layout (binding = 0) uniform sampler2DArray s;
-#if MCM_LIGHTS
 layout (binding = 1) uniform sampler2DArray htex;
-#endif
 layout (binding = 2) uniform sampler2DArray normal_tex;
 layout (binding = 4) uniform sampler2D depth;
 layout (binding = 5) uniform sampler2DArray shadowtex;
@@ -68,6 +66,7 @@ layout (location = 13) uniform float fogDist = 1.0 / 100000.0;
 layout (location = 14) uniform vec2 zdist = vec2(1.0, 1000.0);
 layout (location = 15) uniform float lights_used = 0.0;
 layout (location = 16) uniform float minimum_light = 0.2;
+layout (location = 17) uniform float tex_width = 256;
 #if MCM_LIGHTS
 layout (location = 20) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
 layout (location = 58) uniform mat4 light_data_array[LIGHTS_MAX];
@@ -122,10 +121,22 @@ vec4 read_texture(in sampler2DArray samp_in, in vec3 texcrd)
 	//return texture(samp_in, texcrd);
 }
 
+const int TEX_REQUIRED_BITS = (256 * 256 * 5);
+
 void main()
 {
+	int id_hint = int(fi.texcoord.z + 0.1);
+	int id_tw = int(tex_width);
+	int id_z = id_hint / (id_tw * id_tw);
+	int id_xy = id_hint % (id_tw * id_tw);
+	vec3 id_data = vec3(float(id_xy % id_tw) / float(id_tw), float(id_xy / id_tw) / float(id_tw), float(id_z));
+	int tex_min = max(1, TEX_REQUIRED_BITS / (id_tw * id_tw));
+	vec4 hint_id = textureLod(htex, id_data + vec3(0.5 / tex_width, 0.5 / tex_width, 0.0), 0);
+	int anim_count = int(hint_id.y * 256.0);
+	float anim_time = hint_id.x * 8.0;
+	float tc_z = fi.texcoord.z + (anim_count <= 1 ? 0 : float(int(time / anim_time) % anim_count));
 	position = vec4(fi.pos, 1.0);
-	vec4 col = read_texture(s, fi.texcoord);
+	vec4 col = read_texture(s, vec3(fi.texcoord.xy, tc_z));
 	float extra_specular = 0.0;
 	float rhBlur = 0.0;
 	float reflecto = 0.0;
@@ -169,14 +180,14 @@ void main()
 					vec2 tcfix = vec2(mod(fi.texcoord.x * 3.0, 1.0), mod(fi.texcoord.y * 3.0, 1.0));
 					tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
 					tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
-					col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+					col = read_texture(s, vec3(tcfix, tc_z));
 				}
 				else
 				{
 					vec2 tcfix = vec2(mod(fi.texcoord.x * 2.0, 1.0), mod(fi.texcoord.y * 2.0, 1.0));
 					tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
 					tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
-					col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+					col = read_texture(s, vec3(tcfix, tc_z));
 				}
 			}
 			else
@@ -191,13 +202,13 @@ void main()
 			{
 				float newY = mod(fi.texcoord.y - time * 0.5, 1.0);
 				vec2 tcfix = vec2(fi.texcoord.x, newY < 0.0 ? newY + 1.0 : newY);
-				col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 			else
 			{
 				float newX = mod(fi.texcoord.x - time * 0.5, 1.0);
 				vec2 tcfix = vec2(newX < 0.0 ? newX + 1.0 : newX, fi.texcoord.y);
-				col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 		}
 		else if (fi.tcol.y > (168.0 / 255.0))
@@ -223,7 +234,7 @@ void main()
 				vec2 tcfix = vec2((fi.texcoord.x - 0.5) * rot_factorCOS - (fi.texcoord.y - 0.5) * rot_factorSIN, (fi.texcoord.y - 0.5) * rot_factorCOS + (fi.texcoord.x - 0.5) * rot_factorSIN) + vec2(0.5);
 				tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
 				tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
-				col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 			else if (fi.tcol.y > (164.0 / 255.0))
 			{
@@ -232,7 +243,7 @@ void main()
 				vec2 tcfix = vec2((fi.texcoord.x - 0.5) * rot_factorCOS - (fi.texcoord.y - 0.5) * rot_factorSIN, (fi.texcoord.y - 0.5) * rot_factorCOS + (fi.texcoord.x - 0.5) * rot_factorSIN) + vec2(0.5);
 				tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
 				tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
-				col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 			else
 			{
@@ -240,7 +251,7 @@ void main()
 				vec2 tcfix = vec2((fi.texcoord.x - 0.5) * ROT_FACTOR - (fi.texcoord.y - 0.5) * ROT_FACTOR, (fi.texcoord.y - 0.5) * ROT_FACTOR + (fi.texcoord.x - 0.5) * ROT_FACTOR) + vec2(0.5);
 				tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
 				tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
-				col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 		}
 		else if (fi.tcol.y > (156.0 / 255.0))
@@ -248,19 +259,19 @@ void main()
 			if (fi.tcol.y > (160.0 / 255.0))
 			{
 				vec2 tcfix = vec2(fi.texcoord.x, mod(fi.texcoord.y + time * 0.5, 1.0));
-				col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 			else if (fi.tcol.y > (158.0 / 255.0))
 			{
 				vec2 tcfix = vec2(mod(fi.texcoord.x + time * 0.5, 1.0), fi.texcoord.y);
-				col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 			else
 			{
 				float shift_x = snoise2(vec3(float(int(fi.pos.x)) + time * 0.075, float(int(fi.pos.y)) + time * 0.05, float(int(fi.pos.z)) + time * 0.1));
 				float shift_y = snoise2(vec3(float(int(fi.pos.x)) + time * 0.1, float(int(fi.pos.y)) + time * 0.05, float(int(fi.pos.z)) + time * 0.075));
 				vec2 tcfix = vec2(mod(fi.texcoord.x + shift_x, 1.0), mod(fi.texcoord.y + shift_y, 1.0));
-				col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 		}
 		else if (fi.tcol.y > 0.51)
@@ -271,7 +282,7 @@ void main()
 				{
 					float res_fix = (fi.tcol.y > (154.0 / 255.0) ? 8 : 32);
 					vec2 tcfix = vec2(float(int(fi.texcoord.x * res_fix)) / res_fix, float(int(fi.texcoord.y * res_fix)) / res_fix);
-					col = read_texture(s, vec3(tcfix, fi.texcoord.z));
+					col = read_texture(s, vec3(tcfix, tc_z));
 				}
 				else
 				{
@@ -315,7 +326,7 @@ void main()
 	float thStr = influ + (1.0 - influUse);
 	col.xyz = tempCol / thStr;
 #if MCM_LIGHTS
-	vec4 hintter = read_texture(htex, fi.texcoord);
+	vec4 hintter = read_texture(htex, vec3(0.0, 0.0, float(tex_min)) + vec3(fi.texcoord.xy, tc_z));
 	float specularStrength = max(hintter.x, extra_specular);
 #if MCM_TRANSP
 #else // MCM_TRANSP
@@ -353,7 +364,7 @@ void main()
 #if MCM_BRIGHT
 #else // MCM_BRIGHT
 	float opac_min = 0.0;
-	vec3 norms = read_texture(normal_tex, fi.texcoord).xyz * 2.0 - vec3(1.0);
+	vec3 norms = read_texture(normal_tex, vec3(fi.texcoord.xy, tc_z)).xyz * 2.0 - vec3(1.0);
 	vec3 tf_normal = normalize(fi.tbn * norms);
 	nrml = vec4(tf_normal, 1.0);
 #if MCM_LIGHTS

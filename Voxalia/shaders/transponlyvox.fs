@@ -52,6 +52,7 @@ layout (location = 8) uniform vec2 u_screensize = vec2(1024, 1024);
 layout (location = 9) uniform mat4 lights_used_helper;
 // ...
 layout (location = 16) uniform float minimum_light;
+layout (location = 17) uniform float tex_width = 256;
 // ...
 layout (location = 20) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
 layout (location = 58) uniform mat4 light_details_array[LIGHTS_MAX];
@@ -73,8 +74,16 @@ float linearizeDepth(in float rinput) // Convert standard depth (stretched) to a
 	return (2.0 * lights_used_helper[0][1]) / (lights_used_helper[0][2] + lights_used_helper[0][1] - rinput * (lights_used_helper[0][2] - lights_used_helper[0][1]));
 }
 
+const int TEX_REQUIRED_BITS = (256 * 256 * 5);
+
 void main()
 {
+	int id_hint = int(f.texcoord);
+	int id_tw = int(tex_width);
+	int id_z = id_hint / id_tw;
+	int id_xy = id_hint % id_tw;
+	vec3 id_data = vec3(float(id_xy % id_tw) / float(id_tw), float(id_xy / id_tw) / float(id_tw), float(id_z));
+	int tex_min = max(1, TEX_REQUIRED_BITS / (id_tw * id_tw));
 #if MCM_LL
 	vec4 fcolor;
 #endif

@@ -69,7 +69,7 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 vbo.Vertices.Add(new Vector3((float)vecs[i].X, (float)vecs[i].Y, (float)vecs[i].Z));
                 vbo.Normals.Add(new Vector3((float)norms[i].X, (float)norms[i].Y, (float)norms[i].Z));
-                vbo.TexCoords.Add(new Vector3((float)tcoord[i].X, (float)tcoord[i].Y, (float)tcoord[i].Z));
+                vbo.TexCoords.Add(new Vector3((float)tcoord[i].X, (float)tcoord[i].Y, (float)TheClient.TBlock.TexList[(int)tcoord[i].Z].ResultantID));
                 vbo.Indices.Add((uint)i);
                 vbo.Colors.Add(new Vector4(1, 1, 1, 1));
                 vbo.TCOLs.Add(TheClient.Rendering.AdaptColor(vbo.Vertices[i], tcol));

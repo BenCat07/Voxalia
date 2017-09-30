@@ -65,10 +65,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
             }
             toret.Add(new Tuple<string, long>("Textures", texturec));
             long blocktexturec = TBlock.TWidth * TBlock.TWidth * 4 * 3;
-            for (int i = 0; i < TBlock.Anims.Count; i++)
-            {
-                blocktexturec += TBlock.TWidth * TBlock.TWidth * 4 * TBlock.Anims[i].FBOs.Length;
-            }
             toret.Add(new Tuple<string, long>("BlockTextures", blocktexturec));
             long chunkc = 0;
             long chunkc_transp = 0;
@@ -2431,6 +2427,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             {
 
                 s_forw_vox.Bind();
+                GL.Uniform1(17, (float)TBlock.TWidth);
                 if (CVars.r_forward_lights.ValueB)
                 {
                     GL.Uniform1(15, (float)c);
@@ -2456,6 +2453,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     GL.Uniform3(11, maxLit);
                 }
                 s_forw_vox_slod.Bind();
+                GL.Uniform1(17, (float)TBlock.TWidth);
                 GraphicsUtil.CheckError("Render/Fast - Uniforms 5.25");
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix);
                 GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
@@ -2475,6 +2473,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             view.ViewPatchThree = (fogDist, shadowmat_dat, light_dat, c) =>
             {
                 s_forw_vox_trans.Bind();
+                GL.Uniform1(17, (float)TBlock.TWidth);
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix);
                 GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
                 GL.Uniform1(6, (float)Engine.GlobalTickTime);
@@ -2510,6 +2509,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             view.ViewPatchSeven = () =>
             {
                 s_fbov = s_fbov.Bind();
+                GL.Uniform1(17, (float)TBlock.TWidth);
                 GraphicsUtil.CheckError("Render - GBuffer - Uniforms - 0");
                 GL.Uniform1(6, (float)GlobalTickTimeLocal);
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix);
@@ -2517,6 +2517,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 // TODO: GL.Uniform1(7, AudioLevel);
                 GL.Uniform2(8, new Vector2(sl_min, sl_max));
                 s_fbovslod = s_fbovslod.Bind();
+                GL.Uniform1(17, (float)TBlock.TWidth);
                 GraphicsUtil.CheckError("Render - GBuffer - Uniforms - 0.5");
                 GL.Uniform1(6, (float)GlobalTickTimeLocal);
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix);
@@ -2532,6 +2533,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             view.ViewPatchNine = () =>
             {
                 s_fbov_refract = s_fbov_refract.Bind();
+                GL.Uniform1(17, (float)TBlock.TWidth);
                 GL.Uniform1(6, (float)GlobalTickTimeLocal);
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix);
                 GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
@@ -2583,6 +2585,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix);
                 GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
                 GL.Uniform1(4, view.DesaturationAmount);
+                GL.Uniform1(17, TBlock.TWidth);
             };
             view.ViewPatchTwelve = () =>
             {
@@ -2653,6 +2656,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 // TODO: GL.Uniform1(7, AudioLevel);
                 GL.Uniform2(8, new Vector2(view.Width, view.Height));
                 GL.UniformMatrix4(9, false, ref mat_lhelp);
+                GL.Uniform1(17, (float)TBlock.TWidth);
                 GL.UniformMatrix4(20, View3D.LIGHTS_MAX, false, s_mats);
                 GL.UniformMatrix4(20 + View3D.LIGHTS_MAX, View3D.LIGHTS_MAX, false, l_dats1);
             };
@@ -2662,12 +2666,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 // GL.UniformMatrix4(1, false, ref combined);
                 GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
                 GL.UniformMatrix4(9, false, ref matabc);
+                GL.Uniform1(17, (float)TBlock.TWidth);
             };
             view.ViewPatchFifteen = () =>
             {
                 s_transponlyvox.Bind();
                 //GL.UniformMatrix4(1, false, ref combined);
                 GL.UniformMatrix4(2, false, ref View3D.IdentityMatrix);
+                GL.Uniform1(17, (float)TBlock.TWidth);
             };
         }
     }

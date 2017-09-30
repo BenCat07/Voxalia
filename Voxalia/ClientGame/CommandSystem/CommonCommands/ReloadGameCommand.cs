@@ -54,13 +54,11 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
             {
                 success = true;
                 MaterialHelpers.Populate(TheClient.Files);
-                // TODO: Delay TBlock generation with time!
                 TheClient.TBlock.Generate(TheClient, TheClient.CVars, TheClient.Textures, true);
+                TheClient.VoxelComputer.PrepBuf();
             }
             if (arg == "chunks" || is_blocks || is_textures || is_all)
             {
-                // TODO: Efficiency of this method!
-                // TODO: Ensure this method allows for 
                 success = true;
                 TheClient.TheRegion.RenderingNow.Clear();
                 Location pos = TheClient.Player.GetPosition();
@@ -95,6 +93,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                 success = true;
                 TheClient.Shaders.Clear();
                 TheClient.ShadersCheck();
+                TheClient.VoxelComputer.LoadShaders();
             }
             if (arg == "audio" || is_all)
             {

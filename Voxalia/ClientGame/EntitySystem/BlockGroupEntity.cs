@@ -191,6 +191,10 @@ namespace Voxalia.ClientGame.EntitySystem
                             List<BEPUutilities.Vector3> vecsi = BlockShapeRegistry.BSD[c.BlockData].GetVertices(pos, xps, xms, yps, yms, zps, zms);
                             List<BEPUutilities.Vector3> normsi = BlockShapeRegistry.BSD[c.BlockData].GetNormals(pos, xps, xms, yps, yms, zps, zms);
                             List<BEPUutilities.Vector3> tci = BlockShapeRegistry.BSD[c.BlockData].GetTCoords(pos, (Material)c.BlockMaterial, xps, xms, yps, yms, zps, zms);
+                            for (int i = 0; i < tci.Count; i++)
+                            {
+                                tci[i] = new Vector3(tci[i].X, tci[i].Y, TheClient.TBlock.TexList[(int)tci[i].Z].ResultantID);
+                            }
                             int vertcount = Vertices.Count;
                             for (int i = 0; i < vecsi.Count; i++)
                             {

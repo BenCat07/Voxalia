@@ -564,7 +564,7 @@ namespace Voxalia.ClientGame.WorldSystem
                         int bid_y = Math.Max(0, Math.Min(CSize - 1, (int)fvert.Y));
                         int bid_z = Math.Max(0, Math.Min(CSize - 1, (int)fvert.Z));
                         BlockInternal relevantBI = GetBlockAt(bid_x, bid_y, bid_z);
-                        int tid = relevantBI.Material.TextureID(side);
+                        int tid = OwningRegion.TheClient.TBlock.TexList[relevantBI.Material.TextureID(side)].ResultantID;
                         for (int n = 0; n < 3; n++)
                         {
                             BEPUutilities.Vector3 vert = Verts[OutVerts[i + n]];

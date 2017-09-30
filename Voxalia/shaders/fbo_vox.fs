@@ -23,6 +23,7 @@ layout (location = 7) uniform float volume;
 layout (location = 8) uniform vec2 light_clamp = vec2(0.0, 1.0);
 // ...
 layout (location = 16) uniform float minimum_light = 0.0;
+layout (location = 17) uniform float tex_width = 256;
 
 in struct vox_out
 {
@@ -47,8 +48,16 @@ layout (location = 4) out vec4 renderhint2;
 
 float snoise2(in vec3 v);
 
+const int TEX_REQUIRED_BITS = (256 * 256 * 5);
+
 void main()
 {
+	int id_hint = int(f.texcoord);
+	int id_tw = int(tex_width);
+	int id_z = id_hint / id_tw;
+	int id_xy = id_hint % id_tw;
+	vec3 id_data = vec3(float(id_xy % id_tw) / float(id_tw), float(id_xy / id_tw) / float(id_tw), float(id_z));
+	int tex_min = max(1, TEX_REQUIRED_BITS / (id_tw * id_tw));
 	vec4 dets = texture(htex, f.texcoord);
 #if MCM_REFRACT
 	float refr_rhblur = 0.0;
