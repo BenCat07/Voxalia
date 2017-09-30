@@ -222,10 +222,11 @@ namespace Voxalia.ClientGame.EntitySystem
             {
                 return;
             }
+            Location dirro = Direction;
             if (ServerFlags.HasFlag(YourStatusFlags.NO_ROTATE))
             {
-                Direction.Yaw = tyaw;
-                Direction.Pitch = tpitch;
+                dirro.Yaw = tyaw;
+                dirro.Pitch = tpitch;
             }
             MoveTransmitWaiting += TheClient.Delta;
             if (MoveTransmitWaiting < MoveTransmitTime)
@@ -258,7 +259,7 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             Location p = GetPosition();
             Location v = GetVelocity();
-            TheClient.Network.SendPacket(new KeysPacketOut(CurrentMovePacketID, kpd, Direction, XMove, YMove, p, v, SprintOrWalk, ItemDir(), ItemSourceRelative()));
+            TheClient.Network.SendPacket(new KeysPacketOut(CurrentMovePacketID, kpd, dirro, XMove, YMove, p, v, SprintOrWalk, ItemDir(), ItemSourceRelative()));
             Positions[CurrentMovePacketID] = p;
             Velocities[CurrentMovePacketID] = v;
             GTTs[CurrentMovePacketID] = CurrentRemoteGTT;
