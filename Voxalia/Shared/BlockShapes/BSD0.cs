@@ -153,11 +153,11 @@ namespace Voxalia.Shared.BlockShapes
             {
                 int tID_BOTTOM = mat.TextureID(MaterialSide.BOTTOM);
                 TCoords.Add(new Vector3(0, 0, tID_BOTTOM));
-                TCoords.Add(new Vector3(1, 1, tID_BOTTOM));
-                TCoords.Add(new Vector3(0, 1, tID_BOTTOM));
-                TCoords.Add(new Vector3(0, 0, tID_BOTTOM));
                 TCoords.Add(new Vector3(1, 0, tID_BOTTOM));
                 TCoords.Add(new Vector3(1, 1, tID_BOTTOM));
+                TCoords.Add(new Vector3(0, 0, tID_BOTTOM));
+                TCoords.Add(new Vector3(1, 1, tID_BOTTOM));
+                TCoords.Add(new Vector3(0, 1, tID_BOTTOM));
             }
             if (!XP)
             {
