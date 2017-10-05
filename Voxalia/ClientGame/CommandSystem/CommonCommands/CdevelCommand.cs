@@ -27,6 +27,7 @@ using FreneticGameCore.Collision;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL4;
 using FreneticGameGraphics.AudioSystem;
+using FreneticGameGraphics.GraphicsHelpers;
 
 namespace Voxalia.ClientGame.CommandSystem.CommonCommands
 {
@@ -206,7 +207,22 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                             entry.Info(queue, "Can't load VR. Already loaded!");
                             break;
                         }
-                        TheClient.VR = VRSupport.TryInit(TheClient);
+                        TheClient.VR = VRSupport.TryInit(TheClient.CWindow);
+                        TheClient.CWindow.VR = TheClient.VR;
+                        if (TheClient.VR != null)
+                        {
+                            TheClient.VR.VRScale = 1.5f; // TODO: VR Scale CVar?
+                        }
+                        break;
+                    }
+                case "debugVR":
+                    {
+                        if (TheClient.VR == null)
+                        {
+                            entry.Info(queue, "VR not running!");
+                            break;
+                        }
+                        entry.Info(queue, "Left: " + TheClient.VR.Left?.ToString() + " ||| Right: " + TheClient.VR.Right?.ToString());
                         break;
                     }
                 case "fogEnhance":

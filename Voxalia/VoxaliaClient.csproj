@@ -180,7 +180,6 @@
     <Compile Include="ClientGame\GraphicsSystems\ParticleSystem\ParticleHelper.cs" />
     <Compile Include="ClientGame\GraphicsSystems\TextureBlock.cs" />
     <Compile Include="ClientGame\GraphicsSystems\ChunkVBO.cs" />
-    <Compile Include="ClientGame\GraphicsSystems\VRSupport.cs" />
     <Compile Include="ClientGame\JointSystem\BaseFJoint.cs" />
     <Compile Include="ClientGame\JointSystem\BaseJoint.cs" />
     <Compile Include="ClientGame\JointSystem\ConnectorBeam.cs" />
@@ -266,7 +265,6 @@
     <Compile Include="ClientGame\WorldSystem\LiquidVolume.cs" />
     <Compile Include="ClientGame\WorldSystem\Region.cs" />
     <Compile Include="ClientGame\WorldSystem\RegionWeather.cs" />
-    <Compile Include="openvr_api.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -329,12 +327,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="openvr_api.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="openvr_api.pdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="shaders\fbo_vox.fs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

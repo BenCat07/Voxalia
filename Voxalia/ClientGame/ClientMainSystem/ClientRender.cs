@@ -1148,7 +1148,14 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 {
                     GL.BindFramebuffer(FramebufferTarget.Framebuffer, MainWorldView.OV_FBO);
                     GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, MainWorldView.RS4P.fbo);
-                    GL.BlitFramebuffer(0, 0, MainWorldView.Width, MainWorldView.Height, 0, 0, MainWorldView.Width, MainWorldView.Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                    if (VR != null)
+                    {
+                        GL.BlitFramebuffer(MainWorldView.IsSecondEye ? 0 : (MainWorldView.Width / 2), 0, MainWorldView.Width / 2, MainWorldView.Height, 0, 0, MainWorldView.Width, MainWorldView.Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                    }
+                    else
+                    {
+                        GL.BlitFramebuffer(0, 0, MainWorldView.Width, MainWorldView.Height, 0, 0, MainWorldView.Width, MainWorldView.Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+                    }
                     GL.BindFramebuffer(FramebufferTarget.ReadFramebuffer, 0);
                     GL.BindFramebuffer(FramebufferTarget.Framebuffer, MainWorldView.RS4P.fbo);
                 }
@@ -1490,7 +1497,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (VR.Left != null)
             {
                 Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Left.Position;
-                VR.LeftTexture.CalcTexture(VR.Left, GlobalTickTimeLocal, this);
+                VR.LeftTexture.CalcTexture(VR.Left, GlobalTickTimeLocal, CWindow);
                 isVox = true;
                 SetEnts();
                 mmcircle.Tex = new Texture() { Internal_Texture = VR.LeftTexture.Texture, Engine = Textures };
@@ -1500,7 +1507,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (VR.Right != null)
             {
                 Matrix4 pos = Matrix4.CreateScale(1.5f) * VR.Right.Position;
-                VR.RightTexture.CalcTexture(VR.Right, GlobalTickTimeLocal, this);
+                VR.RightTexture.CalcTexture(VR.Right, GlobalTickTimeLocal, CWindow);
                 isVox = true;
                 SetEnts();
                 mmcircle.Tex = new Texture() { Internal_Texture = VR.RightTexture.Texture, Engine = Textures };
@@ -2467,6 +2474,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             };
             view.ViewPatchTwo = () =>
             {
+                s_forw_vox_slod.Bind();
+                GL.UniformMatrix4(1, false, ref view.PrimaryMatrix_OffsetFor3D);
                 s_forw_vox = s_forw_vox.Bind();
                 GL.UniformMatrix4(1, false, ref view.PrimaryMatrix_OffsetFor3D);
             };

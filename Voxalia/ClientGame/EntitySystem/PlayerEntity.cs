@@ -525,7 +525,7 @@ namespace Voxalia.ClientGame.EntitySystem
                         Downward = false;
                         PVRCrouch = false;
                     }
-                    if (TheClient.VR.Left.Pressed.HasFlag(VRButtons.MENU_BUTTON))
+                    if (TheClient.VR.Left.Pressed.HasFlag(VRButtons.MENU_BUTTON_BY))
                     {
                         Upward = true;
                         PVRJump = true;
@@ -548,7 +548,7 @@ namespace Voxalia.ClientGame.EntitySystem
                         Click = false;
                         PVRPrimary = false;
                     }
-                    if (TheClient.VR.Right.Pressed.HasFlag(VRButtons.MENU_BUTTON))
+                    if (TheClient.VR.Right.Pressed.HasFlag(VRButtons.MENU_BUTTON_BY))
                     {
                         AltClick = true;
                         PVRSecondary = true;
