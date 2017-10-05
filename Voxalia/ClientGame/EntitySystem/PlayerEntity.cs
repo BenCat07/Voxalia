@@ -398,6 +398,15 @@ namespace Voxalia.ClientGame.EntitySystem
         double tyaw = 0;
         double tpitch = 0;
 
+        public enum VRControlMode
+        {
+            NONE = 0,
+            VIVE = 1,
+            OCULUS = 2
+        }
+
+        public VRControlMode VRControls = VRControlMode.NONE;
+
         public bool PVRJump;
         public bool PVRCrouch;
         public bool PVRPrimary;
@@ -491,6 +500,10 @@ namespace Voxalia.ClientGame.EntitySystem
             }
             if (TheClient.VR != null)
             {
+                if (VRControls == VRControlMode.NONE)
+                {
+                    VRControls = TheClient.VR.VRModel.ToLowerFast().Contains("ocul") ? VRControlMode.OCULUS : VRControlMode.VIVE;
+                }
                 OpenTK.Quaternion oquat = TheClient.VR.HeadMatRot.ExtractRotation(true);
                 BEPUutilities.Quaternion quat = new BEPUutilities.Quaternion(oquat.X, oquat.Y, oquat.Z, oquat.W);
                 Vector3 face = -BEPUutilities.Quaternion.Transform(Vector3.UnitZ, quat);
@@ -571,7 +584,8 @@ namespace Voxalia.ClientGame.EntitySystem
                     bool rtppressed = TheClient.VR.Right.Pressed.HasFlag(VRButtons.TRACKPAD);
                     OpenTK.Vector2 rtp = TheClient.VR.Right.TrackPad;
                     float yxdiff = Math.Abs(rtp.Y) - Math.Abs(rtp.X);
-                    if (rtppressed && rtp.Y > 0.01 && (yxdiff > 0.01))
+                    float min = VRControls == VRControlMode.OCULUS ? 0.5f : 0.01f;
+                    if (rtppressed && rtp.Y > min && (yxdiff > 0.01))
                     {
                         ItemUp = true;
                         PVRItemUp = true;
@@ -581,7 +595,7 @@ namespace Voxalia.ClientGame.EntitySystem
                         ItemUp = false;
                         PVRItemUp = false;
                     }
-                    if (rtppressed && rtp.Y < 0.01 && (yxdiff > 0.01))
+                    if (rtppressed && rtp.Y < min && (yxdiff > 0.01))
                     {
                         ItemDown = true;
                         PVRItemDown = true;
@@ -591,7 +605,7 @@ namespace Voxalia.ClientGame.EntitySystem
                         ItemDown = false;
                         PVRItemDown = false;
                     }
-                    if (rtppressed && rtp.X > 0.01 && (yxdiff < -0.01))
+                    if (rtppressed && rtp.X > min && (yxdiff < -0.01))
                     {
                         ItemRight = true;
                         PVRItemRight = true;
@@ -601,7 +615,7 @@ namespace Voxalia.ClientGame.EntitySystem
                         ItemRight = false;
                         PVRItemRight = false;
                     }
-                    if (rtppressed && rtp.X < 0.01 && (yxdiff < -0.01))
+                    if (rtppressed && rtp.X < min && (yxdiff < -0.01))
                     {
                         ItemLeft = true;
                         PVRItemLeft = true;
@@ -612,35 +626,66 @@ namespace Voxalia.ClientGame.EntitySystem
                         PVRItemLeft = false;
                     }
                     bool rtptouched = TheClient.VR.Right.Touched.HasFlag(VRButtons.TRACKPAD);
-                    if (rtptouched && !VRRTouched)
+                    if (VRControls == VRControlMode.OCULUS)
                     {
-                        VRRTouchDown = TheClient.VR.Right.TrackPad;
-                        VRRTouched = true;
+                        if (!rtppressed && rtptouched)
+                        {
+                            VRRTouchDown = TheClient.VR.Right.TrackPad;
+                            if (VRRTouchDown.X < -0.7 && VRRTouchLast.X >= -0.7)
+                            {
+                                TheClient.Commands.ExecuteCommands("itemprev"); // TODO: Less lazy!
+                            }
+                            else if (VRRTouchDown.X > 0.7 && VRRTouchLast.X <= 0.7)
+                            {
+                                TheClient.Commands.ExecuteCommands("itemnext"); // TODO: Less lazy!
+                            }
+                            else if (VRRTouchDown.Y < -0.7 && VRRTouchLast.Y >= -0.7)
+                            {
+                                TheClient.Commands.ExecuteCommands("weaponreload"); // TODO: Less lazy!
+                            }
+                            else if (VRRTouchDown.Y > 0.7 && VRRTouchLast.Y <= 0.7)
+                            {
+                                TheClient.Commands.ExecuteCommands("echo 'Wow! You swiped up! Behavior for this coming SOON!'"); // TODO: Less lazy!
+                            }
+                            VRRTouchLast = TheClient.VR.Right.TrackPad;
+                        }
+                        else
+                        {
+                            VRRTouchLast = OpenTK.Vector2.Zero;
+                        }
                     }
-                    if (rtptouched)
+                    else
                     {
-                        VRRTouchLast = TheClient.VR.Right.TrackPad;
-                    }
-                    const float VR_ADJMIN = 0.5f;
-                    if (!rtptouched && (VRRTouchLast.X != 0.0f || VRRTouchLast.Y != 0.0f))
-                    {
-                        if (VRRTouchDown.X < -VR_ADJMIN && VRRTouchLast.X > VR_ADJMIN)
+                        if (rtptouched && !VRRTouched)
                         {
-                            TheClient.Commands.ExecuteCommands("itemprev"); // TODO: Less lazy!
+                            VRRTouchDown = TheClient.VR.Right.TrackPad;
+                            VRRTouched = true;
                         }
-                        else if (VRRTouchDown.X > VR_ADJMIN && VRRTouchLast.X < -VR_ADJMIN)
+                        if (rtptouched)
                         {
-                            TheClient.Commands.ExecuteCommands("itemnext"); // TODO: Less lazy!
+                            VRRTouchLast = TheClient.VR.Right.TrackPad;
                         }
-                        if (VRRTouchDown.Y < -VR_ADJMIN && VRRTouchLast.Y > VR_ADJMIN)
+                        const float VR_ADJMIN = 0.5f;
+                        if (!rtptouched && (VRRTouchLast.X != 0.0f || VRRTouchLast.Y != 0.0f))
                         {
-                            TheClient.Commands.ExecuteCommands("echo 'Wow! You swiped up! Behavior for this coming SOON!'"); // TODO: Less lazy!
+                            if (VRRTouchDown.X < -VR_ADJMIN && VRRTouchLast.X > VR_ADJMIN)
+                            {
+                                TheClient.Commands.ExecuteCommands("itemprev"); // TODO: Less lazy!
+                            }
+                            else if (VRRTouchDown.X > VR_ADJMIN && VRRTouchLast.X < -VR_ADJMIN)
+                            {
+                                TheClient.Commands.ExecuteCommands("itemnext"); // TODO: Less lazy!
+                            }
+                            if (VRRTouchDown.Y < -VR_ADJMIN && VRRTouchLast.Y > VR_ADJMIN)
+                            {
+                                TheClient.Commands.ExecuteCommands("echo 'Wow! You swiped up! Behavior for this coming SOON!'"); // TODO: Less lazy!
+                            }
+                            else if (VRRTouchDown.Y > VR_ADJMIN && VRRTouchLast.Y < -VR_ADJMIN)
+                            {
+                                TheClient.Commands.ExecuteCommands("weaponreload"); // TODO: Less lazy!
+                            }
+                            VRRTouchLast = OpenTK.Vector2.Zero;
                         }
-                        else if (VRRTouchDown.Y > VR_ADJMIN && VRRTouchLast.Y < -VR_ADJMIN)
-                        {
-                            TheClient.Commands.ExecuteCommands("weaponreload"); // TODO: Less lazy!
-                        }
-                        VRRTouchLast = OpenTK.Vector2.Zero;
                     }
                 }
             }
