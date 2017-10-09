@@ -28,7 +28,7 @@
 layout (binding = 0) uniform sampler2DArray s;
 layout (binding = 1) uniform sampler2DArray htex;
 layout (binding = 2) uniform sampler2DArray normal_tex;
-layout (binding = 4) uniform sampler2D depth;
+layout (binding = 4) uniform sampler2D deptht;
 layout (binding = 5) uniform sampler2DArray shadowtex;
 // ...
 
@@ -53,7 +53,7 @@ in struct vox_fout
 const int LIGHTS_MAX = 38;
 
 // ...
-layout (location = 4) uniform vec4 screen_size = vec4(1024, 1024, 0.1, 1000.0);
+layout (location = 4) uniform vec4 screen_size = vec4(1024.0, 1024.0, 0.1, 1000.0);
 // ...
 layout (location = 6) uniform float time;
 layout (location = 7) uniform float volume;
@@ -66,7 +66,7 @@ layout (location = 13) uniform float fogDist = 1.0 / 100000.0;
 layout (location = 14) uniform vec2 zdist = vec2(1.0, 1000.0);
 layout (location = 15) uniform float lights_used = 0.0;
 layout (location = 16) uniform float minimum_light = 0.2;
-layout (location = 17) uniform float tex_width = 256;
+layout (location = 17) uniform float tex_width = 256.0;
 #if MCM_LIGHTS
 layout (location = 20) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
 layout (location = 58) uniform mat4 light_data_array[LIGHTS_MAX];
@@ -123,6 +123,11 @@ vec4 read_texture(in sampler2DArray samp_in, in vec3 texcrd)
 
 const int TEX_REQUIRED_BITS = (256 * 256 * 5);
 
+float get_wave_height(in vec3 w_pos)
+{
+	return snoise2(w_pos + vec3(time, time * 0.5, time * 2.0)); // TODO: base motion off wind?
+}
+
 void main()
 {
 	int id_hint = int(fi.texcoord.z + 0.1);
@@ -140,6 +145,12 @@ void main()
 	float extra_specular = 0.0;
 	float rhBlur = 0.0;
 	float reflecto = 0.0;
+	float rhb_fx = 1.0;
+	vec3 force_norm_tex = vec3(0.0);
+	int do_force_norm_tex = 0;
+#if MCM_TRANSP
+	int always_do_transp = 0;
+#endif
 	if (fi.tcol.w == 0.0 && fi.tcol.x == 0.0 && fi.tcol.z == 0.0 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7)
 	{
 		rhBlur = (fi.tcol.y - 0.31) * ((1.0 / 0.38) * (3.14159 * 2.0));
@@ -154,12 +165,34 @@ void main()
 		{
 			col.xyz = vec3(1.0) - col.xyz;
 		}
-		// TODO: color shifts effect normals, specular, ...
+		// TODO: color shifts effect normals, specular, etc. maps!
 		else if (fi.tcol.x > 0.51)
 		{
 			if (fi.tcol.x > (146.0 / 255.0))
 			{
-				if (fi.tcol.x > (150.0 / 255.0))
+				if (fi.tcol.x > (152.0 / 255.0))
+				{
+					reflecto = 0.5;
+					extra_specular = 1.0;
+					rhBlur = 0.5;
+					rhb_fx = (!(col.w <= 0.99)) ? 1.0 : sqrt(length(fi.pos.xyz) * 0.05);
+#if MCM_TRANSP
+					rhb_fx = max(1.0, rhb_fx);
+					always_do_transp = 1;
+#endif
+					float w_adder = (1.0 / tex_width);
+					//float w_cc = get_wave_height(fi.pos.xyz);
+					float w_xp = get_wave_height(fi.pos.xyz + fi.tbn * vec3(w_adder, 0.0, 0.0));
+					float w_yp = get_wave_height(fi.pos.xyz + fi.tbn * vec3(0.0, w_adder, 0.0));
+					float w_xm = get_wave_height(fi.pos.xyz + fi.tbn * vec3(-w_adder, 0.0, 0.0));
+					float w_ym = get_wave_height(fi.pos.xyz + fi.tbn * vec3(0.0, -w_adder, 0.0));
+					const float w_amp = 2.0;
+					vec3 w_vx = (vec3(w_amp, 0.0, w_xp - w_xm));
+					vec3 w_vy = (vec3(0.0, w_amp, w_yp - w_ym));
+					force_norm_tex = normalize(cross(w_vx, w_vy));
+					do_force_norm_tex = 1;
+				}
+				else if (fi.tcol.x > (150.0 / 255.0))
 				{
 					float genNoise = snoise2(vec3(ivec3(fi.pos) + ivec3(time)));
 					float sparkleX = mod(genNoise * 10.0, 0.8) + 0.1;
@@ -334,13 +367,12 @@ void main()
 	renderhint2 = vec4(0.0, reflecto, 0.0, 1.0);
 #endif // else - MCM_TRANSP
 #endif // MCM_LIGHTS
-	float rhb_fx = 1.0;
-	if (rhBlur > 0.0 && col.w < 0.99)
-	{
-		rhb_fx = sqrt(length(fi.pos.xyz) * 0.05);
-	}
 #if MCM_NO_ALPHA_CAP
-	if (col.w * fi.color.w * rhb_fx <= 0.01)
+	if (
+#if MCM_TRANSP
+		always_do_transp == 0 &&
+#endif
+		col.w * fi.color.w * rhb_fx <= 0.01)
 	{
 		discard;
 	}
@@ -349,12 +381,12 @@ void main()
 #endif
 #else // MCM_NO_ALPHA_CAP
 #if MCM_TRANSP
-	if (col.w * fi.color.w * rhb_fx >= 0.99)
+	if (always_do_transp == 0 && col.w * fi.color.w * rhb_fx >= 0.99)
 	{
 		discard;
 	}
 #else // MCM_TRANSP
-	if (col.w * fi.color.w * rhb_fx < 0.99)
+	if (!(col.w * fi.color.w * rhb_fx >= 0.99))
 	{
 		discard;
 	}
@@ -364,7 +396,7 @@ void main()
 #if MCM_BRIGHT
 #else // MCM_BRIGHT
 	float opac_min = 0.0;
-	vec3 norms = read_texture(normal_tex, vec3(fi.texcoord.xy, tc_z)).xyz * 2.0 - vec3(1.0);
+	vec3 norms = do_force_norm_tex == 1 ? force_norm_tex : read_texture(normal_tex, vec3(fi.texcoord.xy, tc_z)).xyz * 2.0 - vec3(1.0);
 	vec3 tf_normal = normalize(fi.tbn * norms);
 	nrml = vec4(tf_normal, 1.0);
 #if MCM_LIGHTS
@@ -470,7 +502,7 @@ void main()
 		vec3 L = light_path / light_length; // Get the light's movement direction as a vector
 		vec3 diffuse = max(dot(tf_normal, L), 0.0) * vec3(diffuse_albedo); // Find out how much diffuse light to apply
 		vec3 reller = normalize(fi.pos - eye_pos);
-		float spec_res = pow(max(dot(reflect(L, -tf_normal), reller), 0.0), 200.0) * specular_albedo * specularStrength;
+		float spec_res = pow(max(dot(reflect(L, -tf_normal), reller), 0.0), 16.0) * specular_albedo * specularStrength;
 		spec_res = max(0.0, spec_res);
 		opac_min += spec_res;
 		vec3 specular = vec3(spec_res); // Find out how much specular light to apply.
@@ -493,7 +525,7 @@ void main()
 #if MCM_INVERSE_FADE
 	float dist = linearizeDepth(gl_FragCoord.z);
 	vec2 fc_xy = gl_FragCoord.xy / screen_size.xy;
-	float depthval = linearizeDepth(texture(depth, fc_xy).x);
+	float depthval = linearizeDepth(texture(deptht, fc_xy).x);
 	float mod2 = min(max(0.001 / max(depthval - dist, 0.001), 0.0), 1.0);
 	if (mod2 < 0.8)
 	{
@@ -503,7 +535,7 @@ void main()
 #if MCM_FADE_DEPTH
 	float dist = linearizeDepth(gl_FragCoord.z);
 	vec2 fc_xy = gl_FragCoord.xy / screen_size.xy;
-	float depthval = linearizeDepth(texture(depth, fc_xy).x);
+	float depthval = linearizeDepth(texture(deptht, fc_xy).x);
 	color.w *= min(max((depthval - dist) * fi.size * 0.5 * (screen_size.w - screen_size.z), 0.0), 1.0);
 #endif // MCM_FADE_DEPTH
 }

@@ -23,7 +23,7 @@ layout (location = 7) uniform float volume;
 layout (location = 8) uniform vec2 light_clamp = vec2(0.0, 1.0);
 // ...
 layout (location = 16) uniform float minimum_light = 0.0;
-layout (location = 17) uniform float tex_width = 256;
+layout (location = 17) uniform float tex_width = 256.0;
 
 in struct vox_out
 {
@@ -180,6 +180,7 @@ void main()
 		{
 			col.xyz = vec3(1.0) - col.xyz;
 		}
+		// TODO: color shifts effect normals, specular, etc. maps!
 		else if (f.tcol.x > 0.51)
 		{
 			if (f.tcol.x > (146.0 / 255.0))
@@ -221,7 +222,6 @@ void main()
 				refl = 0.75;
 			}
 		}
-		// TODO: color shifts effect normals, specular, ...
 		else if (f.tcol.y > (172.0 / 255.0))
 		{
 			if (f.tcol.y > (174.0 / 255.0))

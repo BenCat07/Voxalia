@@ -48,11 +48,11 @@ layout (location = 4) uniform float desaturationAmount = 1.0;
 // ...
 layout (location = 6) uniform float time;
 layout (location = 7) uniform float volume;
-layout (location = 8) uniform vec2 u_screensize = vec2(1024, 1024);
+layout (location = 8) uniform vec2 u_screensize = vec2(1024.0, 1024.0);
 layout (location = 9) uniform mat4 lights_used_helper;
 // ...
 layout (location = 16) uniform float minimum_light;
-layout (location = 17) uniform float tex_width = 256;
+layout (location = 17) uniform float tex_width = 256.0;
 // ...
 layout (location = 20) uniform mat4 shadow_matrix_array[LIGHTS_MAX];
 layout (location = 58) uniform mat4 light_details_array[LIGHTS_MAX];
@@ -101,6 +101,7 @@ void main()
 		{
 			tcolor.xyz = vec3(1.0) - tcolor.xyz;
 		}
+		// TODO: color shifts effect normals, specular, etc. maps!
 		else if (f.tcol.x > 0.51)
 		{
 			if (f.tcol.x > (150.0 / 255.0))
@@ -142,7 +143,6 @@ void main()
 				//refl = 0.75;
 			}
 		}
-		// TODO: color shifts effect normals, specular, ...
 		else if (f.tcol.y > (172.0 / 255.0))
 		{
 			if (f.tcol.y > (174.0 / 255.0))

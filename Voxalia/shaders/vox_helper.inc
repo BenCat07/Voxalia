@@ -89,10 +89,11 @@ const vec4 tcolors_val[] = vec4[](
 	vec4(0.8, 0.7, 0.55, 1.0), // TAN = 80
 	vec4((147.0 / 255.0), 0.5, 0.5, 0.0), // TILED_TWO = 81
 	vec4((149.0 / 255.0), 0.5, 0.5, 0.0), // TILED_THREE = 82
-	vec4((151.0 / 255.0), 0.5, 0.5, 0.0) // SPARKLING = 83
-	// TODO: Next will be X 153.0+
-	// TODO: After X=175.0, there's still room for Z 147.0+
-	// TODO: up to 127
+	vec4((151.0 / 255.0), 0.5, 0.5, 0.0), // SPARKLING = 83
+	vec4((153.0 / 255.0), 0.5, 0.5, 0.0) // WATER = 84
+	// TODO: Next will be X=155.0+
+	// TODO: After X=175.0, there's still room for Z=147.0+
+	// TODO: up to ID=127
 );
 
 const uint TRANSP_START = 33;

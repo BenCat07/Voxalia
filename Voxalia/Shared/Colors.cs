@@ -103,6 +103,7 @@ namespace Voxalia.Shared
         public static Color4F TILED_TWO = Color4F.FromArgb(0, 147, 127, 127);
         public static Color4F TILED_THREE = Color4F.FromArgb(0, 149, 127, 127);
         public static Color4F SPARKLING = Color4F.FromArgb(0, 151, 127, 127);
+        public static Color4F WATER = Color4F.FromArgb(0, 153, 127, 127);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
@@ -181,6 +182,7 @@ namespace Voxalia.Shared
         public static int TRANS2;
         public static int TRANS_BASE;
         public static int M_BLUR;
+        public static int M_WATER;
 
         static int Register(string name, Color4F col)
         {
@@ -275,7 +277,8 @@ namespace Voxalia.Shared
             Register("TAN", TAN);
             Register("TILED_TWO", TILED_TWO);
             Register("TILED_THREE", TILED_THREE);
-            Register("SPARKLING", SPARKLING); // 83
+            Register("SPARKLING", SPARKLING);
+            M_WATER = Register("WATER", WATER); // 84
             // TODO: Rest to 127
         }
     }

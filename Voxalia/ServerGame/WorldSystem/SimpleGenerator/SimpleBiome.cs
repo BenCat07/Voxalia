@@ -36,6 +36,11 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator
             return Material.WATER;
         }
 
+        public virtual byte WaterPaint()
+        {
+            return (byte)Colors.M_WATER;
+        }
+
         public virtual Material SandMaterial()
         {
             return Material.SAND;

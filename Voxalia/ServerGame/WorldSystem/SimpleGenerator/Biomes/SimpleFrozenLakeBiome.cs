@@ -36,5 +36,10 @@ namespace Voxalia.ServerGame.WorldSystem.SimpleGenerator.Biomes
         {
             return Material.ICE;
         }
+
+        public override byte WaterPaint()
+        {
+            return 0;
+        }
     }
 }
