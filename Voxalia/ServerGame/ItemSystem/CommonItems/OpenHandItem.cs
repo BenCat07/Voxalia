@@ -51,7 +51,7 @@ namespace Voxalia.ServerGame.ItemSystem.CommonItems
             }
             PlayerEntity player = (PlayerEntity)entity;
             Location end = player.ItemSource() + player.ItemDir * 5;
-            CollisionResult cr = player.TheRegion.Collision.CuboidLineTrace(new Location(0.1, 0.1, 0.1), player.GetEyePosition(), end, player.IgnoreThis);
+            CollisionResult cr = player.TheRegion.Collision.CuboidLineTrace(new Location(0.1, 0.1, 0.1), player.ItemSource(), end, player.IgnoreThis);
             if (cr.Hit && cr.HitEnt != null)
             {
                 // TODO: handle static world impact
