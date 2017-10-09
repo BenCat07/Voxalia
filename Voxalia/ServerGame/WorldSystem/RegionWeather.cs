@@ -26,26 +26,57 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public Location Wind = new Location(0.3, 0, 0);
 
+        private HashSet<Vector2i> HandledSections = new HashSet<Vector2i>();
+
+        const int CLOUD_GRID_SCALE = 600;
+
+        const double CLOUD_HEIGHT_RANGE = 500.0;
+
+        const double CLOUD_HEIGHT_MIN = 300.0;
+
         /// <summary>
         /// Immediately updates all clouds known to the server.
         /// Called by the standard server tick loop.
         /// </summary>
         public void TickClouds()
         {
-            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
+            foreach (PlayerEntity player in Players)
             {
-                foreach (Chunk chunk in chkmap.Values)
+                for (double x = -player.CloudDistLimit; x <= player.CloudDistLimit; x += CLOUD_GRID_SCALE)
                 {
-                    // TODO: Only if pure air?
-                    if (chunk.WorldPosition.Z >= 2 && chunk.WorldPosition.Z <= 5) // TODO: Better estimating. Also, config?
+                    for (double y = -player.CloudDistLimit; y <= player.CloudDistLimit; y += CLOUD_GRID_SCALE)
                     {
-                        if (Utilities.UtilRandom.Next(400) > 399) // TODO: Config?
+                        Vector2i pos = new Vector2i((int)((player.GetPosition().X + x) * (1.0 / CLOUD_GRID_SCALE)), (int)((player.GetPosition().Y + y) * (1.0 / CLOUD_GRID_SCALE)));
+                        if (!HandledSections.Contains(pos))
                         {
-                            double d1 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
-                            double d2 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
-                            double d3 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
-                            Cloud cloud = new Cloud(this, chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(d1, d2, d3));
+                            double d1 = Utilities.UtilRandom.NextDouble() * CLOUD_GRID_SCALE;
+                            double d2 = Utilities.UtilRandom.NextDouble() * CLOUD_GRID_SCALE;
+                            double d3 = Utilities.UtilRandom.NextDouble() * CLOUD_HEIGHT_RANGE + CLOUD_HEIGHT_MIN;
+                            Cloud cloud = new Cloud(this, new Location((player.GetPosition().X + x) + d1, (player.GetPosition().Y + y) + d2, d3)) { GenFull = true };
                             SpawnCloud(cloud);
+                        }
+                    }
+                }
+            }
+            HandledSections.Clear();
+            foreach (PlayerEntity player in Players)
+            {
+                for (double x = -player.CloudDistLimit; x <= player.CloudDistLimit; x += CLOUD_GRID_SCALE)
+                {
+                    for (double y = -player.CloudDistLimit; y <= player.CloudDistLimit; y += CLOUD_GRID_SCALE)
+                    {
+                        Vector2i pos = new Vector2i((int)((player.GetPosition().X + x) * (1.0 / CLOUD_GRID_SCALE)), (int)((player.GetPosition().Y + y) * (1.0 / CLOUD_GRID_SCALE)));
+                        if (!HandledSections.Contains(pos))
+                        {
+                            HandledSections.Add(pos);
+                            if (Utilities.UtilRandom.Next(400) > 398) // TODO: Config?
+                            {
+                                double d1 = Utilities.UtilRandom.NextDouble() * CLOUD_GRID_SCALE;
+                                double d2 = Utilities.UtilRandom.NextDouble() * CLOUD_GRID_SCALE;
+                                double d3 = Utilities.UtilRandom.NextDouble() * CLOUD_HEIGHT_RANGE + CLOUD_HEIGHT_MIN;
+                                Cloud cloud = new Cloud(this, new Location((player.GetPosition().X + x) + d1, (player.GetPosition().Y + y) + d2, d3));
+                                SpawnCloud(cloud);
+                            }
                         }
                     }
                 }
@@ -55,10 +86,10 @@ namespace Voxalia.ServerGame.WorldSystem
                 // TODO: if in non-air chunk, dissipate rapidly?
                 Location ppos = Clouds[i].Position;
                 Clouds[i].Position = ppos + Wind + Clouds[i].Velocity;
-                bool changed = (Utilities.UtilRandom.Next(100) > Clouds[i].Points.Count)
-                    && (Utilities.UtilRandom.Next(100) > Clouds[i].Points.Count)
-                    && (Utilities.UtilRandom.Next(100) > Clouds[i].Points.Count)
-                    && (Utilities.UtilRandom.Next(100) > Clouds[i].Points.Count);
+                bool changed = (Utilities.UtilRandom.Next(25) > Clouds[i].Points.Count)
+                    && (Utilities.UtilRandom.Next(25) > Clouds[i].Points.Count)
+                    && (Utilities.UtilRandom.Next(25) > Clouds[i].Points.Count)
+                    && (Utilities.UtilRandom.Next(25) > Clouds[i].Points.Count);
                 for (int s = 0; s < Clouds[i].Sizes.Count; s++)
                 {
                     Clouds[i].Sizes[s] += 0.05f;
@@ -67,37 +98,57 @@ namespace Voxalia.ServerGame.WorldSystem
                         Clouds[i].Sizes[s] = Clouds[i].EndSizes[s];
                     }
                 }
+                bool anySee = false;
                 foreach (PlayerEntity player in Players)
                 {
-                    bool prev = player.ShouldSeeLODPositionOneSecondAgo(ppos);
-                    bool curr = player.ShouldLoadPosition(Clouds[i].Position);
+                    bool prev = player.VisibleClouds.Contains(Clouds[i].CID);
+                    bool curr = player.ShouldSeeClouds(Clouds[i].Position);
+                    if (curr)
+                    {
+                        anySee = true;
+                    }
                     if (prev && !curr)
                     {
                         player.Network.SendPacket(new RemoveCloudPacketOut(Clouds[i].CID));
                     }
-                    else if (curr && (Clouds[i].IsNew || !prev))
+                    else if (curr && !prev)
                     {
                         player.Network.SendPacket(new AddCloudPacketOut(Clouds[i]));
                     }
                 }
                 Clouds[i].IsNew = false;
+                if (Clouds[i].GenFull)
+                {
+                    Clouds[i].GenFull = false;
+                    int count = Utilities.UtilRandom.Next(5, 15);
+                    for (int cct = 0; cct < count; cct++)
+                    {
+                        AddToCloud(Clouds[i], 190.0);
+                        foreach (PlayerEntity player in Players)
+                        {
+                            bool curr = player.VisibleClouds.Contains(Clouds[i].CID);
+                            if (curr)
+                            {
+                                player.Network.SendPacket(new AddToCloudPacketOut(Clouds[i], Clouds[i].Points.Count - 1));
+                            }
+                        }
+                    }
+                }
                 if (changed)
                 {
                     AddToCloud(Clouds[i], 0f);
                     foreach (PlayerEntity player in Players)
                     {
-                        bool curr = player.ShouldLoadPosition(Clouds[i].Position);
+                        bool curr = player.VisibleClouds.Contains(Clouds[i].CID);
                         if (curr)
                         {
                             player.Network.SendPacket(new AddToCloudPacketOut(Clouds[i], Clouds[i].Points.Count - 1));
                         }
                     }
                 }
-                Vector3i cpos = ChunkLocFor(Clouds[i].Position);
-                if (!TryFindChunk(cpos, out Chunk _))
+                if (!anySee)
                 {
-                    DeleteCloud(Clouds[i]);
-                    continue;
+                    Clouds.RemoveAt(i);
                 }
             }
             foreach (PlayerEntity player in Players)
@@ -113,14 +164,14 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <param name="start">The minimum starting size.</param>
         public void AddToCloud(Cloud cloud, double start)
         {
-            double modif = Math.Sqrt(cloud.Points.Count) * 1.5;
+            double modif = Math.Sqrt(cloud.Points.Count + 1) * 15.0;
             double d1 = Utilities.UtilRandom.NextDouble() * modif * 2 - modif;
             double d2 = Utilities.UtilRandom.NextDouble() * modif * 2 - modif;
             double d3 = Utilities.UtilRandom.NextDouble() * modif * 2 - modif;
-            double d4 = Utilities.UtilRandom.NextDouble() * 10 * modif;
+            double d4 = Utilities.UtilRandom.NextDouble() * 80;
             cloud.Points.Add(new Location(d1, d2, d3));
-            cloud.Sizes.Add(start > d4 ? (double)d4 : start);
-            cloud.EndSizes.Add((double)d4);
+            cloud.Sizes.Add(start > d4 ? start : d4);
+            cloud.EndSizes.Add(d4 * 3);
         }
 
         /// <summary>
@@ -131,7 +182,7 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             foreach (PlayerEntity player in Players)
             {
-                if (player.ShouldSeePosition(cloud.Position))
+                if (player.VisibleClouds.Contains(cloud.CID))
                 {
                     player.Network.SendPacket(new RemoveCloudPacketOut(cloud.CID));
                 }
@@ -151,27 +202,6 @@ namespace Voxalia.ServerGame.WorldSystem
                 {
                     DeleteCloud(Clouds[i]);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Adds clouds to a new chunk based on random noise, and present cloud configuration.
-        /// </summary>
-        /// <param name="chunk">The chunk to add clouds to.</param>
-        public void AddCloudsToNewChunk(Chunk chunk)
-        {
-            if (chunk.WorldPosition.Z >= 3 && chunk.WorldPosition.Z <= 7 && Utilities.UtilRandom.Next(100) > 90)
-            {
-                double d1 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
-                double d2 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
-                double d3 = Utilities.UtilRandom.NextDouble() * Chunk.CHUNK_SIZE;
-                Cloud cloud = new Cloud(this, chunk.WorldPosition.ToLocation() * Chunk.CHUNK_SIZE + new Location(d1, d2, d3));
-                int rand = Utilities.UtilRandom.Next(7) > 2 ? Utilities.UtilRandom.Next(50) + 50: Utilities.UtilRandom.Next(100);
-                for (int i = 0; i < rand; i++)
-                {
-                    AddToCloud(cloud, 10f);
-                }
-                SpawnCloud(cloud);
             }
         }
 

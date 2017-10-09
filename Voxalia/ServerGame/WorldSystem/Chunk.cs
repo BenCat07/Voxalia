@@ -283,7 +283,6 @@ namespace Voxalia.ServerGame.WorldSystem
                 return;
             }
             LateSpawn();
-            OwningRegion.AddCloudsToNewChunk(this);
             OwningRegion.NoticeChunkForUpperArea(WorldPosition);
             ChunkDetect();
             if (IsNew)

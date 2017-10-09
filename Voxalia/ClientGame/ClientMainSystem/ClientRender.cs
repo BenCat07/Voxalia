@@ -1144,7 +1144,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     ch.Render();
                 }
             }*/
-            // TODO: Very distant clouds? new ParticlesEntity(TheRegion) { DistMin = 100, DistMax = TEMP_PARTICLE_MAXRANGE, OutView = true }.Render();
             GraphicsUtil.CheckError("Rendering - Sky - Slods");
             SetEnts();
             if (MainWorldView.FBOid.IsForward())
@@ -1895,6 +1894,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 SetEnts();
                 if (transparents)
                 {
+                    new ParticlesEntity(TheRegion) { DistMin = 100, DistMax = TEMP_PARTICLE_MAXRANGE, OutView = true }.Render();
                     GraphicsUtil.CheckError("Rendering - 0 - Transp - Pre");
                     List<Entity> entsRender = CVars.r_drawents.ValueB ? new List<Entity>(TheRegion.Entities) : new List<Entity>();
                     foreach (Chunk ch in TheRegion.chToRender)

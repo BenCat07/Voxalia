@@ -27,6 +27,8 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public bool IsNew = true;
 
+        public bool GenFull = false;
+
         public Region TheRegion;
 
         public Location Position = Location.Zero;

@@ -967,6 +967,26 @@ namespace Voxalia.ServerGame.EntitySystem
 
         Vector3i excessTops = new Vector3i(int.MaxValue, int.MaxValue, int.MaxValue);
 
+        /// <summary>
+        /// Cloud view distance limit.
+        /// </summary>
+        public double CloudDistLimit = 30.0 * Constants.CHUNK_WIDTH;
+
+        /// <summary>
+        /// Which clouds the player can see.
+        /// </summary>
+        public HashSet<long> VisibleClouds = new HashSet<long>();
+
+        /// <summary>
+        /// Returns whether the player should see clouds at a given world position.
+        /// </summary>
+        /// <param name="worldPos">The world position.</param>
+        /// <returns>Whether chunks are visible.</returns>
+        public bool ShouldSeeClouds(Location worldPos)
+        {
+            return worldPos.DistanceSquared_Flat(LoadRelPos) < CloudDistLimit * CloudDistLimit;
+        }
+
         public void SendExcessTops()
         {
             Vector3i cpos = TheRegion.ChunkLocFor(GetPosition());
