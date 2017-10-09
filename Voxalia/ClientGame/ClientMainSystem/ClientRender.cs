@@ -943,6 +943,11 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void RenderSkybox()
         {
+            SetEnts();
+            if (MainWorldView.FBOid == FBOID.MAIN)
+            {
+                GL.Uniform1(16, 1.0f);
+            }
             GraphicsUtil.CheckError("Rendering - Sky - Before");
             GL.UniformMatrix4(1, false, ref MainWorldView.OutViewMatrix);
             GraphicsUtil.CheckError("Rendering - Sky - Prep - Mat");
@@ -1166,6 +1171,10 @@ namespace Voxalia.ClientGame.ClientMainSystem
             if (MainWorldView.FBOid.IsForward())
             {
                 //GL.Uniform2(14, new Vector2(CVars.r_znear.ValueF, ZFar()));
+            }
+            if (MainWorldView.FBOid == FBOID.MAIN)
+            {
+                GL.Uniform1(16, 0.0f);
             }
             GL.UniformMatrix4(1, false, ref MainWorldView.PrimaryMatrix);
             GL.ClearBuffer(ClearBuffer.Depth, 0, new float[] { 1f });

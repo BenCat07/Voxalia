@@ -93,6 +93,7 @@ namespace Voxalia.ClientGame.CommandSystem.CommonCommands
                 success = true;
                 TheClient.Shaders.Clear();
                 TheClient.ShadersCheck();
+                TheClient.Engine.GetShaders();
                 TheClient.VoxelComputer.LoadShaders();
             }
             if (arg == "audio" || is_all)

@@ -422,6 +422,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             CVars.r_transplighting.OnChanged(null, null);
             CVars.r_lighting.OnChanged += (o, e) => Engine.Deferred_Lights = CVars.r_lighting.ValueB;
             CVars.r_lighting.OnChanged(null, null);
+            CVars.r_fast.OnChanged += (o, e) => Engine.MainView.FastOnly = CVars.r_fast.ValueB;
+            CVars.r_fast.OnChanged(null, null);
             // TODO: Update SunAdjust data
         }
 

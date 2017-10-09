@@ -123,9 +123,32 @@ vec4 read_texture(in sampler2DArray samp_in, in vec3 texcrd)
 
 const int TEX_REQUIRED_BITS = (256 * 256 * 5);
 
+const int NUM_WAVES = 9;
+
+// TODO: (Semi-)dynamic waves?
+const vec4 waves[NUM_WAVES] = vec4[NUM_WAVES](
+	// XSpeed, YSpeed, Amplitude, Frequency
+	vec4(0.1, 10.0, 1.0, 0.5),
+	vec4(7.5, 5.0, 1.0, 0.7),
+	vec4(20.4, -2.3, 4.0, 0.1),
+	vec4(0.0, 0.01, 4.0, 0.3),
+	vec4(-5.0, 1.3, 2.5, 0.02),
+	vec4(-5.0, -7, 2.5, 0.02),
+	vec4(-2.0, -12, 2.5, 0.5),
+	vec4(1.2, -0.1, 2.1, 0.3),
+	vec4(-12.0, 2.5, 2.1, 0.5)
+);
+
 float get_wave_height(in vec3 w_pos)
 {
-	return snoise2(w_pos + vec3(time, time * 0.5, time * 2.0)); // TODO: base motion off wind?
+	vec3 f_pos = vec3(w_pos.x * (sin(time) * 0.5 + 0.5), w_pos.y * (sin(time * 0.5) * 0.5 + 0.5), w_pos.z * (sin(time * 2.0) * 0.5 + 0.5));
+	// TODO: base motion off wind?
+	float h = 0.0;
+	for (int i = 0; i < NUM_WAVES; i++)
+	{
+		h += waves[i].z * sin(dot(waves[i].xyz / (waves[i].x + waves[i].y), w_pos) * waves[i].w + waves[i].w * (waves[i].x + waves[i].y) * time);
+	}
+	return h;// / NUM_WAVES;
 }
 
 void main()
@@ -186,11 +209,17 @@ void main()
 					float w_yp = get_wave_height(fi.pos.xyz + fi.tbn * vec3(0.0, w_adder, 0.0));
 					float w_xm = get_wave_height(fi.pos.xyz + fi.tbn * vec3(-w_adder, 0.0, 0.0));
 					float w_ym = get_wave_height(fi.pos.xyz + fi.tbn * vec3(0.0, -w_adder, 0.0));
-					const float w_amp = 2.0;
-					vec3 w_vx = (vec3(w_amp, 0.0, w_xp - w_xm));
-					vec3 w_vy = (vec3(0.0, w_amp, w_yp - w_ym));
+					const float w_inv_amp = 0.5;
+					vec3 w_vx = (vec3(w_inv_amp, 0.0, w_xp - w_xm));
+					vec3 w_vy = (vec3(0.0, w_inv_amp, w_yp - w_ym));
 					force_norm_tex = normalize(cross(w_vx, w_vy));
 					do_force_norm_tex = 1;
+					//float w_lmod = force_norm_tex.z;
+					const float w_inv_amp2 = 0.07;
+					vec3 w_vx2 = (vec3(w_inv_amp2, 0.0, w_xp - w_xm));
+					vec3 w_vy2 = (vec3(0.0, w_inv_amp2, w_yp - w_ym));
+					float w_lmod = normalize(cross(w_vx2, w_vy2)).z;
+					col.xyz *= (2.0 - w_lmod);
 				}
 				else if (fi.tcol.x > (150.0 / 255.0))
 				{
