@@ -30,9 +30,14 @@ namespace Voxalia.ServerGame.WorldSystem
 
         const int CLOUD_GRID_SCALE = 600;
 
-        const double CLOUD_HEIGHT_RANGE = 500.0;
+        const double CLOUD_HEIGHT_RANGE = 200.0;
 
-        const double CLOUD_HEIGHT_MIN = 300.0;
+        const double CLOUD_HEIGHT_CENTER = 700.0;
+
+        public double RandomCloudHeight()
+        {
+            return (Utilities.UtilRandom.NextDouble() * 2.0 - 1.0) * (Utilities.UtilRandom.NextDouble() * 2.0 - 1.0) * CLOUD_HEIGHT_RANGE + CLOUD_HEIGHT_CENTER;
+        }
 
         /// <summary>
         /// Immediately updates all clouds known to the server.
@@ -51,7 +56,7 @@ namespace Voxalia.ServerGame.WorldSystem
                         {
                             double d1 = Utilities.UtilRandom.NextDouble() * CLOUD_GRID_SCALE;
                             double d2 = Utilities.UtilRandom.NextDouble() * CLOUD_GRID_SCALE;
-                            double d3 = Utilities.UtilRandom.NextDouble() * CLOUD_HEIGHT_RANGE + CLOUD_HEIGHT_MIN;
+                            double d3 = RandomCloudHeight();
                             Cloud cloud = new Cloud(this, new Location((player.GetPosition().X + x) + d1, (player.GetPosition().Y + y) + d2, d3)) { GenFull = true };
                             SpawnCloud(cloud);
                         }
@@ -73,7 +78,7 @@ namespace Voxalia.ServerGame.WorldSystem
                             {
                                 double d1 = Utilities.UtilRandom.NextDouble() * CLOUD_GRID_SCALE;
                                 double d2 = Utilities.UtilRandom.NextDouble() * CLOUD_GRID_SCALE;
-                                double d3 = Utilities.UtilRandom.NextDouble() * CLOUD_HEIGHT_RANGE + CLOUD_HEIGHT_MIN;
+                                double d3 = RandomCloudHeight();
                                 Cloud cloud = new Cloud(this, new Location((player.GetPosition().X + x) + d1, (player.GetPosition().Y + y) + d2, d3));
                                 SpawnCloud(cloud);
                             }
@@ -168,10 +173,11 @@ namespace Voxalia.ServerGame.WorldSystem
             double d1 = Utilities.UtilRandom.NextDouble() * modif * 2 - modif;
             double d2 = Utilities.UtilRandom.NextDouble() * modif * 2 - modif;
             double d3 = Utilities.UtilRandom.NextDouble() * modif * 2 - modif;
-            double d4 = Utilities.UtilRandom.NextDouble() * 80;
+            double d4s = Utilities.UtilRandom.NextDouble() * 30.0;
+            double d4f = Utilities.UtilRandom.NextDouble() * 60.0 + 60.0;
             cloud.Points.Add(new Location(d1, d2, d3));
-            cloud.Sizes.Add(start > d4 ? start : d4);
-            cloud.EndSizes.Add(d4 * 3);
+            cloud.Sizes.Add(start > d4s ? start : d4s);
+            cloud.EndSizes.Add(d4f * 3);
         }
 
         /// <summary>
