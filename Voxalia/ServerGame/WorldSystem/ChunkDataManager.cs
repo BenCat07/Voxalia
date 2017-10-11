@@ -341,7 +341,7 @@ namespace Voxalia.ServerGame.WorldSystem
             det.Version = doc["version"].AsInt32;
             det.Flags = (ChunkFlags)doc["flags"].AsInt32;
             byte[] blk = doc["blocks"].AsBinary;
-            det.Blocks = blk.Length == 0 ? blk : FileHandler.Uncompress(blk);
+            det.Blocks = blk.Length == 0 ? blk : FileHandler.Decompress(blk);
             det.Reachables = doc["reach"].AsBinary;
             return det;
         }
@@ -384,8 +384,8 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return new KeyValuePair<byte[], byte[]>(null, null);
             }
-            byte[] b1 = FileHandler.Uncompress(doc["tops"].AsBinary);
-            byte[] b2 = FileHandler.Uncompress(doc["topstrans"].AsBinary);
+            byte[] b1 = FileHandler.Decompress(doc["tops"].AsBinary);
+            byte[] b2 = FileHandler.Decompress(doc["topstrans"].AsBinary);
             return new KeyValuePair<byte[], byte[]>(b1, b2);
         }
 
@@ -408,8 +408,8 @@ namespace Voxalia.ServerGame.WorldSystem
             {
                 return new KeyValuePair<byte[], byte[]>(null, null);
             }
-            byte[] b1 = FileHandler.Uncompress(doc["tops"].AsBinary);
-            byte[] b2 = FileHandler.Uncompress(doc["topstrans"].AsBinary);
+            byte[] b1 = FileHandler.Decompress(doc["tops"].AsBinary);
+            byte[] b2 = FileHandler.Decompress(doc["topstrans"].AsBinary);
             return new KeyValuePair<byte[], byte[]>(b1, b2);
         }
 

@@ -96,7 +96,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             byte[] data_orig;
             try
             {
-                data_orig = posMult >= 6 ? data_unzipped : FileHandler.Uncompress(data_unzipped);
+                data_orig = posMult >= 6 ? data_unzipped : FileHandler.Decompress(data_unzipped);
             }
             catch (Exception ex)
             {

@@ -31,12 +31,12 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             int x = Utilities.BytesToInt(Utilities.BytesPartial(data, 0, 4));
             int y = Utilities.BytesToInt(Utilities.BytesPartial(data, 4, 4));
             int len = Utilities.BytesToInt(Utilities.BytesPartial(data, 4 + 4, 4));
-            byte[] subdata = FileHandler.Uncompress(Utilities.BytesPartial(data, 4 + 4 + 4, len));
+            byte[] subdata = FileHandler.Decompress(Utilities.BytesPartial(data, 4 + 4 + 4, len));
             for (int i = 0; i < (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH); i++)
             {
                 bua.Blocks[i] = Utilities.BytesToInt(Utilities.BytesPartial(subdata, i * 4, 4));
             }
-            subdata = FileHandler.Uncompress(Utilities.BytesPartial(data, 4 + 4 + 4 + len, data.Length - (4 + 4 + 4 + len)));
+            subdata = FileHandler.Decompress(Utilities.BytesPartial(data, 4 + 4 + 4 + len, data.Length - (4 + 4 + 4 + len)));
             for (int i = 0; i < (Constants.CHUNK_WIDTH * Constants.CHUNK_WIDTH * 4); i++)
             {
                 ushort mat = Utilities.BytesToUShort(Utilities.BytesPartial(subdata, i * 2, 2));

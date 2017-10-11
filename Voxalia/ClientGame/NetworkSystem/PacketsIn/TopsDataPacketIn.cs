@@ -37,7 +37,7 @@ namespace Voxalia.ClientGame.NetworkSystem.PacketsIn
             {
                 dat = new byte[data.Length - 9];
                 Array.Copy(data, 9, dat, 0, dat.Length);
-                dat = FileHandler.Uncompress(dat);
+                dat = FileHandler.Decompress(dat);
             }
             if (mode == 1)
             {
