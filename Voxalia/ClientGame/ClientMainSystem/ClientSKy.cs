@@ -18,6 +18,9 @@ using FreneticGameCore;
 using FreneticGameCore.Collision;
 using FreneticGameGraphics.LightingSystem;
 using FreneticGameGraphics.GraphicsHelpers;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Graphics.OpenGL4;
 
 namespace Voxalia.ClientGame.ClientMainSystem
 {
@@ -194,11 +197,19 @@ namespace Voxalia.ClientGame.ClientMainSystem
 
         private Location pSunAng = Location.Zero;
 
+        public double timeSinceSkyPatch = 0;
+
         /// <summary>
         /// Ticks the region, including all primary calculations and lighting updates.
         /// </summary>
         public void TickWorld(double delta)
         {
+            timeSinceSkyPatch += delta;
+            if (timeSinceSkyPatch > 5 || Math.Abs((SunAngle - pSunAng).BiggestValue()) > 10f) // TODO: CVar for this?
+            {
+                timeSinceSkyPatch = 0;
+                CreateSkyBox();
+            }
             Engine.SunAdjustDirection = TheSun.Direction;
             Engine.SunAdjustBackupLight = new OpenTK.Vector4(TheSun.InternalLights[0].color, 1.0f);
             Engine.MainView.SunLight_Minimum = sl_min;
@@ -218,8 +229,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
                     PlanetDir = Utilities.ForwardVector_Deg(PlanetAngle.Yaw, PlanetAngle.Pitch);
                     ThePlanet.Direction = PlanetDir;
                     ThePlanet.Reposition(corPos - ThePlanet.Direction * 30 * 6);
-                    Vector3 tsd = TheSun.Direction.ToBVector();
-                    Vector3 tpd = PlanetDir.ToBVector();
+                    BEPUutilities.Vector3 tsd = TheSun.Direction.ToBVector();
+                    BEPUutilities.Vector3 tpd = PlanetDir.ToBVector();
                     BEPUutilities.Quaternion.GetQuaternionBetweenNormalizedVectors(ref tsd, ref tpd, out BEPUutilities.Quaternion diff);
                     PlanetSunDist = (float)BEPUutilities.Quaternion.GetAngleFromQuaternion(ref diff) / (float)Utilities.PI180;
                     if (PlanetSunDist < 75)
@@ -280,6 +291,187 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 rTicks = 0;
             }
             TheRegion.TickWorld(delta);
+        }
+
+        /// <summary>
+        /// The sky box texture.
+        /// </summary>
+        public int SKY_TEX = -1;
+
+        /// <summary>
+        /// The sky box frame buffer object.
+        /// </summary>
+        public int[] SKY_FBO = null;
+
+        const int SKY_TEX_SIZE = 256;
+
+        public OpenTK.Vector3[] SkyDirs = new OpenTK.Vector3[]
+            {
+                new OpenTK.Vector3(1, 0, 0),
+                new OpenTK.Vector3(-1, 0, 0),
+                new OpenTK.Vector3(0, 1, 0),
+                new OpenTK.Vector3(0, -1, 0),
+                new OpenTK.Vector3(0, 0, 1),
+                new OpenTK.Vector3(0, 0, -1)
+            };
+
+        public OpenTK.Vector3[] SkyUps = new OpenTK.Vector3[]
+            {
+                new OpenTK.Vector3(0, 0, 1),
+                new OpenTK.Vector3(0, 0, 1),
+                new OpenTK.Vector3(0, 0, 1),
+                new OpenTK.Vector3(0, 0, 1),
+                new OpenTK.Vector3(0, 1, 0),
+                new OpenTK.Vector3(0, 1, 0),
+            };
+
+        /// <summary>
+        /// Creates the sky box texture.
+        /// </summary>
+        public void CreateSkyBox()
+        {
+            GraphicsUtil.CheckError("SKYBOX - Pre");
+            if (SKY_TEX < 0)
+            {
+                SKY_TEX = GL.GenTexture();
+                SKY_FBO = new int[6];
+                GL.BindTexture(TextureTarget.Texture2DArray, SKY_TEX);
+                GraphicsUtil.CheckError("SKYBOX - GenPrep");
+                GL.TexStorage3D(TextureTarget3d.Texture2DArray, 1, SizedInternalFormat.Rgba8, SKY_TEX_SIZE, SKY_TEX_SIZE, 6);
+                GraphicsUtil.CheckError("SKYBOX - TexConfig 0.1");
+                GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMinFilter, (int)(TextureMinFilter.Linear));
+                GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureMagFilter, (int)(TextureMagFilter.Linear));
+                GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+                GL.TexParameter(TextureTarget.Texture2DArray, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+                GL.BindTexture(TextureTarget.Texture2DArray, 0);
+                GraphicsUtil.CheckError("SKYBOX - TexConfig");
+                for (int i = 0; i < 6; i++)
+                {
+                    SKY_FBO[i] = GL.GenFramebuffer();
+                    GL.BindFramebuffer(FramebufferTarget.Framebuffer, SKY_FBO[i]);
+                    GL.FramebufferTextureLayer(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, SKY_TEX, 0, i);
+                    GraphicsUtil.CheckError("SKYBOX - FBO " + i);
+                }
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            }
+            GL.Viewport(0, 0, SKY_TEX_SIZE, SKY_TEX_SIZE);
+            GraphicsUtil.CheckError("SKYBOX - Render/Fast - Uniforms Prep");
+            Engine.Shaders3D.s_forwt_nofog.Bind();
+            GL.Uniform1(6, (float)Engine.GlobalTickTime);
+            GL.Uniform4(12, new OpenTK.Vector4(0f, 0f, 0f, 0f));
+            GL.Uniform1(13, FogMaxDist());
+            //GL.Uniform2(14, zfar_rel);
+            Engine.Rendering.SetColor(Color4F.White, MainWorldView);
+            Engine.Shaders3D.s_forwt.Bind();
+            GraphicsUtil.CheckError("SKYBOX - Render/Fast - Uniforms 4.2");
+            GL.Uniform1(6, (float)Engine.GlobalTickTime);
+            GraphicsUtil.CheckError("SKYBOX - Render/Fast - Uniforms 4.3");
+            GL.Uniform4(12, new OpenTK.Vector4(0f, 0f, 0f, 0f));
+            GraphicsUtil.CheckError("SKYBOX - Render/Fast - Uniforms 4.4");
+            GL.Uniform1(13, FogMaxDist());
+            Matrix4 projo = Matrix4.CreatePerspectiveFieldOfView((float)(90.0 * Utilities.PI180), 1f, 60f, ZFarOut());
+            GL.ActiveTexture(TextureUnit.Texture3);
+            Textures.Black.Bind();
+            GL.ActiveTexture(TextureUnit.Texture2);
+            Textures.Black.Bind();
+            GL.ActiveTexture(TextureUnit.Texture1);
+            Textures.NormalDef.Bind();
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.Disable(EnableCap.CullFace);
+            GL.Disable(EnableCap.DepthTest);
+            Rendering.SetColor(Color4.White, MainWorldView);
+            GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Prep - Color");
+            float skyAlpha = (float)Math.Max(Math.Min((SunAngle.Pitch - 70.0) / (-90.0), 1.0), 0.06);
+            for (int i = 0; i < 6; i++)
+            {
+                GL.BindFramebuffer(FramebufferTarget.Framebuffer, SKY_FBO[i]);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Prep - Color1.1");
+                GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Prep - Color1.2");
+                GL.ClearBuffer(ClearBuffer.Color, 0, new float[] { 0.0f, 1.0f, 1.0f, 1.0f });
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Prep - Color1.3");
+                Matrix4 viewo = Matrix4.LookAt(OpenTK.Vector3.Zero, SkyDirs[i], SkyUps[i]);
+                Matrix4 pv = viewo * projo;
+                GL.UniformMatrix4(1, false, ref pv);
+                Rendering.SetColor(Color4.White, MainWorldView);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Prep - Color2");
+                Matrix4 scale = Matrix4.CreateScale(GetSecondSkyDistance());
+                GL.UniformMatrix4(2, false, ref scale);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Prep - Scale");
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Prep");
+                // TODO: Only render relevant side?
+                // TODO: Save textures!
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "_night/bottom").Bind();
+                skybox[0].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "_night/top").Bind();
+                skybox[1].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "_night/xm").Bind();
+                skybox[2].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "_night/xp").Bind();
+                skybox[3].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "_night/ym").Bind();
+                skybox[4].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "_night/yp").Bind();
+                skybox[5].Render(false);
+                Rendering.SetColor(new OpenTK.Vector4(1, 1, 1, skyAlpha), MainWorldView);
+                scale = Matrix4.CreateScale(GetSkyDistance());
+                GL.UniformMatrix4(2, false, ref scale);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Night");
+                // TODO: Save textures!
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "/bottom").Bind();
+                skybox[0].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "/top").Bind();
+                skybox[1].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "/xm").Bind();
+                skybox[2].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "/xp").Bind();
+                skybox[3].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "/ym").Bind();
+                skybox[4].Render(false);
+                Textures.GetTexture("skies/" + CVars.r_skybox.Value + "/yp").Bind();
+                skybox[5].Render(false);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Light");
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Sun - Pre 1");
+                Rendering.SetColor(Color4.White, MainWorldView);
+                Engine.Shaders3D.s_forwt_nofog.Bind();
+                GL.UniformMatrix4(1, false, ref pv);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Sun - Pre 2");
+                float zf = ZFar();
+                float spf = ZFarOut() * 0.3333f;
+                Textures.GetTexture("skies/sun").Bind(); // TODO: Store var!
+                Matrix4 rot = Matrix4.CreateTranslation(-spf * 0.5f, -spf * 0.5f, 0f)
+                    * Matrix4.CreateRotationY((float)((-SunAngle.Pitch - 90f) * Utilities.PI180))
+                    * Matrix4.CreateRotationZ((float)((180f + SunAngle.Yaw) * Utilities.PI180))
+                    * Matrix4.CreateTranslation(ClientUtilities.Convert(TheSun.Direction * -(GetSkyDistance() * 0.95f)));
+                Rendering.RenderRectangle(0, 0, spf, spf, rot);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Sun");
+                Textures.GetTexture("skies/planet_sphere").Bind(); // TODO: Store var!
+                float ppf = ZFarOut() * 0.5f;
+                GL.Enable(EnableCap.CullFace);
+                Rendering.SetColor(new Color4(PlanetLight, PlanetLight, PlanetLight, 1), MainWorldView);
+                rot = Matrix4.CreateScale(ppf * 0.5f)
+                    * Matrix4.CreateTranslation(-ppf * 0.5f, -ppf * 0.5f, 0f)
+                    * Matrix4.CreateRotationZ((float)((180f + PlanetAngle.Yaw) * Utilities.PI180))
+                    * Matrix4.CreateTranslation(ClientUtilities.Convert(PlanetDir * -(GetSkyDistance() * 0.79f)));
+                GL.UniformMatrix4(2, false, ref rot);
+                Models.Sphere.Draw();
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - Planet");
+                GL.BindTexture(TextureTarget.Texture2D, 0);
+                Matrix4 ident = Matrix4.Identity;
+                GL.UniformMatrix4(2, false, ref ident);
+                GL.Disable(EnableCap.CullFace);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - N3 - Pre");
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - N3 - Light");
+                Rendering.SetColor(Color4.White, MainWorldView);
+                GraphicsUtil.CheckError("SKYBOX - Rendering - Sky - N3 - Color");
+                // TODO: other sky/outview data here as well? (Chunks, trees, etc.?)
+            }
+            GL.Enable(EnableCap.CullFace);
+            GL.Enable(EnableCap.DepthTest);
+            Shaders.ColorMultShader.Bind();
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+            GL.DrawBuffer(DrawBufferMode.Back);
+            GL.Viewport(0, 0, Window.Width, Window.Height);
         }
     }
 }

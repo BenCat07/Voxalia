@@ -62,7 +62,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             for (int i = 0; i < MaterialHelpers.Textures.Length; i++)
             {
                 string[] basic = MaterialHelpers.Textures[i].SplitFast('@')[0].SplitFast('$')[0].SplitFast('%')[0].SplitFast(',');
-                texs.Add(new MaterialTextureInfo() { Mat = i, ResultantID = extras });
+                texs.Add(new MaterialTextureInfo() { Mat = MaterialHelpers.TexMats[i], ResultantID = extras });
                 extras += basic.Length;
             }
             TEngine = eng;
@@ -139,12 +139,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
                         tex.NormalTextures = rorn[0].SplitFast(',');
                         if (tex.NormalTextures.Length > 1)
                         {
-                            SetAnimated((int)resID, tex.NormRate, tex.NormalTextures, NormalTextureID, -1);
+                            SetAnimated((int)resID, tex.NormRate, tex.NormalTextures, NormalTextureID, -1, ((Material)tex.Mat).GetPaintDefault());
                         }
                     }
                     else
                     {
-                        SetTexture((int)resID, "normal_def", -1);
+                        SetTexture((int)resID, "normal_def", -1, ((Material)tex.Mat).GetPaintDefault());
                     }
                     string[] rateornot = normalornot[0].SplitFast('%');
                     if (rateornot.Length > 1)
@@ -155,7 +155,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                     GL.BindTexture(TextureTarget.Texture2DArray, TextureID);
                     if (tex.Textures.Length > 1)
                     {
-                        SetAnimated((int)resID, tex.Rate, tex.Textures, TextureID, resID);
+                        SetAnimated((int)resID, tex.Rate, tex.Textures, TextureID, resID, ((Material)tex.Mat).GetPaintDefault());
                         if (tex.NormalTextures == null)
                         {
                             GL.BindTexture(TextureTarget.Texture2DArray, NormalTextureID);
@@ -165,12 +165,12 @@ namespace Voxalia.ClientGame.GraphicsSystems
                             {
                                 tex.NormalTextures[fz] = "normal_def";
                             }
-                            SetAnimated((int)resID, tex.Rate, tex.NormalTextures, NormalTextureID, -1);
+                            SetAnimated((int)resID, tex.Rate, tex.NormalTextures, NormalTextureID, -1, ((Material)tex.Mat).GetPaintDefault());
                         }
                     }
                     else
                     {
-                        SetTexture((int)resID, tex.Textures[0], resID);
+                        SetTexture((int)resID, tex.Textures[0], resID, ((Material)tex.Mat).GetPaintDefault());
                         if (tex.NormalTextures == null)
                         {
                             tex.NormalTextures = new string[] { "normal_def" };
@@ -341,7 +341,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             return combined;
         }
         
-        public void SetTexture(int ID, string texture, int oSpot)
+        public void SetTexture(int ID, string texture, int oSpot, byte dTex)
         {
             TEngine.LoadTextureIntoArray(texture, ID, TWidth);
             GraphicsUtil.CheckError("TextureBlock - SetTexture - TENG");
@@ -356,7 +356,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 {
                     (1.0f / 8.0f),
                     0.0f,
-                    0.0f,
+                    dTex + 0.1f,
                     1.0f
                 };
                 GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, ix, iy, id_z, 1, 1, 1, OpenTK.Graphics.OpenGL4.PixelFormat.Rgba, PixelType.Float, t);
@@ -373,7 +373,7 @@ namespace Voxalia.ClientGame.GraphicsSystems
             GraphicsUtil.CheckError("TextureBlock - SetAnimated - TENG");
         }
 
-        public void SetAnimated(int ID, double rate, string[] textures, int tid, int oSpot)
+        public void SetAnimated(int ID, double rate, string[] textures, int tid, int oSpot, byte dTex)
         {
             for (int i = 0; i < textures.Length; i++)
             {
@@ -388,12 +388,11 @@ namespace Voxalia.ClientGame.GraphicsSystems
                 int id_xy = oSpot % (TWidth * TWidth);
                 int ix = id_xy % TWidth;
                 int iy = id_xy / TWidth;
-                // ARGB
                 float[] t = new float[4]
                 {
                     (float)time / 256f,
                     textures.Length / 256f,
-                    0.0f,
+                    dTex + 0.1f,
                     1.0f
                 };
                 GL.TexSubImage3D(TextureTarget.Texture2DArray, 0, ix, iy, id_z, 1, 1, 1, OpenTK.Graphics.OpenGL4.PixelFormat.Rgba, PixelType.Float, t);

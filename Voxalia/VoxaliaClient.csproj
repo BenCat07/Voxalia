@@ -112,7 +112,7 @@
     <Compile Include="ClientGame\ClientMainSystem\ClientBase.cs" />
     <Compile Include="ClientGame\ClientMainSystem\ClientChat.cs" />
     <Compile Include="ClientGame\ClientMainSystem\ClientInventory.cs" />
-    <Compile Include="ClientGame\ClientMainSystem\ClientPhysics.cs" />
+    <Compile Include="ClientGame\ClientMainSystem\ClientSky.cs" />
     <Compile Include="ClientGame\ClientMainSystem\ClientRender.cs" />
     <Compile Include="ClientGame\ClientMainSystem\ClientTick.cs" />
     <Compile Include="ClientGame\ClientMainSystem\GameScreen.cs" />

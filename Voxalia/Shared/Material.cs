@@ -238,6 +238,9 @@ namespace Voxalia.Shared
                         case "texture_ym_add":
                             inf.Texture[(int)MaterialSide.YM].Add(opt[1].ToLowerFast());
                             break;
+                        case "defaultpaint":
+                            inf.DefaultPaint = Colors.ForName(opt[1]);
+                            break;
                         default:
                             SysConsole.Output(OutputType.WARNING, "Invalid material option: " + opt[0]);
                             break;
@@ -256,7 +259,7 @@ namespace Voxalia.Shared
                 allmats[(int)mat] = inf;
             }
             int c = 0;
-            Dictionary<string, int> TexturesToIDs = new Dictionary<string, int>();
+            Dictionary<string, KeyValuePair<int, int>> TexturesToIDs = new Dictionary<string, KeyValuePair<int, int>>();
             for (int i = 0; i < allmats.Count; i++)
             {
                 for (int t = 0; t < (int)MaterialSide.COUNT; t++)
@@ -270,29 +273,31 @@ namespace Voxalia.Shared
                     allmats[i].TID[t] = new int[tex.Count];
                     for (int x = 0; x < tex.Count; x++)
                     {
-                        int res;
+                        KeyValuePair<int, int> res;
                         if (TexturesToIDs.ContainsKey(tex[x]))
                         {
                             res = TexturesToIDs[tex[x]];
                         }
                         else
                         {
-                            TexturesToIDs[tex[x]] = c;
-                            res = c;
+                            res = new KeyValuePair<int, int>(c, i);
+                            TexturesToIDs[tex[x]] = res;
                             c++;
                         }
-                        (allmats[i].TID[t])[x] = res;
+                        (allmats[i].TID[t])[x] = res.Key;
                     }
                 }
             }
             Textures = new string[c];
-            Textures[0] = TexturesToIDs.Where((ke) => ke.Value == 0).First().Key;
-            Textures[1] = TexturesToIDs.Where((ke) => ke.Value == 1).First().Key;
-            foreach (KeyValuePair<string, int> val in TexturesToIDs)
+            TexMats = new int[c];
+            //Textures[0] = TexturesToIDs.Where((ke) => ke.Value == 0).First().Key;
+            //Textures[1] = TexturesToIDs.Where((ke) => ke.Value == 1).First().Key;
+            foreach (KeyValuePair<string, KeyValuePair<int, int>> val in TexturesToIDs)
             {
-                if (val.Value > 1)
+               // if (val.Value > 1)
                 {
-                    Textures[val.Value] = val.Key;
+                    Textures[val.Value.Key] = val.Key;
+                    TexMats[val.Value.Key] = val.Value.Value;
                 }
             }
             lock (ALL_MATS)
@@ -303,6 +308,8 @@ namespace Voxalia.Shared
         }
 
         public static string[] Textures;
+
+        public static int[] TexMats;
         
         /// <summary>
         /// All material data known to this engine.
@@ -467,6 +474,11 @@ namespace Voxalia.Shared
         public static float GetPlantMultiplierInverse(this Material mat)
         {
             return ALL_MATS[(int)mat].InversePlantMultiplier;
+        }
+
+        public static byte GetPaintDefault(this Material mat)
+        {
+            return ALL_MATS[(int)mat].DefaultPaint;
         }
 
         public static MaterialSpawnType GetSpawnType(this Material mat)
@@ -749,6 +761,11 @@ namespace Voxalia.Shared
         /// TODO: Calculate from texture?
         /// </summary>
         public bool AnyOpaque = true;
+
+        /// <summary>
+        /// The default paint code.
+        /// </summary>
+        public byte DefaultPaint = 0;
     }
 
     public enum MaterialSpawnType : byte

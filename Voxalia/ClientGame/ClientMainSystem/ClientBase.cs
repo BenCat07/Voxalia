@@ -562,6 +562,8 @@ namespace Voxalia.ClientGame.ClientMainSystem
             SysConsole.Output(OutputType.CLIENTINIT, "Preparing inventory...");
             InitInventory();
             PassLoadScreen();
+            SysConsole.Output(OutputType.CLIENTINIT, "Creating sky...");
+            CreateSkyBox();
             SysConsole.Output(OutputType.CLIENTINIT, "Requesting a menu server...");
             LocalServer?.ShutDown();
             LocalServer = new Server(28009) { IsMenu = true }; // TODO: Grab first free port?

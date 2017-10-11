@@ -30,6 +30,7 @@ layout (binding = 1) uniform sampler2DArray htex;
 layout (binding = 2) uniform sampler2DArray normal_tex;
 layout (binding = 4) uniform sampler2D deptht;
 layout (binding = 5) uniform sampler2DArray shadowtex;
+layout (binding = 6) uniform sampler2DArray s_skybox;
 // ...
 
 in struct vox_fout
@@ -139,6 +140,8 @@ const vec4 waves[NUM_WAVES] = vec4[NUM_WAVES](
 	vec4(-12.0, 2.5, 2.1, 0.5)
 );
 
+const int P_WATER = 84;
+
 float get_wave_height(in vec3 w_pos)
 {
 	vec3 f_pos = vec3(w_pos.x * (sin(time) * 0.5 + 0.5), w_pos.y * (sin(time * 0.5) * 0.5 + 0.5), w_pos.z * (sin(time * 2.0) * 0.5 + 0.5));
@@ -164,6 +167,12 @@ void main()
 	float anim_time = hint_id.x * 8.0;
 	float tc_z = fi.texcoord.z + (anim_count <= 1 ? 0 : float(int(time / anim_time) % anim_count));
 	position = vec4(fi.pos, 1.0);
+#if MCM_TH
+	vec4 fi_tcol = fi.tcol;
+#else
+	int def_paint = int(hint_id.z);
+	vec4 fi_tcol = (def_paint != 0) ? vec4((153.0 / 255.0), 0.5, 0.5, 0.0) : vec4(1.0);
+#endif
 	vec4 col = read_texture(s, vec3(fi.texcoord.xy, tc_z));
 	float extra_specular = 0.0;
 	float rhBlur = 0.0;
@@ -174,28 +183,28 @@ void main()
 #if MCM_TRANSP
 	int always_do_transp = 0;
 #endif
-	if (fi.tcol.w == 0.0 && fi.tcol.x == 0.0 && fi.tcol.z == 0.0 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7)
+	if (fi_tcol.w == 0.0 && fi_tcol.x == 0.0 && fi_tcol.z == 0.0 && fi_tcol.y > 0.3 && fi_tcol.y < 0.7)
 	{
-		rhBlur = (fi.tcol.y - 0.31) * ((1.0 / 0.38) * (3.14159 * 2.0));
+		rhBlur = (fi_tcol.y - 0.31) * ((1.0 / 0.38) * (3.14159 * 2.0));
 	}
-	else if (fi.tcol.w == 0.0 && fi.tcol.x == 0.0 && fi.tcol.z == 0.0 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7)
+	else if (fi_tcol.w == 0.0 && fi_tcol.x == 0.0 && fi_tcol.z == 0.0 && fi_tcol.y > 0.3 && fi_tcol.y < 0.7)
 	{
-		col *= fi.tcol;
+		col *= fi_tcol;
 	}
-	else if (fi.tcol.w == 0.0 && fi.tcol.x > 0.3 && fi.tcol.x < 0.7 && fi.tcol.y > 0.3 && fi.tcol.y < 0.7 && fi.tcol.z > 0.3 && fi.tcol.z < 0.7)
+	else if (fi_tcol.w == 0.0 && fi_tcol.x > 0.3 && fi_tcol.x < 0.7 && fi_tcol.y > 0.3 && fi_tcol.y < 0.7 && fi_tcol.z > 0.3 && fi_tcol.z < 0.7)
 	{
-		if (fi.tcol.z > 0.51)
+		if (fi_tcol.z > 0.51)
 		{
 			col.xyz = vec3(1.0) - col.xyz;
 		}
 		// TODO: color shifts effect normals, specular, etc. maps!
-		else if (fi.tcol.x > 0.51)
+		else if (fi_tcol.x > 0.51)
 		{
-			if (fi.tcol.x > (146.0 / 255.0))
+			if (fi_tcol.x > (146.0 / 255.0))
 			{
-				if (fi.tcol.x > (152.0 / 255.0))
+				if (fi_tcol.x > (152.0 / 255.0))
 				{
-					reflecto = 0.5;
+					reflecto = 0.35;
 					extra_specular = 1.0;
 					rhBlur = 0.5;
 					rhb_fx = (!(col.w <= 0.99)) ? 1.0 : sqrt(length(fi.pos.xyz) * 0.05);
@@ -221,7 +230,7 @@ void main()
 					float w_lmod = normalize(cross(w_vx2, w_vy2)).z;
 					col.xyz *= (2.0 - w_lmod);
 				}
-				else if (fi.tcol.x > (150.0 / 255.0))
+				else if (fi_tcol.x > (150.0 / 255.0))
 				{
 					float genNoise = snoise2(vec3(ivec3(fi.pos) + ivec3(time)));
 					float sparkleX = mod(genNoise * 10.0, 0.8) + 0.1;
@@ -237,7 +246,7 @@ void main()
 					float intensity_dist = 20.0 * max(0.0, 0.05 - abs(dist_xy.x)) * (1.0 - 5.0 * min(0.2, abs(dist_xy.y))) + 20.0 * max(0.0, 0.05 - abs(dist_xy.y)) * (1.0 - 5.0 * min(0.2, abs(dist_xy.x)));
 					col = vec4(min(vec3(1.0), col.xyz + vec3(intensity * intensity_rel * intensity_dist)), 1.0);
 				}
-				else if (fi.tcol.x > (148.0 / 255.0))
+				else if (fi_tcol.x > (148.0 / 255.0))
 				{
 					vec2 tcfix = vec2(mod(fi.texcoord.x * 3.0, 1.0), mod(fi.texcoord.y * 3.0, 1.0));
 					tcfix.x = tcfix.x > 1.0 ? tcfix.x - 1.0 : (tcfix.x < 0.0 ? tcfix.x + 1.0 : tcfix.x);
@@ -258,9 +267,9 @@ void main()
 				extra_specular = 1.0;
 			}
 		}
-		else if (fi.tcol.y > (172.0 / 255.0))
+		else if (fi_tcol.y > (172.0 / 255.0))
 		{
-			if (fi.tcol.y > (174.0 / 255.0))
+			if (fi_tcol.y > (174.0 / 255.0))
 			{
 				float newY = mod(fi.texcoord.y - time * 0.5, 1.0);
 				vec2 tcfix = vec2(fi.texcoord.x, newY < 0.0 ? newY + 1.0 : newY);
@@ -273,9 +282,9 @@ void main()
 				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 		}
-		else if (fi.tcol.y > (168.0 / 255.0))
+		else if (fi_tcol.y > (168.0 / 255.0))
 		{
-			if (fi.tcol.y > (170.0 / 255.0))
+			if (fi_tcol.y > (170.0 / 255.0))
 			{
 				col *= vec4(vec3(snoise2(fi.texcoord * 10.0)), 1.0);
 			}
@@ -287,9 +296,9 @@ void main()
 				col *= mix(vec4(1.0), vec4(snx, sny, snz, 1.0), volume);
 			}
 		}
-		else if (fi.tcol.y > (162.0 / 255.0))
+		else if (fi_tcol.y > (162.0 / 255.0))
 		{
-			if (fi.tcol.y > (166.0 / 255.0))
+			if (fi_tcol.y > (166.0 / 255.0))
 			{
 				float rot_factorCOS = cos(time * 2.0 + dot(fi.texcoord - 0.5, fi.texcoord - 0.5) * 3.0);
 				float rot_factorSIN = sin(time * 2.0 + dot(fi.texcoord - 0.5, fi.texcoord - 0.5) * 3.0);
@@ -298,7 +307,7 @@ void main()
 				tcfix.y = tcfix.y > 1.0 ? tcfix.y - 1.0 : (tcfix.y < 0.0 ? tcfix.y + 1.0 : tcfix.y);
 				col = read_texture(s, vec3(tcfix, tc_z));
 			}
-			else if (fi.tcol.y > (164.0 / 255.0))
+			else if (fi_tcol.y > (164.0 / 255.0))
 			{
 				float rot_factorCOS = cos(time * 0.5);
 				float rot_factorSIN = sin(time * 0.5);
@@ -316,14 +325,14 @@ void main()
 				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 		}
-		else if (fi.tcol.y > (156.0 / 255.0))
+		else if (fi_tcol.y > (156.0 / 255.0))
 		{
-			if (fi.tcol.y > (160.0 / 255.0))
+			if (fi_tcol.y > (160.0 / 255.0))
 			{
 				vec2 tcfix = vec2(fi.texcoord.x, mod(fi.texcoord.y + time * 0.5, 1.0));
 				col = read_texture(s, vec3(tcfix, tc_z));
 			}
-			else if (fi.tcol.y > (158.0 / 255.0))
+			else if (fi_tcol.y > (158.0 / 255.0))
 			{
 				vec2 tcfix = vec2(mod(fi.texcoord.x + time * 0.5, 1.0), fi.texcoord.y);
 				col = read_texture(s, vec3(tcfix, tc_z));
@@ -336,13 +345,13 @@ void main()
 				col = read_texture(s, vec3(tcfix, tc_z));
 			}
 		}
-		else if (fi.tcol.y > 0.51)
+		else if (fi_tcol.y > 0.51)
 		{
-			if (fi.tcol.y > (150.0 / 255.0))
+			if (fi_tcol.y > (150.0 / 255.0))
 			{
-				if (fi.tcol.y > (152.0 / 255.0))
+				if (fi_tcol.y > (152.0 / 255.0))
 				{
-					float res_fix = (fi.tcol.y > (154.0 / 255.0) ? 8 : 32);
+					float res_fix = (fi_tcol.y > (154.0 / 255.0) ? 8 : 32);
 					vec2 tcfix = vec2(float(int(fi.texcoord.x * res_fix)) / res_fix, float(int(fi.texcoord.y * res_fix)) / res_fix);
 					col = read_texture(s, vec3(tcfix, tc_z));
 				}
@@ -353,18 +362,18 @@ void main()
 			}
 			else
 			{
-				float shift = (fi.tcol.y > (148.0 / 255.0)) ? 0.25 : (fi.tcol.y > (146.0 / 255.0)) ? 0.5 : 0.75;
+				float shift = (fi_tcol.y > (148.0 / 255.0)) ? 0.25 : (fi_tcol.y > (146.0 / 255.0)) ? 0.5 : 0.75;
 				col *= mix(vec4(read_texture(s, vec3(fi.texcoord.xy, 1)).xyz, 1.0), vec4(1.0), shift);
 			}
 		}
 		else
 		{
-			col *= mix(vec4(read_texture(s, vec3(fi.texcoord.xy, 0)).xyz, 1.0), vec4(1.0), (fi.tcol.x - 0.3) * 3.0);
+			col *= mix(vec4(read_texture(s, vec3(fi.texcoord.xy, 0)).xyz, 1.0), vec4(1.0), (fi_tcol.x - 0.3) * 3.0);
 		}
 	}
 	else
 	{
-		col *= fi.tcol;
+		col *= fi_tcol;
 	}
 	// TODO: Th's effect spec, normal
 	vec2 tc_h = vec2(fi.texcoord.x / tex_wid - 0.5, fi.texcoord.y / tex_wid - 0.5);
@@ -422,12 +431,12 @@ void main()
 #endif // else - MCM_TRANPS
 #endif // ELSE - MCM_NO_ALPHA_CAP
 	color = col * fi.color;
-#if MCM_BRIGHT
-#else // MCM_BRIGHT
 	float opac_min = 0.0;
 	vec3 norms = do_force_norm_tex == 1 ? force_norm_tex : read_texture(normal_tex, vec3(fi.texcoord.xy, tc_z)).xyz * 2.0 - vec3(1.0);
 	vec3 tf_normal = normalize(fi.tbn * norms);
 	nrml = vec4(tf_normal, 1.0);
+#if MCM_BRIGHT
+#else // MCM_BRIGHT
 #if MCM_LIGHTS
 	vec3 res_color = vec3(0.0);
 	int count = int(lights_used);
@@ -567,6 +576,37 @@ void main()
 	float depthval = linearizeDepth(texture(deptht, fc_xy).x);
 	color.w *= min(max((depthval - dist) * fi.size * 0.5 * (screen_size.w - screen_size.z), 0.0), 1.0);
 #endif // MCM_FADE_DEPTH
+	if (reflecto > 0.01)
+	{
+		vec3 refl_pos = reflect(fi.pos, tf_normal);
+		refl_pos /= max(abs(refl_pos.x), max(abs(refl_pos.y), abs(refl_pos.z)));
+		vec4 ref_col;
+		if (refl_pos.z > 0.999)
+		{
+			ref_col = textureLod(s_skybox, vec3(vec2(-refl_pos.x, refl_pos.y) * 0.5 + 0.5, 4.0), 0);
+		}
+		else if (refl_pos.z < -0.999)
+		{
+			ref_col = textureLod(s_skybox, vec3(refl_pos.xy * 0.5 + 0.5, 5.0), 0);
+		}
+		else if (refl_pos.x > 0.999)
+		{
+			ref_col = textureLod(s_skybox, vec3(vec2(-refl_pos.y, refl_pos.z) * 0.5 + 0.5, 0.0), 0);
+		}
+		else if (refl_pos.x < -0.999)
+		{
+			ref_col = textureLod(s_skybox, vec3(refl_pos.yz * 0.5 + 0.5, 1.0), 0);
+		}
+		else if (refl_pos.y > 0.999)
+		{
+			ref_col = textureLod(s_skybox, vec3(refl_pos.xz * 0.5 + 0.5, 2.0), 0);
+		}
+		else // y < -0.999
+		{
+			ref_col = textureLod(s_skybox, vec3(vec2(-refl_pos.x, refl_pos.z) * 0.5 + 0.5, 3.0), 0);
+		}
+		color.xyz = (reflecto * ref_col.xyz) + (color.xyz * (1.0 - reflecto));
+	}
 }
 
 #include glnoise.inc

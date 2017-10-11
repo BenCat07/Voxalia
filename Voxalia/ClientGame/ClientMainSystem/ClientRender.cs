@@ -943,7 +943,6 @@ namespace Voxalia.ClientGame.ClientMainSystem
         /// </summary>
         public void RenderSkybox()
         {
-            SetEnts();
             if (MainWorldView.FBOid == FBOID.MAIN)
             {
                 GL.Uniform1(16, 1.0f);
@@ -1000,7 +999,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             skybox[4].Render(false);
             Textures.GetTexture("skies/" + CVars.r_skybox.Value + "/yp").Bind();
             skybox[5].Render(false);
-            Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * SunLightModDirect), 1), MainWorldView);
+            //Rendering.SetColor(new Vector4(ClientUtilities.Convert(Location.One * SunLightModDirect), 1), MainWorldView);
             GraphicsUtil.CheckError("Rendering - Sky - Light");
             //Rendering.SetMinimumLight(0, MainWorldView);
             GraphicsUtil.CheckError("Rendering - Sky - Sun - Pre 1");
@@ -2480,6 +2479,15 @@ namespace Voxalia.ClientGame.ClientMainSystem
                 Engine.Rendering.SetColor(Color4.White, view);
                 GL.Uniform3(10, -TheSun.Direction.ToOpenTK());
                 GL.Uniform3(11, maxLit);
+                GL.ActiveTexture(TextureUnit.Texture6);
+                GL.BindTexture(TextureTarget.Texture2DArray, SKY_TEX);
+                GL.ActiveTexture(TextureUnit.Texture0);
+            };
+            view.ViewPatchSixteen = () =>
+            {
+                GL.ActiveTexture(TextureUnit.Texture6);
+                GL.BindTexture(TextureTarget.Texture2DArray, 0);
+                GL.ActiveTexture(TextureUnit.Texture0);
             };
             view.ViewPatchTwo = () =>
             {
