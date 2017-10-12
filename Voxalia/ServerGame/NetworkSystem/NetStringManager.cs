@@ -27,8 +27,7 @@ namespace Voxalia.ServerGame.NetworkSystem
 
         public int IndexForString(string str)
         {
-            int ind;
-            if (StringsMap.TryGetValue(str, out ind))
+            if (StringsMap.TryGetValue(str, out int ind))
             {
                 return ind;
             }

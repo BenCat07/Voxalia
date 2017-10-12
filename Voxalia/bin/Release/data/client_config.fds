@@ -170,13 +170,13 @@ renderer:
 		# How much farther than full_quality you see at half quality, height-wise.
 		half_quality_height: 1
 		# How much farther than full_quality you see at one-fifth quality.
-		fifth_quality: 2
+		fifth_quality: 0
 		# How much farther than full_quality you see at one-fifth quality, height-wise.
-		fith_quality_height: 2
+		fith_quality_height: 0
 		# How much farther than full_quality you see at one-sixth quality.
-		sixth_quality: 4
+		sixth_quality: 0
 		# How much farther than full_quality you see at one-fifteenth quality.
-		fifteenth_quality: 4
+		fifteenth_quality: 0
 		# How far away a light can be from the camera before it is disabled.
 		light_distance: 35
 		# How far away maximum to render models in full quality.
