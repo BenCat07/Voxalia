@@ -53,23 +53,22 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <summary>
         /// Finds a path from the start to the end, if one exists.
         /// Current implementation is A-Star (A*).
-        /// Thanks to fullwall for the reference sources this was originally built from.
         /// Possibly safe for Async usage.
-        /// Runs two searches asynchronously from either end, and returns the shorter path (either one failing = both fail immediately!).
+        /// Runs two searches simultaneously (using async) from either end, and returns the shorter path (either one failing = both fail immediately!).
         /// </summary>
         /// <param name="startloc">The starting location.</param>
         /// <param name="endloc">The ending location.</param>
         /// <param name="maxRadius">The maximum radius to search through.</param>
-        /// <param name="goaldist">The maximum distance from the goal allowed.</param>
+        /// <param name="pfopts">Any pathfinder options.</param>
         /// <returns>The shortest path, as a list of blocks to travel through.</returns>
-        public List<Location> FindPathAsyncDouble(Location startloc, Location endloc, double maxRadius, double goaldist)
+        public List<Location> FindPathAsyncDouble(Location startloc, Location endloc, double maxRadius, PathfinderOptions pfopts)
         {
             CancellationTokenSource cts = new CancellationTokenSource();
             List<Location> a = new List<Location>();
             List<Location> b = new List<Location>();
             Task one = TheWorld.Schedule.StartAsyncTask(() =>
             {
-                List<Location> f = FindPath(startloc, endloc, maxRadius, goaldist, cts);
+                List<Location> f = FindPath(startloc, endloc, maxRadius, pfopts, cts);
                 if (f != null)
                 {
                     a.AddRange(f);
@@ -77,7 +76,7 @@ namespace Voxalia.ServerGame.WorldSystem
             }).Created;
             Task two = TheWorld.Schedule.StartAsyncTask(() =>
             {
-                List<Location> f = FindPath(endloc, startloc, maxRadius, goaldist, cts);
+                List<Location> f = FindPath(endloc, startloc, maxRadius, pfopts, cts);
                 if (f != null)
                 {
                     b.AddRange(f);
@@ -109,16 +108,16 @@ namespace Voxalia.ServerGame.WorldSystem
         /// <param name="startloc">The starting location.</param>
         /// <param name="endloc">The ending location.</param>
         /// <param name="maxRadius">The maximum radius to search through.</param>
-        /// <param name="goaldist">The maximum distance from the goal allowed.</param>
+        /// <param name="pfopts">Any pathfinder options.</param>
         /// <param name="cts">A cancellation token, if any.</param>
         /// <returns>The shortest path, as a list of blocks to travel through.</returns>
-        public List<Location> FindPath(Location startloc, Location endloc, double maxRadius, double goaldist, CancellationTokenSource cts = null)
+        public List<Location> FindPath(Location startloc, Location endloc, double maxRadius, PathfinderOptions pfopts, CancellationTokenSource cts = null)
         {
             // TODO: Improve async safety!
             startloc = startloc.GetBlockLocation() + new Location(0.5, 0.5, 1.0);
             endloc = endloc.GetBlockLocation() + new Location(0.5, 0.5, 1.0);
             double mrsq = maxRadius * maxRadius;
-            double gosq = goaldist * goaldist;
+            double gosq = pfopts.GoalDist * pfopts.GoalDist;
             if (startloc.DistanceSquared(endloc) > mrsq)
             {
                 cts.Cancel();
@@ -217,6 +216,8 @@ namespace Voxalia.ServerGame.WorldSystem
                     {
                         continue;
                     }
+                    // TODO: Implement CanSwim
+                    // TODO: Implement CanParkour
                     int node = GetNode(nodes, ref nloc, neighb, next.G + 1.0, next.F + 1.0 + neighb.ToLocation().Distance(endloc), nextid);
                     PFEntry tpfet;
                     tpfet.Nodes = nodes;
@@ -427,5 +428,14 @@ namespace Voxalia.ServerGame.WorldSystem
             int z = Internal.Z - other.Internal.Z;
             return Math.Sqrt(x * x + y * y + z * z);
         }
+    }
+
+    public class PathfinderOptions
+    {
+        public double GoalDist = 1.5;
+
+        public bool CanParkour = false;
+
+        public bool CanSwim = true;
     }
 }

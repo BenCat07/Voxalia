@@ -271,7 +271,7 @@ namespace Voxalia.ServerGame.EntitySystem
                 Path = null;
                 return;
             }
-            List<Location> tpath = TheRegion.FindPath(selfpos, goal, MaxPathFindDistance, 1);
+            List<Location> tpath = TheRegion.FindPath(selfpos, goal, MaxPathFindDistance, new PathfinderOptions());
             if (tpath == null)
             {
                 TargetPosition = Location.NaN; // TODO: Configurable "can't find path" result -> giveup vs. teleport
