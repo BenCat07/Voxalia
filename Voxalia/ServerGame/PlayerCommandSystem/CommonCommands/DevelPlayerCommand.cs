@@ -264,7 +264,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                     List<Location> locs;
                     try
                     {
-                        locs = entry.Player.TheRegion.FindPath(entry.Player.GetPosition(), goal, 75, new PathfinderOptions());
+                        locs = entry.Player.TheRegion.FindPathAsyncDouble(entry.Player.GetPosition(), goal, 75, new PathfinderOptions());
                     }
                     catch (Exception ex)
                     {

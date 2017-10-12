@@ -50,6 +50,10 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public Stack<Dictionary<Vector3i, Chunk>> PFMapSet = new Stack<Dictionary<Vector3i, Chunk>>();
 
+        public Stack<Dictionary<Vector3i, PathFindNode>> PFClosedSet = new Stack<Dictionary<Vector3i, PathFindNode>>();
+
+        public Stack<Dictionary<Vector3i, PathFindNode>> PFOpenSet = new Stack<Dictionary<Vector3i, PathFindNode>>();
+
         /// <summary>
         /// Finds a path from the start to the end, if one exists.
         /// Current implementation is A-Star (A*).
@@ -126,6 +130,8 @@ namespace Voxalia.ServerGame.WorldSystem
             PathFindNodeSet nodes;
             PriorityQueue<PFEntry> open;
             Dictionary<Vector3i, Chunk> map;
+            Dictionary<Vector3i, PathFindNode> closed;
+            Dictionary<Vector3i, PathFindNode> openset;
             lock (PFNodeSetLock)
             {
                 if (PFNodeSet.Count == 0)
@@ -133,12 +139,16 @@ namespace Voxalia.ServerGame.WorldSystem
                     nodes = null;
                     open = null;
                     map = null;
+                    closed = null;
+                    openset = null;
                 }
                 else
                 {
                     nodes = PFNodeSet.Pop();
                     open = PFQueueSet.Pop();
                     map = PFMapSet.Pop();
+                    closed = PFClosedSet.Pop();
+                    openset = PFOpenSet.Pop();
                 }
             }
             if (nodes == null)
@@ -146,12 +156,11 @@ namespace Voxalia.ServerGame.WorldSystem
                 nodes = new PathFindNodeSet() { Nodes = new PathFindNode[8192] };
                 open = new PriorityQueue<PFEntry>(8192);
                 map = new Dictionary<Vector3i, Chunk>(1024);
+                closed = new Dictionary<Vector3i, PathFindNode>(1024);
+                openset = new Dictionary<Vector3i, PathFindNode>(1024);
             }
             int nloc = 0;
             int start = GetNode(nodes, ref nloc, startloc.ToVec3i(), 0.0, 0.0, -1);
-            // TODO: Grab these from a stack too?
-            Dictionary<Vector3i, PathFindNode> closed = new Dictionary<Vector3i, PathFindNode>();
-            Dictionary<Vector3i, PathFindNode> openset = new Dictionary<Vector3i, PathFindNode>();
             PFEntry pfet;
             pfet.Nodes = nodes;
             pfet.ID = start;
@@ -174,11 +183,15 @@ namespace Voxalia.ServerGame.WorldSystem
                 {
                     open.Clear();
                     map.Clear();
+                    closed.Clear();
+                    openset.Clear();
                     lock (PFNodeSetLock)
                     {
                         PFNodeSet.Push(nodes);
                         PFQueueSet.Push(open);
                         PFMapSet.Push(map);
+                        PFClosedSet.Push(closed);
+                        PFOpenSet.Push(openset);
                     }
                     return Reconstruct(nodes.Nodes, nextid);
                 }
@@ -214,10 +227,10 @@ namespace Voxalia.ServerGame.WorldSystem
                         && GetBlockMaterial(map, next.Internal + new Vector3i(0, 0, -1)).GetSolidity() == MaterialSolidity.NONSOLID
                         && GetBlockMaterial(map, next.Internal + new Vector3i(0, 0, -2)).GetSolidity() == MaterialSolidity.NONSOLID)
                     {
+                        // TODO: Implement CanParkour
                         continue;
                     }
                     // TODO: Implement CanSwim
-                    // TODO: Implement CanParkour
                     int node = GetNode(nodes, ref nloc, neighb, next.G + 1.0, next.F + 1.0 + neighb.ToLocation().Distance(endloc), nextid);
                     PFEntry tpfet;
                     tpfet.Nodes = nodes;
@@ -228,11 +241,15 @@ namespace Voxalia.ServerGame.WorldSystem
             }
             open.Clear();
             map.Clear();
+            closed.Clear();
+            openset.Clear();
             lock (PFNodeSetLock)
             {
                 PFNodeSet.Push(nodes);
                 PFQueueSet.Push(open);
                 PFMapSet.Push(map);
+                PFClosedSet.Push(closed);
+                PFOpenSet.Push(openset);
             }
             cts.Cancel();
             return null;
@@ -432,10 +449,24 @@ namespace Voxalia.ServerGame.WorldSystem
 
     public class PathfinderOptions
     {
+        /// <summary>
+        /// How far we can go from the goal before we're "there".
+        /// </summary>
         public double GoalDist = 1.5;
 
+        /// <summary>
+        /// How far we can safely fall.
+        /// </summary>
+        public double MaxFallDist = 3;
+
+        /// <summary>
+        /// Whether we can parkour.
+        /// </summary>
         public bool CanParkour = false;
 
+        /// <summary>
+        /// whether we can swim.
+        /// </summary>
         public bool CanSwim = true;
     }
 }
