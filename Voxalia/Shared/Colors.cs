@@ -121,6 +121,27 @@ namespace Voxalia.Shared
         public static Color4F SPLAT_YELLOW = Color4F.FromArgb(6, 255, 255, 0);
         public static Color4F SPLAT_CYAN = Color4F.FromArgb(6, 0, 255, 255);
         public static Color4F TEX_SHARE = Color4F.FromArgb(0, 155, 127, 127);
+        public static Color4F HALF_DARK_GREEN = Color4F.FromArgb(4, 0, 128, 0);
+        public static Color4F HALF_DARK_BLUE = Color4F.FromArgb(4, 0, 0, 128);
+        public static Color4F HALF_DARK_RED = Color4F.FromArgb(4, 128, 0, 0);
+        public static Color4F HALF_LIGHT_GREEN = Color4F.FromArgb(4, 128, 255, 128);
+        public static Color4F HALF_LIGHT_BLUE = Color4F.FromArgb(4, 128, 128, 255);
+        public static Color4F HALF_LIGHT_RED = Color4F.FromArgb(4, 255, 128, 128);
+        public static Color4F HALF_GRAY = Color4F.FromArgb(4, 128, 128, 128);
+        public static Color4F HALF_LIGHT_GRAY = Color4F.FromArgb(4, 192, 192, 192);
+        public static Color4F HALF_DARK_GRAY = Color4F.FromArgb(4, 64, 64, 64);
+        public static Color4F HALF_DARK_MAGENTA = Color4F.FromArgb(4, 128, 0, 128);
+        public static Color4F HALF_DARK_YELLOW = Color4F.FromArgb(4, 128, 128, 0);
+        public static Color4F HALF_DARK_CYAN = Color4F.FromArgb(4, 0, 128, 128);
+        public static Color4F HALF_LIGHT_MAGENTA = Color4F.FromArgb(4, 255, 128, 255);
+        public static Color4F HALF_LIGHT_YELLOW = Color4F.FromArgb(4, 255, 255, 128);
+        public static Color4F HALF_LIGHT_CYAN = Color4F.FromArgb(4, 128, 255, 255);
+        public static Color4F HALF_ORANGE = Color4F.FromArgb(4, 255, 128, 0);
+        public static Color4F HALF_BROWN = Color4F.FromArgb(4, 128, 64, 0);
+        public static Color4F HALF_PURPLE = Color4F.FromArgb(4, 128, 0, 255);
+        public static Color4F HALF_PINK = Color4F.FromArgb(4, 255, 128, 255);
+        public static Color4F HALF_LIME = Color4F.FromArgb(4, 128, 255, 0);
+        public static Color4F HALF_SKY_BLUE = Color4F.FromArgb(4, 0, 128, 255);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
@@ -314,8 +335,29 @@ namespace Voxalia.Shared
             Register("SPLAT_YELLOW", SPLAT_YELLOW);
             Register("SPLAT_CYAN", SPLAT_CYAN);
             M_TEX_SHARE = Register("TEX_SHARE", TEX_SHARE);
-            // 101
-            // TODO: Rest to 127
+            Register("HALF_DARK_GREEN", HALF_DARK_GREEN);
+            Register("HALF_DARK_BLUE", HALF_DARK_BLUE);
+            Register("HALF_DARK_RED", HALF_DARK_RED);
+            Register("HALF_LIGHT_GREEN", HALF_LIGHT_GREEN);
+            Register("HALF_LIGHT_BLUE", HALF_LIGHT_BLUE);
+            Register("HALF_LIGHT_RED", HALF_LIGHT_RED);
+            Register("HALF_GRAY", HALF_GRAY);
+            Register("HALF_LIGHT_GRAY", HALF_LIGHT_GRAY);
+            Register("HALF_DARK_GRAY", HALF_DARK_GRAY);
+            Register("HALF_DARK_MAGENTA", HALF_DARK_MAGENTA);
+            Register("HALF_DARK_YELLOW", HALF_DARK_YELLOW);
+            Register("HALF_DARK_CYAN", HALF_DARK_CYAN);
+            Register("HALF_LIGHT_MAGENTA", HALF_LIGHT_MAGENTA);
+            Register("HALF_LIGHT_YELLOW", HALF_LIGHT_YELLOW);
+            Register("HALF_LIGHT_CYAN", HALF_LIGHT_CYAN);
+            Register("HALF_ORANGE", HALF_ORANGE);
+            Register("HALF_BROWN", HALF_BROWN);
+            Register("HALF_PURPLE", HALF_PURPLE);
+            Register("HALF_PINK", HALF_PINK);
+            Register("HALF_LIME", HALF_LIME);
+            Register("HALF_SKY_BLUE", HALF_SKY_BLUE);
+            // 122
+            // TODO: Rest to 255
         }
     }
 }

@@ -107,18 +107,40 @@ const vec4 tcolors_val[] = vec4[](
 	vec4(1.0, 0.0, 1.0, (6.0 / 255.0)), // SPLAT_MAGENTA = 98
 	vec4(1.0, 1.0, 0.0, (6.0 / 255.0)), // SPLAT_YELLOW = 99
 	vec4(0.0, 1.0, 1.0, (6.0 / 255.0)), // SPLAT_CYAN = 100
-	vec4((155.0 / 255.0), 0.5, 0.5, 0.0) // TEX_SHARE = 101
+	vec4((155.0 / 255.0), 0.5, 0.5, 0.0), // TEX_SHARE = 101
+	vec4(0.0, 0.5, 0.0, (4.0 / 255.0)), // HALF_DARK_GREEN = 102
+	vec4(0.0, 0.0, 0.5, (4.0 / 255.0)), // HALF_DARK_BLUE = 103
+	vec4(0.5, 0.0, 0.0, (4.0 / 255.0)), // HALF_DARK_RED = 104
+	vec4(0.5, 1.0, 0.5, (4.0 / 255.0)), // HALF_LIGHT_GREEN = 105
+	vec4(0.5, 0.5, 1.0, (4.0 / 255.0)), // HALF_LIGHT_BLUE = 106
+	vec4(1.0, 0.5, 0.5, (4.0 / 255.0)), // HALF_LIGHT_RED = 107
+	vec4(0.5, 0.5, 0.5, (4.0 / 255.0)), // HALF_GRAY = 108
+	vec4(0.75, 0.75, 0.75, (4.0 / 255.0)), // HALF_LIGHT_GRAY = 109
+	vec4(0.25, 0.25, 0.25, (4.0 / 255.0)), // HALF_DARK_GRAY = 110
+	vec4(0.5, 0.0, 0.5, (4.0 / 255.0)), // HALF_DARK_MAGENTA = 111
+	vec4(0.5, 0.5, 0.0, (4.0 / 255.0)), // HALF_DARK_YELLOW = 112
+	vec4(0.0, 0.5, 0.5, (4.0 / 255.0)), // HALF_DARK_CYAN = 113
+	vec4(1.0, 0.5, 1.0, (4.0 / 255.0)), // HALF_LIGHT_MAGENTA = 114
+	vec4(1.0, 1.0, 0.5, (4.0 / 255.0)), // HALF_LIGHT_YELLOW = 115
+	vec4(0.5, 1.0, 1.0, (4.0 / 255.0)), // HALF_LIGHT_CYAN = 116
+	vec4(1.0, 0.5, 0.0, (4.0 / 255.0)), // HALF_ORANGE = 117
+	vec4(0.5, 0.25, 0.0, (4.0 / 255.0)), // HALF_BROWN = 118
+	vec4(0.5, 0.0, 1.0, (4.0 / 255.0)), // HALF_PURPLE = 119
+	vec4(1.0, 0.5, 1.0, (4.0 / 255.0)), // HALF_PINK = 120
+	vec4(0.5, 1.0, 0.0, (4.0 / 255.0)), // HALF_LIME = 121
+	vec4(0.0, 0.5, 1.0, (4.0 / 255.0)) // HALF_SKY_BLUE = 122
 	// TODO: Next special will be X=157.0+
 	// TODO: After X=175.0, there's still room for Z=147.0+
-	// TODO: up to ID=127
+	// TODO: up to ID=256
 );
 
 const uint TRANSP_START = 33;
 const uint TRANSP_END = 41;
+const uint TEX_SHARE = 101;
 
 uint blockPaint(in uint bpnt)
 {
-	return bpnt & 127;
+	return bpnt;
 }
 
 uint blkSize()
