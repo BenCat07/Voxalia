@@ -112,6 +112,14 @@ namespace Voxalia.Shared
         public static Color4F HALF_MAGENTA = Color4F.FromArgb(4, 255, 0, 255);
         public static Color4F HALF_YELLOW = Color4F.FromArgb(4, 255, 255, 0);
         public static Color4F HALF_CYAN = Color4F.FromArgb(4, 0, 255, 255);
+        public static Color4F SPLAT_WHITE = Color4F.FromArgb(6, 255, 255, 255);
+        public static Color4F SPLAT_BLACK = Color4F.FromArgb(6, 7, 7, 7);
+        public static Color4F SPLAT_GREEN = Color4F.FromArgb(6, 0, 255, 0);
+        public static Color4F SPLAT_BLUE = Color4F.FromArgb(6, 0, 0, 255);
+        public static Color4F SPLAT_RED = Color4F.FromArgb(6, 255, 0, 0);
+        public static Color4F SPLAT_MAGENTA = Color4F.FromArgb(6, 255, 0, 255);
+        public static Color4F SPLAT_YELLOW = Color4F.FromArgb(6, 255, 255, 0);
+        public static Color4F SPLAT_CYAN = Color4F.FromArgb(6, 0, 255, 255);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
@@ -294,7 +302,15 @@ namespace Voxalia.Shared
             Register("HALF_RED", HALF_RED);
             Register("HALF_MAGENTA", HALF_MAGENTA);
             Register("HALF_YELLOW", HALF_YELLOW);
-            Register("HALF_CYAN", HALF_CYAN); // 92
+            Register("HALF_CYAN", HALF_CYAN);
+            Register("SPLAT_WHITE", SPLAT_WHITE);
+            Register("SPLAT_BLACK", SPLAT_BLACK);
+            Register("SPLAT_GREEN", SPLAT_GREEN);
+            Register("SPLAT_BLUE", SPLAT_BLUE);
+            Register("SPLAT_RED", SPLAT_RED);
+            Register("SPLAT_MAGENTA", SPLAT_MAGENTA);
+            Register("SPLAT_YELLOW", SPLAT_YELLOW);
+            Register("SPLAT_CYAN", SPLAT_CYAN); // 100
             // TODO: Rest to 127
         }
     }

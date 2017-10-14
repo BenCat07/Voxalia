@@ -303,6 +303,15 @@ void main()
 			tcolor *= mix(vec4(texture(tex, vec3(f.texcoord.xy, 0)).xyz, 1.0), vec4(1.0), (f.tcol.x - 0.3) * 3.0);
 		}
 	}
+	else if (f.tcol.w < (5.0 / 255.0))
+	{
+		tcolor = vec4(f.tcol.xyz * 0.5 + tcolor.xyz * 0.5, tcolor.w);
+	}
+	else if (f.tcol.w < (7.0 / 255.0))
+	{
+		float fv_tval = texture(tex, vec3(f.texcoord.xy, 1)).x;
+		tcolor = vec4(f.tcol.xyz * (1.0 - fv_tval) + tcolor.xyz * (fv_tval),tcolor.w);
+	}
 	else
 	{
 		tcolor *= f.tcol;

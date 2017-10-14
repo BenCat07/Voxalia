@@ -380,6 +380,15 @@ void main()
 			col *= mix(vec4(texture(s, vec3(f.texcoord.xy, 0)).xyz, 1.0), vec4(1.0), (f.tcol.x - 0.3) * 3.0);
 		}
 	}
+	else if (f.tcol.w < (5.0 / 255.0))
+	{
+		col = vec4(f.tcol.xyz * 0.5 + col.xyz * 0.5, col.w);
+	}
+	else if (f.tcol.w < (7.0 / 255.0))
+	{
+		float fv_tval = texture(s, vec3(f.texcoord.xy, 1)).x;
+		col = vec4(f.tcol.xyz * (1.0 - fv_tval) + col.xyz * (fv_tval), col.w);
+	}
 	else
 	{
 		col *= f.tcol;

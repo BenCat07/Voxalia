@@ -375,6 +375,11 @@ void main()
 	{
 		col = vec4(fi_tcol.xyz * 0.5 + col.xyz * 0.5, col.w);
 	}
+	else if (fi_tcol.w < (7.0 / 255.0))
+	{
+		float fv_tval = read_texture(s, vec3(fi.texcoord.xy, 1)).x;
+		col = vec4(fi_tcol.xyz * (1.0 - fv_tval) + col.xyz * (fv_tval), col.w);
+	}
 	else
 	{
 		col *= fi_tcol;
