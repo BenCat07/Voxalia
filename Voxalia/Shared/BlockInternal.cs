@@ -127,33 +127,40 @@ namespace Voxalia.Shared
 
         /// <summary>
         /// The paint details represented by this block.
-        /// This is a custom getter, that returns a small portion of the potential space.
         /// </summary>
         public byte BlockPaint
         {
             get
             {
-                return (byte)(_BlockPaintInternal & 127);
+                return _BlockPaintInternal;
             }
             set
             {
-                _BlockPaintInternal = (byte)(value | (BlockShareTex ? 128 : 0));
+                _BlockPaintInternal = value;
             }
         }
 
         /// <summary>
         /// Whether this block should grab surrounding texture data to color itself.
         /// This is a custom getter, that returns a small portion of the potential space.
+        /// <para>This is a specific reference <see cref="BlockPaint"/> value.</para>
         /// </summary>
         public bool BlockShareTex
         {
             get
             {
-                return (_BlockPaintInternal & 128) == 128;
+                return _BlockPaintInternal == Colors.M_TEX_SHARE;
             }
             set
             {
-                _BlockPaintInternal = (byte)(BlockPaint | (value ? 128 : 0));
+                if (value)
+                {
+                    _BlockPaintInternal = (byte)Colors.M_TEX_SHARE;
+                }
+                else if (_BlockPaintInternal == Colors.M_TEX_SHARE)
+                {
+                    _BlockPaintInternal = 0;
+                }
             }
         }
         

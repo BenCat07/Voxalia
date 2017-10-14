@@ -106,8 +106,9 @@ const vec4 tcolors_val[] = vec4[](
 	vec4(1.0, 0.0, 0.0, (6.0 / 255.0)), // SPLAT_RED = 97
 	vec4(1.0, 0.0, 1.0, (6.0 / 255.0)), // SPLAT_MAGENTA = 98
 	vec4(1.0, 1.0, 0.0, (6.0 / 255.0)), // SPLAT_YELLOW = 99
-	vec4(0.0, 1.0, 1.0, (6.0 / 255.0)) // SPLAT_CYAN = 100
-	// TODO: Next special will be X=155.0+
+	vec4(0.0, 1.0, 1.0, (6.0 / 255.0)), // SPLAT_CYAN = 100
+	vec4((155.0 / 255.0), 0.5, 0.5, 0.0) // TEX_SHARE = 101
+	// TODO: Next special will be X=157.0+
 	// TODO: After X=175.0, there's still room for Z=147.0+
 	// TODO: up to ID=127
 );

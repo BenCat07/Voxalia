@@ -126,75 +126,6 @@ void main()
 #endif
 	vec4 col = textureLod(s, f.texcoord, textureQueryLod(s, f.texcoord.xy).x);
 	vec3 t_normal = texture(normal_tex, f.texcoord).xyz;
-#if MCM_TH
-	// Setup
-	vec3 thval = vec3(0.0); // Value
-	float thstr = 0.0; // Strength
-	vec3 thnorm = vec3(0.0); // Normal
-	vec2 th_pos = vec2(f.texcoord.x - 0.5, f.texcoord.y - 0.5);
-	float sep = 1.5;
-	// Self (0,0)
-	float t_w = max(1.0 - (dot(th_pos, th_pos) * sep), 0.0);
-	thval += col.xyz * t_w;
-	thnorm += t_normal * t_w;
-	thstr += t_w;
-	// X+ (1,0)
-	vec2 t_r = th_pos - vec2(1.0, 0.0);
-	const float MULTO = 2.0;
-	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.x * MULTO, 0.0);
-	thval += texture(s, vec3(f.texcoord.xy, f.thv.x)).xyz * t_w;
-	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.x)).xyz * t_w;
-	thstr += t_w;
-	// X- (-1,0)
-	t_r = th_pos - vec2(-1.0, 0.0);
-	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.y * MULTO, 0.0);
-	thval += texture(s, vec3(f.texcoord.xy, f.thv.y)).xyz * t_w;
-	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.y)).xyz * t_w;
-	thstr += t_w;
-	// Y+ (0,1)
-	t_r = th_pos - vec2(0.0, 1.0);
-	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.z * MULTO, 0.0);
-	thval += texture(s, vec3(f.texcoord.xy, f.thv.z)).xyz * t_w;
-	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.z)).xyz * t_w;
-	thstr += t_w;
-	// Y- (0,-1)
-	t_r = th_pos - vec2(0.0, -1.0);
-	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.w * MULTO, 0.0);
-	thval += texture(s, vec3(f.texcoord.xy, f.thv.w)).xyz * t_w;
-	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.w)).xyz * t_w;
-	thstr += t_w;
-	// X+Y+ (1,1)
-	t_r = th_pos - vec2(1.0, 1.0);
-	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.x * MULTO, 0.0);
-	thval += texture(s, vec3(f.texcoord.xy, f.thv2.x)).xyz * t_w;
-	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.x)).xyz * t_w;
-	thstr += t_w;
-	// X+Y- (1,-1)
-	t_r = th_pos - vec2(1.0, -1.0);
-	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.y * MULTO, 0.0);
-	thval += texture(s, vec3(f.texcoord.xy, f.thv2.y)).xyz * t_w;
-	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.y)).xyz * t_w;
-	thstr += t_w;
-	// X-Y+ (-1,1)
-	t_r = th_pos - vec2(-1.0, 1.0);
-	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.z * MULTO, 0.0);
-	thval += texture(s, vec3(f.texcoord.xy, f.thv2.z)).xyz * t_w;
-	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.z)).xyz * t_w;
-	thstr += t_w;
-	// X-Y- (-1,-1)
-	t_r = th_pos - vec2(-1.0, -1.0);
-	t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.w * MULTO, 0.0);
-	thval += texture(s, vec3(f.texcoord.xy, f.thv2.w)).xyz * t_w;
-	thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.w)).xyz * t_w;
-	thstr += t_w;
-	/*
-	float trel = max(min(1.0 - thstr, 1.0), 0.0);
-	thval += col.xyz * trel;
-	thstr += trel;
-	*/
-	col.xyz = thval / thstr;
-	t_normal = thnorm / thstr;
-#endif
 	float rhBlur = 0.0;
     float spec = dets.x;
     float refl = dets.y;
@@ -213,7 +144,79 @@ void main()
 		// TODO: color shifts effect normals, specular, etc. maps!
 		else if (f.tcol.x > 0.51)
 		{
-			if (f.tcol.x > (146.0 / 255.0))
+			if (f.tcol.x > (154.0 / 255.0))
+			{
+#if MCM_TH
+				// Setup
+				vec3 thval = vec3(0.0); // Value
+				float thstr = 0.0; // Strength
+				vec3 thnorm = vec3(0.0); // Normal
+				vec2 th_pos = vec2(f.texcoord.x - 0.5, f.texcoord.y - 0.5);
+				float sep = 1.5;
+				// Self (0,0)
+				float t_w = max(1.0 - (dot(th_pos, th_pos) * sep), 0.0);
+				thval += col.xyz * t_w;
+				thnorm += t_normal * t_w;
+				thstr += t_w;
+				// X+ (1,0)
+				vec2 t_r = th_pos - vec2(1.0, 0.0);
+				const float MULTO = 2.0;
+				t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.x * MULTO, 0.0);
+				thval += texture(s, vec3(f.texcoord.xy, f.thv.x)).xyz * t_w;
+				thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.x)).xyz * t_w;
+				thstr += t_w;
+				// X- (-1,0)
+				t_r = th_pos - vec2(-1.0, 0.0);
+				t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.y * MULTO, 0.0);
+				thval += texture(s, vec3(f.texcoord.xy, f.thv.y)).xyz * t_w;
+				thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.y)).xyz * t_w;
+				thstr += t_w;
+				// Y+ (0,1)
+				t_r = th_pos - vec2(0.0, 1.0);
+				t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.z * MULTO, 0.0);
+				thval += texture(s, vec3(f.texcoord.xy, f.thv.z)).xyz * t_w;
+				thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.z)).xyz * t_w;
+				thstr += t_w;
+				// Y- (0,-1)
+				t_r = th_pos - vec2(0.0, -1.0);
+				t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw.w * MULTO, 0.0);
+				thval += texture(s, vec3(f.texcoord.xy, f.thv.w)).xyz * t_w;
+				thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv.w)).xyz * t_w;
+				thstr += t_w;
+				// X+Y+ (1,1)
+				t_r = th_pos - vec2(1.0, 1.0);
+				t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.x * MULTO, 0.0);
+				thval += texture(s, vec3(f.texcoord.xy, f.thv2.x)).xyz * t_w;
+				thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.x)).xyz * t_w;
+				thstr += t_w;
+				// X+Y- (1,-1)
+				t_r = th_pos - vec2(1.0, -1.0);
+				t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.y * MULTO, 0.0);
+				thval += texture(s, vec3(f.texcoord.xy, f.thv2.y)).xyz * t_w;
+				thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.y)).xyz * t_w;
+				thstr += t_w;
+				// X-Y+ (-1,1)
+				t_r = th_pos - vec2(-1.0, 1.0);
+				t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.z * MULTO, 0.0);
+				thval += texture(s, vec3(f.texcoord.xy, f.thv2.z)).xyz * t_w;
+				thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.z)).xyz * t_w;
+				thstr += t_w;
+				// X-Y- (-1,-1)
+				t_r = th_pos - vec2(-1.0, -1.0);
+				t_w = max((1.0 - (dot(t_r, t_r) * sep)) * f.thw2.w * MULTO, 0.0);
+				thval += texture(s, vec3(f.texcoord.xy, f.thv2.w)).xyz * t_w;
+				thnorm += texture(normal_tex, vec3(f.texcoord.xy, f.thv2.w)).xyz * t_w;
+				thstr += t_w;
+				/*
+				float trel = max(min(1.0 - thstr, 1.0), 0.0);
+				thval += col.xyz * trel;
+				thstr += trel;
+				*/
+				col.xyz = thval / thstr;
+				t_normal = thnorm / thstr;
+#endif
+			}
+			else if (f.tcol.x > (146.0 / 255.0))
 			{
 				if (f.tcol.x > (152.0 / 255.0))
 				{

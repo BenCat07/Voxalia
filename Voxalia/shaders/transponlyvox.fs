@@ -135,7 +135,11 @@ void main()
 		// TODO: color shifts effect normals, specular, etc. maps!
 		else if (f.tcol.x > 0.51)
 		{
-			if (f.tcol.x > (152.0 / 255.0))
+			if (f.tcol.x > (154.0 / 255.0))
+			{
+				// TODO: TH Share?
+			}
+			else if (f.tcol.x > (152.0 / 255.0))
 			{
 				//reflecto = 0.5;
 				spec = 1.0;

@@ -120,6 +120,7 @@ namespace Voxalia.Shared
         public static Color4F SPLAT_MAGENTA = Color4F.FromArgb(6, 255, 0, 255);
         public static Color4F SPLAT_YELLOW = Color4F.FromArgb(6, 255, 255, 0);
         public static Color4F SPLAT_CYAN = Color4F.FromArgb(6, 0, 255, 255);
+        public static Color4F TEX_SHARE = Color4F.FromArgb(0, 155, 127, 127);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
@@ -199,6 +200,7 @@ namespace Voxalia.Shared
         public static int TRANS_BASE;
         public static int M_BLUR;
         public static int M_WATER;
+        public static int M_TEX_SHARE;
 
         static int Register(string name, Color4F col)
         {
@@ -310,7 +312,9 @@ namespace Voxalia.Shared
             Register("SPLAT_RED", SPLAT_RED);
             Register("SPLAT_MAGENTA", SPLAT_MAGENTA);
             Register("SPLAT_YELLOW", SPLAT_YELLOW);
-            Register("SPLAT_CYAN", SPLAT_CYAN); // 100
+            Register("SPLAT_CYAN", SPLAT_CYAN);
+            M_TEX_SHARE = Register("TEX_SHARE", TEX_SHARE);
+            // 101
             // TODO: Rest to 127
         }
     }
