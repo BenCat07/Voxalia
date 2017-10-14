@@ -189,7 +189,7 @@ void main()
 	}
 	else if (fi_tcol.w == 0.0 && fi_tcol.x == 0.0 && fi_tcol.z == 0.0 && fi_tcol.y > 0.3 && fi_tcol.y < 0.7)
 	{
-		col *= fi_tcol;
+		col *= fi_tcol; // TODO: ???
 	}
 	else if (fi_tcol.w == 0.0 && fi_tcol.x > 0.3 && fi_tcol.x < 0.7 && fi_tcol.y > 0.3 && fi_tcol.y < 0.7 && fi_tcol.z > 0.3 && fi_tcol.z < 0.7)
 	{
@@ -370,6 +370,10 @@ void main()
 		{
 			col *= mix(vec4(read_texture(s, vec3(fi.texcoord.xy, 0)).xyz, 1.0), vec4(1.0), (fi_tcol.x - 0.3) * 3.0);
 		}
+	}
+	else if (fi_tcol.w < (5.0 / 255.0))
+	{
+		col = vec4(fi_tcol.xyz * 0.5 + col.xyz * 0.5, col.w);
 	}
 	else
 	{

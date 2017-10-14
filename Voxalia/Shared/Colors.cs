@@ -104,6 +104,14 @@ namespace Voxalia.Shared
         public static Color4F TILED_THREE = Color4F.FromArgb(0, 149, 127, 127);
         public static Color4F SPARKLING = Color4F.FromArgb(0, 151, 127, 127);
         public static Color4F WATER = Color4F.FromArgb(0, 153, 127, 127);
+        public static Color4F HALF_WHITE = Color4F.FromArgb(4, 255, 255, 255);
+        public static Color4F HALF_BLACK = Color4F.FromArgb(4, 7, 7, 7);
+        public static Color4F HALF_GREEN = Color4F.FromArgb(4, 0, 255, 0);
+        public static Color4F HALF_BLUE = Color4F.FromArgb(4, 0, 0, 255);
+        public static Color4F HALF_RED = Color4F.FromArgb(4, 255, 0, 0);
+        public static Color4F HALF_MAGENTA = Color4F.FromArgb(4, 255, 0, 255);
+        public static Color4F HALF_YELLOW = Color4F.FromArgb(4, 255, 255, 0);
+        public static Color4F HALF_CYAN = Color4F.FromArgb(4, 0, 255, 255);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
@@ -278,7 +286,15 @@ namespace Voxalia.Shared
             Register("TILED_TWO", TILED_TWO);
             Register("TILED_THREE", TILED_THREE);
             Register("SPARKLING", SPARKLING);
-            M_WATER = Register("WATER", WATER); // 84
+            M_WATER = Register("WATER", WATER);
+            Register("HALF_WHITE", HALF_WHITE);
+            Register("HALF_BLACK", HALF_BLACK);
+            Register("HALF_GREEN", HALF_GREEN);
+            Register("HALF_BLUE", HALF_BLUE);
+            Register("HALF_RED", HALF_RED);
+            Register("HALF_MAGENTA", HALF_MAGENTA);
+            Register("HALF_YELLOW", HALF_YELLOW);
+            Register("HALF_CYAN", HALF_CYAN); // 92
             // TODO: Rest to 127
         }
     }

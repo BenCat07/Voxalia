@@ -90,8 +90,16 @@ const vec4 tcolors_val[] = vec4[](
 	vec4((147.0 / 255.0), 0.5, 0.5, 0.0), // TILED_TWO = 81
 	vec4((149.0 / 255.0), 0.5, 0.5, 0.0), // TILED_THREE = 82
 	vec4((151.0 / 255.0), 0.5, 0.5, 0.0), // SPARKLING = 83
-	vec4((153.0 / 255.0), 0.5, 0.5, 0.0) // WATER = 84
-	// TODO: Next will be X=155.0+
+	vec4((153.0 / 255.0), 0.5, 0.5, 0.0), // WATER = 84
+	vec4(1.0, 1.0, 1.0, (4.0 / 255.0)), // HALF_WHITE = 85
+	vec4(0.02, 0.02, 0.02, (4.0 / 255.0)), // HALF_BLACK = 86
+	vec4(0.0, 1.0, 0.0, (4.0 / 255.0)), // HALF_GREEN = 87
+	vec4(0.0, 0.0, 1.0, (4.0 / 255.0)), // HALF_BLUE = 88
+	vec4(1.0, 0.0, 0.0, (4.0 / 255.0)), // HALF_RED = 89
+	vec4(1.0, 0.0, 1.0, (4.0 / 255.0)), // HALF_MAGENTA = 90
+	vec4(1.0, 1.0, 0.0, (4.0 / 255.0)), // HALF_YELLOW = 91
+	vec4(0.0, 1.0, 1.0, (4.0 / 255.0)) // HALF_CYAN = 92
+	// TODO: Next special will be X=155.0+
 	// TODO: After X=175.0, there's still room for Z=147.0+
 	// TODO: up to ID=127
 );
