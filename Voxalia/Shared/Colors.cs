@@ -142,6 +142,7 @@ namespace Voxalia.Shared
         public static Color4F HALF_PINK = Color4F.FromArgb(4, 255, 128, 255);
         public static Color4F HALF_LIME = Color4F.FromArgb(4, 128, 255, 0);
         public static Color4F HALF_SKY_BLUE = Color4F.FromArgb(4, 0, 128, 255);
+        public static Color4F GRAYSCALE = Color4F.FromArgb(0, 157, 127, 127);
 
         public static Dictionary<string, byte> KnownColorNames = new Dictionary<string, byte>();
 
@@ -356,7 +357,8 @@ namespace Voxalia.Shared
             Register("HALF_PINK", HALF_PINK);
             Register("HALF_LIME", HALF_LIME);
             Register("HALF_SKY_BLUE", HALF_SKY_BLUE);
-            // 122
+            Register("GRAYSCALE", GRAYSCALE);
+            // 123
             // TODO: Rest to 255
         }
     }

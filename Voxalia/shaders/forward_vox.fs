@@ -202,27 +202,34 @@ void main()
 		{
 			if (fi_tcol.x > (154.0 / 255.0))
 			{
-				// TODO: Th's effect spec, normal
-				vec2 tc_h = vec2(fi.texcoord.x / tex_wid - 0.5, fi.texcoord.y / tex_wid - 0.5);
-				const float multo = 0.75;
-				vec3 tempCol = vec3(0.0);
-				// X+
-				float xpMulto = max(0.0, 1.0 - dot(tc_h - vec2(1.0, 0.0), tc_h - vec2(1.0, 0.0)));
-				tempCol += xpMulto * multo * fi.thw.x * read_texture(s, vec3(fi.texcoord.xy, fi.thv.x)).xyz;
-				// X-
-				float xmMulto = max(0.0, 1.0 - dot(tc_h - vec2(-1.0, 0.0), tc_h - vec2(-1.0, 0.0)));
-				tempCol += xmMulto * multo * fi.thw.y * read_texture(s, vec3(fi.texcoord.xy, fi.thv.y)).xyz;
-				// Y+
-				float ypMulto = max(0.0, 1.0 - dot(tc_h - vec2(0.0, 1.0), tc_h - vec2(0.0, 1.0)));
-				tempCol += ypMulto * multo * fi.thw.z * read_texture(s, vec3(fi.texcoord.xy, fi.thv.z)).xyz;
-				// Y-
-				float ymMulto = max(0.0, 1.0 - dot(tc_h - vec2(0.0, -1.0), tc_h - vec2(0.0, -1.0)));
-				tempCol += ymMulto * multo * fi.thw.w * read_texture(s, vec3(fi.texcoord.xy, fi.thv.w)).xyz;
-				float influ = max(0.0, xpMulto * multo * fi.thw.x + xmMulto * multo * fi.thw.y + ypMulto * multo * fi.thw.z + ymMulto * multo * fi.thw.w);
-				float influUse = min(1.0, influ);
-				tempCol = col.xyz * (1.0 - influUse) + tempCol;
-				float thStr = influ + (1.0 - influUse);
-				col.xyz = tempCol / thStr;
+				if (fi_tcol.x > (156.0 / 255.0))
+				{
+					col.xyz = vec3((col.x + col.y + col.z) * (1.0 / 3.0));
+				}
+				else
+				{
+					// TODO: Th's effect spec, normal
+					vec2 tc_h = vec2(fi.texcoord.x / tex_wid - 0.5, fi.texcoord.y / tex_wid - 0.5);
+					const float multo = 0.75;
+					vec3 tempCol = vec3(0.0);
+					// X+
+					float xpMulto = max(0.0, 1.0 - dot(tc_h - vec2(1.0, 0.0), tc_h - vec2(1.0, 0.0)));
+					tempCol += xpMulto * multo * fi.thw.x * read_texture(s, vec3(fi.texcoord.xy, fi.thv.x)).xyz;
+					// X-
+					float xmMulto = max(0.0, 1.0 - dot(tc_h - vec2(-1.0, 0.0), tc_h - vec2(-1.0, 0.0)));
+					tempCol += xmMulto * multo * fi.thw.y * read_texture(s, vec3(fi.texcoord.xy, fi.thv.y)).xyz;
+					// Y+
+					float ypMulto = max(0.0, 1.0 - dot(tc_h - vec2(0.0, 1.0), tc_h - vec2(0.0, 1.0)));
+					tempCol += ypMulto * multo * fi.thw.z * read_texture(s, vec3(fi.texcoord.xy, fi.thv.z)).xyz;
+					// Y-
+					float ymMulto = max(0.0, 1.0 - dot(tc_h - vec2(0.0, -1.0), tc_h - vec2(0.0, -1.0)));
+					tempCol += ymMulto * multo * fi.thw.w * read_texture(s, vec3(fi.texcoord.xy, fi.thv.w)).xyz;
+					float influ = max(0.0, xpMulto * multo * fi.thw.x + xmMulto * multo * fi.thw.y + ypMulto * multo * fi.thw.z + ymMulto * multo * fi.thw.w);
+					float influUse = min(1.0, influ);
+					tempCol = col.xyz * (1.0 - influUse) + tempCol;
+					float thStr = influ + (1.0 - influUse);
+					col.xyz = tempCol / thStr;
+				}
 			}
 			else if (fi_tcol.x > (146.0 / 255.0))
 			{

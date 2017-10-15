@@ -128,10 +128,13 @@ const vec4 tcolors_val[] = vec4[](
 	vec4(0.5, 0.0, 1.0, (4.0 / 255.0)), // HALF_PURPLE = 119
 	vec4(1.0, 0.5, 1.0, (4.0 / 255.0)), // HALF_PINK = 120
 	vec4(0.5, 1.0, 0.0, (4.0 / 255.0)), // HALF_LIME = 121
-	vec4(0.0, 0.5, 1.0, (4.0 / 255.0)) // HALF_SKY_BLUE = 122
-	// TODO: Next special will be X=157.0+
+	vec4(0.0, 0.5, 1.0, (4.0 / 255.0)), // HALF_SKY_BLUE = 122
+	vec4((157.0 / 255.0), 0.5, 0.5, 0.0) // GRAYSCALE = 123
+	// TODO: Next special will be X=159.0+
 	// TODO: After X=175.0, there's still room for Z=147.0+
-	// TODO: up to ID=256
+	// TODO: If more needed, use values >1.0 and add relevant handling code
+	// TODO: Or, combine x/y/z values?
+	// TODO: up to ID=255
 );
 
 const uint TRANSP_START = 33;

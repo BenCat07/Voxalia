@@ -137,7 +137,14 @@ void main()
 		{
 			if (f.tcol.x > (154.0 / 255.0))
 			{
-				// TODO: TH Share?
+				if (f.tcol.x > (156.0 / 255.0))
+				{
+					tcolor.xyz = vec3((tcolor.x + tcolor.y + tcolor.z) * (1.0 / 3.0));
+				}
+				else
+				{
+					// TODO: TH Share?
+				}
 			}
 			else if (f.tcol.x > (152.0 / 255.0))
 			{
