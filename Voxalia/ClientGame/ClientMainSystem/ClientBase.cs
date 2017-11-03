@@ -482,7 +482,7 @@ namespace Voxalia.ClientGame.ClientMainSystem
             TBlock.Generate(this, CVars, Textures, false);
             GraphicsUtil.CheckError("Load - Textures");
             SysConsole.Output(OutputType.CLIENTINIT, "Loading fonts...");
-            Fonts = new GLFontEngine(Shaders);
+            Fonts = new GLFontEngine(Textures, Shaders);
             Fonts.Init(Files);
             FontSets = new FontSetEngine(Fonts);
             FontSets.Init((subdat) => Languages.GetText(Files, subdat), () => Ortho, () => GlobalTickTimeLocal);
