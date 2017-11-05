@@ -152,14 +152,19 @@ namespace Voxalia.ServerGame.NetworkSystem
             {
                 NameValueCollection data = new NameValueCollection()
                 {
-                    { "formtype", "confirm" },
+                    { "qtype", "check_key" },
                     { "username", username },
-                    { "session", key }
+                    { "ou_key", key },
+                    { "SType", "voxalia" }
                 };
-                byte[] response = wb.UploadValues(VoxProgram.GlobalServerAddress + "account/microconfirm", "POST", data);
+                byte[] response = wb.UploadValues(VoxProgram.GlobalServerAddress, "POST", data);
                 string resp = FileHandler.DefaultEncoding.GetString(response).Trim(' ', '\n', '\r', '\t');
                 if (resp.StartsWith("ACCEPT=") && resp.EndsWith(";"))
                 {
+                    SysConsole.Output(OutputType.INFO, "Connection from '" + rip + "' accepted with username: " + username);
+                    return;
+                    // TODO: Re-implement IP address checking!
+                    /*
                     string ip = resp.Substring("ACCEPT=".Length, resp.Length - 1 - "ACCEPT=".Length);
                     if (!TheServer.Settings.Net_VerifyIP
                         || IsLocalIP(rip)
@@ -169,8 +174,9 @@ namespace Voxalia.ServerGame.NetworkSystem
                         return;
                     }
                     throw new Exception("Connection from '" + rip + "' rejected because its IP is not " + ip + " or localhost!");
+                    */
                 }
-                throw new Exception("Connection from '" + rip + "' rejected because: Failed to verify session!");
+                throw new Exception("Connection from '" + rip + "' rejected because: Failed to verify session (" + resp + ") for sess (" + key + ")");
             }
         }
 

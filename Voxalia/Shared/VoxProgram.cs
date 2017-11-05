@@ -50,7 +50,7 @@ namespace Voxalia.Shared
         /// <summary>
         /// The web address for the primary global server that handles logging in.
         /// </summary>
-        public const string GlobalServerAddress = "https://frenetic.xyz/";
+        public const string GlobalServerAddress = "https://forum.freneticllc.com/Account/APIv1";
 
         /// <summary>
         /// This method should be called FIRST!

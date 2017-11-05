@@ -79,14 +79,15 @@ namespace Voxalia.ClientGame.NetworkSystem
             NameValueCollection data = new NameValueCollection();
             using (ShortWebClient wb = new ShortWebClient())
             {
-                data["formtype"] = "getsess";
+                data["qtype"] = "one_use_key";
                 data["username"] = Username;
-                data["session"] = Key;
-                byte[] response = wb.UploadValues(VoxProgram.GlobalServerAddress + "account/microgetsess", "POST", data);
+                data["SType"] = "voxalia";
+                data["sess_key"] = Key;
+                byte[] response = wb.UploadValues(VoxProgram.GlobalServerAddress, "POST", data);
                 string resp = FileHandler.DefaultEncoding.GetString(response).Trim(' ', '\n', '\r', '\t');
                 if (resp.StartsWith("ACCEPT=") && resp.EndsWith(";"))
                 {
-                    return resp.Substring("ACCEPT=".Length, resp.Length - 1 - "ACCEPT=".Length);
+                    return resp.Substring("ACCEPT=KEY/".Length, resp.Length - 1 - "ACCEPT=KEY/".Length);
                 }
                 throw new Exception("Failed to get session: " + resp);
             }

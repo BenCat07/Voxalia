@@ -140,7 +140,7 @@ namespace VoxaliaLauncher
 
         public bool Trying = false;
 
-        public const string GlobalServerAddress = "https://frenetic.xyz/";
+        public const string GlobalServerAddress = "https://forum.freneticllc.com/Account/APIv1";
 
         public void GlobalLoginAttempt(string user, string pass, string tfa)
         {
@@ -160,16 +160,17 @@ namespace VoxaliaLauncher
                     NameValueCollection data = new NameValueCollection();
                     try
                     {
-                        data["formtype"] = "login";
+                        data["qtype"] = "login";
                         data["username"] = user;
                         data["password"] = pass;
                         data["tfa_code"] = tfa;
-                        data["session_id"] = "0";
-                        byte[] response = wb.UploadValues(GlobalServerAddress + "account/micrologin", "POST", data);
+                        data["SType"] = "voxalia";
+                        byte[] response = wb.UploadValues(GlobalServerAddress, "POST", data);
                         string resp = encoding.GetString(response).Trim(' ', '\n', '\r', '\t');
                         if (resp.StartsWith("ACCEPT=") && resp.EndsWith(";"))
                         {
                             string key = resp.Substring("ACCEPT=".Length, resp.Length - 1 - "ACCEPT=".Length);
+                            key = key.Split(',')[0].Substring("SESSION/".Length); // TODO: Less lazy!
                             Invoke(new Action(() =>
                             {
                                 logoutButton.Enabled = true;
