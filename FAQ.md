@@ -105,11 +105,11 @@
 
 ### What is FreneticLLC?
 
-- Our company! It's a limited liability company owned and operated by CEO Alex "mcmonkey" Goodwin.
+- Our company! It's a limited liability company owned and operated by our team.
 
 ### No, what is FreneticLLC *really*?
 
-- A drunken misunderstanding of government guidelines.
+- A drunken misapplication of government guidelines.
 
 ### Why does the readme have all those badges on it?
 
@@ -129,7 +129,7 @@
 
 ### Can I redistribute the files for the game?
 
-- Only the code and binaries resultant directly from the code (*.exe, *.dll, *.xml, *.pdb) many be redistributed. Art assets (available separately) are licensed separately, and may not be redistributed!
+- Only the code and binaries resultant directly from the code (*.exe, *.dll, *.xml, *.pdb) may be redistributed. Art assets (available separately) are licensed separately, and may not be redistributed!
 
 ### I want to know more about how the game is licensed!
 
@@ -137,10 +137,10 @@
 
 ### I want to sue you or otherwise engage you in court!
 
-- Please don't. As stated in the license, we are not liable for anything done with the project. This is just a game, and while we hope nobody does anything bad with it, we simply don't have the technology to prevent it entirely!
-- If you have a problem with anything we do or think we can help a problem you have, please do CONTACT US as the first step: https://frenetic.xyz/contact - we're open and friendly, don't worry!
+- Please don't. We are not liable for anything bad done with the project. This is just a game, and while we hope nobody does anything bad with it, we simply don't have the technology to prevent it entirely!
+- If you have a problem with anything we do or think we can help a problem you have, please do CONTACT US as the first step: https://freneticllc.com/Home/Contact - we're open and friendly, don't worry!
 
 ### There's something dangerous or mislicensed or majorly problematic in this repo!
 
-- Oh no! Please CONTACT US IMMEDIATELY at https://frenetic.xyz/contact
+- Oh no! Please CONTACT US IMMEDIATELY at https://freneticllc.com/Home/Contact
 - If you find a potentially important issue and need motivation to bother reporting it, feel free to ask for a bounty payment. We're happy to award one to the first finder, with an amount relative to the scale of the issue!
