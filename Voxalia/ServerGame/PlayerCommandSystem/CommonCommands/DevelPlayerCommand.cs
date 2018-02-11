@@ -286,7 +286,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
             else if (arg0 == "massiveSet" && entry.InputArguments.Count > 1)
             {
                 BlockInternal bi = new BlockInternal((ushort)(Utilities.UtilRandom.Next(10) > 5 ? Material.DIRT : Material.STONE), 0, 0, (byte)BlockFlags.EDITED);
-                int pre_count = entry.Player.TheRegion.LoadedChunks.Count;
+                int pre_count = entry.Player.TheRegion.ChunkCount();
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 Location radius = Location.FromString(entry.InputArguments[1]);
@@ -326,7 +326,7 @@ namespace Voxalia.ServerGame.PlayerCommandSystem.CommonCommands
                     }
                 }
                 sw.Stop();
-                int post_count = entry.Player.TheRegion.LoadedChunks.Count;
+                int post_count = entry.Player.TheRegion.ChunkCount();
                 entry.Player.SendMessage(TextChannel.COMMAND_RESPONSE, "Took: " + (sw.ElapsedTicks / (double)Stopwatch.Frequency) + " seconds... chunk load count: " + (post_count - pre_count));
                 for (int i = 0; i < chunks.Length; i++)
                 {

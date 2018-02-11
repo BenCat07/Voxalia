@@ -7,6 +7,7 @@
 //
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Diagnostics;
@@ -114,6 +115,10 @@ namespace Voxalia.ServerGame.WorldSystem
         /// </summary>
         public void BuildRegion()
         {
+            for (int i = 0; i < LoadedChunks.Length; i++)
+            {
+                LoadedChunks[i] = new Dictionary<Vector3i, Chunk>(512); // TODO: Tweak the 512 value, or base it off relevant configuration options.
+            }
             // TODO: generator registry
             if (TheWorld.Generator == "sphere")
             {
@@ -156,7 +161,7 @@ namespace Voxalia.ServerGame.WorldSystem
         {
             TickClouds();
             List<Vector3i> DelMe = new List<Vector3i>();
-            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
+            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks)
             {
                 foreach (Chunk chk in chkmap.Values)
                 {
@@ -311,7 +316,7 @@ namespace Voxalia.ServerGame.WorldSystem
             // TODO: Transfer all players to another world. Or kick if no worlds available?
             IntHolder counter = new IntHolder(); // TODO: is IntHolder needed here?
             IntHolder total = new IntHolder(); // TODO: is IntHolder needed here?
-            List<Chunk> chunks = GetAllChunksLoaded();
+            List<Chunk> chunks = GetAllChunksLoaded().ToList();
             foreach (Chunk chunk in chunks)
             {
                 total.Value++;

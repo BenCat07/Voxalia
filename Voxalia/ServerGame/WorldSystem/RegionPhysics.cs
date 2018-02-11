@@ -73,7 +73,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 Max = start
             };
             box.Include(start + dir * len);
-            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
+            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks)
             {
                 foreach (Chunk chunk in chkmap.Values)
                 {
@@ -141,7 +141,7 @@ namespace Voxalia.ServerGame.WorldSystem
                 Max = start
             };
             box.Include(start + dir * len);
-            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
+            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks)
             {
                 foreach (Chunk chunk in chkmap.Values)
                 {

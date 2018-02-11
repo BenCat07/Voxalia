@@ -36,6 +36,7 @@ namespace Voxalia.ServerGame.CommandSystem.CommonCommands
 
         public static void Execute(CommandQueue queue, CommandEntry entry)
         {
+            // TODO: Update all the information here. The chunk usages in particular are entirely wrong due to RAM-management updates.
             Server TheServer = (entry.Command as MeminfoCommand).TheServer;
             const string rn = "   Region Name Here   ";
             const string cr = "Chunk Exact RAM in MB";
@@ -47,7 +48,7 @@ namespace Voxalia.ServerGame.CommandSystem.CommonCommands
             foreach (World world in TheServer.LoadedWorlds)
             {
                 n++;
-                long chunk = Chunk.RAM_USAGE * world.MainRegion.LoadedChunks.Count;
+                long chunk = Chunk.RAM_USAGE * world.MainRegion.ChunkCount();
                 //string reg_cr = Utilities.Pad(Utilities.FormatNumber(chunk), ' ', cr.Length, false);
                 long ent = 0;
                 foreach (Entity e in world.MainRegion.Entities.Values)

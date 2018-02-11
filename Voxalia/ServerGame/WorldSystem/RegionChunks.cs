@@ -642,11 +642,25 @@ namespace Voxalia.ServerGame.WorldSystem
                 ChunkManager.SetMins(two.X, two.Y, chk.WorldPosition.Z);
             }
         }
-        
+
         /// <summary>
         /// All currently loaded chunks.
         /// </summary>
-        public Dictionary<int, Dictionary<Vector3i, Chunk>> LoadedChunks = new Dictionary<int, Dictionary<Vector3i, Chunk>>(1024);
+        public Dictionary<Vector3i, Chunk>[] LoadedChunks = new Dictionary<Vector3i, Chunk>[1024];
+
+        /// <summary>
+        /// Returns the number of currently loaded chunks.
+        /// </summary>
+        /// <returns>Count of chunks.</returns>
+        public int ChunkCount()
+        {
+            int c = 0;
+            for (int i = 0; i < LoadedChunks.Length; i++)
+            {
+                c += LoadedChunks[i].Count;
+            }
+            return c;
+        }
 
         /// <summary>
         /// Determines whether a character is allowed to break a material at a location.
@@ -1000,34 +1014,17 @@ namespace Voxalia.ServerGame.WorldSystem
 
         public void QuickAddChunk(Vector3i cpos, Chunk chk)
         {
-            int code = cpos.GetHashCode() % 512;
-            if (!LoadedChunks.TryGetValue(code, out Dictionary<Vector3i, Chunk> chks))
-            {
-                chks = new Dictionary<Vector3i, Chunk>(512);
-                LoadedChunks[code] = chks;
-            }
-            chks.Add(cpos, chk);
+            LoadedChunks[(cpos.GetHashCode() % 512) + 512].Add(cpos, chk);
         }
 
         public void QuickRemoveChunk(Vector3i cpos)
         {
-            if (LoadedChunks.TryGetValue(cpos.GetHashCode() % 512, out Dictionary<Vector3i, Chunk> chks))
-            {
-                chks.Remove(cpos);
-            }
+            LoadedChunks[(cpos.GetHashCode() % 512) + 512].Remove(cpos);
         }
 
         public bool TryFindChunk(Vector3i cpos, out Chunk chunk)
         {
-            if (LoadedChunks.TryGetValue(cpos.GetHashCode() % 512, out Dictionary<Vector3i, Chunk> chks))
-            {
-                if (chks.TryGetValue(cpos, out chunk))
-                {
-                    return true;
-                }
-            }
-            chunk = null;
-            return false;
+            return LoadedChunks[(cpos.GetHashCode() % 512) + 512].TryGetValue(cpos, out chunk);
         }
 
         /// <summary>
@@ -1217,14 +1214,15 @@ namespace Voxalia.ServerGame.WorldSystem
             return ch.GetBlockAt(x, y, z);
         }
 
-        public List<Chunk> GetAllChunksLoaded()
+        public IEnumerable<Chunk> GetAllChunksLoaded()
         {
-            List<Chunk> chks = new List<Chunk>();
-            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks.Values)
+            foreach (Dictionary<Vector3i, Chunk> chkmap in LoadedChunks)
             {
-                chks.AddRange(chkmap.Values);
+                foreach (Chunk chk in chkmap.Values)
+                {
+                    yield return chk;
+                }
             }
-            return chks;
         }
 
         /// <summary>
