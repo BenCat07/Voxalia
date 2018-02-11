@@ -180,7 +180,7 @@ namespace Voxalia.ClientGame.GraphicsSystems.ParticleSystem
                 double yoff = Utilities.UtilRandom.NextDouble() * spread - spread * 0.5;
                 Location temp = new Location(xoff, yoff, TheClient.TheRegion.PhysicsWorld.ForceUpdater.Gravity.Z * 0.15f);
                 float ttl = (float)Utilities.UtilRandom.NextDouble() * 3f + 3f;
-                Texture tex = TheClient.Textures.GetTexture(TheClient.TBlock.IntTexs[mat.TextureID(MaterialSide.TOP)]);
+                Texture tex = TheClient.Textures.GetTexture(TheClient.TBlock.IntTexs[(int)mat]);
                 Location size = new Location(0.1, 0.1, 0.1);
                 Engine.AddEffect(ParticleEffectType.SQUARE, (o) => pos + temp * (1 - o.TTL / o.O_TTL)
                 + new Location(xoff, yoff, 0) * Math.Sqrt(1 - o.TTL / o.O_TTL) + nvel * (1 - o.TTL / o.O_TTL), (o) => size, (o) => 1, ttl, Location.One, Location.One, true, tex, 1);
