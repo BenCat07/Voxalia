@@ -36,7 +36,7 @@ View the [FAQ](/FAQ.md) for more information!
 
 ## Windows Install Notes
 
-- Requires OpenAL (Run `oalinst.exe` from the assets repo)
+- Requires OpenAL (Run `oalinst.exe` from the assets' repo)
 - Requires reasonably up to date graphics drivers
 - Requires a 64-bit system
 - Windows build is primarily tested on Windows 10 with latest NVidia drivers.
@@ -46,7 +46,7 @@ View the [FAQ](/FAQ.md) for more information!
 - Requires mono.
 - Requires LibOpus.
 - Requires fully up to date non-Intel graphics drivers (Must support OpenGL 4.3).
-- Requires "espeak" program/package. Must be a valid "espeak" executable in path.
+- Requires ”espeak” program/package. Must be a valid ”espeak” executable in path.
 - Requires a 64-bit system.
 - Linux build is primarily tested on Ubuntu 16.04 with latest NVidia drivers.
 - Swap the folder `xulrunner` for the one in the Linux tarball.
